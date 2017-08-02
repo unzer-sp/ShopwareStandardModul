@@ -1,0 +1,13 @@
+#hp_frame_cc,
+#hp_frame_dc{
+	border: 0;
+	width: 287px;
+	height: 200px;
+}
+
+#content #payment #hp_frame_cc,
+#content #payment #hp_frame_dc{
+	border: 0;
+	width: 345px;
+	height: 200px;
+}

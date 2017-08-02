@@ -1,0 +1,80 @@
+/* SW4 */
+#paymentFrameForm div.form-row{ margin: 0 0 3px 0;}
+#paymentFrameForm #accountVerificationContainer{ margin: 0 0 3px 5px;}
+
+/* style for the labels */
+#paymentFrameForm label{
+	color: #333;
+	font-family: Arial, "Helvetica Neue", Helvetica,sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+/* style for all input and select fields in the frame */
+#paymentFrameForm input,
+#paymentFrameForm select{
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #bbb;
+	color: #333;
+	font-family: Arial, "Helvetica Neue", Helvetica,sans-serif;
+	font-size: 12px;
+}
+
+/* style for all faulty input and select fields in the frame */
+#paymentFrameForm input.error,
+#paymentFrameForm select.error{
+    background: #f7e9e9 none repeat scroll 0 0;
+    border-color: #df7373;
+    box-shadow: 0 0 4px #f0d5dc;
+}
+
+/* vertical adjust images and hint box  */
+#paymentFrameForm #accountBrandContainer .creditCardSymbols,
+#paymentFrameForm #accountVerificationContainer #verificationInlineHint{}
+
+
+/* SW5 - responsive tpl */
+#paymentFrameForm{}
+
+#paymentFrameForm div{
+	margin-bottom: 3px;
+}
+
+/* style for the labels */
+#paymentFrameForm label{
+    color: #5f7285;
+	font-size: 14px;
+}
+
+/* style for all input and select fields in the frame */
+#paymentFrameForm input,
+#paymentFrameForm select{
+    background: #f8f8fa none repeat scroll 0 0;
+    border-color: #cbcbdb #dadae5 #dadae5;
+    border-image: none;
+    border-radius: 3px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 1px 1px #dadae5 inset;
+    box-sizing: border-box;
+    color: #5f7285;
+    font-size: 14px;
+    line-height: 1.1875rem;
+    padding: 0.625rem 0.625rem 0.5625rem;
+    text-align: left;
+	height: 40px;
+}
+
+/* style for all faulty input and select fields in the frame */
+#paymentFrameForm input.error,
+#paymentFrameForm select.error{
+    background: #faeceb none repeat scroll 0 0;
+    border-color: #e74c3c;
+    color: #e74c3c;
+}
+
+/* vertical adjust images and hint box  */
+#paymentFrameForm #accountBrandContainer .creditCardSymbols,
+#paymentFrameForm #accountVerificationContainer #verificationInlineHint{
+	margin-top: 9px;
+}

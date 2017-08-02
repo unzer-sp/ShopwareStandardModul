@@ -1,0 +1,35 @@
+/* conexco template */
+form.payment .radio{ float: left; margin: 2px 5px 0 0; }
+form.payment .space{ font-size: 1px; }
+form.payment .grid_8{ margin: 10px 0 10px 18px; }
+form.payment .grid_8 table tr td{ padding: 0 20px 0 0; }
+form.payment .grid_8 label{ width: 120px; }
+form.payment .grid_8 select{ width: 285px; }
+
+.payment .payment_method label{ width: 120px; }
+.payment .payment_method select{ width: 285px; }
+
+.instyle_error{ border: 1px solid #8A1F11; }
+
+/* twenty2media template */
+#payment{ margin: 0 !important; border: 0 !important; width: 310px !important; text-align: left; }
+#payment .error{ text-align: left; width: 310px !important; }
+#payment .register .payment_method{ background-color: transparent !important; border: 0 !important; }
+#payment .register .payment_method div label{ margin: 10px 0 0 10px !important; width: 100px !important; }
+#payment .register .payment_method div select{ width: 310px !important; }
+
+#payment .payment{ width: 310px !important; margin: inherit !important; }
+#payment .payment .description{ color: #8A1F11 !important; }
+
+#payment .payment .button-left,
+#payment .payment .button-right{ width: 100px !important; height: 40px !important; margin: 0 !important; padding: 0 10px !important; }
+
+.register .payment .payment_method{ width: 295px !important; }
+.register .payment .payment_method .grid_8 div,
+.register .payment .payment_method .grid_8 table{ width: 275px !important; }
+.register .payment .payment_method .grid_8 table tr td{ padding: 3px 5px !important; }
+.register .payment .payment_method .grid_8{ margin: 0 0 0 -20px; }
+.register .payment .payment_method .grid_8 div label{ margin: 10px 0 0 0 !important; width: 100px !important; }
+.register .payment .payment_method .grid_8 div input[type=text]{ width: 160px !important; }
+
+#payment .payment.register .grid_10.payment_method{ background-color: transparent !important; }

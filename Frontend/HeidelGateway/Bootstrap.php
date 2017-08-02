@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.07.26';
+		return '17.08.01';
 	}
 
 	/**
@@ -660,6 +660,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				} catch (Exception $e) {
 					$this->logError($msg, $e);
 				}
+
+            case '17.07.26':
+                //
+                try {
+                    $msg .= '* update 17.08.01 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 			// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}

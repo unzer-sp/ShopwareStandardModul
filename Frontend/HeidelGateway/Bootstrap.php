@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.08.01';
+		return '17.08.02';
 	}
 
 	/**
@@ -660,15 +660,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				} catch (Exception $e) {
 					$this->logError($msg, $e);
 				}
-
-            case '17.07.26':
+            // Compatibility for Shopware 5.3
+            case '17.08.02':
                 //
                 try {
-                    $msg .= '* update 17.08.01 <br />';
+                    $this->createEvents();
+                    $msg .= '* update 17.08.02 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-			// overwrite $msg if update was successful
+    		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}
 
@@ -827,6 +828,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'Theme_Compiler_Collect_Plugin_Less',
 					'addLessFiles'
 					);
+            // Register your custom JS files, so that they are processed into JS and included in the module template (SW5)
+//            $this->subscribeEvent(
+//                'Theme_Compiler_Collect_Plugin_Javascript',
+//                'addJsFiles'
+//            );
 
 			/*	Hooks	*/
 			$this->subscribeEvent(
@@ -1760,6 +1766,21 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		return new Doctrine\Common\Collections\ArrayCollection(array($less));
 	}
 
+    /**
+     * Provide the file collection for js files
+     *
+     * @param Enlight_Event_EventArgs $args
+     * @return \Doctrine\Common\Collections\ArrayCollection
+     */
+//    public function addJsFiles(Enlight_Event_EventArgs $args)
+//    {
+//       $jsFiles = array(
+//            __DIR__ . '/Views/responsive/frontend/_public/src/js/valPayment.js',
+//            __DIR__ . '/Views/responsive/frontend/_public/src/js/hpf_script.js'
+//        );
+//        return new Doctrine\Common\Collections\ArrayCollection($jsFiles);
+//    }
+
 	/**
 	 * Method to return the path to the backend controller.
 	 * @return string
@@ -1920,7 +1941,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$user == NULL	?	$user = Shopware()->Modules()->Admin()->sGetUserData()	: $user;
 
 			$count = '1';
-			$amountTotalVat;
+			$amountTotalVat = 0;
 			$shoppingCart = array();
 				
 			// catching basic basket-Api-information

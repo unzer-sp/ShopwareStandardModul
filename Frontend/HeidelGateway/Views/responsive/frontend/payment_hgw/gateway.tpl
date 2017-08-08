@@ -4,7 +4,8 @@
 {* Javascript *}
 {block name="frontend_index_header_javascript_jquery_lib" append}
 	<script type="text/javascript">
-		$(document).ready(function(){
+//		$(document).ready(function(){
+        document.asyncReady(function() {
 			jQuery('#payment_frame').css('display', 'none');
 			jQuery('#payment_loader').css('display', 'block');
 			
@@ -16,23 +17,26 @@
 	</script>
 
 	<script type='text/javascript'>
-		$(document).ready(function(){
-			//add error div		
+//		$(document).ready(function(){
+        document.asyncReady(function() {
+			//add error div
 			if(jQuery('#payment .panel.has--border .alert--content').length < 1){
 				jQuery('#payment').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div></div>');
 			}	
 		});
 	</script>
-
+<h1>frontend_index_content_left</h1>
 	{if isset($pluginPath) && $pluginPath != ''}
+
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js'></script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/hpf_script.js'></script>
+		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js' defer='defer'></script>
+		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/hpf_script.js' defer='defer'></script>
 	{/if}
 
 	<script type='text/javascript'>
 		//sepa switch
-		$(document).ready(function(){
+//		$(document).ready(function(){
+        document.asyncReady(function() {
 			var call = true;
 			if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
 			if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
@@ -74,7 +78,9 @@
 
 	{if isset($PaymentUrl)}
 		{if isset($Input)}
-			<script type='text/javascript'>$(document).ready(function(){
+			<script type='text/javascript'>
+//               $(document).ready(function(){
+            document.asyncReady(function() {
 				jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
 				$.overlay.open();
 				$.loadingIndicator.open();
@@ -83,7 +89,9 @@
 		{/if}
 	{elseif isset($formUrl)}
 		{if !isset($pm)}
-			<script type='text/javascript'>$(document).ready(function(){
+			<script type='text/javascript'>
+//                $(document).ready(function(){
+                document.asyncReady(function() {
 				jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
 				$.overlay.open();
 				$.loadingIndicator.open();
@@ -91,7 +99,9 @@
 			});</script>
 		{/if}
 	{else}
-		<script type='text/javascript'>$(document).ready(function(){
+		<script type='text/javascript'>
+//            $(document).ready(function(){
+        document.asyncReady(function() {
 			jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
 			$.overlay.open();
 			$.loadingIndicator.open();

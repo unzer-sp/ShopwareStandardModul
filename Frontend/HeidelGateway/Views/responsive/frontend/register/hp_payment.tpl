@@ -1,10 +1,12 @@
 {extends file="parent:frontend/index/index.tpl"}
-
-{block name="frontend_index_header_javascript_jquery_lib" append}
-	<script type='text/javascript'>
+{debug}
+{* block name="frontend_index_header_javascript_jquery_lib" append *}
+{block name="frontend_index_javascript_async_ready" append}
+    <script type='text/javascript'>
 		// define formUrl to make it useable in external JS
 		var formUrl = {$formUrl|@json_encode};
-		$(document).ready(function(){
+//		$(document).ready(function(){
+        document.asyncReady(function() {
 			if(jQuery('#center .panel.has--border .alert--content').length < 1){
 				jQuery('#center .panel.has--border').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div>');
 			}
@@ -15,46 +17,51 @@
 		{/if}
 	</script>
 	
-	<script type='text/javascript'>
-		$(document).ready(function(){
-			$(document).ibanCheck();
-		});
-		//sepa switch
-		jQuery.fn.ibanCheck = function(){
-			if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-			if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-			
-			jQuery('#sepa_switch').change(function(){
-				if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-				if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-			});
-			
-			function iban(){
-				if(jQuery('.newreg_dd #iban').is(':hidden')){
-					jQuery('.newreg_dd #account').parent().hide();
-					jQuery('.newreg_dd #bankcode').parent().hide();
-					jQuery('.newreg_dd #cardBrand').parent().hide();
-					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
-					jQuery('.newreg_dd #iban').parent().show();
-				}
-			}
-			
-			function noiban(){
-				if(jQuery('.newreg_dd #account').is(':hidden')){
-					jQuery('.newreg_dd #account').parent().show();
-					jQuery('.newreg_dd #bankcode').parent().show();
-					jQuery('.newreg_dd #cardBrand').parent().show();
-					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').show();
-					jQuery('.newreg_dd #iban').parent().hide();
-				}
-			}
-		};
-	</script>
-	{if $action != 'cart'}
+	{*<script type='text/javascript'>*}
+{*//		$(document).ready(function(){*}
+		{*document.asyncReady(function() {*}
+			{*$(document).ibanCheck();*}
+{*//			jQuery(document).ibanCheck();*}
+        {*});*}
+		{*//sepa switch*}
+		{*jQuery.fn.ibanCheck = function(){*}
+			{*if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }*}
+			{*if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }*}
+
+			{*jQuery('#sepa_switch').change(function(){*}
+				{*if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }*}
+				{*if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }*}
+			{*});*}
+
+			{*function iban(){*}
+				{*if(jQuery('.newreg_dd #iban').is(':hidden')){*}
+					{*jQuery('.newreg_dd #account').parent().hide();*}
+					{*jQuery('.newreg_dd #bankcode').parent().hide();*}
+					{*jQuery('.newreg_dd #cardBrand').parent().hide();*}
+					{*jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();*}
+					{*jQuery('.newreg_dd #iban').parent().show();*}
+				{*}*}
+			{*}*}
+
+			{*function noiban(){*}
+				{*if(jQuery('.newreg_dd #account').is(':hidden')){*}
+					{*jQuery('.newreg_dd #account').parent().show();*}
+					{*jQuery('.newreg_dd #bankcode').parent().show();*}
+					{*jQuery('.newreg_dd #cardBrand').parent().show();*}
+					{*jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').show();*}
+					{*jQuery('.newreg_dd #iban').parent().hide();*}
+				{*}*}
+			{*}*}
+		{*};*}
+
+
+	{*</script>*}
+	<h1>frontend_index_javascript_async_ready</h1>
+    {if $action != 'cart'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js'></script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/hpf_script.js'></script>
-	{/if}
+		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js' defer='defer'></script>
+		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/hpf_script.js' defer='defer'></script>
+    {/if}
 {/block}
 
 {block name="hp_payment"}

@@ -129,7 +129,8 @@
 	<script type='text/javascript'>
 		//define formUrl to make it useable in external JS
 		var formUrl = {$formUrl|@json_encode};
-		$(document).ready(function(){
+//		$(document).ready(function(){
+		document.asyncReady(function() {
 			//add error div
 			if(jQuery('#center .error').length < 1){
 				jQuery('#center').prepend('<div class="error" style="display: none;"><h2>{s name='RegisterErrorHeadline' namespace='frontend/register/error_message'}{/s}</h2><ul></ul></div>');

@@ -1,7 +1,8 @@
 {block name="frontend_index_header_javascript_jquery_lib" append}
 	<script type='text/javascript'>
 		var mobile = "{$isMobile}";
-		$(document).ready(function(){
+//		$(document).ready(function(){
+        document.asyncReady(function() {
 			jQuery('.wallet').click(function(){
 				jQuery('#lbOverlay').fadeIn(350);
 				$.loadingIndicator.open();

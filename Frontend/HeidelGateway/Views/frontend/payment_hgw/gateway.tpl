@@ -59,7 +59,10 @@
 							jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
 							$($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
 							$.loadingIndicator.open();
-							$(document).ready(function(){ document.forms['heidelpay'].submit(); });
+//							$(document).ready(function(){
+                            document.asyncReady(function() {
+							    document.forms['heidelpay'].submit();
+							});
 						});
 					</script>
 					<noscript>
@@ -89,7 +92,8 @@
 		{/block}
 		
 		<script type='text/javascript'>
-			$(document).ready(function(){
+//			$(document).ready(function(){
+			document.asyncReady(function() {
 				//add error div
 				if(jQuery('#payment .error').length < 1){
 					jQuery('#payment').prepend('<div class="error" style="display: none;"><h2>{s name='RegisterErrorHeadline' namespace='frontend/register/error_message'}{/s}</h2><ul></ul></div>');
@@ -129,7 +133,10 @@
 								jQuery('.payment.register').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
 								$($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
 								$.loadingIndicator.open();
-								$(document).ready(function(){ document.forms['heidelpay'].submit(); });
+//								$(document).ready(function(){
+                                document.asyncReady(function() {
+								    document.forms['heidelpay'].submit();
+								});
 							});
 						</script>
 					{/if}
@@ -160,7 +167,10 @@
 						jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
 						$($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
 						$.loadingIndicator.open();
-						$(document).ready(function(){ document.forms['heidelpay'].submit(); });
+//						$(document).ready(function(){
+                        document.asyncReady(function() {
+						    document.forms['heidelpay'].submit();
+						});
 					});
 				</script>
 				<noscript>

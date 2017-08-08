@@ -15,7 +15,8 @@
 		<div class="newreg_{$pm}" id="payType" {if {$hasReg{$pm}}} style="display: none;" {/if}>
 			{if ($heidel_iban == '2')}
 				<script type='text/javascript'>
-					$(document).ready(function(){
+//					$(document).ready(function(){
+                    document.asyncReady(function() {
 						if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
 						if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
 						

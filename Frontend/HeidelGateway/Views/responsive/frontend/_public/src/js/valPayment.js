@@ -1,17 +1,36 @@
-$(document).ready(function(){
+// $(document).ready(function(){
+/* ************************************* */
+(function() {
+    var nTimer = setInterval(function() {
+        if (window.jQuery) {
+/* ************************************* */
+
+// function waitForjQuery() {
+// if (typeof jQuery != 'undefined') {
+/* ************************************* */
+document.asyncReady(function() {
+
 	// fix for missing csrf-token
 	if(swVersion.substring(0,3) >= '5.2'){
-		var token = jQuery('input[name="__csrf_token"]').val();
-	
-		if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
-		
+		var token = jQuery('input[name ="__csrf_token" ]').val();
+console.log("Token: ");
+console.log(token);
+		 // if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
+
+
+        jQuery('.payment input:checkbox').click(function(){
+            var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+            jQuery('.reuse'+pm).toggle(500);
+            jQuery('.newreg'+pm).toggle(500);
+        });
+
 			var orgLink = jQuery('form.payment').attr('action');
 			// SELECT PAYMENT
 			if(window.location.pathname.indexOf('gateway') == '-1'){
 				// save original form action
 				var orgLink = jQuery('form.payment').attr('action');
 				if(window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1'){
-					$(document).reuse();
+					// $(document).reuse();
 					
 					// change checked option
 					jQuery('.register--payment').click(function(){
@@ -37,13 +56,13 @@ $(document).ready(function(){
 					// set original form action (before AJAX is sent)
 					$.ajaxSetup({
 						beforeSend: function(event, xhr, settings){
-						
+
 							// check for right ajax request
 							if(xhr.data != undefined){
 								// just execute if hgw pay. method is selected
 								if(clicked.indexOf('hgw_') != -1){
 									xhr.data += '&hgw=1';
-									
+
 									if ($("#shippingPaymentForm input[name='__csrf_token']").length == 0) {
 										$('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="'+token+'">');
 									}
@@ -82,9 +101,10 @@ $(document).ready(function(){
 							jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');				
 							// just call changeUrl() after all animations are done 
 							$(document).promise().done(function(){
-								$(document).ready(function(){
+								// $(document).ready(function(){
+                                document.asyncReady(function() {
 									$(document).reuse();
-									$(document).ibanCheck();
+									// $(document).ibanCheck();
 									var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
 									$('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function(){
 										// change form action
@@ -184,7 +204,14 @@ $(document).ready(function(){
 					
 				jQuery('#birthdate_papg').val(birthYear+'-'+birthMonth+'-'+birthDay);
 			}
-		}
+
+            // jQuery('.reues_cc input:checkbox').click(function(){
+				// console.log("clicked");
+            //     var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+            //     jQuery('.reuse'+pm).toggle(500);
+            //     jQuery('.newreg'+pm).toggle(500);
+            // });
+		// }
 	} else { // if SW-Version <= 5.2
 		
 		var orgLink = jQuery('form.payment').attr('action');
@@ -252,7 +279,8 @@ $(document).ready(function(){
 						jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');				
 						// just call changeUrl() after all animations are done 
 						$(document).promise().done(function(){
-							$(document).ready(function(){
+							// $(document).ready(function(){
+                            document.asyncReady(function() {
 								$(document).reuse();
 								$(document).ibanCheck();
 								var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
@@ -355,17 +383,50 @@ $(document).ready(function(){
 			jQuery('#birthdate_papg').val(birthYear+'-'+birthMonth+'-'+birthDay);
 		}
 	}
-});
 
+    // jQuery('.payment input:checkbox').click(function(e){
+    //
+    //     var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+    //
+    //     jQuery('.reuse'+pm).toggle(500);
+    //     jQuery('.newreg'+pm).toggle(500);
+    // });
 
-// REUSE PAYMENT
-jQuery.fn.reuse = function(){
-	jQuery('.payment input:checkbox').click(function(){
-		var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
-		jQuery('.reuse'+pm).toggle(500);
-		jQuery('.newreg'+pm).toggle(500);
+	/* **************************** */
+    clearInterval(nTimer);
 	});
-}
+    }
+}, 100);
+    /* **************************** */
+
+
+
+})();
+ /* ****************************************** */
+// } else {
+//     window.setTimeout(function () { waitForjQuery(); }, 100);
+// }
+// }
+/* ******************************** */
+(function() {
+    var nTimer = setInterval(function() {
+        if (window.jQuery) {
+/* *****************************+** */
+// REUSE PAYMENT
+	jQuery.fn.reuse = function(){
+	      jQuery('.payment input:checkbox').click(function(){
+console.log("ToggleFunction 422");
+            var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+            jQuery('.reuse'+pm).toggle(500);
+            jQuery('.newreg'+pm).toggle(500);
+        });
+    }
+/* ******************************** */
+    clearInterval(nTimer);
+        }
+    }, 100);
+})();
+/* ******************************** */
 
 // CHANGE FORM URL
 function changeUrl(checkedOpt, orgLink){

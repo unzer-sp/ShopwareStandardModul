@@ -1,4 +1,5 @@
-$(document).ready(function(){
+// $(document).ready(function(){
+document.asyncReady(function() {
 	// SELECT PAYMENT
 	if(window.location.pathname.indexOf('gateway') == '-1'){
 		// save original form action

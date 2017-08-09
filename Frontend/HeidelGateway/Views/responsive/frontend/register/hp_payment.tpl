@@ -69,7 +69,6 @@
 	{assign var='bar_at' value=$payment_mean.name|strpos:'_'}
 	{assign var='pm' value=$payment_mean.name|substr:($bar_at+1)}
 	{if $pm == 'pay'}{assign var='pm' value='va'}{/if}
-
 	{if $payment_mean.name == "hgw_cc" && $heidel_bm_cc && ($formUrl.$pm != '')}
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_cc.tpl"}
 	{elseif $payment_mean.name == "hgw_dc" && $heidel_bm_dc && ($formUrl.$pm != '')}

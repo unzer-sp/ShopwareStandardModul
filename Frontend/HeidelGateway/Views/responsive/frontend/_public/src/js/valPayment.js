@@ -1,373 +1,387 @@
-document.asyncReady(function() {
+(function() {
+	var nTimer = setInterval(function() {
+    	if (window.jQuery) {
+/* ********************************* */
+            // document.asyncReady(function () {
+            $().ready(function() {
+                // fix for missing csrf-token
+                if (swVersion.substring(0, 3) >= '5.2') {
+                    var token = jQuery('input[name ="__csrf_token" ]').val();
+                    console.log(token);
+                    if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
 
-	// fix for missing csrf-token
-	if(swVersion.substring(0,3) >= '5.2'){
-		var token = jQuery('input[name ="__csrf_token" ]').val();
-		if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
 
+                        // jQuery('.payment input:checkbox').click(function () {
+                        //     var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+                        //     jQuery('.reuse' + pm).toggle(500);
+                        //     jQuery('.newreg' + pm).toggle(500);
+                        // });
 
-            jQuery('.payment input:checkbox').click(function () {
-                var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
-                jQuery('.reuse' + pm).toggle(500);
-                jQuery('.newreg' + pm).toggle(500);
-            });
+                        var orgLink = jQuery('form.payment').attr('action');
+                        // SELECT PAYMENT
+                        if (window.location.pathname.indexOf('gateway') == '-1') {
+                            // save original form action
+                            var orgLink = jQuery('form.payment').attr('action');
+                            if (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1') {
+                                $(document).reuse();
 
-            var orgLink = jQuery('form.payment').attr('action');
-            // SELECT PAYMENT
-            if (window.location.pathname.indexOf('gateway') == '-1') {
-                // save original form action
-                var orgLink = jQuery('form.payment').attr('action');
-                if (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1') {
-                    $(document).reuse();
-
-                    // change checked option
-                    jQuery('.register--payment').click(function () {
-                        // change form action
-                        var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
-                        changeUrl(checkedOpt, orgLink);
-                    });
-				} else {
-                    var clicked = '';
-                    $(this).click(function (e) {
-                        clicked = e.target.className;
-                    });
-
-                    jQuery('.payment--method-list').click(function () {
-                        // change form action
-                        var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
-                        changeUrl(checkedOpt, orgLink);
-
-                    });
-
-                    // set original form action (before AJAX is sent)
-                    $.ajaxSetup({
-                        beforeSend: function (event, xhr, settings) {
-
-                            // check for right ajax request
-                            if (xhr.data != undefined) {
-                                // just execute if hgw pay. method is selected
-                                if (clicked.indexOf('hgw_') != -1) {
-                                    xhr.data += '&hgw=1';
-
-                                    if ($("#shippingPaymentForm input[name='__csrf_token']").length == 0) {
-                                        $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
-                                    }
-
-                                    if (this.url != orgLink) {
-                                        this.url = orgLink;
-                                        jQuery('form.payment').attr('action', orgLink);
-                                    }
-                                }
-                            }
-                        },
-                    });
-
-                    $(document).ajaxComplete(function (event, xhr, settings) {
-                        // fix for missing csrf-Token
-                        if (swVersion >= '5.2') {
-                            if ($(" shippingPaymentForm input[name='__csrf_token']").length == 0) {
-                                $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
-                            }
-                        }
-                        if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
-                            // load fancy-js for select boxes
-                            if (swVersion >= '5.1') {
-                                jQuery('select:not([data-no-fancy-select="true"])').swSelectboxReplacement();
+                                // change checked option
+                                jQuery('.register--payment').click(function () {
+                                    // change form action
+                                    var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
+                                    changeUrl(checkedOpt, orgLink);
+                                });
                             } else {
-                                jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
-                            }
+                                var clicked = '';
+                                $(this).click(function (e) {
+                                    clicked = e.target.className;
+                                });
 
-                            // set width for XS-State (with SW-Statemanger)
-                            StateManager.registerListener({
-                                state: 'xs',
-                                enter: function () {
-                                    jQuery('.js--fancy-select').attr('style', 'width:100%;');
-                                },
-                                exit: function () {
-                                    jQuery('.js--fancy-select').removeAttr('style');
-                                }
-                            });
-                            // add validation for form
-                            jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
-                            // just call changeUrl() after all animations are done
-                            $(document).promise().done(function () {
-                                // $(document).ready(function(){
-                                document.asyncReady(function () {
-                                    // $(document).reuse();
-                                    // $(document).ibanCheck();
-                                    var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
-                                    $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function () {
-                                        // change form action
-                                        changeUrl(checkedOpt, orgLink);
-                                    });
-                                    if (checkedOpt.indexOf('papg') != '-1') {
-                                        // change form action
-                                        changeUrl(checkedOpt, orgLink);
+                                jQuery('.payment--method-list').click(function () {
+                                    // change form action
+                                    var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
+                                    changeUrl(checkedOpt, orgLink);
+
+                                });
+
+                                // set original form action (before AJAX is sent)
+                                $.ajaxSetup({
+                                    beforeSend: function (event, xhr, settings) {
+
+                                        // check for right ajax request
+                                        if (xhr.data != undefined) {
+                                            // just execute if hgw pay. method is selected
+                                            if (clicked.indexOf('hgw_') != -1) {
+                                                xhr.data += '&hgw=1';
+
+                                                if ($("#shippingPaymentForm input[name='__csrf_token']").length == 0) {
+                                                    $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
+                                                }
+
+                                                if (this.url != orgLink) {
+                                                    this.url = orgLink;
+                                                    jQuery('form.payment').attr('action', orgLink);
+                                                }
+                                            }
+                                        }
+                                    },
+                                });
+
+                                $(document).ajaxComplete(function (event, xhr, settings) {
+                                    // fix for missing csrf-Token
+                                    if (swVersion >= '5.2') {
+                                        if ($(" shippingPaymentForm input[name='__csrf_token']").length == 0) {
+                                            $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
+                                        }
                                     }
+                                    if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
+                                        // load fancy-js for select boxes
+                                        if (swVersion >= '5.1') {
+                                            jQuery('select:not([data-no-fancy-select="true"])').swSelectboxReplacement();
+                                        } else {
+                                            jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
+                                        }
 
-                                    if (checkedOpt.indexOf('san') != '-1') {
-                                        // change form action
-                                        changeUrl(checkedOpt, orgLink);
+                                        // set width for XS-State (with SW-Statemanger)
+                                        StateManager.registerListener({
+                                            state: 'xs',
+                                            enter: function () {
+                                                jQuery('.js--fancy-select').attr('style', 'width:100%;');
+                                            },
+                                            exit: function () {
+                                                jQuery('.js--fancy-select').removeAttr('style');
+                                            }
+                                        });
+                                        // add validation for form
+                                        jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
+                                        // just call changeUrl() after all animations are done
+                                        $(document).promise().done(function () {
+                                            // $(document).ready(function(){
+                                            document.asyncReady(function () {
+                                                // $(document).reuse();
+                                                // $(document).ibanCheck();
+                                                var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
+                                                $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function () {
+                                                    // change form action
+                                                    changeUrl(checkedOpt, orgLink);
+                                                });
+                                                if (checkedOpt.indexOf('papg') != '-1') {
+                                                    // change form action
+                                                    changeUrl(checkedOpt, orgLink);
+                                                }
+
+                                                if (checkedOpt.indexOf('san') != '-1') {
+                                                    // change form action
+                                                    changeUrl(checkedOpt, orgLink);
+                                                }
+                                            });
+                                        });
                                     }
                                 });
+                            }
+                        }
+
+                        //Function to set Birthdate in hidden field for Chrome on mac
+                        jQuery("input[type='submit'], .right").click(function (e) {
+                            if (jQuery("input[type='submit'], .right").val() == "Weiter") {
+                                var birthDay = null;
+                                var birthMonth = null;
+                                var birthYear = null;
+                                var pm = null;
+                                pm = jQuery("#payType").attr("class");
+                                pm = pm.substr(7);
+
+                                if (jQuery(".newreg_" + pm) > 0) {
+                                    birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
+                                    birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                                    birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
+                                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                                }
+
+                                if (birthYear == null) {
+                                    jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
+                                    var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
+                                    var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                                    var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
+                                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                                }
+                            }
+                        });
+
+
+                        jQuery('.newreg_dd').click(function (e) {
+
+                            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        });
+
+                        if (jQuery('.newreg_dd')) {
+                            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        }
+
+                        jQuery('.newreg_san').click(function (e) {
+
+                            var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        });
+
+                        if (jQuery('.newreg_san')) {
+                            var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        }
+
+                        jQuery('.newreg_papg').click(function (e) {
+
+                            var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        });
+
+                        if (jQuery('.newreg_papg')) {
+                            var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        }
+                    }
+                } else { // if SW-Version <= 5.2
+
+                    var orgLink = jQuery('form.payment').attr('action');
+                    // SELECT PAYMENT
+                    if (window.location.pathname.indexOf('gateway') == '-1') {
+                        // save original form action
+                        var orgLink = jQuery('form.payment').attr('action');
+                        if (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1') {
+                            $(document).reuse();
+
+                            // change checked option
+                            jQuery('.register--payment').click(function () {
+                                // change form action
+                                var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
+                                changeUrl(checkedOpt, orgLink);
+                            });
+                        } else {
+                            var clicked = '';
+                            $(this).click(function (e) {
+                                clicked = e.target.className;
+                            });
+
+                            jQuery('.payment--method-list').click(function () {
+                                // change form action
+                                var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
+                                changeUrl(checkedOpt, orgLink);
+
+                            });
+
+                            // set original form action (before AJAX is sent)
+                            $.ajaxSetup({
+                                beforeSend: function (event, xhr, settings) {
+
+                                    // check for right ajax request
+                                    if (xhr.data != undefined) {
+                                        // just execute if hgw pay. method is selected
+                                        if (clicked.indexOf('hgw_') != -1) {
+                                            xhr.data += '&hgw=1';
+
+                                            if (this.url != orgLink) {
+                                                this.url = orgLink;
+                                                jQuery('form.payment').attr('action', orgLink);
+                                            }
+                                        }
+                                    }
+                                },
+                            });
+
+                            $(document).ajaxComplete(function (event, xhr, settings) {
+                                if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
+                                    // load fancy-js for select boxes
+                                    if (swVersion >= '5.1') {
+                                        jQuery('select:not([data-no-fancy-select="true"])').swSelectboxReplacement();
+                                    } else {
+                                        jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
+                                    }
+
+                                    // set width for XS-State (with SW-Statemanger)
+                                    StateManager.registerListener({
+                                        state: 'xs',
+                                        enter: function () {
+                                            jQuery('.js--fancy-select').attr('style', 'width:100%;');
+                                        },
+                                        exit: function () {
+                                            jQuery('.js--fancy-select').removeAttr('style');
+                                        }
+                                    });
+                                    // add validation for form
+                                    jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
+                                    // just call changeUrl() after all animations are done
+                                    $(document).promise().done(function () {
+                                        // $(document).ready(function(){
+                                        document.asyncReady(function () {
+                                            $(document).reuse();
+                                            $(document).ibanCheck();
+                                            var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
+                                            $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function () {
+                                                // change form action
+                                                changeUrl(checkedOpt, orgLink);
+                                            });
+                                            if (checkedOpt.indexOf('papg') != '-1') {
+                                                // change form action
+                                                changeUrl(checkedOpt, orgLink);
+                                            }
+
+                                            if (checkedOpt.indexOf('san') != '-1') {
+                                                // change form action
+                                                changeUrl(checkedOpt, orgLink);
+                                            }
+                                        });
+                                    });
+                                }
                             });
                         }
+                    }
+
+                    //Function to set Birthdate in hidden field for Chrome on mac
+                    jQuery("input[type='submit'], .right").click(function (e) {
+                        //jQuery(".content--wrapper").click(function(e){
+                        if (jQuery("input[type='submit'], .right").val() == "Weiter") {
+                            var birthDay = null;
+                            var birthMonth = null;
+                            var birthYear = null;
+                            var pm = null;
+                            pm = jQuery("#payType").attr("class");
+                            pm = pm.substr(7);
+
+                            if (jQuery(".newreg_" + pm) > 0) {
+                                birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
+                                birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                                birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
+                                jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                            }
+
+                            if (birthYear == null) {
+                                jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
+                                var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
+                                var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                                var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
+                                jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                            }
+                        }
                     });
-                }
-            }
 
-            //Function to set Birthdate in hidden field for Chrome on mac
-            jQuery("input[type='submit'], .right").click(function (e) {
-                if (jQuery("input[type='submit'], .right").val() == "Weiter") {
-                    var birthDay = null;
-                    var birthMonth = null;
-                    var birthYear = null;
-                    var pm = null;
-                    pm = jQuery("#payType").attr("class");
-                    pm = pm.substr(7);
+                    jQuery('.newreg_dd').click(function (e) {
 
-                    if (jQuery(".newreg_" + pm) > 0) {
-                        birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
-                        birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                        birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
-                        jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                        var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                        var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                        jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    });
+
+                    if (jQuery('.newreg_dd')) {
+                        var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                        var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                        var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                        jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
                     }
 
-                    if (birthYear == null) {
-                        jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
-                        var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
-                        var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                        var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
-                        jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    jQuery('.newreg_san').click(function (e) {
+
+                        var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                        var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                        var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                        jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    });
+
+                    if (jQuery('.newreg_san')) {
+                        var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                        var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                        var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                        jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    }
+
+                    jQuery('.newreg_papg').click(function (e) {
+
+                        var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
+                        var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
+                        var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
+
+                        jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    });
+
+                    if (jQuery('.newreg_papg')) {
+                        var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
+                        var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
+                        var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
+
+                        jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
                     }
                 }
-            });
-
-
-            jQuery('.newreg_dd').click(function (e) {
-
-                var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
-
-                jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-            });
-
-            if (jQuery('.newreg_dd')) {
-                var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
-
-                jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-            }
-
-            jQuery('.newreg_san').click(function (e) {
-
-                var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-
-                jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
-            });
-
-            if (jQuery('.newreg_san')) {
-                var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-
-                jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
-            }
-
-            jQuery('.newreg_papg').click(function (e) {
-
-                var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
-
-                jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
-            });
-
-            if (jQuery('.newreg_papg')) {
-                var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
-
-                jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
-            }
-        }
-	} else { // if SW-Version <= 5.2
-		
-		var orgLink = jQuery('form.payment').attr('action');
-		// SELECT PAYMENT
-		if(window.location.pathname.indexOf('gateway') == '-1'){
-			// save original form action
-			var orgLink = jQuery('form.payment').attr('action');
-			if(window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1'){
-				$(document).reuse();
-				
-				// change checked option
-				jQuery('.register--payment').click(function(){
-					// change form action
-					var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
-					changeUrl(checkedOpt, orgLink);
-				});
-			}else{
-				var clicked = '';
-				$(this).click(function(e){
-					clicked = e.target.className;
-				});
-				
-				jQuery('.payment--method-list').click(function(){
-					// change form action
-					var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
-					changeUrl(checkedOpt, orgLink);
-	
-				});
-				
-				// set original form action (before AJAX is sent)
-				$.ajaxSetup({
-					beforeSend: function(event, xhr, settings){
-					
-						// check for right ajax request
-						if(xhr.data != undefined){
-							// just execute if hgw pay. method is selected
-							if(clicked.indexOf('hgw_') != -1){
-								xhr.data += '&hgw=1';
-							
-								if(this.url != orgLink){
-									this.url = orgLink;
-									jQuery('form.payment').attr('action', orgLink);
-								}
-							}
-						}
-					},
-				});
-	
-				$(document).ajaxComplete(function(event, xhr, settings){
-					if(((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)){
-						// load fancy-js for select boxes
-						if(swVersion >= '5.1'){
-							jQuery('select:not([data-no-fancy-select="true"])').swSelectboxReplacement();
-						}else{
-							jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
-						}
-	
-						// set width for XS-State (with SW-Statemanger)
-						StateManager.registerListener({
-							state: 'xs',
-							enter: function(){	jQuery('.js--fancy-select').attr('style', 'width:100%;');	},
-							exit: function(){ jQuery('.js--fancy-select').removeAttr('style'); }
-						});
-						// add validation for form
-						jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');				
-						// just call changeUrl() after all animations are done 
-						$(document).promise().done(function(){
-							// $(document).ready(function(){
-                            document.asyncReady(function() {
-								$(document).reuse();
-								$(document).ibanCheck();
-								var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
-								$('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function(){
-									// change form action
-									changeUrl(checkedOpt, orgLink);
-								});
-								if(checkedOpt.indexOf('papg') != '-1'){
-									// change form action
-									changeUrl(checkedOpt, orgLink);
-								}
-								
-								if(checkedOpt.indexOf('san') != '-1'){
-									// change form action
-									changeUrl(checkedOpt, orgLink);
-								}
-							});
-						});
-					}
-				});
-			}
-		}
-		
-		//Function to set Birthdate in hidden field for Chrome on mac
-		jQuery("input[type='submit'], .right").click(function(e){
-		//jQuery(".content--wrapper").click(function(e){
-			if(jQuery("input[type='submit'], .right").val() == "Weiter") {
-				var birthDay =  null;
-				var birthMonth = null;
-				var birthYear = null;
-				var pm = null;
-				pm = jQuery("#payType").attr("class");
-				pm = pm.substr(7);					
-				
-				if(jQuery(".newreg_"+pm) > 0) {
-					birthDay = jQuery(".newreg_"+pm+" [name='Date_Day']").val();
-					birthMonth = jQuery(".newreg_"+pm+" [name = 'Date_Month']").val();
-					birthYear = jQuery(".newreg_"+pm+" [name = 'Date_Year']").val();
-					jQuery("#birthdate_"+pm).val( birthYear+'-'+birthMonth+'-'+birthDay);
-				} 
-				
-				if(birthYear == null) {
-						jQuery(".newreg_"+pm+" [name = 'Date_Year']").val(jQuery(".newreg_"+pm+" [name = 'Date_Year']").next("div.js--fancy-select-text").text()) ;	
-						var birthYear = jQuery(".newreg_"+pm+" [name = 'Date_Year']").next("div.js--fancy-select-text").text();
-						var birthMonth = jQuery(".newreg_"+pm+" [name = 'Date_Month']").val();
-						var birthDay = jQuery(".newreg_"+pm+" [name = 'Date_Day']").next("div.js--fancy-select-text").text();
-						jQuery("#birthdate_"+pm).val(birthYear+'-'+birthMonth+'-'+birthDay);
-				}
-			}
-		});
-		
-		jQuery('.newreg_dd').click(function(e){
-			
-			var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-			var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-			var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
-				
-			jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
-		});
-		
-		if(jQuery('.newreg_dd')) {
-			var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-			var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-			var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
-				
-			jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
-		}
-		
-		jQuery('.newreg_san').click(function(e){
-			
-			var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-			var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-			var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-				
-			jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
-		});
-		
-		if(jQuery('.newreg_san')) {
-			var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-			var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-			var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-				
-			jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
-		}
-		
-		jQuery('.newreg_papg').click(function(e){
-			
-			var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
-			var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
-			var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
-				
-			jQuery('#birthdate_papg').val(birthYear+'-'+birthMonth+'-'+birthDay);
-		});
-		
-		if(jQuery('.newreg_papg')) {
-			var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
-			var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
-			var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
-				
-			jQuery('#birthdate_papg').val(birthYear+'-'+birthMonth+'-'+birthDay);
-		}
-	}
+/* ********************************** */
+                clearInterval(nTimer);
+                	});
+                }
+        }, 100);
 })();
- /* ****************************************** */
+/* ****************************************** */
 
 // REUSE PAYMENT
 document.asyncReady(function() {

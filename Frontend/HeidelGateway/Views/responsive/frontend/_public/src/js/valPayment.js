@@ -11,11 +11,11 @@
                     if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
 
 
-                        // jQuery('.payment input:checkbox').click(function () {
-                        //     var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
-                        //     jQuery('.reuse' + pm).toggle(500);
-                        //     jQuery('.newreg' + pm).toggle(500);
-                        // });
+                        jQuery('.payment input:checkbox').click(function () {
+                            var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+                            jQuery('.reuse' + pm).toggle(500);
+                            jQuery('.newreg' + pm).toggle(500);
+                        });
 
                         var orgLink = jQuery('form.payment').attr('action');
                         // SELECT PAYMENT

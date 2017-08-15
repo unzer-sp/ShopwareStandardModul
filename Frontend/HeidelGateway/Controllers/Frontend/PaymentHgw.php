@@ -74,7 +74,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				));
 			}
 			$this->View()->swVersion	= Shopware()->Config()->Version;
-
+mail("sascha.pflueger@heidelpay.de","PaymentHgw 77",print_r(Shopware()->Config()->Version,1));
 			if($this->Config()->HGW_MOBILE_CSS){
 				$this->View()->isMobile = $this->hgw()->isMobile();
 			}

@@ -1,13 +1,10 @@
-(function() {
-	var nTimer = setInterval(function() {
-    	if (window.jQuery) {
-/* ********************************* */
-            // document.asyncReady(function () {
-            $().ready(function() {
+document.asyncReady(function () {
+console.log("test START");
+console.log(swVersion);
                 // fix for missing csrf-token
                 if (swVersion.substring(0, 3) >= '5.2') {
                     var token = jQuery('input[name ="__csrf_token" ]').val();
-                    console.log(token);
+console.log(token);
                     if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
 
 
@@ -375,12 +372,7 @@
                         jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
                     }
                 }
-/* ********************************** */
-                clearInterval(nTimer);
-                	});
-                }
-        }, 100);
-})();
+});
 /* ****************************************** */
 
 // REUSE PAYMENT

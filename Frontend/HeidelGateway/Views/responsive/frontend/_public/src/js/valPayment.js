@@ -1,26 +1,26 @@
 document.asyncReady(function () {
+
 console.log("test START");
-console.log(swVersion);
                 // fix for missing csrf-token
                 if (swVersion.substring(0, 3) >= '5.2') {
-                    var token = jQuery('input[name ="__csrf_token" ]').val();
-console.log(token);
-                    if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
 
-
-                        jQuery('.payment input:checkbox').click(function () {
-                            var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
-                            jQuery('.reuse' + pm).toggle(500);
-                            jQuery('.newreg' + pm).toggle(500);
-                        });
+                    // if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
 
                         var orgLink = jQuery('form.payment').attr('action');
+                        if(orgLink == 'undefined'){
+                            var orglink = jQuery('form[name="shippingPaymentForm"]').attr('action');
+                        }
+
                         // SELECT PAYMENT
                         if (window.location.pathname.indexOf('gateway') == '-1') {
                             // save original form action
                             var orgLink = jQuery('form.payment').attr('action');
+                            if(orgLink == 'undefined'){
+                                var orglink = jQuery('form[name="shippingPaymentForm"]').attr('action');
+                            }
+
                             if (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1') {
-                                $(document).reuse();
+                                // $(document).reuse();
 
                                 // change checked option
                                 jQuery('.register--payment').click(function () {
@@ -34,6 +34,7 @@ console.log(token);
                                     clicked = e.target.className;
                                 });
 
+
                                 jQuery('.payment--method-list').click(function () {
                                     // change form action
                                     var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
@@ -44,16 +45,15 @@ console.log(token);
                                 // set original form action (before AJAX is sent)
                                 $.ajaxSetup({
                                     beforeSend: function (event, xhr, settings) {
-
                                         // check for right ajax request
                                         if (xhr.data != undefined) {
                                             // just execute if hgw pay. method is selected
                                             if (clicked.indexOf('hgw_') != -1) {
                                                 xhr.data += '&hgw=1';
 
-                                                if ($("#shippingPaymentForm input[name='__csrf_token']").length == 0) {
-                                                    $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
-                                                }
+                                                // if ($("#shippingPaymentForm input[name='__csrf_token']").length == 0) {
+                                                //     $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
+                                                // }
 
                                                 if (this.url != orgLink) {
                                                     this.url = orgLink;
@@ -65,11 +65,12 @@ console.log(token);
                                 });
 
                                 $(document).ajaxComplete(function (event, xhr, settings) {
+
                                     // fix for missing csrf-Token
                                     if (swVersion >= '5.2') {
-                                        if ($(" shippingPaymentForm input[name='__csrf_token']").length == 0) {
-                                            $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
-                                        }
+                                        // if ($(" shippingPaymentForm input[name='__csrf_token']").length == 0) {
+                                        //     $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
+                                        // }
                                     }
                                     if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
                                         // load fancy-js for select boxes
@@ -91,6 +92,7 @@ console.log(token);
                                         });
                                         // add validation for form
                                         jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
+
                                         // just call changeUrl() after all animations are done
                                         $(document).promise().done(function () {
                                             // $(document).ready(function(){
@@ -119,31 +121,35 @@ console.log(token);
                         }
 
                         //Function to set Birthdate in hidden field for Chrome on mac
-                        jQuery("input[type='submit'], .right").click(function (e) {
-                            if (jQuery("input[type='submit'], .right").val() == "Weiter") {
-                                var birthDay = null;
-                                var birthMonth = null;
-                                var birthYear = null;
-                                var pm = null;
-                                pm = jQuery("#payType").attr("class");
-                                pm = pm.substr(7);
-
-                                if (jQuery(".newreg_" + pm) > 0) {
-                                    birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
-                                    birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                                    birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
-                                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                                }
-
-                                if (birthYear == null) {
-                                    jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
-                                    var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
-                                    var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                                    var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
-                                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                                }
-                            }
-                        });
+                        // jQuery("input[type='submit'], .right").click(function (e) {
+                        //     if (jQuery("input[type='submit'], .right").val() == "Weiter") {
+                        //         var birthDay = null;
+                        //         var birthMonth = null;
+                        //         var birthYear = null;
+                        //         var pm = null;
+                        //         pm = jQuery("#payType").attr("class");
+                        //         pm = pm.substr(7);
+                        //
+                        //         if (jQuery(".newreg_" + pm) > 0) {
+                        //             birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
+                        //             birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                        //             birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
+                        //             jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        //             console.log("erste Funktion");
+                        //             console.log(birthYear + '-' + birthMonth + '-' + birthDay);
+                        //         }
+                        //
+                        //         if (birthYear == null) {
+                        //             jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
+                        //             var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
+                        //             var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                        //             var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
+                        //             jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                        //             console.log("ZWEITE Funktion");
+                        //             console.log(birthYear + '-' + birthMonth + '-' + birthDay);
+                        //         }
+                        //     }
+                        // });
 
 
                         jQuery('.newreg_dd').click(function (e) {
@@ -196,7 +202,7 @@ console.log(token);
 
                             jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
                         }
-                    }
+                    // }
                 } else { // if SW-Version <= 5.2
 
                     var orgLink = jQuery('form.payment').attr('action');
@@ -270,8 +276,9 @@ console.log(token);
                                     $(document).promise().done(function () {
                                         // $(document).ready(function(){
                                         document.asyncReady(function () {
-                                            $(document).reuse();
-                                            $(document).ibanCheck();
+                                            // $(document).reuse();
+                                            // $(document).ibanCheck();
+                                            // $(document).iban();
                                             var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
                                             $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function () {
                                                 // change form action
@@ -372,19 +379,26 @@ console.log(token);
                         jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
                     }
                 }
-});
-/* ****************************************** */
 
-// REUSE PAYMENT
-document.asyncReady(function() {
-    jQuery.fn.reuse = function () {
+    // jQuery.fn.reuse = function () {
         jQuery('.payment input:checkbox').click(function () {
             var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
             jQuery('.reuse' + pm).toggle(500);
             jQuery('.newreg' + pm).toggle(500);
         });
-    }
 });
+/* ****************************************** */
+
+// REUSE PAYMENT
+// document.asyncReady(function() {
+//     jQuery.fn.reuse = function () {
+//         jQuery('.payment input:checkbox').click(function () {
+//             var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+//             jQuery('.reuse' + pm).toggle(500);
+//             jQuery('.newreg' + pm).toggle(500);
+//         });
+//     }
+// });
 
 
 /* ******************************** */
@@ -395,12 +409,16 @@ function changeUrl(checkedOpt, orgLink){
 		var prefix = 'hgw_';
 		var checkedOptPos = checkedOpt.indexOf(prefix);
 
+console.log("changeUrl orgLink = ");
+console.log(orgLink);
+
 		if(checkedOptPos >= 0){
 			var pm = checkedOpt.substr(checkedOptPos+prefix.length);
-		
+console.log("changeUrl checktOpt = ");
+console.log(pm);
 			if(pm == 'pay'){ pm = 'va'; }
 			if(pm == 'dd'){
-				$(document).ibanCheck();
+				// $(document).ibanCheck();
 			}
 			if((jQuery('.reues_'+pm).length > 0) && !(jQuery('.reues_'+pm).is(':checked'))){
 				var reuse = true;
@@ -561,10 +579,12 @@ function valGatewayForm(){
 }
 
 // VALIDATE FORM ON SHIPPINGPAYMENT
-function valShippingPaymentForm(){
+function valShippingPaymentForm(){console.log("valShippingPaymentForm");
 	var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
 	var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_')+4);
-	
+
+console.log(checkedOpt);
+console.log(pm);
 	// remove check vor cc and dc
 	if((pm != 'cc') && (pm != 'dc')){
 		// check if 'newreg' is shown

@@ -17,46 +17,60 @@
 		{/if}
 	</script>
 	
-	{*<script type='text/javascript'>*}
-{*//		$(document).ready(function(){*}
-		{*document.asyncReady(function() {*}
-			{*$(document).ibanCheck();*}
-{*//			jQuery(document).ibanCheck();*}
-        {*});*}
-		{*//sepa switch*}
-		{*jQuery.fn.ibanCheck = function(){*}
-			{*if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }*}
-			{*if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }*}
+	<script type='text/javascript'>
+//		$(document).ready(function(){
+		document.asyncReady(function() {
+//			$(document).ibanCheck();
+//			jQuery(document).ibanCheck();
 
-			{*jQuery('#sepa_switch').change(function(){*}
-				{*if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }*}
-				{*if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }*}
-			{*});*}
+		//sepa switch
+//		jQuery.fn.ibanCheck = function(){
+//			if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+//			if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+//
+//			jQuery('#sepa_switch').change(function(){
+//				if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+//				if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+//			});
+//
+//			function iban(){
+//				if(jQuery('.newreg_dd #iban').is(':hidden')){
+//					jQuery('.newreg_dd #account').parent().hide();
+//					jQuery('.newreg_dd #bankcode').parent().hide();
+//					jQuery('.newreg_dd #cardBrand').parent().hide();
+//					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
+//					jQuery('.newreg_dd #iban').parent().show();
+//				}
+//			}
+//
+//			function noiban(){
+//				if(jQuery('.newreg_dd #account').is(':hidden')){
+//					jQuery('.newreg_dd #account').parent().show();
+//					jQuery('.newreg_dd #bankcode').parent().show();
+//					jQuery('.newreg_dd #cardBrand').parent().show();
+//					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').show();
+//					jQuery('.newreg_dd #iban').parent().hide();
+//				}
+//			}
+//		};
 
-			{*function iban(){*}
-				{*if(jQuery('.newreg_dd #iban').is(':hidden')){*}
-					{*jQuery('.newreg_dd #account').parent().hide();*}
-					{*jQuery('.newreg_dd #bankcode').parent().hide();*}
-					{*jQuery('.newreg_dd #cardBrand').parent().hide();*}
-					{*jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();*}
-					{*jQuery('.newreg_dd #iban').parent().show();*}
-				{*}*}
-			{*}*}
-
-			{*function noiban(){*}
-				{*if(jQuery('.newreg_dd #account').is(':hidden')){*}
-					{*jQuery('.newreg_dd #account').parent().show();*}
-					{*jQuery('.newreg_dd #bankcode').parent().show();*}
-					{*jQuery('.newreg_dd #cardBrand').parent().show();*}
-					{*jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').show();*}
-					{*jQuery('.newreg_dd #iban').parent().hide();*}
-				{*}*}
-			{*}*}
-		{*};*}
 
 
-	{*</script>*}
-	<h1>frontend_index_javascript_async_ready</h1>
+                function iban(){
+                    if(jQuery('.newreg_dd #iban').is(':hidden')){
+                        jQuery('.newreg_dd #account').parent().hide();
+                        jQuery('.newreg_dd #bankcode').parent().hide();
+                        jQuery('.newreg_dd #cardBrand').parent().hide();
+                        jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
+                        jQuery('.newreg_dd #iban').parent().show();
+                    }
+                }
+
+
+
+});
+
+	</script>
     {if $action != 'cart'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
 		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js' defer='defer'></script>

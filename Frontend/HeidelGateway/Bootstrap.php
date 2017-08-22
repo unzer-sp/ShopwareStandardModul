@@ -1527,7 +1527,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						$view->lang			= Shopware()->Locale()->getLanguage();
 						$view->swVersion	= Shopware()->Config()->Version;
 
-						$view->extendsTemplate('register/hp_payment.tpl');
+						if(Shopware()->Config()->Version >= 5.3){
+                            $view->extendsTemplate('register/hp_payment53.tpl');
+                        } else{
+                            $view->extendsTemplate('register/hp_payment.tpl');
+                        }
+
 
 						$file = realpath(dirname(__FILE__)).'/Controllers/Frontend/PaymentHgw.php';
 

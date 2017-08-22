@@ -47,7 +47,6 @@
 	{/if}
 
 	{if isset($pluginPath) && $pluginPath != ''}
-
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
 		{if $swVersion >= "5.3"}
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>

@@ -1,12 +1,9 @@
 {extends file="parent:frontend/index/index.tpl"}
-{debug}
-{* block name="frontend_index_header_javascript_jquery_lib" append *}
-{block name="frontend_index_javascript_async_ready" append}
+{block name="frontend_index_header_javascript_jquery_lib" append}
     <script type='text/javascript'>
 		// define formUrl to make it useable in external JS
 		var formUrl = {$formUrl|@json_encode};
-//		$(document).ready(function(){
-        document.asyncReady(function() {
+		$(document).ready(function(){
 			if(jQuery('#center .panel.has--border .alert--content').length < 1){
 				jQuery('#center .panel.has--border').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div>');
 			}
@@ -19,11 +16,10 @@
 	
 	<script type='text/javascript'>
 //		$(document).ready(function(){
-		document.asyncReady(function() {
-//			$(document).ibanCheck();
+////			$(document).ibanCheck();
 //			jQuery(document).ibanCheck();
-
-		//sepa switch
+//
+////		sepa switch
 //		jQuery.fn.ibanCheck = function(){
 //			if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
 //			if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
@@ -53,24 +49,24 @@
 //				}
 //			}
 //		};
-
-
-
-                function iban(){
-                    if(jQuery('.newreg_dd #iban').is(':hidden')){
-                        jQuery('.newreg_dd #account').parent().hide();
-                        jQuery('.newreg_dd #bankcode').parent().hide();
-                        jQuery('.newreg_dd #cardBrand').parent().hide();
-                        jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
-                        jQuery('.newreg_dd #iban').parent().show();
-                    }
-                }
-
-
-
-});
-
+//
+//
+//
+//                function iban(){
+//                    if(jQuery('.newreg_dd #iban').is(':hidden')){
+//                        jQuery('.newreg_dd #account').parent().hide();
+//                        jQuery('.newreg_dd #bankcode').parent().hide();
+//                        jQuery('.newreg_dd #cardBrand').parent().hide();
+//                        jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
+//                        jQuery('.newreg_dd #iban').parent().show();
+//                    }
+//                }
+//
+//
+//
+//	});
 	</script>
+
     {if $action != 'cart'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
 		{if $swVersion >= "5.3"}

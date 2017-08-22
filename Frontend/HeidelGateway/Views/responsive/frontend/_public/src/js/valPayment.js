@@ -1,6 +1,5 @@
 document.asyncReady(function () {
 
-console.log("test START");
                 // fix for missing csrf-token
                 if (swVersion.substring(0, 3) >= '5.2') {
 

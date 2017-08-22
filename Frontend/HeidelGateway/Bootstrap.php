@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.08.02';
+		return '17.08.20';
 	}
 
 	/**
@@ -660,12 +660,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				} catch (Exception $e) {
 					$this->logError($msg, $e);
 				}
-            // Compatibility for Shopware 5.3
-            case '17.08.02':
-                //
+             case '17.08.20':
+                //Compatibility for Shopware 5.3
                 try {
-                    $this->createEvents();
-                    $msg .= '* update 17.08.02 <br />';
+                    $msg .= '* update 17.08.20 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

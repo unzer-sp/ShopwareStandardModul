@@ -3,110 +3,223 @@
 
 {* Javascript *}
 {block name="frontend_index_header_javascript_jquery_lib" append}
-	<script type="text/javascript">
-//		$(document).ready(function(){
-        document.asyncReady(function() {
-			jQuery('#payment_frame').css('display', 'none');
-			jQuery('#payment_loader').css('display', 'block');
-			
-			jQuery('#payment_frame').load(function(){
-				jQuery('#payment_loader').css('display', 'none');
-				jQuery('#payment_frame').css('display', 'block');
-			});
-		});
-	</script>
+	{if $swVersion >= "5.3"}
+		<script type="text/javascript">
+			document.asyncReady(function() {
+				jQuery('#payment_frame').css('display', 'none');
+				jQuery('#payment_loader').css('display', 'block');
 
-	<script type='text/javascript'>
-//		$(document).ready(function(){
-        document.asyncReady(function() {
-			//add error div
-			if(jQuery('#payment .panel.has--border .alert--content').length < 1){
-				jQuery('#payment').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div></div>');
-			}	
-		});
-	</script>
-<h1>frontend_index_content_left</h1>
+				jQuery('#payment_frame').load(function(){
+					jQuery('#payment_loader').css('display', 'none');
+					jQuery('#payment_frame').css('display', 'block');
+				});
+			});
+		</script>
+
+		<script type='text/javascript'>
+			document.asyncReady(function() {
+				//add error div
+				if(jQuery('#payment .panel.has--border .alert--content').length < 1){
+					jQuery('#payment').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div></div>');
+				}
+			});
+		</script>
+    {else}
+		<script type="text/javascript">
+            $(document).ready(function(){
+                jQuery('#payment_frame').css('display', 'none');
+                jQuery('#payment_loader').css('display', 'block');
+
+                jQuery('#payment_frame').load(function(){
+                    jQuery('#payment_loader').css('display', 'none');
+                    jQuery('#payment_frame').css('display', 'block');
+                });
+            });
+		</script>
+		<script type='text/javascript'>
+           $(document).ready(function(){
+				//add error div
+                if(jQuery('#payment .panel.has--border .alert--content').length < 1){
+                    jQuery('#payment').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div></div>');
+                }
+            });
+		</script>
+	{/if}
+
 	{if isset($pluginPath) && $pluginPath != ''}
 
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js' defer='defer'></script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/hpf_script.js' defer='defer'></script>
+		{if $swVersion >= "5.3"}
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+		{else}
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
+		{/if}
+
+
 	{/if}
 
-	<script type='text/javascript'>
-		//sepa switch
-//		$(document).ready(function(){
-        document.asyncReady(function() {
-			var call = true;
-			if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-			if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-			
-			jQuery('#sepa_switch').change(function(){
-				if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-				if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-			});
+    {if $swVersion >= "5.3"}
+		<script type='text/javascript'>
+            //sepa switch
+            //		$(document).ready(function(){
+            document.asyncReady(function() {
+                var call = true;
+                if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
 
-			function iban(){
-				if(jQuery('#iban').parent().is(':hidden') || call){
-					jQuery('#account').parent().hide();
-					jQuery('#bankcode').parent().hide();
-					jQuery('#iban').parent().show();
-					jQuery('#bic').parent().show();
-					call = false;
-				}
-			}
-			function noiban(){
-				if(jQuery('#account').parent().is(':hidden') || call){
-					jQuery('#account').parent().show();
-					jQuery('#bankcode').parent().show();
-					jQuery('#iban').parent().hide();
-					jQuery('#bic').parent().hide();
-					call = false;
-				}
-			}
-			jQuery('#iban').on('input', function(){
-				if(jQuery(this).val().match(/^(D|d)(E|e)/) && !$('#bic').parent().parent().hasClass('newreg_gir')){
-					jQuery('#bic').parent().fadeOut();
-					jQuery('#bic').attr('disabled', 'disabled');
-				}else{
-					jQuery('#bic').removeAttr('disabled');
-					jQuery('#bic').parent().fadeIn();
-				}
-			});
-		});
-	</script>
+                jQuery('#sepa_switch').change(function(){
+                    if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                    if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+                });
+
+                function iban(){
+                    if(jQuery('#iban').parent().is(':hidden') || call){
+                        jQuery('#account').parent().hide();
+                        jQuery('#bankcode').parent().hide();
+                        jQuery('#iban').parent().show();
+                        jQuery('#bic').parent().show();
+                        call = false;
+                    }
+                }
+                function noiban(){
+                    if(jQuery('#account').parent().is(':hidden') || call){
+                        jQuery('#account').parent().show();
+                        jQuery('#bankcode').parent().show();
+                        jQuery('#iban').parent().hide();
+                        jQuery('#bic').parent().hide();
+                        call = false;
+                    }
+                }
+                jQuery('#iban').on('input', function(){
+                    if(jQuery(this).val().match(/^(D|d)(E|e)/) && !$('#bic').parent().parent().hasClass('newreg_gir')){
+                        jQuery('#bic').parent().fadeOut();
+                        jQuery('#bic').attr('disabled', 'disabled');
+                    }else{
+                        jQuery('#bic').removeAttr('disabled');
+                        jQuery('#bic').parent().fadeIn();
+                    }
+                });
+            });
+		</script>
+    {else}
+		<script type='text/javascript'>
+            //sepa switch
+            $(document).ready(function(){
+                var call = true;
+                if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+
+                jQuery('#sepa_switch').change(function(){
+                    if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                    if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+                });
+
+                function iban(){
+                    if(jQuery('#iban').parent().is(':hidden') || call){
+                        jQuery('#account').parent().hide();
+                        jQuery('#bankcode').parent().hide();
+                        jQuery('#iban').parent().show();
+                        jQuery('#bic').parent().show();
+                        call = false;
+                    }
+                }
+                function noiban(){
+                    if(jQuery('#account').parent().is(':hidden') || call){
+                        jQuery('#account').parent().show();
+                        jQuery('#bankcode').parent().show();
+                        jQuery('#iban').parent().hide();
+                        jQuery('#bic').parent().hide();
+                        call = false;
+                    }
+                }
+                jQuery('#iban').on('input', function(){
+                    if(jQuery(this).val().match(/^(D|d)(E|e)/) && !$('#bic').parent().parent().hasClass('newreg_gir')){
+                        jQuery('#bic').parent().fadeOut();
+                        jQuery('#bic').attr('disabled', 'disabled');
+                    }else{
+                        jQuery('#bic').removeAttr('disabled');
+                        jQuery('#bic').parent().fadeIn();
+                    }
+                });
+            });
+		</script>
+	{/if}
+
 
 	{if isset($PaymentUrl)}
-		{if isset($Input)}
-			<script type='text/javascript'>
-//               $(document).ready(function(){
-            document.asyncReady(function() {
-				jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
-				$.overlay.open();
-				$.loadingIndicator.open();
-				document.forms['heidelpay'].submit();
-			});</script>
+    	{if $swVersion >= "5.3"}
+            {if isset($Input)}
+				<script type='text/javascript'>
+                    //               $(document).ready(function(){
+                    document.asyncReady(function() {
+                        jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                        $.overlay.open();
+                        $.loadingIndicator.open();
+                        document.forms['heidelpay'].submit();
+                    });
+				</script>
+            {/if}
+		{else}
+            {if isset($Input)}
+				<script type='text/javascript'>
+                    $(document).ready(function(){
+                        jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                        $.overlay.open();
+                        $.loadingIndicator.open();
+                        document.forms['heidelpay'].submit();
+                    });
+				</script>
+            {/if}
 		{/if}
 	{elseif isset($formUrl)}
-		{if !isset($pm)}
-			<script type='text/javascript'>
-//                $(document).ready(function(){
-                document.asyncReady(function() {
-				jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
-				$.overlay.open();
-				$.loadingIndicator.open();
-				document.forms['heidelpay'].submit();
-			});</script>
+    	{if $swVersion >= "5.3"}
+			{if !isset($pm)}
+				<script type='text/javascript'>
+					document.asyncReady(function() {
+						jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+						$.overlay.open();
+						$.loadingIndicator.open();
+						document.forms['heidelpay'].submit();
+					});
+				</script>
+			{/if}
+		{else}
+            {if !isset($pm)}
+				<script type='text/javascript'>
+                    $(document).ready(function(){
+                        jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                        $.overlay.open();
+                        $.loadingIndicator.open();
+                        document.forms['heidelpay'].submit();
+                    });
+				</script>
+            {/if}
 		{/if}
+
 	{else}
-		<script type='text/javascript'>
-//            $(document).ready(function(){
-        document.asyncReady(function() {
-			jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
-			$.overlay.open();
-			$.loadingIndicator.open();
-			document.forms['heidelpay'].submit();
-		});</script>
+    	{if $swVersion >= "5.3"}
+			<script type='text/javascript'>
+                document.asyncReady(function() {
+                    jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                    $.overlay.open();
+                    $.loadingIndicator.open();
+                    document.forms['heidelpay'].submit();
+                });
+			</script>
+		{else}
+			<script type='text/javascript'>
+				$(document).ready(function(){
+                    jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                    $.overlay.open();
+                    $.loadingIndicator.open();
+                    document.forms['heidelpay'].submit();
+                });
+			</script>
+		{/if}
+
+
 	{/if}
 {/block}
 

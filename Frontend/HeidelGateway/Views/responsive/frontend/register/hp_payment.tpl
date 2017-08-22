@@ -73,8 +73,13 @@
 	</script>
     {if $action != 'cart'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js' defer='defer'></script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/hpf_script.js' defer='defer'></script>
+		{if $swVersion >= "5.3"}
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+		{else}
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
+		{/if}
     {/if}
 {/block}
 

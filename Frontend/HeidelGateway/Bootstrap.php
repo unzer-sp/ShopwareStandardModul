@@ -2196,7 +2196,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 		}catch(Exception $e){
-			$this->Logging('Logging | '.$e->getMessage());
+//			$this->Logging('Logging | '.$e->getMessage());
+			self::Logging('Logging | '.$e->getMessage());
 			return;
 		}
 	}

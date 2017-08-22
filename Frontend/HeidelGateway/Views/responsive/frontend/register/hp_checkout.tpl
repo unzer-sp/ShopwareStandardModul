@@ -1,22 +1,39 @@
 {block name="frontend_index_header_javascript_jquery_lib" append}
-	<script type='text/javascript'>
-		var mobile = "{$isMobile}";
-//		$(document).ready(function(){
-        document.asyncReady(function() {
-			jQuery('.wallet').click(function(){
-				jQuery('#lbOverlay').fadeIn(350);
-				$.loadingIndicator.open();
-				
-				if(mobile){
-					// workaround for mobile devices
-					var href = $(this).attr('href');
-					setTimeout(function(){ window.location = href }, 500);
-				}
-			});
-		});
-		
-		
-	</script>
+	<h1>Version {$swVersion}</h1>
+	{if $swVersion >= "5.3"}
+		<script type='text/javascript'>
+            var mobile = "{$isMobile}";
+            document.asyncReady(function() {
+                jQuery('.wallet').click(function(){
+                    jQuery('#lbOverlay').fadeIn(350);
+                    $.loadingIndicator.open();
+
+                    if(mobile){
+                        // workaround for mobile devices
+                        var href = $(this).attr('href');
+                        setTimeout(function(){ window.location = href }, 500);
+                    }
+                });
+            });
+		</script>
+	{else}
+		<script type='text/javascript'>
+            var mobile = "{$isMobile}";
+            $(document).ready(function(){
+                jQuery('.wallet').click(function(){
+                    jQuery('#lbOverlay').fadeIn(350);
+                    $.loadingIndicator.open();
+
+                    if(mobile){
+                        // workaround for mobile devices
+                        var href = $(this).attr('href');
+                        setTimeout(function(){ window.location = href }, 500);
+                    }
+                });
+            });
+		</script>
+	{/if}
+
 {/block}
 
 {block name="masterpass_button"}

@@ -130,8 +130,6 @@ document.asyncReady(function () {
         //             birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
         //             birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
         //             jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-        //             console.log("erste Funktion");
-        //             console.log(birthYear + '-' + birthMonth + '-' + birthDay);
         //         }
         //
         //         if (birthYear == null) {
@@ -140,8 +138,6 @@ document.asyncReady(function () {
         //             var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
         //             var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
         //             jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-        //             console.log("ZWEITE Funktion");
-        //             console.log(birthYear + '-' + birthMonth + '-' + birthDay);
         //         }
         //     }
         // });
@@ -404,13 +400,9 @@ function changeUrl(checkedOpt, orgLink) {
         var prefix = 'hgw_';
         var checkedOptPos = checkedOpt.indexOf(prefix);
 
-        console.log("changeUrl orgLink = ");
-        console.log(orgLink);
-
         if (checkedOptPos >= 0) {
             var pm = checkedOpt.substr(checkedOptPos + prefix.length);
-            console.log("changeUrl checktOpt = ");
-            console.log(pm);
+
             if (pm == 'pay') {
                 pm = 'va';
             }
@@ -577,12 +569,9 @@ function valGatewayForm() {
 
 // VALIDATE FORM ON SHIPPINGPAYMENT
 function valShippingPaymentForm() {
-    console.log("valShippingPaymentForm");
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
 
-    console.log(checkedOpt);
-    console.log(pm);
     // remove check vor cc and dc
     if ((pm != 'cc') && (pm != 'dc')) {
         // check if 'newreg' is shown

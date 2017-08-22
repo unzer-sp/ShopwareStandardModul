@@ -1,4 +1,3 @@
-// $(document).ready(function(){
 document.asyncReady(function() {
 	var hasListener = [];
 	hasListener['dc'] = false;
@@ -22,7 +21,7 @@ document.asyncReady(function() {
 	if(window.location.pathname.indexOf('account/payment') >= '0'){
 		// ACCOUNT/PAYMENT
 		var errorDiv = '#center .alert .alert--content';
-console.log("ACCOUNT");
+
 		// check if payment selection is changed
 		$('.register--payment').click(function(){
 			// change form action
@@ -65,7 +64,7 @@ console.log("ACCOUNT");
 		
 	}else if(window.location.pathname.indexOf('gateway') >= '0'){
 		// GATEWAY
-console.log("GATEWAY");
+
 		var errorDiv = '#payment .alert .alert--content';
 		checkedOpt = $('#payment .payment_method');
 		var checkedClass = checkedOpt.attr('class');
@@ -104,16 +103,16 @@ console.log("GATEWAY");
 	}else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
 		// SHIPPINGPAYMENT
 		var errorDiv = '.content-main--inner .content .alert .alert--content';
-console.log("SHIPPAY");
-		// $(document).ajaxComplete(function(event, xhr, settings){
+
+
 			// reset the flags for the frame listener, because event bindings are deleted due to ajax
 			// 'msg' flag don't need a reset because the listener is on the window
 			hasListener['dc'] = false;
 			hasListener['cc'] = false;
- console.log("115");
+
 			checkedOpt = jQuery('.payment--method-list input:radio:checked');
 			var checkedClass = checkedOpt.attr('class');
-console.log(checkedClass);
+
 			if(typeof checkedClass != 'undefined'){
 				var prefix = 'hgw_';
 				var checkedClassPos = checkedClass.indexOf(prefix);
@@ -146,7 +145,6 @@ console.log(checkedClass);
 					}
 				}else{ pm = ''; }
 			}
-		// });
 	}
 
 	// add an event listener that will execute the sendMessage() function when the send button is clicked.
@@ -169,7 +167,6 @@ console.log(checkedClass);
 	
 	// a function to handle sending messages via postMessage to iFrame
 	function sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt){
-		console.log("sendMessage pm=");
 		if((pm == 'cc') || (pm == 'dc')){
 			// just use eventListener on new registration or debit
 			if(jQuery('.newreg_'+pm).is(':visible')){
@@ -204,11 +201,7 @@ console.log(checkedClass);
 								data[input.name] = input.value;
 							}
 						}
-						
-						// if (swVersion.substring(0,3) >= '5.2') {
-						// 	data["__csrf_token"] = jQuery('input[name="__csrf_token"]').val();
-						// }
-						
+
 						paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
 					}
 				}
@@ -218,7 +211,6 @@ console.log(checkedClass);
 	
 	// a function to receive a postMessages from iFrame
 	function receiveMessage(e, origEvent, targetOrigin, paymentFrameForm, checkedOpt){
-		console.log("receiveMessage");
 		// Check to make sure that this message came from the correct domain
 		if(e.origin !== targetOrigin){
 			return;

@@ -14,8 +14,7 @@
 			
 			{if ($heidel_iban == '2')}
 				<script type='text/javascript'>
-//					$(document).ready(function(){
-					document.asyncReady(function() {
+					$(document).ready(function(){
 						if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
 						if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
 						

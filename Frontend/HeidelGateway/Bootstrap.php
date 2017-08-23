@@ -7,7 +7,7 @@
 * @subpackage Plugin
 * @link http://www.heidelpay.de
 * @copyright Copyright (c) 2016, Heidelberger Payment GmbH
-* @author Jens Richter / Andreas Nemet / Sascha Pflueger
+* @author Jens Richter / Sascha Pflueger
 */
 require_once __DIR__ . '/Components/CSRFWhitelistAware.php';
 

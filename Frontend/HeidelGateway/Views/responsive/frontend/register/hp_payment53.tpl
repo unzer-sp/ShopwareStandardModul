@@ -143,7 +143,6 @@
 {/block}
 
 {block name='frontend_register_payment_fieldset_description'}
-	{debug}
 	{if $payment_mean.name == "hgw_mpa"}
 	<div class="payment--description panel--td">
 		{if $payment_mean.additionaldescription|strip:'' != ''}

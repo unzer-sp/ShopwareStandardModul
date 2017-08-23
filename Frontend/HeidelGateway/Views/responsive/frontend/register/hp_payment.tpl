@@ -92,9 +92,7 @@
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_dd.tpl"}
 	{elseif $payment_mean.name == "hgw_pay" && $heidel_bm_va && ($formUrl.$pm != '')}
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va'}
-	{*{elseif $payment_mean.name == "hgw_papg"}
-		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_papg.tpl" pm='papg'}
-	 *}
+
 	{else}
 		{$smarty.block.parent}
 	{/if}

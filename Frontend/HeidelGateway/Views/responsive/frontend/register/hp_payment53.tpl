@@ -143,12 +143,13 @@
 {/block}
 
 {block name='frontend_register_payment_fieldset_description'}
+	{debug}
 	{if $payment_mean.name == "hgw_mpa"}
 	<div class="payment--description panel--td">
 		{if $payment_mean.additionaldescription|strip:'' != ''}
 			{include file="string:{$payment_mean.additionaldescription}"}<br/>
 		{/if}
-		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_mpa.tpl"}
+		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_mpa.tpl"}
 	</div>
 	{else}
 		{$smarty.block.parent}
@@ -182,7 +183,7 @@
 		{if $payment_mean.additionaldescription|strip:'' != ''}
 			{include file="string:{$payment_mean.additionaldescription}"}<br/>
 		{/if}
-		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_mpa.tpl"}
+		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_mpa.tpl"}
 	</div>
 	{else}
 		{$smarty.block.parent}

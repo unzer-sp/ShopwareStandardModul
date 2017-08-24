@@ -358,13 +358,20 @@ $(document).ready(function(){
 });
 
 
-// REUSE PAYMENT
-jQuery.fn.reuse = function(){
-    jQuery('.payment input:checkbox').click(function(){
-        var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
-        jQuery('.reuse'+pm).toggle(500);
-        jQuery('.newreg'+pm).toggle(500);
-    });
+// // REUSE PAYMENT
+// jQuery.fn.reuse = function(){
+//     jQuery('.payment input:checkbox').click(function(){
+//         var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+//         jQuery('.reuse'+pm).toggle(500);
+//         jQuery('.newreg'+pm).toggle(500);
+//     });
+// }
+
+// function to toggle between registrated payment data and enter new paymentdata
+function hgwToggleReuse (pm)
+{
+    jQuery('.reuse' + pm).toggle(500);
+    jQuery('.newreg' + pm).toggle(500);
 }
 
 // CHANGE FORM URL

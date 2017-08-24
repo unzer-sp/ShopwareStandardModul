@@ -21,6 +21,6 @@
 
 		{if isset($regData.$pm)}
 		<div class="space">&nbsp;</div>
-		<div><input class="reues_{$pm}" type='checkbox'>{s name='hp_reenter' namespace='frontend/register/hp_payment'}{/s}</div>{/if}
+		<div><input class="reues_{$pm}" type='checkbox' onclick="hgwToggleReuse('_dc')">{s name='hp_reenter' namespace='frontend/register/hp_payment'}{/s}</div>{/if}
 	</div>
 {/block}

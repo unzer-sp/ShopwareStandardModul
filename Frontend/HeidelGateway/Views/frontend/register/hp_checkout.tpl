@@ -32,8 +32,7 @@
 
 	<script type='text/javascript'>
 		var mobile = "{$isMobile}";
-//		$(document).ready(function(){
-        document.asyncReady(function() {
+		$(document).ready(function(){
 			jQuery('.wallet').click(function(){
 				jQuery('#lbOverlay').fadeIn(350);
 				$.loadingIndicator.open();

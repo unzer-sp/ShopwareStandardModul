@@ -13,59 +13,6 @@
 			var token = "{$token}";
 		{/if}
 	</script>
-	
-	<script type='text/javascript'>
-//		$(document).ready(function(){
-////			$(document).ibanCheck();
-//			jQuery(document).ibanCheck();
-//
-////		sepa switch
-//		jQuery.fn.ibanCheck = function(){
-//			if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-//			if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-//
-//			jQuery('#sepa_switch').change(function(){
-//				if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-//				if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-//			});
-//
-//			function iban(){
-//				if(jQuery('.newreg_dd #iban').is(':hidden')){
-//					jQuery('.newreg_dd #account').parent().hide();
-//					jQuery('.newreg_dd #bankcode').parent().hide();
-//					jQuery('.newreg_dd #cardBrand').parent().hide();
-//					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
-//					jQuery('.newreg_dd #iban').parent().show();
-//				}
-//			}
-//
-//			function noiban(){
-//				if(jQuery('.newreg_dd #account').is(':hidden')){
-//					jQuery('.newreg_dd #account').parent().show();
-//					jQuery('.newreg_dd #bankcode').parent().show();
-//					jQuery('.newreg_dd #cardBrand').parent().show();
-//					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').show();
-//					jQuery('.newreg_dd #iban').parent().hide();
-//				}
-//			}
-//		};
-//
-//
-//
-//                function iban(){
-//                    if(jQuery('.newreg_dd #iban').is(':hidden')){
-//                        jQuery('.newreg_dd #account').parent().hide();
-//                        jQuery('.newreg_dd #bankcode').parent().hide();
-//                        jQuery('.newreg_dd #cardBrand').parent().hide();
-//                        jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
-//                        jQuery('.newreg_dd #iban').parent().show();
-//                    }
-//                }
-//
-//
-//
-//	});
-	</script>
 
     {if $action != 'cart'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
@@ -92,7 +39,8 @@
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_dd.tpl"}
 	{elseif $payment_mean.name == "hgw_pay" && $heidel_bm_va && ($formUrl.$pm != '')}
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va'}
-
+    {elseif $payment_mean.name == "hgw_hpr"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
 	{else}
 		{$smarty.block.parent}
 	{/if}

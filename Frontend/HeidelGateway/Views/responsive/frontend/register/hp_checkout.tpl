@@ -1,5 +1,4 @@
 {block name="frontend_index_header_javascript_jquery_lib" append}
-	<h1>Version {$swVersion}</h1>
 	{if $swVersion >= "5.3"}
 		<script type='text/javascript'>
             var mobile = "{$isMobile}";

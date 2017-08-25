@@ -62,7 +62,6 @@
     {if $swVersion >= "5.3"}
 		<script type='text/javascript'>
             //sepa switch
-            //		$(document).ready(function(){
             document.asyncReady(function() {
                 var call = true;
                 if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
@@ -301,7 +300,9 @@
 					{include file="frontend/register/hp_payment_papg.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
 				{elseif $pm == 'san'}
 					{include file="frontend/register/hp_payment_san.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
-				{else}	
+                {elseif $pm == 'hpr'}
+                    {include file="frontend/register/hp_payment_hpr.tpl" pm=$pm grid=$grid classname=$classname}
+				{else}
 					{if !isset($pm)}
 						<noscript><h2 class="headingbox_dark largesize">{s name='PaymentRedirect' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2></noscript>
 					{/if}

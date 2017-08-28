@@ -658,6 +658,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				} catch (Exception $e) {
 					$this->logError($msg, $e);
 				}
+
             case '17.08.20':
                 //Compatibility for Shopware 5.3
                 try {
@@ -666,9 +667,23 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
             case '17.09.04':
-                //Compatibility for Shopware 5.3
+                // Compatibility for Shopware 5.3
+                // changed name of Logging-User for Heidelpay-Plugin
                 // Integration of Ratepay by easyCredit
+                // Bugfix Shopware()->Shop()
+                // used shopwareArticleNumber ($basketItem['ordernumber']) if there´s no EAN for BasketApi use
                 try {
+                    $this->updateLoggingUser();
+                    $this->createPayments();
+                    $this->addSnippets();
+                    $this->createEvents();
+                    $form->setElement('text', 'HGW_HPR_CHANNEL',
+                        array(
+                            'label'=>'EasyCredit Channel',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
                     $msg .= '* update 17.09.04 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
@@ -2114,6 +2129,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         }
     }
 
+    /**
+     * getHgwTransactions() fetches a single transaction from hgw_transactions by a transactionId
+     * @param $transactionId
+     * @return mixed
+     */
     public function getHgwTransactions($transactionId) {
         $sql= "SELECT * FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ? ORDER BY `id` DESC LIMIT 1 ;";
         $params = array($transactionId);
@@ -2576,7 +2596,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			$prms_id 		= NULL;
 			$prms_roleID 	= '1';
-			$prms_username 	= 'heidelpay';
+			$prms_username 	= 'heidelpay-logging';
 			$prms_name 		= $this->getLabel();
 			$prms_email 	= 'support@heidelpay.de';
 			$prms_active	= '1';
@@ -2588,6 +2608,26 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			return;
 		}
 	}
+
+    /**
+     * Method to update a db entry for heidelpay,
+     * so you can filter the log-files for heidelpay entrys
+     */
+    public function updateLoggingUser(){
+        try{
+            $sql = '
+			UPDATE `s_core_auth` SET `username` = ? WHERE `username` = "heidelpay"
+			';
+
+            $prms_username 	= 'heidelpay-logging';
+
+            $params = array($prms_username);
+            return Shopware()->Db()->query($sql, $params);
+        }catch(Exception $e){
+            $this->Logging('updateLoggingUser | '.$e->getMessage());
+            return;
+        }
+    }
 
 	/**
 	 * Method that adds an entry to the log and throws an exception
@@ -2632,7 +2672,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 		}catch(Exception $e){
-//			$this->Logging('Logging | '.$e->getMessage());
 			self::Logging('Logging | '.$e->getMessage());
 			return;
 		}
@@ -2769,6 +2808,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'description'	=> 'Heidelpay CD-Edition PostFinace',
 					'trans_desc' 	=> 'Heidelpay CD-Edition PostFinace',
 			);
+            $inst[] = array(
+                'name'			=> 'hpr',
+                'description'	=> 'Heidelpay CD-Edition ratenkauf by easyCredit',
+                'trans_desc' 	=> 'Heidelpay CD-Edition Hire purchase by easyCredit',
+                'additionalDescription' => '
+								<div class="EasyPermission">
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (200 - 3.000 EUR). </p>
+								</div>',
+                'template' 		=> 'hp_payment_hpr.tpl',
+
+            );
 			$inst[] = array(
 					'name'			=> 'mpa',
 					'description'	=> 'Heidelpay CD-Edition MasterPass',
@@ -2868,7 +2918,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-100.100.500','Please verify your payment data');
 		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-100.396.101','Abbruch durch Benutzer');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-100.396.101','Canceled by user');
-		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-100.400.110','Bitte w&auml;hlen Sie eine andere Zahlart');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-100.396.102','Die Transaktion wurde abgelehnt');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-100.396.102','Transaction was declined');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-100.400.110','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-100.400.110','Please choose another payment method');
 		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.151','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.151','Please choose another payment method');
@@ -2888,8 +2940,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.171','Please choose another payment method');
 		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.300.101','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.300.101','Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge (200 - 3.000 EUR) ');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of 200 and 3000 EUR');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.153','Die verwendete Adresse wurde nicht gefunden');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.153','Sorry, your address could not be found');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.152','Die verwendete Adresse wurde nicht gefunden');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.152','Sorry, your address could not be found');
 
-		$snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
+
+        $snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','en','PaymentProcess','Payment process');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentCancel','Der Bezahlvorgang wurde von Ihnen abgebrochen.');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','en','PaymentCancel','The payment process was canceled by you.');
@@ -3030,8 +3089,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/register/hp_payment','en','hp_paypalInfo',"You'll be redirectet to PayPal to confirm your data, if you want to register it.");
 		$snippets[] = array('frontend/register/hp_payment','de','hp_moreMpa','über MasterPass');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_moreMpa','about MasterPass');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_interest','accrued interest');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_interest','Zinsen f&uuml;r Ratenkauf');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_totalInterest','total amount with interest');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_totalInterest','Gesamtsumme mit Zinsen');
 
-		$snippets[] = array('backend/heidelBackend','de','action','Aktion');
+
+        $snippets[] = array('backend/heidelBackend','de','action','Aktion');
 		$snippets[] = array('backend/heidelBackend','en','action','Action');
 		$snippets[] = array('backend/heidelBackend','de','amount','Betrag');
 		$snippets[] = array('backend/heidelBackend','en','amount','Amount');
@@ -3417,6 +3481,7 @@ Mit freundlichen Gruessen
 							'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
 							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofortüberweisung Channel'),
+                            'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Kreditkarten Buchungsmodus',
 									'description' 		=> $bookingModeDescDE,
@@ -3501,6 +3566,7 @@ Mit freundlichen Gruessen
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Invoice Channel'),
 							'HGW_PAPG_CHANNEL', array('label'=> 'Invoice with guarantee Channel'),
 							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Banking Channel'),
+                            'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Credit Card booking mode',
 									'description' 		=> $bookingModeDescEn,
@@ -3669,15 +3735,13 @@ Mit freundlichen Gruessen
 				}
 
 
-				return 	hash('sha512',
-						$user['shippingaddress']['firstname'].
-						$user['shippingaddress']['lastname'].
-						$user['shippingaddress']['street'].
-						$user['shippingaddress']['zipcode'].
-						$user['shippingaddress']['city'].
-						$user['shippingaddress']['countryID']
-						);
-
+		return 	hash('sha512',
+		$user['shippingaddress']['firstname'].
+			$user['shippingaddress']['lastname'].
+		    $user['shippingaddress']['street'].
+			$user['shippingaddress']['zipcode'].
+			$user['shippingaddress']['city'].
+			$user['shippingaddress']['countryID']
+        );
 	}
-
 }

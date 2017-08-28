@@ -2480,6 +2480,66 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			return;
 		}
 	}
+
+    /**
+     * function to prepare Request-Data for paymentmethod HPR
+     * @param array $config
+     * @param array $frontend
+     * @param array $userData
+     * @param array $basketData
+     * @param array $criterion
+     * @param array $additional
+     * @return array
+     */
+    public function prepareHprIniData($config = array(), $frontend = array(), $userData = array(), $basketData = array(), $criterion = array(), $additional = array())
+    {
+        try {
+            $params = array();
+            // configurtation part of this function
+            $params['SECURITY.SENDER']		= $config['SECURITY.SENDER'];
+            $params['USER.LOGIN'] 			= $config['USER.LOGIN'];
+            $params['USER.PWD'] 			= $config['USER.PWD'];
+            $params['TRANSACTION.MODE']		= $config['TRANSACTION.MODE'];
+            $params['TRANSACTION.CHANNEL']	= $config['TRANSACTION.CHANNEL'];
+            $clientIP = explode(',', Shopware()->Front()->Request()->getclientIP(true));
+            if(!filter_var($clientIP[0], FILTER_VALIDATE_IP)){ $clientIP[0] = '127.0.0.1'; }
+            $params['CONTACT.IP'] 			= $clientIP[0];
+            $params['FRONTEND.LANGUAGE'] 	= strtoupper(Shopware()->Locale()->getLanguage());
+            $params['FRONTEND.MODE'] 		= "WHITELABEL";
+            $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+            $params['PAYMENT.CODE'] 		= "HP.".$type;
+            $params['ACCOUNT.BRAND'] 		= "EASYCREDIT";
+            $params['FRONTEND.ENABLED'] 	= "true";
+
+            //adding additionaldata
+            $params = array_merge($params,$additional);
+
+            if(array_key_exists('SHOP.TYPE',$config)) $params['SHOP.TYPE'] = $config['SHOP.TYPE'];
+            if(array_key_exists('SHOPMODULE.VERSION',$config)) $params['SHOPMODULE.VERSION'] = $config['SHOPMODULE.VERSION'];
+
+            // costumer data configuration
+            $params = array_merge($params, $userData);
+
+            // basket data configuration
+            $params['BASKET.ID'] = $basketData['basketId'];
+
+            // criterion data configuration
+            $params = array_merge($params, $criterion);
+            $params['CRITERION.SHOP_ID']	= Shopware()->Shop()->getId();
+            $params['CRITERION.PUSH_URL'] 	= Shopware()->Front()->Router()->assemble(array('forceSecure' => 1,'controller' => 'PaymentHgw','action' => 'rawnotify'));
+            $params['REQUEST.VERSION'] 		= "1.0";
+
+            $params['FRONTEND.RESPONSE_URL'] = Shopware()->Front()->Router()->assemble(array(
+                'forceSecure'	=> 1,
+                'controller' 	=> 'PaymentHgw',
+                'action' 		=> 'responseHpr'
+            ));
+
+            return $params;
+        } catch (Exception $e) {
+            $this->Logging('prepareHprIniData | '.$e->getMessage());
+        }
+    }
 	
 	/**
 	 * Method to get registerd payment information

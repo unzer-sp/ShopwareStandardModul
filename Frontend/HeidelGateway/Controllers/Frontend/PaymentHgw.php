@@ -1598,7 +1598,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$transType 	= $transaction['payment_type'];
 			$kto = $blz = '';
 
-			if(($parameters['CRITERION_WALLET'] == '1') && (strtoupper($transType) == 'IN')){
+			if(($parameters->CRITERION_WALLET == '1') && (strtoupper($transType) == 'IN')){
 				Shopware()->Session()->HPResp = $parameters;
 					
 				print Shopware()->Front()->Router()->assemble(array(

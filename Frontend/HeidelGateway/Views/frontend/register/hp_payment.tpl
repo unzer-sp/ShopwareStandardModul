@@ -39,6 +39,8 @@
 		{if !isset($regData.$pm)} {block name="hp_toggle"}{/block}	{else} {block name="hp_untoggle"}{/block} {/if}
 			{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va' classname='debit hgw_va'}
 		</div>
+	{elseif $payment_mean.name == "hgw_hpr"}
+		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
 	{ elseif $payment_mean.name == "hgw_papg"}
 		<!--<div>-->
 			{* include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_papg.tpl" pm='papg' classname='debit hgw_papg' *}
@@ -129,8 +131,7 @@
 	<script type='text/javascript'>
 		//define formUrl to make it useable in external JS
 		var formUrl = {$formUrl|@json_encode};
-//		$(document).ready(function(){
-		document.asyncReady(function() {
+		$(document).ready(function(){
 			//add error div
 			if(jQuery('#center .error').length < 1){
 				jQuery('#center').prepend('<div class="error" style="display: none;"><h2>{s name='RegisterErrorHeadline' namespace='frontend/register/error_message'}{/s}</h2><ul></ul></div>');

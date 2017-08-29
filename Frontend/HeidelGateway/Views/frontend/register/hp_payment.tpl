@@ -41,10 +41,7 @@
 		</div>
 	{elseif $payment_mean.name == "hgw_hpr"}
 		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
-	{ elseif $payment_mean.name == "hgw_papg"}
-		<!--<div>-->
-			{* include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_papg.tpl" pm='papg' classname='debit hgw_papg' *}
-		<!--</div>-->
+
 	{else}
 		{$smarty.block.parent}
 	{/if}

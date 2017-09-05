@@ -1484,8 +1484,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->Request()->setParam('sTarget', 'checkout');
 				$this->Request()->setParam('sTargetAction', 'index');
 				$_SERVER['REQUEST_METHOD'] = 'POST';
-mail("sascha.pflueger@heidelpay.de","PaymentHgw 1489",print_r("",1));
-				$this->forward('saveShippingPayment', 'checkout', '', $postData);
+    			$this->forward('saveShippingPayment', 'checkout', '', $postData);
 			}else{
 
 				return $this->redirect(array(

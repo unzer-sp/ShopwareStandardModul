@@ -14,8 +14,6 @@ document.asyncReady(function() {
 
     var sendHandler = function(e){
         origEvent = e;
-console.log("sendHander ");
-console.log(checkedOpt);
         sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt);
     }
 
@@ -66,12 +64,11 @@ console.log(checkedOpt);
 
     }else if(window.location.pathname.indexOf('gateway') >= '0'){
         // GATEWAY
-console.log("gateway")
         var errorDiv = '#payment .alert .alert--content';
 
         checkedOpt = $('#payment .payment_method');
         var checkedClass = checkedOpt.attr('class');
-console.log(checkedClass);
+
         if(typeof checkedClass != 'undefined'){
             var prefix = 'hgw_';
             var checkedClassPos = checkedClass.indexOf(prefix);
@@ -107,7 +104,6 @@ console.log(checkedClass);
         // SHIPPINGPAYMENT
         var errorDiv = '.content-main--inner .content .alert .alert--content';
 
-console.log("shippingPayment hpf_script");
         // reset the flags for the frame listener, because event bindings are deleted due to ajax
         // 'msg' flag don't need a reset because the listener is on the window
         hasListener['dc'] = false;
@@ -115,10 +111,8 @@ console.log("shippingPayment hpf_script");
 
         checkedOpt = jQuery('.payment--method-list input:radio:checked');
         var checkedClass = checkedOpt.attr('class');
-console.log("CHECKED OPT");
-console.log(checkedClass);
 
-       if(typeof checkedClass != 'undefined'){
+        if(typeof checkedClass != 'undefined'){
             var prefix = 'hgw_';
             var checkedClassPos = checkedClass.indexOf(prefix);
 
@@ -175,7 +169,6 @@ console.log(checkedClass);
 
     // a function to handle sending messages via postMessage to iFrame
     function sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt){
-console.log("sendMessage hpf_script");
     	if((pm == 'cc') || (pm == 'dc')){
 
             // just use eventListener on new registration or debit
@@ -197,8 +190,7 @@ console.log("sendMessage hpf_script");
                     }else{
                         e.returnValue = false;
                     }
-console.log("205");
-console.log(checkedOpt);
+
                     if(activePm == pm){
                         // disable all other input fields
                         jQuery('.payment--method input').attr('disabled', 'disabled');
@@ -216,8 +208,6 @@ console.log(checkedOpt);
                                 data[input.name] = input.value;
                             }
                         }
-console.log("223");
-console.log(data);
                         paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
                     }
                 }
@@ -234,7 +224,6 @@ console.log(data);
 
     // a function to receive a postMessages from iFrame
     function receiveMessage(e, origEvent, targetOrigin, paymentFrameForm, checkedOpt){
-console.log("receiveMessage hpf_Script");
     	// Check to make sure that this message came from the correct domain
         if(e.origin !== targetOrigin){
             return;
@@ -350,17 +339,14 @@ console.log("receiveMessage hpf_Script");
             }
 
             if(!hasListener[pm]){
-console.log("hpf submitListener gesetzt");
                 setSubmitListener();
                 hasListener[pm] = true;
             }
 
             if(!hasListener['msg']){
-console.log("hpf receiveListener gesetzt");
                 setMessageListener();
                 hasListener['msg'] = true;
             }
         }
-        console.log("callAfunction DURCH hpfScript");
     }
 });

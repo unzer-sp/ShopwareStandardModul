@@ -370,13 +370,6 @@ document.asyncReady(function () {
             jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
     }
-
-    // jQuery.fn.reuse = function () {
-    // jQuery('.payment input:checkbox').click(function () {
-    //     var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
-    //     jQuery('.reuse' + pm).toggle(500);
-    //     jQuery('.newreg' + pm).toggle(500);
-    // });
 });
 
 // function to toggle between registrated payment data and enter new paymentdata

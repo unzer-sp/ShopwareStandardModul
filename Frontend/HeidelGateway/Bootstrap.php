@@ -1593,7 +1593,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 										$avPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
 
 										$user = Shopware()->Modules()->Admin()->sGetUserData();
-											
+
 										foreach($avPayments as $key => $avPayment){
 											$prefix = 'hgw_';
 											$pos = strpos($avPayment['name'], $prefix);

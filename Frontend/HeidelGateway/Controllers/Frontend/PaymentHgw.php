@@ -814,12 +814,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	public function responseRegAction() {
 		
 		// setting csrf-Token is required
-		if($this->Request()->getPost('__csrf_token')){
-			$token = 'X-CSRF-Token';
-			Shopware()->Session()->$token = $this->Request()->getPost('__csrf_token');
-		}
-		Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
-		
+//		if($this->Request()->getPost('__csrf_token')){
+//			$token = 'X-CSRF-Token';
+//			Shopware()->Session()->$token = $this->Request()->getPost('__csrf_token');
+//		}
+//		Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
+		Shopware()->Session()->sUserId	= $this->Request()->getPost('CRITERION_USER_ID');
 		unset(Shopware()->Session()->HPError);
 		if($this->Request()->isPost()){
 			$flag = ENT_COMPAT;
@@ -959,12 +959,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			if ($resp['PROCESSING_RESULT'] == 'ACK') {
 				// setting csrf-Token is required
-				if(isset($resp['__csrf_token'])){
-					$token = 'X-CSRF-Token';
-					Shopware()->Session()->$token = $resp['__csrf_token'];
-				}
-				Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
-					
+//				if(isset($resp['__csrf_token'])){
+//					$token = 'X-CSRF-Token';
+//					Shopware()->Session()->$token = $resp['__csrf_token'];
+//				}
+//				Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
+				Shopware()->Session()->sUserId	= $resp['CRITERION_USER_ID'];
+
 				// save registration to DB
 				switch (substr($resp['PAYMENT_CODE'], 0,2)) {
 					case 'CC':
@@ -1483,7 +1484,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->Request()->setParam('sTarget', 'checkout');
 				$this->Request()->setParam('sTargetAction', 'index');
 				$_SERVER['REQUEST_METHOD'] = 'POST';
-
+mail("sascha.pflueger@heidelpay.de","PaymentHgw 1489",print_r("",1));
 				$this->forward('saveShippingPayment', 'checkout', '', $postData);
 			}else{
 
@@ -3043,9 +3044,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				case 'dc':
 					$params['PAYMENT.CODE'] = strtoupper($config['PAYMENT.METHOD']).'.'.$config['PAYMENT.TYPE'];
 					$params['FRONTEND.ENABLED'] = "true";
+
 					$url = parse_url(Shopware()->Front()->Router()->assemble(array('forceSecure' => 1)));
 					$params['FRONTEND.PAYMENT_FRAME_ORIGIN']	= $url['scheme'] .'://'. $url['host'];
-					$params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = 'FALSE';
+//					$params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = 'FALSE';
+					$params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = 'TRUE';
 					// path to CSS
 					$cssVar = 'HGW_HPF_'.strtoupper($config['PAYMENT.METHOD']).'_CSS';
 					$konfiguration = self::Config();

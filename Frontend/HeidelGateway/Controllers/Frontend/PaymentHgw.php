@@ -3101,6 +3101,16 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$params['CRITERION.PUSH_URL'] 	= Shopware()->Front()->Router()->assemble(array('forceSecure' => 1,'controller' => 'PaymentHgw','action' => 'rawnotify'));
 			$params['REQUEST.VERSION'] 		= "1.0";
 
+			if(
+                $params['PAYMENT.CODE'] == "CC.DB" ||
+                $params['PAYMENT.CODE'] == "CC.PA" ||
+                $params['PAYMENT.CODE'] == "DC.DB" ||
+                $params['PAYMENT.CODE'] == "DC.PA"
+            )
+			{
+			    $params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = "FALSE";
+            }
+//mail("sascha.pflueger@heidelpay.de","3110",print_r($params['FRONTEND.PREVENT_ASYNC_REDIRECT'],1));
 			$payMethode = substr($params['PAYMENT.CODE'], 3);
 			switch ($payMethode) {
 				case 'RR':

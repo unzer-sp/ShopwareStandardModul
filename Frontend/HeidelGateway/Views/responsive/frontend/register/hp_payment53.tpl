@@ -73,8 +73,8 @@
     {if $action != 'cart'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
         {if $swVersion >= "5.3"}
-			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
-			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+            <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
+            <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
         {else}
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
@@ -116,14 +116,13 @@
     {/if} *}
 
     {if $action == 'shippingPayment'}
-
-		{if {$payment_mean.name} == "hgw_cc"}
-			<!--<input type="radio" name="payment" onclick="callAFunction('cc')" onchange="callAFunction('cc')" class="radio auto_submit {$payment_mean.name}" value="{$payment_mean.id}" id="payment_mean{$payment_mean.id}" {if $payment_mean.id eq $form_data.payment or ($payment_mean.id == $sPayment.id)} checked="checked"{/if} />-->
+        {if {$payment_mean.name} == "hgw_cc"}
 			<input type="radio" name="payment" class="radio auto_submit {$payment_mean.name}" value="{$payment_mean.id}" id="payment_mean{$payment_mean.id}" {if $payment_mean.id eq $form_data.payment or ($payment_mean.id == $sPayment.id)} checked="checked"{/if} />
-            <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer="defer"></script>
+
         {elseif {$payment_mean.name} == "hgw_dc"}
 			<input type="radio" name="payment" class="radio auto_submit {$payment_mean.name}" value="{$payment_mean.id}" id="payment_mean{$payment_mean.id}" {if $payment_mean.id eq $form_data.payment or ($payment_mean.id == $sPayment.id)} checked="checked"{/if} />
-		{else}
+
+         {else}
 			<input type="radio" name="payment" class="radio auto_submit {$payment_mean.name}" value="{$payment_mean.id}" id="payment_mean{$payment_mean.id}" {if $payment_mean.id eq $form_data.payment or ($payment_mean.id == $sPayment.id)} checked="checked"{/if} />
 		{/if}
     {else}

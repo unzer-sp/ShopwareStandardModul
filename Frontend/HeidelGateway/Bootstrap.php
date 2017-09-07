@@ -2579,7 +2579,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function doRequest($params = array(), $url = NULL){
 		try{
-			if($url == NULL){ $url = self::$requestUrl; }
+		    if($url == NULL){ $url = self::$requestUrl; }
 			$client = new Zend_Http_Client($url, array(
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,
 					'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8'

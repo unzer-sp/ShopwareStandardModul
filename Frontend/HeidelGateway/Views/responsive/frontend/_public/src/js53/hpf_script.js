@@ -20,13 +20,13 @@ document.asyncReady(function() {
     // PATH SWITCH
     if(window.location.pathname.indexOf('account/payment') >= '0'){
         // ACCOUNT/PAYMENT
-console.log("ACCOUNT");
         var errorDiv = '#center .alert .alert--content';
 
         // check if payment selection is changed
         $('.register--payment').click(function(){
             // change form action
             checkedOpt = $('.register--payment input:radio:checked');
+
             var checkedClass = checkedOpt.attr('class');
             if(typeof checkedClass != 'undefined'){
                 var prefix = 'hgw_';
@@ -49,6 +49,7 @@ console.log("ACCOUNT");
 
                         if(!hasListener[pm]){
                             setSubmitListener();
+console.log("SubmitListener Set");
                             hasListener[pm] = true;
                         }
 
@@ -65,7 +66,7 @@ console.log("ACCOUNT");
 
     }else if(window.location.pathname.indexOf('gateway') >= '0'){
         // GATEWAY
-console.log("GATEWAY");
+        console.log("GATEWAY")
         var errorDiv = '#payment .alert .alert--content';
 
         checkedOpt = $('#payment .payment_method');
@@ -91,7 +92,7 @@ console.log("GATEWAY");
                             break;
                         }
                     }
-console.log(paymentFrameIframe);
+
                     if(!hasListener[pm]){
                         setSubmitListener();
                         hasListener[pm] = true;
@@ -106,53 +107,59 @@ console.log(paymentFrameIframe);
         }
     }else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
         // SHIPPINGPAYMENT
-console.log("SHIPPINGPAYMENT");
+console.log("ShippingPayment");
         var errorDiv = '.content-main--inner .content .alert .alert--content';
-
         // reset the flags for the frame listener, because event bindings are deleted due to ajax
         // 'msg' flag don't need a reset because the listener is on the window
-        hasListener['dc'] = false;
-        hasListener['cc'] = false;
+        $( document ).ajaxComplete(function() {
+            hasListener['dc'] = false;
+            hasListener['cc'] = false;
+    console.log("hasListener 114");
+    console.log(hasListener);
+            checkedOpt = jQuery('.payment--method-list input:radio:checked');
+            var checkedClass = checkedOpt.attr('class');
+            if(typeof checkedClass != 'undefined'){
+                var prefix = 'hgw_';
+                var checkedClassPos = checkedClass.indexOf(prefix);
 
-        checkedOpt = jQuery('.payment--method-list input:radio:checked');
-        var checkedClass = checkedOpt.attr('class');
+                if(checkedClassPos >= 0){
+                    pm = checkedClass.substr(checkedClassPos+prefix.length);
 
-        if(typeof checkedClass != 'undefined'){
-            var prefix = 'hgw_';
-            var checkedClassPos = checkedClass.indexOf(prefix);
+                    callAFunction(pm);
 
-            if(checkedClassPos >= 0){
-                pm = checkedClass.substr(checkedClassPos+prefix.length);
-
-                callAFunction(pm);
-
-               if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
-                    // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
-                    targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
-                    paymentFrameForm = document.getElementsByName('shippingPaymentForm');
-                    paymentFrameIframe = document.getElementById('hp_frame_'+pm);
-                    // get right element from nodelist
-                    for(var i = 0; i < paymentFrameForm.length; i++){
-                        var item = paymentFrameForm[i];
-                        if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
-                            paymentFrameForm = paymentFrameForm[i];
-                            break;
+                   if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
+                        // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
+                        targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
+                        paymentFrameForm = document.getElementsByName('shippingPaymentForm');
+                        paymentFrameIframe = document.getElementById('hp_frame_'+pm);
+                        // get right element from nodelist
+                        for(var i = 0; i < paymentFrameForm.length; i++){
+                            var item = paymentFrameForm[i];
+                            if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
+                                paymentFrameForm = paymentFrameForm[i];
+                                break;
+                            }
                         }
-                    }
 
-                    if(!hasListener[pm]){
-                        setSubmitListener();
-                        hasListener[pm] = true;
-                    }
+                        if(!hasListener[pm]){
+                            setSubmitListener();
+                            hasListener[pm] = true;
+                        }
 
-                    if(!hasListener['msg']){
-                        setMessageListener();
-                        hasListener['msg'] = true;
+                        if(!hasListener['msg']){
+                            setMessageListener();
+                            hasListener['msg'] = true;
+                        }
+    console.log("hasListener 150");
+    console.log(hasListener);
                     }
-                }
-            }else{ pm = ''; }
-        }
+                }else{ pm = ''; }
+            }
+
+        });
     }
+
+
 
     // add an event listener that will execute the sendMessage() function when the send button is clicked.
     function setSubmitListener(){
@@ -174,8 +181,9 @@ console.log("SHIPPINGPAYMENT");
 
     // a function to handle sending messages via postMessage to iFrame
     function sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt){
+console.log("sendMessage START");
     	if((pm == 'cc') || (pm == 'dc')){
-
+console.log("186");
             // just use eventListener on new registration or debit
             if(jQuery('.newreg_'+pm).is(':visible')){
                 $.overlay.open();
@@ -183,7 +191,12 @@ console.log("SHIPPINGPAYMENT");
                 $(paymentFrameForm).find('input[type="submit"]').attr('disabled', 'disabled');
                 // var checkedClass = checkedOpt.attr('class');
                 checkedClass = jQuery('.payment--method-list input:radio:checked').attr('class');
-
+console.log("194");
+console.log(checkedClass)
+                if(typeof checkedClass == 'undefined'){
+                    checkedClass = jQuery('.payment_method').attr('class');
+                }
+console.log(checkedClass)
                 if(typeof checkedClass != 'undefined'){
                     var prefix = 'hgw_';
                     var checkedClassPos = checkedClass.indexOf(prefix);
@@ -195,7 +208,7 @@ console.log("SHIPPINGPAYMENT");
                     }else{
                         e.returnValue = false;
                     }
-
+console.log("210");
                     if(activePm == pm){
                         // disable all other input fields
                         jQuery('.payment--method input').attr('disabled', 'disabled');
@@ -213,6 +226,7 @@ console.log("SHIPPINGPAYMENT");
                                 data[input.name] = input.value;
                             }
                         }
+console.log(data);
                         paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
                     }
                 }
@@ -261,6 +275,7 @@ console.log("SHIPPINGPAYMENT");
             }else if(paymentFrameForm.detachEvent){ // IE DOM
                 paymentFrameForm.detachEvent('onsubmit', sendHandler);
             }
+
             // do default action
             $(paymentFrameForm).trigger(origEvent.type);
         }
@@ -326,7 +341,7 @@ console.log("SHIPPINGPAYMENT");
 
     function callAFunction(payMeth) {
         pm = payMeth;
-
+console.log("callAFunction");
         if(((payMeth.toLowerCase() == 'cc') || (payMeth.toLowerCase() == 'dc')) && $('#hp_frame_'+payMeth).length > 0){
             // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
             targetOrigin = getDomainFromUrl($('#hp_frame_'+payMeth).attr('src'));

@@ -19,6 +19,7 @@ document.asyncReady(function() {
 
     // PATH SWITCH
     if(window.location.pathname.indexOf('account/payment') >= '0'){
+console.log("ACCOUNT");
         // ACCOUNT/PAYMENT
         var errorDiv = '#center .alert .alert--content';
 
@@ -108,14 +109,61 @@ console.log("SubmitListener Set");
     }else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
         // SHIPPINGPAYMENT
 console.log("ShippingPayment");
+console.log("Kein CC / DC vorausgewählt");
         var errorDiv = '.content-main--inner .content .alert .alert--content';
+
+        /* ************************************** */
+        // wenn CC / DC schon vorausgewählt war
+        hasListener['dc'] = false;
+        hasListener['cc'] = false;
+
+        checkedOpt = jQuery('.payment--method-list input:radio:checked');
+        var checkedClass = checkedOpt.attr('class');
+
+        if(typeof checkedClass != 'undefined') {
+            var prefix = 'hgw_';
+            var checkedClassPos = checkedClass.indexOf(prefix);
+
+            if(checkedClassPos >= 0) {
+                pm = checkedClass.substr(checkedClassPos + prefix.length);
+
+                callAFunction(pm);
+
+                if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
+                    // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
+                    targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
+                    paymentFrameForm = document.getElementsByName('shippingPaymentForm');
+                    paymentFrameIframe = document.getElementById('hp_frame_'+pm);
+                    // get right element from nodelist
+                    for(var i = 0; i < paymentFrameForm.length; i++){
+                        var item = paymentFrameForm[i];
+                        if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
+                            paymentFrameForm = paymentFrameForm[i];
+                            break;
+                        }
+                    }
+
+                    if(!hasListener[pm]){
+                        setSubmitListener();
+                        hasListener[pm] = true;
+                    }
+
+                    if(!hasListener['msg']){
+                        setMessageListener();
+                        hasListener['msg'] = true;
+                    }
+                }
+            }
+            console.log("Kein CC / DC vorausgewählt durch 156");
+        } else{ pm = ''; }
+        /* ************************************** */
         // reset the flags for the frame listener, because event bindings are deleted due to ajax
         // 'msg' flag don't need a reset because the listener is on the window
+        // wenn CC / DC erst auf Shipping-Payment ausgewählt wird (Nach Reload der Seite)
         $( document ).ajaxComplete(function() {
             hasListener['dc'] = false;
             hasListener['cc'] = false;
-    console.log("hasListener 114");
-    console.log(hasListener);
+
             checkedOpt = jQuery('.payment--method-list input:radio:checked');
             var checkedClass = checkedOpt.attr('class');
             if(typeof checkedClass != 'undefined'){
@@ -125,9 +173,9 @@ console.log("ShippingPayment");
                 if(checkedClassPos >= 0){
                     pm = checkedClass.substr(checkedClassPos+prefix.length);
 
-                    callAFunction(pm);
-
                    if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
+console.log("ajaxComplete CC / DC vorausgewählt");
+                       callAFunction(pm);
                         // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
                         targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
                         paymentFrameForm = document.getElementsByName('shippingPaymentForm');
@@ -150,8 +198,7 @@ console.log("ShippingPayment");
                             setMessageListener();
                             hasListener['msg'] = true;
                         }
-    console.log("hasListener 150");
-    console.log(hasListener);
+    console.log("ajaxComplete durch 200");
                     }
                 }else{ pm = ''; }
             }
@@ -194,8 +241,15 @@ console.log("186");
 console.log("194");
 console.log(checkedClass)
                 if(typeof checkedClass == 'undefined'){
+                    //for ShippingPayment
                     checkedClass = jQuery('.payment_method').attr('class');
                 }
+                if(typeof checkedClass == 'undefined'){
+                    // for Account-page
+                    checkedClass = jQuery('.payment--selection-input input:radio:checked').attr('class')
+                }
+
+
 console.log(checkedClass)
                 if(typeof checkedClass != 'undefined'){
                     var prefix = 'hgw_';
@@ -229,6 +283,8 @@ console.log("210");
 console.log(data);
                         paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
                     }
+                } else {
+console.log("checkedClass UNDEFINED")
                 }
             }
         }

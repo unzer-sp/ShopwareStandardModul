@@ -814,12 +814,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	public function responseRegAction() {
 		
 		// setting csrf-Token is required
-//		if($this->Request()->getPost('__csrf_token')){
-//			$token = 'X-CSRF-Token';
-//			Shopware()->Session()->$token = $this->Request()->getPost('__csrf_token');
-//		}
+		if($this->Request()->getPost('__csrf_token')){
+			$token = 'X-CSRF-Token';
+			Shopware()->Session()->$token = $this->Request()->getPost('__csrf_token');
+		}
 //		Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
 		Shopware()->Session()->sUserId	= $this->Request()->getPost('CRITERION_USER_ID');
+
 		unset(Shopware()->Session()->HPError);
 		if($this->Request()->isPost()){
 			$flag = ENT_COMPAT;
@@ -955,7 +956,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->hgw()->Logging('responseRegAction saving response failed | '.$e->getMessage());
 				return;
 			}
-				
+
 
 			if ($resp['PROCESSING_RESULT'] == 'ACK') {
 				// setting csrf-Token is required
@@ -963,7 +964,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 //					$token = 'X-CSRF-Token';
 //					Shopware()->Session()->$token = $resp['__csrf_token'];
 //				}
-//				Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
+
 				Shopware()->Session()->sUserId	= $resp['CRITERION_USER_ID'];
 
 				// save registration to DB
@@ -1014,7 +1015,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 								return;
 								break;
 							default:
-								print Shopware()->Front()->Router()->assemble(array(
+    							print Shopware()->Front()->Router()->assemble(array(
 								'forceSecure' 	=> 1,
 								'controller' 	=> 'checkout',
 								'sTarget' 		=> $this->Request()->getPost('sTarget'),
@@ -1382,7 +1383,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		try{
 
 			$postparams = array();
-			$postparams = array('payment' => $this->Request()->getParam('register'));
+//			$postparams = array('payment' => $this->Request()->getParam('register'));
+
+			$postparams = array('payment' => $this->Request()->getParam('sRegister'));
+
 
 			$_SERVER['REQUEST_METHOD'] = 'GET';
 			$this->Request()->setPost('isPost', 'true');
@@ -1395,10 +1399,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$tokenNameResponse = '__csrf_token';
 			Shopware()->Session()->$tokenNameSession = $token->$tokenNameResponse;
 
-			$postparams['payment'] = $token->var_Register->payment;
+//			$postparams['payment'] = $token->var_Register->payment;
 
-			Shopware()->Session()->sRegister = $postparams;
-			$this->Request()->setPost('register', $postparams);
+//			Shopware()->Session()->sRegister = $postparams;
+			$this->Request()->setPost('sRegister', $postparams);
 
 			$target = false;
 			$target = $this->Request()->getParam('sTarget');
@@ -1418,7 +1422,17 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->hgw()->Logging('savePaymentAction | changing paymenthod failed| '.$e->getMessage());
 			}
 
-			$this->forward('savePayment', 'account', '', $postparams);
+            // bis SW 5.2.27 aktuell
+//			$this->forward('savePayment', 'account', '', $postparams);
+//			$this->forward('confirm','checkout', '', $postparams);
+            // funktionstüchtig für SW 5.3
+            $this-> redirect(array(
+                    'controller' => 'checkout',
+                    'action' => 'confirm',
+                    'sTarget' => 'checkout',
+                    'sTargetAction' => 'confirm',
+                )
+            );
 
 		}catch(Exception $e){
 			//Shopware()->Plugins()->Logging('savePaymentAction | '.$e->getMessage());
@@ -1570,7 +1584,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 * Transactions will be forwarded.
 	 */
 	public function successAction(){
-		try{
+		try{mail("sascha.pflueger@heidelpay.de","successAction",print_r("Test",1));
             unset(Shopware()->Session()->HPError);
             unset($this->View()->amortisationText);
 

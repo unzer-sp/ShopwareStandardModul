@@ -1584,7 +1584,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 * Transactions will be forwarded.
 	 */
 	public function successAction(){
-		try{mail("sascha.pflueger@heidelpay.de","successAction",print_r("Test",1));
+		try{
             unset(Shopware()->Session()->HPError);
             unset($this->View()->amortisationText);
 
@@ -3124,7 +3124,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			{
 			    $params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = "FALSE";
             }
-//mail("sascha.pflueger@heidelpay.de","3110",print_r($params['FRONTEND.PREVENT_ASYNC_REDIRECT'],1));
+
 			$payMethode = substr($params['PAYMENT.CODE'], 3);
 			switch ($payMethode) {
 				case 'RR':

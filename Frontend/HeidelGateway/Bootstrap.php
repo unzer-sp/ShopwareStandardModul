@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.09.05';
+		return '17.09.18';
 	}
 
 	/**
@@ -666,11 +666,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-            case '17.09.05':
+            case '17.09.18':
                 // Compatibility for Shopware 5.3
                 // changed name of Logging-User for Heidelpay-Plugin
                 // Integration of Ratepay by easyCredit
-                // Bugfix Shopware()->Shop()
+                // Bugfix "Shopware()->Shop()"
                 // used shopwareArticleNumber ($basketItem['ordernumber']) if there´s no EAN for BasketApi use
                 try {
                     $this->updateLoggingUser();
@@ -684,7 +684,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 17.09.05 <br />';
+                    $msg .= '* update 17.09.18 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

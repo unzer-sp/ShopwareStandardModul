@@ -19,7 +19,6 @@ document.asyncReady(function() {
 
     // PATH SWITCH
     if(window.location.pathname.indexOf('account/payment') >= '0'){
-console.log("ACCOUNT");
         // ACCOUNT/PAYMENT
         var errorDiv = '#center .alert .alert--content';
 
@@ -50,7 +49,6 @@ console.log("ACCOUNT");
 
                         if(!hasListener[pm]){
                             setSubmitListener();
-console.log("SubmitListener Set");
                             hasListener[pm] = true;
                         }
 
@@ -67,7 +65,6 @@ console.log("SubmitListener Set");
 
     }else if(window.location.pathname.indexOf('gateway') >= '0'){
         // GATEWAY
-        console.log("GATEWAY")
         var errorDiv = '#payment .alert .alert--content';
 
         checkedOpt = $('#payment .payment_method');
@@ -108,12 +105,10 @@ console.log("SubmitListener Set");
         }
     }else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
         // SHIPPINGPAYMENT
-console.log("ShippingPayment");
-console.log("Kein CC / DC vorausgewählt");
         var errorDiv = '.content-main--inner .content .alert .alert--content';
 
         /* ************************************** */
-        // wenn CC / DC schon vorausgewählt war
+        // if CC / DC was chosen before
         hasListener['dc'] = false;
         hasListener['cc'] = false;
 
@@ -154,7 +149,6 @@ console.log("Kein CC / DC vorausgewählt");
                     }
                 }
             }
-            console.log("Kein CC / DC vorausgewählt durch 156");
         } else{ pm = ''; }
         /* ************************************** */
         // reset the flags for the frame listener, because event bindings are deleted due to ajax
@@ -174,7 +168,6 @@ console.log("Kein CC / DC vorausgewählt");
                     pm = checkedClass.substr(checkedClassPos+prefix.length);
 
                    if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
-console.log("ajaxComplete CC / DC vorausgewählt");
                        callAFunction(pm);
                         // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
                         targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
@@ -198,7 +191,6 @@ console.log("ajaxComplete CC / DC vorausgewählt");
                             setMessageListener();
                             hasListener['msg'] = true;
                         }
-    console.log("ajaxComplete durch 200");
                     }
                 }else{ pm = ''; }
             }
@@ -228,9 +220,7 @@ console.log("ajaxComplete CC / DC vorausgewählt");
 
     // a function to handle sending messages via postMessage to iFrame
     function sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt){
-console.log("sendMessage START");
     	if((pm == 'cc') || (pm == 'dc')){
-console.log("186");
             // just use eventListener on new registration or debit
             if(jQuery('.newreg_'+pm).is(':visible')){
                 $.overlay.open();
@@ -238,8 +228,7 @@ console.log("186");
                 $(paymentFrameForm).find('input[type="submit"]').attr('disabled', 'disabled');
                 // var checkedClass = checkedOpt.attr('class');
                 checkedClass = jQuery('.payment--method-list input:radio:checked').attr('class');
-console.log("194");
-console.log(checkedClass)
+
                 if(typeof checkedClass == 'undefined'){
                     //for ShippingPayment
                     checkedClass = jQuery('.payment_method').attr('class');
@@ -249,8 +238,6 @@ console.log(checkedClass)
                     checkedClass = jQuery('.payment--selection-input input:radio:checked').attr('class')
                 }
 
-
-console.log(checkedClass)
                 if(typeof checkedClass != 'undefined'){
                     var prefix = 'hgw_';
                     var checkedClassPos = checkedClass.indexOf(prefix);
@@ -262,7 +249,7 @@ console.log(checkedClass)
                     }else{
                         e.returnValue = false;
                     }
-console.log("210");
+
                     if(activePm == pm){
                         // disable all other input fields
                         jQuery('.payment--method input').attr('disabled', 'disabled');
@@ -280,11 +267,10 @@ console.log("210");
                                 data[input.name] = input.value;
                             }
                         }
-console.log(data);
+
                         paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
                     }
                 } else {
-console.log("checkedClass UNDEFINED")
                 }
             }
         }
@@ -397,7 +383,7 @@ console.log("checkedClass UNDEFINED")
 
     function callAFunction(payMeth) {
         pm = payMeth;
-console.log("callAFunction");
+
         if(((payMeth.toLowerCase() == 'cc') || (payMeth.toLowerCase() == 'dc')) && $('#hp_frame_'+payMeth).length > 0){
             // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
             targetOrigin = getDomainFromUrl($('#hp_frame_'+payMeth).attr('src'));

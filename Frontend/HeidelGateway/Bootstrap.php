@@ -1589,7 +1589,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 							if(
 									(($request->getControllerName() == 'account') && ($action == 'payment')) ||
 									(($request->getControllerName() == 'checkout') && (($action == 'confirm') || ($action == 'shippingPayment')))
-									){
+								){
 										$avPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
 
 										$user = Shopware()->Modules()->Admin()->sGetUserData();

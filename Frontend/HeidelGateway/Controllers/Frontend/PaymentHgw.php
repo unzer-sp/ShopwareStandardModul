@@ -1381,17 +1381,15 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function savePaymentAction(){
 		try{
+		    $swVersion = Shopware::VERSION;
+		    $tplVersion = Shopware()->Shop()->getTemplate()->getVersion();
 
 			$postparams = array();
-//			$postparams = array('payment' => $this->Request()->getParam('register'));
-
-			$postparams = array('payment' => $this->Request()->getParam('sRegister'));
-
+            $postparams = array('payment' => $this->Request()->getParam('sRegister'));
 
 			$_SERVER['REQUEST_METHOD'] = 'GET';
 			$this->Request()->setPost('isPost', 'true');
 			$transaction = $this->getHgwTransactions($this->Request()->txnId);
-
 
 			$token = json_decode($transaction['jsonresponse']);
 
@@ -1399,9 +1397,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$tokenNameResponse = '__csrf_token';
 			Shopware()->Session()->$tokenNameSession = $token->$tokenNameResponse;
 
-//			$postparams['payment'] = $token->var_Register->payment;
+			if($swVersion < 5.3)
+			{
+			    $postparams['payment'] = $token->var_Register->payment;
+                Shopware()->Session()->sRegister = $postparams;
+            }
 
-//			Shopware()->Session()->sRegister = $postparams;
 			$this->Request()->setPost('sRegister', $postparams);
 
 			$target = false;
@@ -1422,17 +1423,20 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->hgw()->Logging('savePaymentAction | changing paymenthod failed| '.$e->getMessage());
 			}
 
-            // bis SW 5.2.27 aktuell
-//			$this->forward('savePayment', 'account', '', $postparams);
-//			$this->forward('confirm','checkout', '', $postparams);
-            // funktionstüchtig für SW 5.3
-            $this-> redirect(array(
-                    'controller' => 'checkout',
-                    'action' => 'confirm',
-                    'sTarget' => 'checkout',
-                    'sTargetAction' => 'confirm',
-                )
-            );
+            if($swVersion < 5.3)
+            {
+                // bis SW 5.2.27 aktuell
+			    $this->forward('savePayment', 'account', '', $postparams);
+            } else {
+                // funktionstüchtig für SW 5.3
+                $this-> redirect(array(
+                        'controller' => 'checkout',
+                        'action' => 'confirm',
+                        'sTarget' => 'checkout',
+                        'sTargetAction' => 'confirm',
+                    )
+                );
+            }
 
 		}catch(Exception $e){
 			//Shopware()->Plugins()->Logging('savePaymentAction | '.$e->getMessage());

@@ -1,38 +1,21 @@
 {block name="frontend_index_header_javascript_jquery_lib" append}
-	{if $swVersion >= "5.3"}
-		<script type='text/javascript'>
-            var mobile = "{$isMobile}";
-            document.asyncReady(function() {
-                jQuery('.wallet').click(function(){
-                    jQuery('#lbOverlay').fadeIn(350);
-                    $.loadingIndicator.open();
-
-                    if(mobile){
-                        // workaround for mobile devices
-                        var href = $(this).attr('href');
-                        setTimeout(function(){ window.location = href }, 500);
-                    }
-                });
-            });
-		</script>
-	{else}
-		<script type='text/javascript'>
-            var mobile = "{$isMobile}";
-            $(document).ready(function(){
-                jQuery('.wallet').click(function(){
-                    jQuery('#lbOverlay').fadeIn(350);
-                    $.loadingIndicator.open();
-
-                    if(mobile){
-                        // workaround for mobile devices
-                        var href = $(this).attr('href');
-                        setTimeout(function(){ window.location = href }, 500);
-                    }
-                });
-            });
-		</script>
-	{/if}
-
+	<script type='text/javascript'>
+		var mobile = "{$isMobile}";
+		$(document).ready(function(){
+			jQuery('.wallet').click(function(){
+				jQuery('#lbOverlay').fadeIn(350);
+				$.loadingIndicator.open();
+				
+				if(mobile){
+					// workaround for mobile devices
+					var href = $(this).attr('href');
+					setTimeout(function(){ window.location = href }, 500);
+				}
+			});
+		});
+		
+		
+	</script>
 {/block}
 
 {block name="masterpass_button"}

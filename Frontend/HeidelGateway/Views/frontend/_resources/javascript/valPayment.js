@@ -144,31 +144,6 @@ $(document).ready(function(){
 			jQuery('#birthdate_san').val(birthyear+'-'+birthmonth+'-'+birthday);
 		}
 	});
-
-    //setting Checkbox for EasyCredit not Required
-    jQuery('#hgw_cb_hpr').removeAttr("required");
-
-    jQuery("[type=radio]").click(function(e){
-        if( jQuery("[type=radio].hgw_hpr").is(":checked") ){
-            jQuery('#hgw_cb_hpr').attr("required","required");
-        } else {
-            jQuery('#hgw_cb_hpr').removeAttr("required");
-        }
-    });
-
-    if(jQuery('[name="ACTIVATEEASY"]')) {
-        if(jQuery('[name="ACTIVATEEASY"]').val() == 'FALSE' || jQuery('[name="ACTIVATEEASY"]').val() == '') {
-            jQuery('#easyText').hide();
-            jQuery('[type=radio].hgw_hpr').attr('disabled','disabled');
-            jQuery('[type=checkbox]#hgw_cb_hpr').attr('disabled','disabled');
-            jQuery('.EasyPermission').attr('display','block');
-        } else {
-            jQuery('#easyText').show();
-            jQuery('.hgw_hpr').removeAttr('disabled');
-            jQuery('.EasyPermission').remove();
-        }
-    }
-
 });
 
 // VALIDATE FORM

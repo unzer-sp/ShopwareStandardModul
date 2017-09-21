@@ -1,7 +1,6 @@
 {extends file="parent:frontend/index/index.tpl"}
-
 {block name="frontend_index_header_javascript_jquery_lib" append}
-	<script type='text/javascript'>
+    <script type='text/javascript'>
 		// define formUrl to make it useable in external JS
 		var formUrl = {$formUrl|@json_encode};
 		$(document).ready(function(){
@@ -14,47 +13,17 @@
 			var token = "{$token}";
 		{/if}
 	</script>
-	
-	<script type='text/javascript'>
-		$(document).ready(function(){
-			$(document).ibanCheck();
-		});
-		//sepa switch
-		jQuery.fn.ibanCheck = function(){
-			if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-			if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-			
-			jQuery('#sepa_switch').change(function(){
-				if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
-				if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
-			});
-			
-			function iban(){
-				if(jQuery('.newreg_dd #iban').is(':hidden')){
-					jQuery('.newreg_dd #account').parent().hide();
-					jQuery('.newreg_dd #bankcode').parent().hide();
-					jQuery('.newreg_dd #cardBrand').parent().hide();
-					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
-					jQuery('.newreg_dd #iban').parent().show();
-				}
-			}
-			
-			function noiban(){
-				if(jQuery('.newreg_dd #account').is(':hidden')){
-					jQuery('.newreg_dd #account').parent().show();
-					jQuery('.newreg_dd #bankcode').parent().show();
-					jQuery('.newreg_dd #cardBrand').parent().show();
-					jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').show();
-					jQuery('.newreg_dd #iban').parent().hide();
-				}
-			}
-		};
-	</script>
-	{if $action != 'cart'}
+
+    {if $action != 'cart' && $action != 'orders'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/valPayment.js'></script>
-		<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js/hpf_script.js'></script>
-	{/if}
+		{if $swVersion >= "5.3"}
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+		{else}
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
+			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
+		{/if}
+    {/if}
 {/block}
 
 {block name="hp_payment"}
@@ -62,7 +31,6 @@
 	{assign var='bar_at' value=$payment_mean.name|strpos:'_'}
 	{assign var='pm' value=$payment_mean.name|substr:($bar_at+1)}
 	{if $pm == 'pay'}{assign var='pm' value='va'}{/if}
-	
 	{if $payment_mean.name == "hgw_cc" && $heidel_bm_cc && ($formUrl.$pm != '')}
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_cc.tpl"}
 	{elseif $payment_mean.name == "hgw_dc" && $heidel_bm_dc && ($formUrl.$pm != '')}
@@ -71,9 +39,8 @@
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_dd.tpl"}
 	{elseif $payment_mean.name == "hgw_pay" && $heidel_bm_va && ($formUrl.$pm != '')}
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va'}
-	{*{elseif $payment_mean.name == "hgw_papg"}
-		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_papg.tpl" pm='papg'}
-	 *}
+    {elseif $payment_mean.name == "hgw_hpr"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
 	{else}
 		{$smarty.block.parent}
 	{/if}

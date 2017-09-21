@@ -46,8 +46,16 @@
 			{if isset($optin)}
 				<div>
 					<p><input type="checkbox" id="hgw_cb_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox"> {$optin}</p>
-					<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label>
-					<div id="hgw_privacyPolicy" style="height:160px;width:30 rem;overflow:auto;">{$privacy_policy}</div>
+					<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}*:</label>
+					<div id="hgw_privacyPolicy" style="height:160px;width:30 rem;overflow:auto;">
+						<input type="checkbox" id="hgw_dp_san" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" required="required">
+						{$privacy_policy}
+					</div>
+					<!--<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}*:</label>
+					<div id="hgw_privacyPolicy" style="height:160px;width:30 rem;overflow:auto;">
+						<input type="checkbox" id="hgw_dp_san" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" required="required">
+                        {* $privacy_policy *}
+					</div>-->
 				</div>
 			{/if}		
 			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>

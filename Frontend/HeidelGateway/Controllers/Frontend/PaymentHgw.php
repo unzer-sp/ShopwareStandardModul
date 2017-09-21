@@ -331,7 +331,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						($activePayment != 'iv') &&
 						($activePayment != 'bs') &&
 						($activePayment != 'mk') &&
-						($activePayment != 'mpa')
+                        ($activePayment != 'mpa')&&
+                        ($activePayment != 'hpr')
 						){
 
 							//adding a basketId for santander / papg payment
@@ -462,6 +463,18 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 					}
 
+                    if ($activePayment == 'hpr') {
+                        // fetch INI Transaction to set the ReferenceId
+                        $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+
+                        //setting
+                        $ppd_bskt['PRESENTATION.AMOUNT'] 	= $this->hgw()->formatNumber($basket['amount']);
+                        $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
+
+                        $ppd_crit['IDENTIFICATION.REFERENCEID'] = $transaction['uniqueid'];
+                        unset($this->View()->configOptInText);
+                    }
+
 					$params = $this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit);
 
 					if($activePayment == 'bs'){
@@ -490,6 +503,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						Shopware()->Session()->HPError = $response['PROCESSING_RETURN_CODE'];
 						return $this->forward('fail');
 			}elseif($response['PROCESSING_RESULT'] == "NOK"){
+                $this->hgw()->saveRes($response);
 				Shopware()->Session()->HPError = $response['PROCESSING_RETURN_CODE'];
 				return $this->forward('fail');
 			}
@@ -568,8 +582,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$this->saveOrder($transactionId, $paymentUniqueId, $paymentStatus,false);
 					// add infos to order
 					$params = array(
-// 							'o_attr1' => $response['IDENTIFICATION_SHORTID'],
-// 							'o_attr2' => $response['IDENTIFICATION_UNIQUEID'],
 							'comment' => $comment,
 							'internalcomment' => $comment,
 					);
@@ -580,22 +592,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					Shopware()->Session()->sOrderVariables['sTransactionumber'] = $transactionId;
 					Shopware()->Session()->sOrderVariables['prepaymentText'] = $comment;
 					
-					// prepayment e-mail
-// 					$orderNum = $this->getOrder($transactionId);
-// 					$prepayment = array();
-// 					foreach($repl AS $k => $v){
-// 						$key = preg_replace('/{/', '', $k);
-// 						$key = preg_replace('/}/', '', $key);
-// 						$prepayment[$key] = $v;
-// 					}
-// 					if(($this->Config()->HGW_PP_MAIL > 0) && ($activePayment = 'pp')){ $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment); };
-					
 					return $this->redirect(array(
 							'forceSecure' => 1,
 							'action' => 'success',
 							'txnID' => $transactionId,
 							'sUniqueID' => $transactionId,
-							//'sComment' => urlencode($comment)
 					));
 				}elseif(!empty($response['IDENTIFICATION_REFERENCEID'])){
 					$transactionId = $response['IDENTIFICATION_TRANSACTIONID'];
@@ -615,6 +616,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							'internalcomment' => "ShortID: ".$response['IDENTIFICATION_SHORTID']
 					);
 					$this->addOrderInfos($transactionId, $params, $paymentStatus);
+
+                    // save Response for HP.PA
+                    if ($response['PAYMENT_CODE'] == 'HP.PA') {
+                        $this->hgw()->saveRes($response);
+                    }
 
 					return $this->redirect(array(
 							'forceSecure' => 1,
@@ -665,7 +671,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 				$resp['CRITERION_SHOP_ID']			= $this->Request()->getPost('CRITERION_SHOP_ID') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_ID'), $flag, $enc) : '';
 				$resp['CRITERION_USER_ID']			= $this->Request()->getPost('CRITERION_USER_ID') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_USER_ID'), $flag, $enc) : '';
-				$resp['CRITERION_DBONRG']			= $this->Request()->getPost('CRITERION_DBONRG') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_DBONRG'), $flag, $enc) : '';
 				$resp['CRITERION_DBONRG']			= $this->Request()->getPost('CRITERION_DBONRG') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_DBONRG'), $flag, $enc) : '';
 				$resp['CRITERION_SHIPPAY']			= $this->Request()->getPost('CRITERION_SHIPPAY') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHIPPAY'), $flag, $enc) : '';
 				$resp['CRITERION_GATEWAY']			= $this->Request()->getPost('CRITERION_GATEWAY') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_GATEWAY'), $flag, $enc) : '';
@@ -813,8 +818,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$token = 'X-CSRF-Token';
 			Shopware()->Session()->$token = $this->Request()->getPost('__csrf_token');
 		}
-		Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
-		
+//		Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
+		Shopware()->Session()->sUserId	= $this->Request()->getPost('CRITERION_USER_ID');
+
 		unset(Shopware()->Session()->HPError);
 		if($this->Request()->isPost()){
 			$flag = ENT_COMPAT;
@@ -950,16 +956,17 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->hgw()->Logging('responseRegAction saving response failed | '.$e->getMessage());
 				return;
 			}
-				
+
 
 			if ($resp['PROCESSING_RESULT'] == 'ACK') {
 				// setting csrf-Token is required
-				if(isset($resp['__csrf_token'])){
-					$token = 'X-CSRF-Token';
-					Shopware()->Session()->$token = $resp['__csrf_token'];
-				}
-				Shopware()->Session()->sUserId	= $resp['IDENTIFICATION_SHOPPERID'];
-					
+//				if(isset($resp['__csrf_token'])){
+//					$token = 'X-CSRF-Token';
+//					Shopware()->Session()->$token = $resp['__csrf_token'];
+//				}
+
+				Shopware()->Session()->sUserId	= $resp['CRITERION_USER_ID'];
+
 				// save registration to DB
 				switch (substr($resp['PAYMENT_CODE'], 0,2)) {
 					case 'CC':
@@ -1008,7 +1015,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 								return;
 								break;
 							default:
-								print Shopware()->Front()->Router()->assemble(array(
+    							print Shopware()->Front()->Router()->assemble(array(
 								'forceSecure' 	=> 1,
 								'controller' 	=> 'checkout',
 								'sTarget' 		=> $this->Request()->getPost('sTarget'),
@@ -1085,6 +1092,196 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 		}
 	}
+
+    /** responseHprAction()
+     * receives response from payment for HP.PA and .IN with special Criterion Parameters,
+     * saves transactions to transaction table,
+     * redirects to successAction() or failAction()
+     */
+    public function responseHprAction() {
+        unset(Shopware()->Session()->HPError);
+        if($this->Request()->isPost()){
+            $flag = ENT_COMPAT;
+            $enc = 'UTF-8';
+            if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
+
+            $flag = ENT_COMPAT;
+            $enc = 'UTF-8';
+            if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
+            $resp['REQUEST_VERSION']			= $this->Request()->getPost('REQUEST_VERSION') == true ? htmlspecialchars($this->Request()->getPost('REQUEST_VERSION'), $flag, $enc) : '';
+            $resp['SECURITY_SENDER']			= $this->Request()->getPost('SECURITY_SENDER') == true ? htmlspecialchars($this->Request()->getPost('SECURITY_SENDER'), $flag, $enc) : '';
+            $resp['USER_LOGIN']					= $this->Request()->getPost('USER_LOGIN') == true ? htmlspecialchars($this->Request()->getPost('USER_LOGIN'), $flag, $enc) : '';
+            $resp['USER_PWD']					= $this->Request()->getPost('USER_PWD') == true ? htmlspecialchars($this->Request()->getPost('USER_PWD'), $flag, $enc) : '';
+            $resp['TRANSACTION_CHANNEL']		= $this->Request()->getPost('TRANSACTION_CHANNEL') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_CHANNEL'), $flag, $enc) : '';
+
+            $resp['PROCESSING_RESULT']			= $this->Request()->getPost('PROCESSING_RESULT') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_RESULT'), $flag, $enc) : '';
+            $resp['PROCESSING_RETURN']			= $this->Request()->getPost('PROCESSING_RETURN') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_RETURN'), $flag, $enc) : '';
+            $resp['PROCESSING_CODE']			= $this->Request()->getPost('PROCESSING_CODE') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_CODE'), $flag, $enc) : '';
+            $resp['PROCESSING_RETURN_CODE']		= $this->Request()->getPost('PROCESSING_RETURN_CODE') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_RETURN_CODE'), $flag, $enc) : '';
+            $resp['PROCESSING_STATUS_CODE']		= $this->Request()->getPost('PROCESSING_STATUS_CODE') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_STATUS_CODE'), $flag, $enc) : '';
+            $resp['PROCESSING_REASON_CODE']		= $this->Request()->getPost('PROCESSING_REASON_CODE') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_REASON_CODE'), $flag, $enc) : '';
+            $resp['PROCESSING_REASON']			= $this->Request()->getPost('PROCESSING_REASON') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_REASON'), $flag, $enc) : '';
+            $resp['PROCESSING_TIMESTAMP']		= $this->Request()->getPost('PROCESSING_TIMESTAMP') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_TIMESTAMP'), $flag, $enc) : '';
+            $resp['PROCESSING_STATUS']			= $this->Request()->getPost('PROCESSING_STATUS') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_STATUS'), $flag, $enc) : '';
+
+            // special criterions for HPR
+            $resp['CRITERION_EASYCREDIT_FIRSTRATEDUEDATE']	= $this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_AMORTISATIONTEXTT']	= $this->Request()->getPost('CRITERION_EASYCREDIT_AMORTISATIONTEXT') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_AMORTISATIONTEXT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_TOTALRUNTIME']		= $this->Request()->getPost('CRITERION_EASYCREDIT_TOTALRUNTIME') 		== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_TOTALRUNTIME'), $flag, $enc) : '';
+            $resp['CONFIG_OPTIN_EASYCREDIT']				= $this->Request()->getPost('CONFIG_OPTIN_TEXT') 					== true ? htmlspecialchars($this->Request()->getPost('CONFIG_OPTIN_TEXT'), $flag, $enc) : '';
+
+            $resp['CRITERION_EASYCREDIT_MONTHLYRATECOUNT']	= $this->Request()->getPost('CRITERION_EASYCREDIT_MONTHLYRATECOUNT') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_MONTHLYRATECOUNT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_PRECONTRACTINFORMATIONURL']	= $this->Request()->getPost('CRITERION_EASYCREDIT_PRECONTRACTINFORMATIONURL') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_PRECONTRACTINFORMATIONURL'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_LASTRATEAMOUNT']	= $this->Request()->getPost('CRITERION_EASYCREDIT_LASTRATEAMOUNT') 		== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_LASTRATEAMOUNT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_MONTHLYRATEAMOUNT']	= $this->Request()->getPost('CRITERION_EASYCREDIT_MONTHLYRATEAMOUNT') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_MONTHLYRATEAMOUNT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_NOMINALINTEREST']	= $this->Request()->getPost('CRITERION_EASYCREDIT_NOMINALINTEREST') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_NOMINALINTEREST'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_ACCRUINGINTEREST']	= $this->Request()->getPost('CRITERION_EASYCREDIT_ACCRUINGINTEREST') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_ACCRUINGINTEREST'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_TOTALAMOUNT']		= $this->Request()->getPost('CRITERION_EASYCREDIT_TOTALAMOUNT') 		== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_TOTALAMOUNT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_LASTRATEDUEDATE']	= $this->Request()->getPost('CRITERION_EASYCREDIT_LASTRATEDUEDATE') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_LASTRATEDUEDATE'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_TOTALORDERAMOUNT']	= $this->Request()->getPost('CRITERION_EASYCREDIT_TOTALORDERAMOUNT') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_TOTALORDERAMOUNT'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_EFFECTIVEINTEREST']	= $this->Request()->getPost('CRITERION_EASYCREDIT_EFFECTIVEINTEREST') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_EFFECTIVEINTEREST'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_DEVICEIDENTTOKEN']	= $this->Request()->getPost('CRITERION_EASYCREDIT_DEVICEIDENTTOKEN') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_DEVICEIDENTTOKEN'), $flag, $enc) : '';
+            $resp['CRITERION_EASYCREDIT_UUID']				= $this->Request()->getPost('CRITERION_EASYCREDIT_UUID') 				== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_UUID'), $flag, $enc) : '';
+
+            $resp['RISKINFORMATION.CUSTOMERGUESTCHECKOUT']	= $this->Request()->getPost('RISKINFORMATION.CUSTOMERGUESTCHECKOUT') 	== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERGUESTCHECKOUT'), $flag, $enc) : '';
+            $resp['RISKINFORMATION.CUSTOMERSINCE']			= $this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE') 			== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE'), $flag, $enc) : '';
+            $resp['RISKINFORMATION.CUSTOMERORDERCOUNT']		= $this->Request()->getPost('RISKINFORMATION.CUSTOMERORDERCOUNT') 		== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERORDERCOUNT'), $flag, $enc) : '';
+
+            $resp['CRITERION_SHOP_ID']			= $this->Request()->getPost('CRITERION_SHOP_ID') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_ID'), $flag, $enc) : '';
+            $resp['CRITERION_SECRET']			= $this->Request()->getPost('CRITERION_SECRET') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SECRET'), $flag, $enc) : '';
+            $resp['CRITERION_SESS']				= $this->Request()->getPost('CRITERION_SESS') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SESS'), $flag, $enc) : '';
+            $resp['CRITERION_PUSH_URL']			= $this->Request()->getPost('CRITERION_PUSH_URL') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_PUSH_URL'), $flag, $enc) : '';
+            $resp['CRITERION_SHOP_TYPE']		= $this->Request()->getPost('CRITERION_SHOP_TYPE') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_TYPE'), $flag, $enc) : '';
+            $resp['SHOP_TYPE']					= $this->Request()->getPost('SHOP_TYPE') == true ? htmlspecialchars($this->Request()->getPost('SHOP_TYPE'), $flag, $enc) : '';
+            $resp['SHOPMODULE_VERSION']			= $this->Request()->getPost('SHOPMODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('SHOPMODULE_VERSION'), $flag, $enc) : '';
+            $resp['CRITERION_MODULE_VERSION']	= $this->Request()->getPost('CRITERION_MODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_MODULE_VERSION'), $flag, $enc) : '';
+
+            $resp['PAYMENT_CODE']				= $this->Request()->getPost('PAYMENT_CODE') == true ? htmlspecialchars($this->Request()->getPost('PAYMENT_CODE'), $flag, $enc) : '';
+
+            $resp['PRESENTATION_CURRENCY']		= $this->Request()->getPost('PRESENTATION_CURRENCY') == true ? htmlspecialchars($this->Request()->getPost('PRESENTATION_CURRENCY'), $flag, $enc) : '';
+            $resp['PRESENTATION_AMOUNT']		= $this->Request()->getPost('PRESENTATION_AMOUNT') == true ? htmlspecialchars($this->Request()->getPost('PRESENTATION_AMOUNT'), $flag, $enc) : '';
+
+            $resp['IDENTIFICATION_TRANSACTIONID']= $this->Request()->getPost('IDENTIFICATION_TRANSACTIONID') == true ? htmlspecialchars($this->Request()->getPost('IDENTIFICATION_TRANSACTIONID'), $flag, $enc) : '';
+            $resp['IDENTIFICATION_UNIQUEID']	= $this->Request()->getPost('IDENTIFICATION_UNIQUEID') == true ? htmlspecialchars($this->Request()->getPost('IDENTIFICATION_UNIQUEID'), $flag, $enc) : '';
+            $resp['IDENTIFICATION_SHORTID']		= $this->Request()->getPost('IDENTIFICATION_SHORTID') == true ? htmlspecialchars($this->Request()->getPost('IDENTIFICATION_SHORTID'), $flag, $enc) : '';
+            $resp['IDENTIFICATION_SHOPPERID']	= $this->Request()->getPost('IDENTIFICATION_SHOPPERID') == true ? htmlspecialchars($this->Request()->getPost('IDENTIFICATION_SHOPPERID'), $flag, $enc) : '';
+            $resp['CLEARING_DESCRIPTOR']		= $this->Request()->getPost('CLEARING_DESCRIPTOR') == true ? htmlspecialchars($this->Request()->getPost('CLEARING_DESCRIPTOR'), $flag, $enc) : '';
+            $resp['CLEARING_CURRENCY']			= $this->Request()->getPost('CLEARING_CURRENCY') == true ? htmlspecialchars($this->Request()->getPost('CLEARING_CURRENCY'), $flag, $enc) : '';
+            $resp['CLEARING_AMOUNT']			= $this->Request()->getPost('CLEARING_AMOUNT') == true ? htmlspecialchars($this->Request()->getPost('CLEARING_AMOUNT'), $flag, $enc) : '';
+
+            $resp['BASKET_ID']					= $this->Request()->getPost('BASKET_ID') == true ? htmlspecialchars($this->Request()->getPost('BASKET_ID'), $flag, $enc) : '';
+
+            $resp['FRONTEND_MODE']				= $this->Request()->getPost('FRONTEND_MODE') == true ? $this->Request()->getPost('FRONTEND_MODE') : '';
+            $resp['FRONTEND_RESPONSE_URL']		= $this->Request()->getPost('FRONTEND_RESPONSE_URL') == true ? $this->Request()->getPost('FRONTEND_RESPONSE_URL') : '';
+            $resp['FRONTEND_ENABLED']			= $this->Request()->getPost('FRONTEND_ENABLED') == true ? $this->Request()->getPost('FRONTEND_ENABLED') : '';
+            $resp['FRONTEND_LANGUAGE']			= $this->Request()->getPost('FRONTEND_LANGUAGE') == true ? $this->Request()->getPost('FRONTEND_LANGUAGE') : '';
+
+            $resp['ACCOUNT_BRAND']				= $this->Request()->getPost('ACCOUNT_BRAND') == true ? htmlspecialchars($this->Request()->getPost('ACCOUNT_BRAND'), $flag, $enc) : '';
+            $resp['ACCOUNT_HOLDER']				= $this->Request()->getPost('ACCOUNT_HOLDER') == true ? htmlspecialchars($this->Request()->getPost('ACCOUNT_HOLDER'), $flag, $enc) : '';
+
+            $resp['NAME_COMPANY']				= $this->Request()->getPost('NAME_COMPANY') == true ? htmlspecialchars($this->Request()->getPost('NAME_COMPANY'), $flag, $enc) : '';
+            $resp['NAME_SALUTATION']			= $this->Request()->getPost('NAME_SALUTATION') == true ? htmlspecialchars($this->Request()->getPost('NAME_SALUTATION'), $flag, $enc) : '';
+
+            $resp['NAME_BIRTHDATE']				= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
+            $resp['NAME_FAMILY']				= $this->Request()->getPost('NAME_FAMILY') == true ? htmlspecialchars($this->Request()->getPost('NAME_FAMILY'), $flag, $enc) : '';
+            $resp['NAME_GIVEN']					= $this->Request()->getPost('NAME_GIVEN') == true ? htmlspecialchars($this->Request()->getPost('NAME_GIVEN'), $flag, $enc) : '';
+            $resp['ADDRESS_STREET']				= $this->Request()->getPost('ADDRESS_STREET') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_STREET'), $flag, $enc) : '';
+            $resp['ADDRESS_CITY']				= $this->Request()->getPost('ADDRESS_CITY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_CITY'), $flag, $enc) : '';
+            $resp['ADDRESS_ZIP']				= $this->Request()->getPost('ADDRESS_ZIP') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_ZIP'), $flag, $enc) : '';
+            $resp['ADDRESS_COUNTRY']			= $this->Request()->getPost('ADDRESS_COUNTRY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_COUNTRY'), $flag, $enc) : '';
+
+            $resp['CONTACT_EMAIL']				= $this->Request()->getPost('CONTACT_EMAIL') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_EMAIL'), $flag, $enc) : '';
+            $resp['CONTACT_PHONE']				= $this->Request()->getPost('CONTACT_PHONE') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_PHONE'), $flag, $enc) : '';
+            $resp['CONTACT_IP']					= $this->Request()->getPost('CONTACT_IP') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_IP'), $flag, $enc) : '';
+
+            $resp['TRANSACTION_CHANNEL']		= $this->Request()->getPost('TRANSACTION_CHANNEL') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_CHANNEL'), $flag, $enc) : '';
+            $resp['TRANSACTION_MODE']			= $this->Request()->getPost('TRANSACTION_MODE') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_MODE'), $flag, $enc) : '';
+
+            $resp['var_Register']				= ($this->Request()->getPost('register') == true && gettype($this->Request()->getPost('register')) == 'array') ? $this->Request()->getPost('register') : '';
+            if(empty($resp['var_Register'])){
+                $resp['var_Register']['payment'] = $this->Request()->getPost('payment') == true ? htmlspecialchars($this->Request()->getPost('payment'), $flag, $enc) : '';
+            }
+            $resp['var_sTarget']				= $this->Request()->getPost('sTarget') == true ? htmlspecialchars($this->Request()->getPost('sTarget'), $flag, $enc) : '';
+            $resp['var_sepa']					= $this->Request()->getPost('hpdd_sepa') == true ? htmlspecialchars($this->Request()->getPost('hpdd_sepa'), $flag, $enc) : '';
+            $resp['__csrf_token']				= $this->Request()->getPost('__csrf_token') == true ? htmlspecialchars($this->Request()->getPost('__csrf_token'), $flag, $enc) : '';
+
+            if (isset($resp['NAME_BIRTHDATE']) && !(empty($resp['NAME_BIRTHDATE'])) ) {
+                $resp['NAME_BIRTHDATE'] 		= $resp['NAME_BIRTHDATE'];
+            } else {
+                $resp['NAME_BIRTHDATE'] 		= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('birthdate_san'), $flag, $enc) : '';
+            }
+
+            // case for suspected Manipulation
+            $orgHash = $this->createSecretHash($resp['IDENTIFICATION_TRANSACTIONID']);
+            if($resp['CRITERION_SECRET'] != $orgHash){
+                Shopware()->Session()->HPError = '';
+                $this->hgw()->Logging(
+                    "Hash verification error, suspecting manipulation.".
+                    "<br />PaymentUniqeID: " . $resp['IDENTIFICATION_TRANSACTIONID']  .
+                    "<br />IP: " . $_SERVER['REMOTE_ADDR'] .
+                    "<br />Hash: " .htmlspecialchars($orgHash) .
+                    "<br />ResponseHash: " .htmlspecialchars($resp['CRITERION_SECRET']));
+                print Shopware()->Front()->Router()->assemble(array(
+                    'forceSecure' => 1,
+                    'action' => 'fail'
+                ));
+                exit;
+            }
+            //save Temporary Order-Id to Session to get the order in failAction() or successAction()
+            Shopware()->Session()->HPOrderID = $resp['IDENTIFICATION_TRANSACTIONID'];
+            Shopware()->Session()->sessionId = $resp['CRITERION_SESS'];
+
+            if ($resp['PROCESSING_RESULT'] == 'ACK') {
+                switch ($resp['PAYMENT_CODE'] == 'HP.IN') {
+                    case 'HP.IN':
+                        //save result to hgw_transactions
+                        $this->hgw()->saveRes($resp);
+
+                        // Weiterleitung auf "checkout/confirm";
+                        print Shopware()->Front()->Router()->assemble(array(
+                            'forceSecure' 	=> 1,
+                            'controller' 	=> 'paymentHgw',
+                            'action' 		=> 'afterEasy',
+                        ));
+                        break;
+                    case 'HP.PA':
+                        //save result to hgw_transactions
+                        $this->hgw()->saveRes($resp);
+
+                        // Weiterleitung auf "success";
+                        print Shopware()->Front()->Router()->assemble(array(
+                            'forceSecure' => 1,
+                            'controller' => 'PaymentHgw',
+                            'action' => 'success'
+                        ));
+                        break;
+
+                    default:
+                        print Shopware()->Front()->Router()->assemble(array(
+                            'forceSecure' => 1,
+                            'controller' => 'checkout',
+                            'action' => 'confirm'
+                        ));
+                        break;
+                }
+
+            }else {
+                //save result to hgw_transactions
+                $this->hgw()->saveRes($resp);
+                Shopware()->Session()->HPOrderID = $resp['IDENTIFICATION_TRANSACTIONID'];
+
+                // Weiterleitung auf Fehlercontroller
+                print Shopware()->Front()->Router()->assemble(array(
+                    'forceSecure' => 1,
+                    'controller' => 'PaymentHgw',
+                    'action' => 'fail'
+                ));
+                return;
+            }
+
+
+        }
+    }
 
 	/**
 	 * Recurring payment action method.
@@ -1186,7 +1383,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		try{
 
 			$postparams = array();
-			$postparams = array('payment' => $this->Request()->getParam('register'));
+//			$postparams = array('payment' => $this->Request()->getParam('register'));
+
+			$postparams = array('payment' => $this->Request()->getParam('sRegister'));
+
 
 			$_SERVER['REQUEST_METHOD'] = 'GET';
 			$this->Request()->setPost('isPost', 'true');
@@ -1199,10 +1399,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$tokenNameResponse = '__csrf_token';
 			Shopware()->Session()->$tokenNameSession = $token->$tokenNameResponse;
 
-			$postparams['payment'] = $token->var_Register->payment;
+//			$postparams['payment'] = $token->var_Register->payment;
 
-			Shopware()->Session()->sRegister = $postparams;
-			$this->Request()->setPost('register', $postparams);
+//			Shopware()->Session()->sRegister = $postparams;
+			$this->Request()->setPost('sRegister', $postparams);
 
 			$target = false;
 			$target = $this->Request()->getParam('sTarget');
@@ -1222,7 +1422,17 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->hgw()->Logging('savePaymentAction | changing paymenthod failed| '.$e->getMessage());
 			}
 
-			$this->forward('savePayment', 'account', '', $postparams);
+            // bis SW 5.2.27 aktuell
+//			$this->forward('savePayment', 'account', '', $postparams);
+//			$this->forward('confirm','checkout', '', $postparams);
+            // funktionstüchtig für SW 5.3
+            $this-> redirect(array(
+                    'controller' => 'checkout',
+                    'action' => 'confirm',
+                    'sTarget' => 'checkout',
+                    'sTargetAction' => 'confirm',
+                )
+            );
 
 		}catch(Exception $e){
 			//Shopware()->Plugins()->Logging('savePaymentAction | '.$e->getMessage());
@@ -1288,8 +1498,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->Request()->setParam('sTarget', 'checkout');
 				$this->Request()->setParam('sTargetAction', 'index');
 				$_SERVER['REQUEST_METHOD'] = 'POST';
-
-				$this->forward('saveShippingPayment', 'checkout', '', $postData);
+    			$this->forward('saveShippingPayment', 'checkout', '', $postData);
 			}else{
 
 				return $this->redirect(array(
@@ -1310,14 +1519,24 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function failAction(){
 		try{
-			$transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
-			$parameters = json_decode($transaction['jsonresponse']);
+            if (empty(Shopware()->Session()->HPOrderID)) {
+                $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+                $parameters = json_decode($transaction['jsonresponse']);
+            } else {
+                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
+                $parameters = json_decode($transaction['jsonresponse']);
+            }
 
 			$payType = $transaction['payment_method'];
 			$transType = $transaction['payment_type'];
 
-			// cancelation CC, MPA, SoFü
-			if ($parameters->CRITERION_GATEWAY == '1' || (strtolower($payType) == 'wt') ) {
+			// cancelation MPA, HP
+            if (
+                $parameters->CRITERION_GATEWAY == '1' ||
+                (strtolower($payType) == 'wt') ||
+                (strtolower($payType)== 'hp')
+            )
+            {
 				Shopware()->Session()->HPError = $parameters->PROCESSING_RETURN_CODE;
 					
 				print Shopware()->Front()->Router()->assemble(array(
@@ -1346,6 +1565,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				}
 			}
 
+            unset(Shopware()->Session()->HPdidRequest);
+            unset(Shopware()->Session()->wantEasy);
+
 			Shopware()->Template()->addTemplateDir(dirname(__FILE__).'/Views/');
 			$this->View()->back2basket = 1;
 
@@ -1363,10 +1585,17 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function successAction(){
 		try{
-			unset(Shopware()->Session()->HPError);
-			// get transaction from hgw_transactions
-			$transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
-			$parameters = json_decode($transaction['jsonresponse']);
+            unset(Shopware()->Session()->HPError);
+            unset($this->View()->amortisationText);
+
+            // get transaction from hgw_transactions
+            if (empty(Shopware()->Session()->HPOrderID)) {
+                $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+                $parameters = json_decode($transaction['jsonresponse']);
+            } else {
+                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
+                $parameters = json_decode($transaction['jsonresponse']);
+            }
 
 			if ($parameters->PROCESSING_RESULT == 'NOK') {
 				Shopware()->Session()->HPError = $parameters->PROCESSING_RETURN_CODE;
@@ -1383,8 +1612,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$transType 	= $transaction['payment_type'];
 			$kto = $blz = '';
 
-			if(($resp['CRITERION_WALLET'] == '1') && (strtoupper($transType) == 'IN')){
-				Shopware()->Session()->HPResp = $resp;
+			if(($parameters->CRITERION_WALLET == '1') && (strtoupper($transType) == 'IN')){
+				Shopware()->Session()->HPResp = $parameters;
 					
 				print Shopware()->Front()->Router()->assemble(array(
 						'forceSecure' 	=> 1,
@@ -1596,6 +1825,17 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 								}
 								
 								break;
+
+                            case 'hp':
+                                unset(Shopware()->Session()->HPdidRequest);
+                                unset(Shopware()->Session()->wantEasy);
+                                unset($this->View()->configOptInText);
+                                unset($this->View()->amortisationText);
+
+                                unset($comment);
+                                //delete chosen payment of user
+                                $user = Shopware()->Modules()->Admin()->sGetUserData();
+                                break;
 							
 							default:
 								break;
@@ -1646,35 +1886,70 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						));
 
 			} else {
-				if(strtolower($payType) == 'dd'){
-					if($resp['var_sepa'] == 'iban'){
-						$kto = substr($parameters->ACCOUNT_IBAN,0,2).str_repeat('*',strlen($parameters->ACCOUNT_IBAN)-6).substr($parameters->ACCOUNT_IBAN,-4);
-						$blz = str_repeat('*',strlen($parameters->ACCOUNT_BIC)-4).substr($parameters->ACCOUNT_BIC,-4);
-					}else{
-						$kto = str_repeat('*',strlen($parameters->ACCOUNT_NUMBER)-4).substr($parameters->ACCOUNT_NUMBER,-4);
-						$blz = str_repeat('*',strlen($parameters->ACCOUNT_BANK)-4).substr($parameters->ACCOUNT_BANK,-4);
-					}
-					$parameters->ACCOUNT_NUMBER = '';
+// 				if(strtolower($payType) == 'dd'){
+// 					if($resp['var_sepa'] == 'iban'){
+// 						$kto = substr($parameters->ACCOUNT_IBAN,0,2).str_repeat('*',strlen($parameters->ACCOUNT_IBAN)-6).substr($parameters->ACCOUNT_IBAN,-4);
+// 						$blz = str_repeat('*',strlen($parameters->ACCOUNT_BIC)-4).substr($parameters->ACCOUNT_BIC,-4);
+// 					}else{
+// 						$kto = str_repeat('*',strlen($parameters->ACCOUNT_NUMBER)-4).substr($parameters->ACCOUNT_NUMBER,-4);
+// 						$blz = str_repeat('*',strlen($parameters->ACCOUNT_BANK)-4).substr($parameters->ACCOUNT_BANK,-4);
+// 					}
+// 					$parameters->ACCOUNT_NUMBER = '';
 
-					// prepare Values of response to save in DB
-					if ($this->Config()->HGW_DD_GUARANTEE_MODE == 1) {
+// 					// prepare Values of response to save in DB
+// 					if ($this->Config()->HGW_DD_GUARANTEE_MODE == 1) {
 
-						$birthdayArray = explode('-', $parameters->NAME_BIRTHDATE);
-						$address = array(
-								'salut' => $parameters->NAME_SALUTATION,
-								'birthdate' =>
-									array(
-										'day' 		=> $birthdayArray[2],
-										'month'		=> $birthdayArray[1],
-										'year'		=> $birthdayArray[0],
-										'formatted'	=> $parameters->NAME_BIRTHDATE
-									)
-							);
-						$this->saveRegData(json_decode($transaction['jsonresponse'],1), $kto, $blz,$address);
-					} else {
-						$this->saveRegData(json_decode($transaction['jsonresponse'],1), $kto, $blz);
-					}
-				}
+// 						$birthdayArray = explode('-', $parameters->NAME_BIRTHDATE);
+// 						$address = array(
+// 								'salut' => $parameters->NAME_SALUTATION,
+// 								'birthdate' =>
+// 									array(
+// 										'day' 		=> $birthdayArray[2],
+// 										'month'		=> $birthdayArray[1],
+// 										'year'		=> $birthdayArray[0],
+// 										'formatted'	=> $parameters->NAME_BIRTHDATE
+// 									)
+// 							);
+// 						$this->saveRegData(json_decode($transaction['jsonresponse'],1), $kto, $blz,$address);
+// 					} else {
+// 						$this->saveRegData(json_decode($transaction['jsonresponse'],1), $kto, $blz);
+// 					}
+// 				}
+                switch (strtolower($payType)) {
+                    case 'dd':
+                        if ($resp['var_sepa'] == 'iban') {
+                            $kto = substr($parameters->ACCOUNT_IBAN, 0, 2) . str_repeat('*', strlen($parameters->ACCOUNT_IBAN) - 6) . substr($parameters->ACCOUNT_IBAN, -4);
+                            $blz = str_repeat('*', strlen($parameters->ACCOUNT_BIC) - 4) . substr($parameters->ACCOUNT_BIC, -4);
+                        } else {
+                            $kto = str_repeat('*', strlen($parameters->ACCOUNT_NUMBER) - 4) . substr($parameters->ACCOUNT_NUMBER, -4);
+                            $blz = str_repeat('*', strlen($parameters->ACCOUNT_BANK) - 4) . substr($parameters->ACCOUNT_BANK, -4);
+                        }
+                        $parameters->ACCOUNT_NUMBER = '';
+
+                        // prepare Values of response to save in DB
+                        if ($this->Config()->HGW_DD_GUARANTEE_MODE == 1) {
+
+                            $birthdayArray = explode('-', $parameters->NAME_BIRTHDATE);
+                            $address = array(
+                                'salut' => $parameters->NAME_SALUTATION,
+                                'birthdate' =>
+                                    array(
+                                        'day' => $birthdayArray[2],
+                                        'month' => $birthdayArray[1],
+                                        'year' => $birthdayArray[0],
+                                        'formatted' => $parameters->NAME_BIRTHDATE
+                                    )
+                            );
+                            $this->saveRegData(json_decode($transaction['jsonresponse'], 1), $kto, $blz, $address);
+                        } else {
+                            $this->saveRegData(json_decode($transaction['jsonresponse'], 1), $kto, $blz);
+                        }
+                        break;
+                    case 'hp':
+                        unset(Shopware()->Session()->HPdidRequest);
+                        unset(Shopware()->Session()->wantEasy);
+                        break;
+                }
 
 				if($parameters->CRITERION_DBONRG === '1'){
 					print Shopware()->Front()->Router()->assemble(array(
@@ -1973,7 +2248,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$xmlData['IDENTIFICATION_REFERENCEID'] = (string)$xml->Transaction->Analysis->ACCOUNT_REGISTRATION;
 			}
 
-			$orgHash = $this->createSecretHash($xmlData['IDENTIFICATION_TRANSACTIONID']);
+//			$orgHash = $this->createSecretHash($xmlData['IDENTIFICATION_TRANSACTIONID']);
+            // Anpassung weil bei EasyCredit die SessionId als TransactionId benutzt wird
+            if($xmlData['PAYMENT_CODE'] == 'HP.PA' || $xmlData['PAYMENT_CODE'] == 'HP.IN'){
+                $orgHash = $this->createSecretHash($xmlData['CRITERION_SESS']);
+            } else {
+                $orgHash = $this->createSecretHash($xmlData['IDENTIFICATION_TRANSACTIONID']);
+            }
 			$crit_Secret = $xmlData['SECRET'];
 
 			if($crit_Secret != $orgHash){
@@ -2765,14 +3046,22 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$params['FRONTEND.ENABLED']		= "true";
 
 					break;
+                    /* EasyCredit */
+                case 'hpr':
+                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+                    $params['PAYMENT.CODE'] 		= "HP.".$type;
+                    $params['TRANSACTION.RESPONSE']	= "SYNC";
+                    break;
 					/* credit- & debitcard */
 				case 'cc':
 				case 'dc':
 					$params['PAYMENT.CODE'] = strtoupper($config['PAYMENT.METHOD']).'.'.$config['PAYMENT.TYPE'];
 					$params['FRONTEND.ENABLED'] = "true";
+
 					$url = parse_url(Shopware()->Front()->Router()->assemble(array('forceSecure' => 1)));
 					$params['FRONTEND.PAYMENT_FRAME_ORIGIN']	= $url['scheme'] .'://'. $url['host'];
-					$params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = 'FALSE';
+//					$params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = 'FALSE';
+					$params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = 'TRUE';
 					// path to CSS
 					$cssVar = 'HGW_HPF_'.strtoupper($config['PAYMENT.METHOD']).'_CSS';
 					$konfiguration = self::Config();
@@ -2826,6 +3115,16 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$params['CRITERION.PUSH_URL'] 	= Shopware()->Front()->Router()->assemble(array('forceSecure' => 1,'controller' => 'PaymentHgw','action' => 'rawnotify'));
 			$params['REQUEST.VERSION'] 		= "1.0";
 
+			if(
+                $params['PAYMENT.CODE'] == "CC.DB" ||
+                $params['PAYMENT.CODE'] == "CC.PA" ||
+                $params['PAYMENT.CODE'] == "DC.DB" ||
+                $params['PAYMENT.CODE'] == "DC.PA"
+            )
+			{
+			    $params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = "FALSE";
+            }
+
 			$payMethode = substr($params['PAYMENT.CODE'], 3);
 			switch ($payMethode) {
 				case 'RR':
@@ -2838,6 +3137,23 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 					));
 					break;
+                case 'PA':
+                    if ($params['PAYMENT.CODE'] == 'HP.PA') {
+                        // if PA is for hire purchace take responseHpr-url
+                        $params['FRONTEND.RESPONSE_URL'] = Shopware()->Front()->Router()->assemble(array(
+                            'forceSecure'	=> 1,
+                            'controller' 	=> 'PaymentHgw',
+                            'action' 		=> 'responseHpr'
+                        ));
+                    } else {
+                        // if PA is not from hire purchace take normal response-url
+                        $params['FRONTEND.RESPONSE_URL'] = Shopware()->Front()->Router()->assemble(array(
+                            'forceSecure'	=> 1,
+                            'controller' 	=> 'PaymentHgw',
+                            'action' 		=> 'response',
+                        ));
+                    }
+                    break;
 
 				default:
 					$params['FRONTEND.RESPONSE_URL'] = Shopware()->Front()->Router()->assemble(array(
@@ -3195,6 +3511,20 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		return Shopware()->Plugins()->Frontend()->HeidelGateway();
 	}
 
+    /**
+     * Function to cheat Shopware Session and redirect to Checkout-Confirm
+     */
+    public function afterEasyAction()
+    {
+        Shopware()->Session()->HPdidRequest = 'TRUE';
+        $this->redirect(
+            array(
+                'controller' => 'checkout',
+                'action' => 'confirm',
+            )
+        );
+    }
+
 	/**
 	 * function to deactivate CSRF token
 	 * validation for specified actions
@@ -3203,15 +3533,17 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	public function getWhitelistedCSRFActions()
 	{
 		return array(
-				'response',
-				'responseReg',
-				'notify',
-				'rawnotify',
-				'wallet',
-				'saveBirthdate',
-				'savePayment',
-				'succsess'
-
+            'afterEasy',
+            'response',
+            'responseReg',
+            'responseHpr',
+            'alibi',
+            'notify',
+            'rawnotify',
+            'wallet',
+            'saveBirthdate',
+            'savePayment',
+            'succsess'
 		);
 	}
 }

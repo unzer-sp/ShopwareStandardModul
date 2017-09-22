@@ -169,8 +169,25 @@ document.asyncReady(function () {
             jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
 
-        $( document ).ajaxComplete(function() {
+        /* ************************************************ */
+        jQuery('.newreg_dd').click(function (e) {
+            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+        });
 
+
+        if (jQuery('.newreg_dd')) {
+            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+        }
+        /* ************************************************ */
+
+        $( document ).ajaxComplete(function() {
             jQuery('.newreg_dd').click(function (e) {
                 var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
                 var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();

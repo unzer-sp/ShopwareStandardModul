@@ -981,8 +981,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						} else {
 							$dataToSave = NULL;
 						}
-						
-						if (!empty($resp['ACCOUNT_IBAN'])) {
+
+    					if (!empty($resp['ACCOUNT_IBAN'])) {
 							$saved = $this->saveRegData($resp, $resp['ACCOUNT_IBAN'], $resp['ACCOUNT_BIC'],$dataToSave);
 						} else {
 							$saved = $this->saveRegData($resp, $resp['ACCOUNT_NUMBER'], $resp['ACCOUNT_BANK'],$dataToSave);

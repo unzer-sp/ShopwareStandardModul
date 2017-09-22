@@ -184,6 +184,44 @@ $(document).ready(function(){
 
                 jQuery('#birthdate_papg').val(birthYear+'-'+birthMonth+'-'+birthDay);
             }
+
+            $( document ).ajaxComplete(function() {
+                console.log("Ajax Complete");
+                jQuery('.newreg_dd').click(function(e){
+                    console.log("Ajax NewReg");
+                    var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                });
+
+                if(jQuery('.newreg_dd')) {
+                    var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                }
+
+                jQuery('.newreg_san').click(function(e){
+
+                    var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                });
+
+                if(jQuery('.newreg_san')) {
+                    var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                }
+            });
+
         }
     } else { // if SW-Version <= 5.2
 
@@ -254,7 +292,7 @@ $(document).ready(function(){
                         $(document).promise().done(function(){
                             $(document).ready(function(){
                                 $(document).reuse();
-                                $(document).ibanCheck();
+                                //$(document).ibanCheck();
                                 var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
                                 $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function(){
                                     // change form action
@@ -338,6 +376,44 @@ $(document).ready(function(){
             jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
         }
 
+        /* ******************************************* */
+        $( document ).ajaxComplete(function() {
+            console.log("Ajax Complete");
+            jQuery('.newreg_dd').click(function(e){
+console.log("Ajax NewReg");
+                var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            });
+
+            if(jQuery('.newreg_dd')) {
+                var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            }
+
+            jQuery('.newreg_san').click(function(e){
+
+                var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            });
+
+            if(jQuery('.newreg_san')) {
+                var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            }
+        }); // ende ajaxComplete
+        /* ******************************************* */
         jQuery('.newreg_papg').click(function(e){
 
             var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
@@ -359,20 +435,20 @@ $(document).ready(function(){
 
 
 // // REUSE PAYMENT
-// jQuery.fn.reuse = function(){
-//     jQuery('.payment input:checkbox').click(function(){
-//         var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
-//         jQuery('.reuse'+pm).toggle(500);
-//         jQuery('.newreg'+pm).toggle(500);
-//     });
-// }
+jQuery.fn.reuse = function(){
+    jQuery('.payment input:checkbox').click(function(){
+        var pm = jQuery(this).attr('class').substring(jQuery(this).attr('class').indexOf('_'));
+        jQuery('.reuse'+pm).toggle(500);
+        jQuery('.newreg'+pm).toggle(500);
+    });
+}
 
 // function to toggle between registrated payment data and enter new paymentdata
-function hgwToggleReuse (pm)
-{
-    jQuery('.reuse' + pm).toggle(500);
-    jQuery('.newreg' + pm).toggle(500);
-}
+// function hgwToggleReuse (pm)
+// {
+//     jQuery('.reuse' + pm).toggle(500);
+//     jQuery('.newreg' + pm).toggle(500);
+// }
 
 // CHANGE FORM URL
 function changeUrl(checkedOpt, orgLink){

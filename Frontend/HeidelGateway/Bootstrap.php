@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.09.18';
+		return '17.09.25';
 	}
 
 	/**
@@ -688,6 +688,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
+
+            case '17.09.25':
+                // Compatibility for Shopware 4.3.6 - 5.3.3
+                // Some changes in Js
+                try {
+                    $msg .= '* update 17.09.25 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}
@@ -2602,7 +2612,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			if(array_key_exists('raw', $params)){
 				$res = json_decode($response->getBody(), true);
 				if($response->isError()){
-					self::Logging('doRequest | '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
+					self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
 				}
 				return $res;
 				exit;
@@ -2639,7 +2649,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			return $result;
 		}catch(Exception $e){
-			self::Logging('doRequest | '.$e->getMessage());
+			self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$e->getMessage());
 			return;
 		}
 	}

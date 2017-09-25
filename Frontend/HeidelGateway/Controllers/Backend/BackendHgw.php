@@ -100,8 +100,17 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$modul = substr($modul,0,strpos($modul,'_'));
 			$beLocaleId = $this->getBeLocaleId();
 			$this->setSubShop($transID);
-				
-			switch($trans->payName){
+
+            $payName = '';
+            if (isset($trans->payName) && (!empty($trans->payName))) {
+                $payName = $trans->payName;
+            } else {
+                $payName = $this->Request()->getParam('modul');
+                $payName = str_replace('hgw_', '', $payName);
+            }
+
+// 			switch($trans->payName){
+            switch($payName){
 				case 'pay':
 					$payName = 'va';
 					break;
@@ -115,12 +124,20 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				case 'mpa':
 					$payName = 'wt';
 					break;
+                case 'hpr':
+                    $payName = 'hp';
+                    break;
 				default:
 					$payName = $trans->payName;
 					break;
 			}
-				
-			$transaction = $this->getTransactions($transID, $trans->uid);
+
+            if (isset($trans->uid) && (!empty($trans->uid))) {
+                $transaction = $this->getTransactions($transID, $trans->uid);
+            } else {
+                $transaction = $this->getTransactions($transID);
+            }
+
 			$data = $transaction[0];
 
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
@@ -130,7 +147,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$data['PRESENTATION_AMOUNT'] = $amount;
 			$data['FRONTEND_ENABLED'] = 'false';
 			$data['FRONTEND_MODE'] = 'DEFAULT';
-			$data['IDENTIFICATION_REFERENCEID'] = $trans->uid;
+//			$data['IDENTIFICATION_REFERENCEID'] = $trans->uid;
+            $data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
 
 			unset($data['FRONTEND_RESPONSE_URL']);
 			unset($data['FRONTEND_CSS_PATH']);
@@ -372,6 +390,12 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 								$btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
 							}
 							break;
+                        case 'hpr':
+                            $maxFi = $value['PRESENTATION_AMOUNT'];
+                            if($payInfo['payType'] == 'pa'){
+                                $btns['fi']['active'] = 'true';
+                            }
+                            break;
 						default:
 							break;
 					}

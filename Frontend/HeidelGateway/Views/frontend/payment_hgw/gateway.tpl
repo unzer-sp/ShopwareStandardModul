@@ -54,14 +54,19 @@
 					{foreach from=$Input key=k item=v}
 						<input type="hidden" name="{$k}" value="{$v}" />
 					{/foreach}
+
 					<script>
-						$(document).ready(function($){
-							jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
-							$($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
-							$.loadingIndicator.open();
-							$(document).ready(function(){ document.forms['heidelpay'].submit(); });
+                    	$(document).ready(function($){
+                        	jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                            $($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
+                            $.loadingIndicator.open();
+
+							$(document).ready(function(){
+                            	document.forms['heidelpay'].submit();
+							});
 						});
 					</script>
+
 					<noscript>
 						<h2 class="headingbox_dark largesize">{s name='PaymentRedirect' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>
 						<br />
@@ -87,15 +92,16 @@
 				<div class='msg_exp'>{s name='ErrorExp' namespace='frontend/register/hp_payment'}{/s}</div>
 			</div>
 		{/block}
-		
+
 		<script type='text/javascript'>
-			$(document).ready(function(){
-				//add error div
-				if(jQuery('#payment .error').length < 1){
-					jQuery('#payment').prepend('<div class="error" style="display: none;"><h2>{s name='RegisterErrorHeadline' namespace='frontend/register/error_message'}{/s}</h2><ul></ul></div>');
+        	$(document).ready(function(){
+            	//add error div
+                if(jQuery('#payment .error').length < 1){
+                	jQuery('#payment').prepend('<div class="error" style="display: none;"><h2>{s name='RegisterErrorHeadline' namespace='frontend/register/error_message'}{/s}</h2><ul></ul></div>');
 				}
 			});
 		</script>
+
 		<h2 class="headingbox_dark largesize">{s name='PaymentHeader' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>
 		{if ($pm == 'cc') || ($pm == 'dc')}
 			<form name="heidelpay" class="payment" action='' method='post' autocomplete="off" onsubmit="return valGatewayForm();">
@@ -122,32 +128,37 @@
 					{include file="frontend/register/hp_payment_san.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
 				{elseif $pm == 'papg'}
 					{include file="frontend/register/hp_payment_papg.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
+                {elseif $pm == 'hpr'}
+                    {include file="frontend/register/hp_payment_hpr.tpl" pm=$pm grid=$grid classname=$classname}
 				{else}
 					{if !isset($pm)}
 						<script>
-							$(document).ready(function($){
-								jQuery('.payment.register').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
-								$($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
+                        	$(document).ready(function($){
+                            	jQuery('.payment.register').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                                $($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
 								$.loadingIndicator.open();
-								$(document).ready(function(){ document.forms['heidelpay'].submit(); });
+
+								$(document).ready(function(){
+                                	document.forms['heidelpay'].submit();
+								});
 							});
 						</script>
 					{/if}
 				{/if}
 		{/if}
-				<input type="hidden" name='CRITERION.GATEWAY' value='1' />
-				{if $DbOnRg}<input type="hidden" name='CRITERION.DBONRG' value='{$DbOnRg}' />{/if}
-				{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg'}<noscript>
-					<h2 class="headingbox_dark largesize">{s name='PaymentRedirect' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>{/if}
-					<br />
-					<a class="button-left large left" href="{url controller=payment_hgw action=cancel}">
-						<span>{s name='hp_cancelPay' namespace='frontend/register/hp_payment'}{/s}</span>
-					</a>
-					<input type="submit" class="button-right large right" value="{s name='ListingLinkNext' namespace='frontend/content/paging'}{/s}">
-				
-				{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg'}</noscript>{/if}
-			</div>
-		</form>
+					<input type="hidden" name='CRITERION.GATEWAY' value='1' />
+					{if $DbOnRg}<input type="hidden" name='CRITERION.DBONRG' value='{$DbOnRg}' />{/if}
+					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg'}<noscript>
+						<h2 class="headingbox_dark largesize">{s name='PaymentRedirect' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>{/if}
+						<br />
+						<a class="button-left large left" href="{url controller=payment_hgw action=cancel}">
+							<span>{s name='hp_cancelPay' namespace='frontend/register/hp_payment'}{/s}</span>
+						</a>
+						<input type="submit" class="button-right large right" value="{s name='ListingLinkNext' namespace='frontend/content/paging'}{/s}">
+
+					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg'}</noscript>{/if}
+				</div>
+			</form>
 	{else}
 		<h2 class="headingbox_dark largesize">{s name='PaymentHeader' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>
 		<form name="heidelpay" action="{$RedirectURL}" target="_top" method="post" autocomplete="off">
@@ -155,14 +166,19 @@
 				{foreach from=$Input key=k item=v}
 					<input type="hidden" name="{$k}" value="{$v}" />
 				{/foreach}
+
 				<script>
-					$(document).ready(function($){
-						jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
-						$($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
-						$.loadingIndicator.open();
-						$(document).ready(function(){ document.forms['heidelpay'].submit(); });
+                	$(document).ready(function($){
+                    	jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                        $($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
+                        $.loadingIndicator.open();
+
+                        $(document).ready(function(){
+                            document.forms['heidelpay'].submit();
+                        });
 					});
-				</script>
+					</script>
+
 				<noscript>
 					<h2 class="headingbox_dark largesize">{s name='PaymentRedirect' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>
 					<br />

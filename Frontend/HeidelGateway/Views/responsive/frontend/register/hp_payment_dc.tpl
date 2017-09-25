@@ -1,5 +1,5 @@
 {block name="hp_payment_dc"}
-	<div class="{$classname}" style='background-color: transparent;'>
+	<div class="{$classname}" style="background-color: transparent;">
 		{if isset($regData.$pm)}
 			{assign var="hasReg{$pm}" value=true}
 			<div class="reuse_{$pm}" {if {$hasReg{$pm}}} style="display: block;" {/if}>

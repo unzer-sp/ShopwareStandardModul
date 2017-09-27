@@ -39,6 +39,8 @@
 		{if !isset($regData.$pm)} {block name="hp_toggle"}{/block}	{else} {block name="hp_untoggle"}{/block} {/if}
 			{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va' classname='debit hgw_va'}
 		</div>
+	{elseif $payment_mean.name == "hgw_san"}
+		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_san.tpl" pm='san'}
 	{elseif $payment_mean.name == "hgw_hpr"}
 		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
 

@@ -98,6 +98,8 @@
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va'}
     {elseif $payment_mean.name == "hgw_hpr"}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
+    {elseif $payment_mean.name == "hgw_san"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_san.tpl" pm='san'}
     {else}
         {$smarty.block.parent}
     {/if}
@@ -146,6 +148,8 @@
 		<div class='msg_bank'>{s name='ErrorBank' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_exp'>{s name='ErrorExp' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_dob'>{s name='ErrorDob' namespace='frontend/register/hp_payment'}{/s}</div>
+        <div class='msg_salut'>{s name='ErrorSalut' namespace='frontend/register/hp_payment'}{/s}</div>
+        <div class='msg_cb'>{s name='ErrorCb' namespace='frontend/register/hp_payment'}{/s}</div>
 	</div>
 {/block}
 

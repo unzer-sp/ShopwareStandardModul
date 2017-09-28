@@ -20,7 +20,7 @@
 					{/if}	<!-- salutation == mr -->
 				{else}
 					<select id="salutation" class="hgw_required" name="NAME.SALUTATION">
-						<option value="">{s name='hp_accSal_gender' namespace='frontend/register/hp_payment'}{/s}</option>
+						<option value="-">{s name='hp_accSal_gender' namespace='frontend/register/hp_payment'}{/s}</option>
 						<option value="MR">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
 						<option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
 					</select><br />
@@ -44,7 +44,6 @@
 			{/if}
 			{if isset($optin)}
 				<div>
-					<!--<p><input type="checkbox" id="hgw_cb_san" name="CUSTOMER.OPTIN" class="checkbox" value="TRUE"> {$optin}</p>-->
 					<p>
 						<label for="hgw_adv_san">{s name='hp_sanAdvPermission' namespace='frontend/register/hp_payment'}{/s}:</label></br>
 						{if $checkOptin == "TRUE"}
@@ -61,10 +60,7 @@
 						</br>
 					</p>
 						<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label></br>
-						{*<div id="hgw_privacyPolicy" style="height:160px;width:30 rem;overflow:auto;">
-							<input type="checkbox" id="hgw_dp_san" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" required="required">
-							{$privacy_policy}
-						</div>*}
+
 					<p id="hgw_ParaPrivacyPolicy">
                         {if $checkPrivacyPolicy == "TRUE" }
 							<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" checked="checked">

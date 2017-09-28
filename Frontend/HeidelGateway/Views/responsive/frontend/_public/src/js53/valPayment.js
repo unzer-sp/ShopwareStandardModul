@@ -161,27 +161,29 @@ document.asyncReady(function () {
             }
 
             if (jQuery("input[type='submit'], .right").val() == "Weiter") {
-                var birthDay = null;
-                var birthMonth = null;
-                var birthYear = null;
-                var pm = null;
-                pm = jQuery("#payType").attr("class");
-                pm = pm.substr(7);
+                // var birthDay = null;
+                // var birthMonth = null;
+                // var birthYear = null;
+                // var pm = null;
+                // pm = jQuery("#payType").attr("class");
+                // pm = pm.substr(7);
 
-                if (jQuery(".newreg_" + pm) > 0) {
-                    birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
-                    birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                    birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
-                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                }
 
-                if (birthYear == null) {
-                    jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
-                    var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
-                    var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                    var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
-                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                }
+                // if (jQuery(".newreg_" + pm) > 0) {
+                //     birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
+                //     birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                //     birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
+                //     jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                // }
+
+                // if (birthYear == null) {
+                //     jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
+                //     var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
+                //     var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                //     var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
+                //     jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                // }
+
             } else {
                 pm = jQuery("#payType").attr("class");
                 if (pm != undefined) {
@@ -197,6 +199,7 @@ document.asyncReady(function () {
         });
 
         jQuery('.newreg_papg').click(function (e) {
+
             var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
             var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
             var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();

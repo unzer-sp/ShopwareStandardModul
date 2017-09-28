@@ -44,13 +44,22 @@ $(document).ready(function(){
 						var reuse = false;
 					}
 					
-					if(formUrl != null){
-						if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
-							jQuery('form.payment').attr('action', orgLink);
-						}else{
-							jQuery('form.payment').attr('action', formUrl[pm]);
-						}
-					}
+					// if(formUrl != null){
+					// 	if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
+					// 		jQuery('form.payment').attr('action', orgLink);
+					// 	}else{
+					// 		jQuery('form.payment').attr('action', formUrl[pm]);
+					// 	}
+					// }
+                    console.log(pm);
+					if( (formUrl != null)&& (formUrl != undefined) ){
+
+                        if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
+                            jQuery('form.payment').attr('action', orgLink);
+                        }else{
+                            jQuery('form.payment').attr('action', formUrl[pm]);
+                        }
+                    }
 				}else{
 					jQuery('form.payment').attr('action', orgLink);
 					hideForm();

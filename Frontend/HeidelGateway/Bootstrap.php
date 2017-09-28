@@ -230,7 +230,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$msg .= '* update 14.08.13<br />';
 					$this->createPayments();
 					$form->setElement('text', 'HGW_PF_CHANNEL', array(
-							'label'=>'PostFinace Channel',
+							'label'=>'PostFinance Channel',
 							'value'=>'',
 							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 				}catch(Exception $e){
@@ -1237,7 +1237,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setElement('text', 'HGW_EPS_CHANNEL', array('label'=>'EPS Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_BS_CHANNEL', array('label'=>'BillSafe Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_MK_CHANNEL', array('label'=>'MangirKart Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-			$form->setElement('text', 'HGW_PF_CHANNEL', array('label'=>'PostFinace Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+			$form->setElement('text', 'HGW_PF_CHANNEL', array('label'=>'PostFinance Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_MPA_CHANNEL', array('label'=>'MasterPass Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_HPR_CHANNEL', array('label'=>'EasyCredit Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array('label' => 'Gesicherte Lastschrift', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use direct debit with guarantee.'));
@@ -3031,8 +3031,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			);
 			$inst[] = array(
 					'name'			=> 'pf',
-					'description'	=> 'Heidelpay CD-Edition PostFinace',
-					'trans_desc' 	=> 'Heidelpay CD-Edition PostFinace',
+					'description'	=> 'Heidelpay CD-Edition PostFinance',
+					'trans_desc' 	=> 'Heidelpay CD-Edition PostFinance',
 			);
             $inst[] = array(
                 'name'			=> 'hpr',

@@ -1800,6 +1800,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
+                    //User-Indexe bei SW.516 leer
+                    if (empty($user['additional']['user']['userID']))
+                    {
+                        $user['additional']['user']['userID'] = $user['additional']['user']['customerId'];
+                        $user['additional']['user']['firstname'] = $user['billingaddress']['firstname'];
+                        $user['additional']['user']['lastname'] = $user['billingaddress']['lastname'];
+                        $user['additional']['user']['email'] = $user['additional']['user']['email'];
+
+                    }
+
                     $payment_data = [
                         "NAME_BIRTHDATE"                    => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
                         "CUSTOMER_OPTIN"                    =>

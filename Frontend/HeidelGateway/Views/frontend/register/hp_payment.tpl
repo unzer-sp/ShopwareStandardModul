@@ -152,6 +152,8 @@
 			<div class='msg_bank'>{s name='ErrorBank' namespace='frontend/register/hp_payment'}{/s}</div>
 			<div class='msg_exp'>{s name='ErrorExp' namespace='frontend/register/hp_payment'}{/s}</div>
 			<div class='msg_dob'>{s name='ErrorDob' namespace='frontend/register/hp_payment'}{/s}</div>
+			<div class='msg_salut'>{s name='ErrorSalut' namespace='frontend/register/hp_payment'}{/s}</div>
+			<div class='msg_cb'>{s name='ErrorCb' namespace='frontend/register/hp_payment'}{/s}</div>
 		</div>
 	{/block}
 	

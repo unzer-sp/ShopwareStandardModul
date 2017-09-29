@@ -51,7 +51,7 @@ $(document).ready(function(){
 					// 		jQuery('form.payment').attr('action', formUrl[pm]);
 					// 	}
 					// }
-                    console.log(pm);
+
 					if( (formUrl != null)&& (formUrl != undefined) ){
 
                         if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){

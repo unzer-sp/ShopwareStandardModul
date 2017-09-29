@@ -44,13 +44,22 @@ $(document).ready(function(){
 						var reuse = false;
 					}
 					
-					if(formUrl != null){
-						if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
-							jQuery('form.payment').attr('action', orgLink);
-						}else{
-							jQuery('form.payment').attr('action', formUrl[pm]);
-						}
-					}
+					// if(formUrl != null){
+					// 	if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
+					// 		jQuery('form.payment').attr('action', orgLink);
+					// 	}else{
+					// 		jQuery('form.payment').attr('action', formUrl[pm]);
+					// 	}
+					// }
+
+					if( (formUrl != null)&& (formUrl != undefined) ){
+
+                        if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
+                            jQuery('form.payment').attr('action', orgLink);
+                        }else{
+                            jQuery('form.payment').attr('action', formUrl[pm]);
+                        }
+                    }
 				}else{
 					jQuery('form.payment').attr('action', orgLink);
 					hideForm();
@@ -68,7 +77,30 @@ $(document).ready(function(){
 	
 	//Function to set Birthdate in hidden field for Chrome on mac
 	jQuery("input[type='submit'], .right").click(function(e){
-	//jQuery(".content--wrapper").click(function(e){
+
+        var pm = $('input:radio:checked').attr('class');
+
+        if(pm != undefined) {
+            if(pm.indexOf("hgw_san") > 0)
+            {
+                var errorsSan = valSantander();
+                if((jQuery('.'+"hgw_san"+'  .instyle_error').length > 0)){
+                    jQuery('.error ul li').remove();
+					jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
+
+                    jQuery.each(errorsSan, function(key, value){
+                        jQuery('.error ul').append('<li>'+jQuery(value).html()+'</li>');
+                    });
+
+                    jQuery('.error').show();
+                    jQuery('html, body').animate({ scrollTop: 0 }, 0);
+
+                    return false;
+
+                }
+            }
+        }
+
 		if(jQuery("input[type='submit'], .right").val() == "Weiter") {
 			var birthDay =  null;
 			var birthMonth = null;
@@ -352,6 +384,63 @@ function valBirthdate(age){
 	
 	return errors;
 }
+
+// function to show validate Santander Form
+function valSantander() {
+    var errors = {};
+    var i = 0;
+
+    // validation of salutation
+    var salutation = $('.newreg_san select[name="NAME.SALUTATION"]').val();
+    if(salutation == undefined || salutation == "-")
+    {
+        $('.newreg_san #salutation').parent('.outer-select').addClass("instyle_error");
+        errors[i++] = '.msg_salut';
+    } else {
+        $('.newreg_san #salutation').parent('.outer-select').removeClass('instyle_error');
+    }
+
+    // validation of birthdate
+    var birthdate = $('#birthdate_san').val();
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+        var dob = new Date(jQuery('.hgw_san select[name="Date_Year"]').val(), jQuery('.hgw_san select[name="Date_Month"]').val()-1, jQuery('.hgw_san select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+        if(age < 18){
+
+            jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+
+            errors[i++] = '.msg_dob';
+        }else{
+            jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        errors[i++] = '.msg_dob';
+    }
+
+    // validation of privacy policy
+    if($("#hgw_privacyPolicy").is(':checked'))
+    {
+        $("#hgw_privacyPolicy").removeClass('instyle_error');
+    } else {
+        $("#hgw_privacyPolicy").addClass('instyle_error');
+        $("#hgw_privacyPolicy").attr("required","required");
+
+        errors[i++] = '.msg_cb';
+        $('.hgw_san #hgw_privacyPolicy').attr("required","required");
+    }
+    return errors;
+}
+
 
 // function to show iFrame form
 function showForm(toggleForm){

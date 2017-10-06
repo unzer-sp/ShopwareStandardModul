@@ -2083,51 +2083,59 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $konfiguration = self::Config();
         $secret = $konfiguration['HGW_SECRET'];
 
-        $additional = array(
-            'PRESENTATION.AMOUNT' 	=> $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
-            'PRESENTATION.CURRENCY' => Shopware()->Currency()->getShortName(),
-            'IDENTIFICATION.TRANSACTIONID' => Shopware()->SessionID(),
-            'CRITERION.SECRET' 		=> hash('sha512', Shopware()->SessionID().$secret),
-            'CRITERION.SESS'		=> Shopware()->Session()->sessionId,
-            'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ? 'TRUE' : 'FALSE',
-            'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
-            'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> empty($countOrderForCustomer['COUNT(id)']) ? "0" : $countOrderForCustomer['COUNT(id)'],
+        //check if EasyCredit is active
+        $sGetPaymentMeans = Shopware()->Modules()->Admin()->sGetPaymentMeans();
 
-        );
+        foreach ($sGetPaymentMeans as $singlePayment => $values) {
+            if ($values['name'] == "hgw_hpr" && $values['active'] == 1 ){
+                $additional = array(
+                    'PRESENTATION.AMOUNT' 	=> $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
+                    'PRESENTATION.CURRENCY' => Shopware()->Currency()->getShortName(),
+                    'IDENTIFICATION.TRANSACTIONID' => Shopware()->SessionID(),
+                    'CRITERION.SECRET' 		=> hash('sha512', Shopware()->SessionID().$secret),
+                    'CRITERION.SESS'		=> Shopware()->Session()->sessionId,
+                    'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ? 'TRUE' : 'FALSE',
+                    'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
+                    'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> empty($countOrderForCustomer['COUNT(id)']) ? "0" : $countOrderForCustomer['COUNT(id)'],
 
-        // prepare data and do request
-        $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
-        $responseHpr 	= $this->doRequest($requestData);
+                );
 
-        //preparing OptIn-text to show
-        $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
+                // prepare data and do request
+                $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
+                $responseHpr 	= $this->doRequest($requestData);
 
-        $optinText = str_replace('{', '', $optinText);
-        $optinText = str_replace('"optin": "', '', $optinText);
-        $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
-        $optinText = str_replace('"', '', $optinText);
-        $optinText = str_replace('}', '', $optinText);
+                //preparing OptIn-text to show
+                $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
 
- 		//expand template
-        $view->configOptInText = $optinText;
+                $optinText = str_replace('{', '', $optinText);
+                $optinText = str_replace('"optin": "', '', $optinText);
+                $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
+                $optinText = str_replace('"', '', $optinText);
+                $optinText = str_replace('}', '', $optinText);
 
-        if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-            $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
-        }else{
-            $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
-        }
-        $view->extendsTemplate('register/hp_payment_hpr.tpl');
+                //expand template
+                $view->configOptInText = $optinText;
+
+                if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
+                    $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
+                }else{
+                    $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+                }
+                $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
 
-        if (
-        ($args->getSubject()->Request()->getControllerName() == 'checkout')
-        )
-        {
-            if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
-                Shopware()->Session()->HPdidRequest = 'TRUE';
-                return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                if (
+                ($args->getSubject()->Request()->getControllerName() == 'checkout')
+                )
+                {
+                    if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+                        Shopware()->Session()->HPdidRequest = 'TRUE';
+                        return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                    }
+                }
             }
         }
+
     }
 
     /**

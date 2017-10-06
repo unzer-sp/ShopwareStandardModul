@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.09.18';
+		return '17.09.19';
 	}
 
 	/**
@@ -685,6 +685,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         )
                     );
                     $msg .= '* update 17.09.18 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '17.09.19':
+                // Fix for doRequest-logging while EasyCredit is not active
+                try {
+                    $msg .= '* update 17.09.19 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

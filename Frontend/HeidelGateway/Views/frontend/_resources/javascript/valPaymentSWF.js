@@ -64,11 +64,11 @@ function valForm(){
 						});
 
 						if(pm == 'dd'){
-							if(jQuery('.newreg_'+pm+' #sepa_switch').find(":selected").val() == 'iban'){
+							// if(jQuery('.newreg_'+pm+' #sepa_switch').find(":selected").val() == 'iban'){
 								var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
-							}else{
-								var errors = valInputDdAccount(jQuery('.newreg_'+pm+' #account').val(), jQuery('.newreg_'+pm+' #bankcode').val());
-							}
+							// }else{
+							// 	var errors = valInputDdAccount(jQuery('.newreg_'+pm+' #account').val(), jQuery('.newreg_'+pm+' #bankcode').val());
+							// }
 						}
 					}
 				}else{			
@@ -113,11 +113,11 @@ function valGatewayForm(){
 	var pm = checkedOpt.substr(checkedOpt.indexOf('_')+1);
 
 	if(pm == 'dd'){
-		if(jQuery('.newreg_'+pm+' #sepa_switch').find(":selected").val() == 'iban'){
+		// if(jQuery('.newreg_'+pm+' #sepa_switch').find(":selected").val() == 'iban'){
 			var errors = valInputDdIban(jQuery('.'+checkedOpt+' #iban').val(), pm);
-		}else{
-			var errors = valInputDdAccount(jQuery('.newreg_'+pm+' #account').val(), jQuery('.newreg_'+pm+' #bankcode').val());
-		}
+		// }else{
+		// 	var errors = valInputDdAccount(jQuery('.newreg_'+pm+' #account').val(), jQuery('.newreg_'+pm+' #bankcode').val());
+		// }
 	}else if((pm == 'sue') || (pm == 'gir')){
 		var errors = {};
 		var i = 0;

@@ -88,15 +88,18 @@
     {assign var='pm' value=$payment_mean.name|substr:($bar_at+1)}
     {if $pm == 'pay'}{assign var='pm' value='va'}{/if}
     {if $payment_mean.name == "hgw_cc" && $heidel_bm_cc && ($formUrl.$pm != '')}
-        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_cc.tpl"}
+
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment53_cc.tpl"}
     {elseif $payment_mean.name == "hgw_dc" && $heidel_bm_dc && ($formUrl.$pm != '')}
-        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_dc.tpl"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment53_dc.tpl"}
     {elseif $payment_mean.name == "hgw_dd" && $heidel_bm_dd && ($formUrl.$pm != '')}
-        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_dd.tpl"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment53_dd.tpl"}
     {elseif $payment_mean.name == "hgw_pay" && $heidel_bm_va && ($formUrl.$pm != '')}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va'}
     {elseif $payment_mean.name == "hgw_hpr"}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
+    {elseif $payment_mean.name == "hgw_san"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_san.tpl" pm='san'}
     {else}
         {$smarty.block.parent}
     {/if}
@@ -145,6 +148,8 @@
 		<div class='msg_bank'>{s name='ErrorBank' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_exp'>{s name='ErrorExp' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_dob'>{s name='ErrorDob' namespace='frontend/register/hp_payment'}{/s}</div>
+        <div class='msg_salut'>{s name='ErrorSalut' namespace='frontend/register/hp_payment'}{/s}</div>
+        <div class='msg_cb'>{s name='ErrorCb' namespace='frontend/register/hp_payment'}{/s}</div>
 	</div>
 {/block}
 

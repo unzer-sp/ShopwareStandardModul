@@ -13,7 +13,7 @@
 			</div>
 		{/if}
 
-		<div class="newreg_{$pm}" {if {$hasReg{$pm}}} onclick="callAFunction('cc')" style="display: none;" {/if}>
+		<div class="newreg_{$pm}" {if {$hasReg{$pm}}} style="display: none;" {/if}>
 			{if $frame.$pm}
 				<iframe id="hp_frame_{$pm}" src="{$formUrl.$pm}">your browser doesn't support iframes</iframe>
 			{/if}
@@ -21,6 +21,6 @@
 		
 		{if isset($regData.$pm)}
 		<div class="space">&nbsp;</div>
-		<div><input class="reues_{$pm}" type='checkbox' onclick="hgwToggleReuse('_cc')">{s name='hp_reenter' namespace='frontend/register/hp_payment'}{/s}</div>{/if}
+		<div><input class="reues_{$pm}" type='checkbox'>{s name='hp_reenter' namespace='frontend/register/hp_payment'}{/s}</div>{/if}
 	</div>
 {/block}

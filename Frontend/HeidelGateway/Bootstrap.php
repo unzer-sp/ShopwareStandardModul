@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.09.30';
+		return '17.10.10';
 	}
 
 	/**
@@ -691,7 +691,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '17.09.25':
+            case '17.09.19':
                 // Compatibility for Shopware 4.3.6 - 5.3.3
                 // Some changes in Js
                 try {
@@ -710,6 +710,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
+            case '17.10.10':
+                // updatefix 17.09.19
+                try {
+                    $msg .= '* update 17.09.30 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
 
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';

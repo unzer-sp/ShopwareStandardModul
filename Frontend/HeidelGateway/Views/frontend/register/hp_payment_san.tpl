@@ -56,7 +56,7 @@
 							weitergegeben werden. Die Santander darf diese Daten gerne dazu nutzen, um mich über Produkte der
 							Santander zu informieren. Natürlich kann ich meine Einwilligung jederzeit mit Wirkung für die Zukunft
 							widerrufen. Ausführliche Informationen zu dieser Einwilligung sowie die Möglichkeit zum Widerruf
-							finde ich <a href="{$optinLink}" target="_blank">hier</a>.</strong>
+							finde ich <!--<a href="{$optinLink}" target="_blank">hier</a>--> <a href="https://www.santander.de/applications/rechnungskauf/werbewiderspruch" target="_blank">hier</a> .</strong>
 						</br>
 					</p>
 						<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label></br>

@@ -3142,6 +3142,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$params['ACCOUNT.BRAND'] 		= "SANTANDER";
 					$params['FRONTEND.ENABLED'] 	= "true";
 					break;
+                /* payolution direct */
+                case 'ivpd':
+                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+                    $params['PAYMENT.CODE'] 		= "IV.".$type;
+                    $params['ACCOUNT.BRAND'] 		= "PAYOLUTION_DIRECT";
+                    $params['FRONTEND.ENABLED'] 	= "true";
+                    break;
 					/* billsafe */
 				case 'bs':
 					$type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];

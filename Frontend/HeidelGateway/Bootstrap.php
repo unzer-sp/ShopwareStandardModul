@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.11';
+		return '17.10.12';
 	}
 
 	/**
@@ -725,7 +725,29 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-
+            case '17.10.12':
+                // Introducing Paymentmethod "Payolution direct"
+                try{
+                    $this->addSnippets();
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_IVPD_CHANNEL',
+                        array(
+                            'label'=>'Payolution branded Channel',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
+                    $form->setElement('text', 'HGW_IVPD_EMAIL',
+                        array(
+                            'label'=>'Payolution E-Mail',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
+                    $msg .= '* update 17.10.12 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
@@ -1245,7 +1267,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setElement('text', 'HGW_IV_CHANNEL', array('label'=>'Invoice Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_PAPG_CHANNEL', array('label'=>'Invoice with guarantee Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_SAN_CHANNEL', array('label'=>'Santander Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-			$form->setElement('text', 'HGW_P24_CHANNEL', array('label'=>'Przelewy24 Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+            $form->setElement('text', 'HGW_IVPD_CHANNEL', array('label'=>'Payolution branded Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+            $form->setElement('text', 'HGW_P24_CHANNEL', array('label'=>'Przelewy24 Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_SUE_CHANNEL', array('label'=>'Sofort Banking Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_GIR_CHANNEL', array('label'=>'Giropay Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_VA_CHANNEL', array('label'=>'PayPal Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
@@ -1258,7 +1281,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $form->setElement('text', 'HGW_HPR_CHANNEL', array('label'=>'EasyCredit Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array('label' => 'Gesicherte Lastschrift', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use direct debit with guarantee.'));
 
-			$bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
+			$form->setElement('text', 'HGW_IVPD_EMAIL',array('label'=>'Payolution E-Mail','value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+
+            $bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
 			$form->setElement('select', 'HGW_CC_BOOKING_MODE', array(
 					'label' => 'Credit Card booking mode',
 					'value' => 1,
@@ -1510,8 +1535,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
 				$view->assign('Containers', $containerData);
 			}elseif(
-					($document->_order->payment['name'] == 'hgw_iv') || ($document->_order->payment['name'] == 'hgw_papg')
-					|| ($document->_order->payment['name'] == 'hgw_san')
+					($document->_order->payment['name'] == 'hgw_iv') ||
+                    ($document->_order->payment['name'] == 'hgw_papg') ||
+                    ($document->_order->payment['name'] == 'hgw_san') ||
+                    ($document->_order->payment['name'] == 'hgw_ivpd')
+
 					){
 						$orderData = $view->getTemplateVars('Order');
 						$containers = $view->getTemplateVars('Containers');
@@ -1726,6 +1754,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                                                 }
 
+                                                /* **************************************************************************** */
+                                                if($pm == 'ivpd')
+                                                {
+                                                    $regData = $this->getRegData($user['additional']['user']['id'], $pm);
+//                                                    $getFormUrl = Shopware_Controllers_Frontend_PaymentHgw::getFormUrl($pm, $bookingMode, $user['additional']['user']['id'], $tempID, Null, NULL, NULL, true);
+                                                    $view->birthdate = $regData;
+//                                                    mail("sascha.pflueger@heidelpay.de","Bootstrap 1763",print_r($regData,1));
+                                                }
+                                                /* **************************************************************************** */
+
+
                                                 if(((isset($bookingMode)) && (($bookingMode == '3') || ($bookingMode == '4'))) && Shopware()->Modules()->Admin()->sCheckUser()){
 
 													$getFormUrl = Shopware_Controllers_Frontend_PaymentHgw::getFormUrl($pm, $bookingMode, $user['additional']['user']['id'], $tempID, $regData[$pm]['uid'], NULL, NULL, true);
@@ -1806,6 +1845,87 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($request->getControllerName() == 'account' &&  $action == 'savePayment')
             )
             {
+                /* ********************************************************************* */
+                $sGetPaymentMeans = Shopware()->Modules()->Admin()->sGetPaymentMeans();
+                foreach($sGetPaymentMeans as $key => $value){
+                    $avPayments[$value['name']] = $value;
+                }
+mail("sascha.pflueger@heidelpay.de","1853",print_r($_POST,1));
+mail("sascha.pflueger@heidelpay.de","1854",print_r($avPayments,1));
+                // check if IVPD is active
+                if(array_key_exists('hgw_ivpd',$avPayments))
+                {
+                    //save Birthdate to DB
+                    if($request->getpost('payment') == $avPayments['hgw_ivpd']['id'])
+                    {
+mail("sascha.pflueger@heidelpay.de","TREFFER 1861",print_r("",1));
+                        $flag = ENT_COMPAT;
+                        $enc = 'UTF-8';
+                        $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year')) : '';
+                        $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
+                        $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
+
+                        //daten in DB Speichern
+                        $user = Shopware()->Modules()->Admin()->sGetUserData();
+
+                        // Benoetigte User-Indexe bei SW.516 anders vergeben
+                        $user = self::formatUserInfos($user);
+
+                        $payment_data = [
+                            "NAME_BIRTHDATE"                    => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
+                            "NAME_SALUTATION"                   =>
+                                $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
+                        ];
+
+                        $sql = '
+			                INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
+					        `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
+				            VALUES (:userID, :payType , :uid, :cardnr, :expMonth, :expYear, :brand, :owner,
+					        :kto, :blz, :chan, :shippingHash, :email, :payment_data)
+			                ON DUPLICATE KEY UPDATE
+					        uid = :uidNew, cardnr = :cardnrNew, expMonth = :expMonthNew, expYear = :expYearNew, brand = :brandNew, owner = :ownerNew,
+					        kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
+
+                        $params = array(
+                            'userID' 	=> $user['additional']['user']['userID'],
+                            'payType' 	=> "ivpd",
+                            'uid' 		=> "0",
+                            'cardnr' 	=> "0",
+                            'expMonth' 	=> "0",
+                            'expYear' 	=> "0",
+                            'brand' 	=> "PAYOLUTION",
+                            'owner' 	=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
+                            'kto' 		=> "0",
+                            'blz' 		=> "0",
+                            'chan' 		=> $config->HGW_IVPD_CHANNEL,
+                            'shippingHash' => "0",
+                            'email' 	=> $user['additional']['user']['email'],
+                            'payment_data' => json_encode($payment_data),
+
+                            'uidNew' 		=> "0",
+                            'cardnrNew' 	=> "0",
+                            'expMonthNew' 	=> "0",
+                            'expYearNew' 	=> "0",
+                            'brandNew'		=> "PAYOLUTION",
+                            'ownerNew'		=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
+                            'ktoNew' 		=> "0",
+                            'blzNew' 		=> "0",
+                            'chanNew' 		=> $config->HGW_IVPD_CHANNEL,
+                            'shippingHashNew'=> "0",
+                            'emailNew' 		=> $user['additional']['user']['email'],
+                            'payment_dataNew' => json_encode($payment_data)
+                        );
+
+                        try {
+                            Shopware()->Db()->query($sql, $params);
+                        }
+                        catch (Exception $e) {
+                            $this->logError("IVPD saving to DB | ". $e->getMessage());
+                        }
+                    }
+                }
+                /* ********************************************************************* */
+
                 if ($request->getPost("CUSTOMER_ACCEPT_PRIVACY_POLICY") == "TRUE")
                 {
                     $flag = ENT_COMPAT;
@@ -1816,15 +1936,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
-                    //User-Indexe bei SW.516 leer
-                    if (empty($user['additional']['user']['userID']))
-                    {
-                        $user['additional']['user']['userID'] = $user['additional']['user']['customerId'];
-                        $user['additional']['user']['firstname'] = $user['billingaddress']['firstname'];
-                        $user['additional']['user']['lastname'] = $user['billingaddress']['lastname'];
-                        $user['additional']['user']['email'] = $user['additional']['user']['email'];
 
-                    }
+                    // Benoetigte User-Indexe bei SW.516 anders vergeben
+                    $user = self::formatUserInfos($user);
 
                     $payment_data = [
                         "NAME_BIRTHDATE"                    => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
@@ -1853,7 +1967,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'expMonth' 	=> "0",
                         'expYear' 	=> "0",
                         'brand' 	=> "SANTANDER",
-                        'owner' 	=> $user['additional']['user']['firstname'],
+                        'owner' 	=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
                         'kto' 		=> "0",
                         'blz' 		=> "0",
                         'chan' 		=> $config->HGW_SAN_CHANNEL,
@@ -1866,7 +1980,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'expMonthNew' 	=> "0",
                         'expYearNew' 	=> "0",
                         'brandNew'		=> "SANTANDER",
-                        'ownerNew'		=> $user['additional']['user']['firstname'],
+                        'ownerNew'		=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
                         'ktoNew' 		=> "0",
                         'blzNew' 		=> "0",
                         'chanNew' 		=> $config->HGW_SAN_CHANNEL,
@@ -2038,6 +2152,18 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             }
             $view->extendsTemplate('register/hp_payment_hpr.tpl');
         }
+
+        /* *************************************************************** */
+        if (
+            ($request->getControllerName() == 'checkout') &&
+            ($request->getActionName() == 'shippingPayment') &&
+            (strtolower($user['additional']['payment']['name']) == 'hgw_ivpd')
+        )
+        {
+//mail("sascha.pflueger@heidelpay.de","Bootstrap 2058",print_r($request->getActionName(),1));
+
+        }
+        /* *************************************************************** */
 
         //after chosen HPR redirect to EasyCredit
         if (
@@ -3071,6 +3197,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'trans_desc' 	=> 'Heidelpay CD-Edition PostFinance',
 			);
             $inst[] = array(
+                'name'			=> 'ivpd',
+                'description'	=> 'Payolution Rechnungskauf',
+                'trans_desc' 	=> 'Payolution invoice payment',
+            );
+            $inst[] = array(
                 'name'			=> 'hpr',
                 'description'	=> 'Heidelpay CD-Edition ratenkauf by easyCredit',
                 'trans_desc' 	=> 'Heidelpay CD-Edition Hire purchase by easyCredit',
@@ -3815,7 +3946,9 @@ Mit freundlichen Gruessen
 							'HGW_DD_CHANNEL' 		=> array('label' => 'Lastschrift Channel'),
 							'HGW_PP_CHANNEL' 		=> array('label' => 'Vorkasse Channel'),
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Rechnung Channel'),
-							'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
+                            'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Rechnungskauf Channel'),
+                            'HGW_IVPD_EMAIL' 		=> array('label' => 'Payolution E-Mail-Adresse'),
+                            'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
 							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofortüberweisung Channel'),
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
@@ -3902,7 +4035,9 @@ Mit freundlichen Gruessen
 							'HGW_PP_CHANNEL' 		=> array('label' => 'Prepayment Channel'),
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Invoice Channel'),
 							'HGW_PAPG_CHANNEL', array('label'=> 'Invoice with guarantee Channel'),
-							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Banking Channel'),
+                            'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Invoice Payment Channel'),
+                            'HGW_IVPD_EMAIL' 		=> array('label' => 'Payolution email-address'),
+                            'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Banking Channel'),
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Credit Card booking mode',
@@ -4081,4 +4216,26 @@ Mit freundlichen Gruessen
 			$user['shippingaddress']['countryID']
         );
 	}
+
+    /** formatUserInfos() to normalize $userArray given from Shopware in different ways in Shopware 5.1.6
+     * @param null $user
+     * @return normalzed User Array
+     */
+    public static function formatUserInfos($user = null)
+    {
+        $userGiven = $user;
+        if($userGiven != null)
+        {
+            $user['additional']['user']['userID']       = isset($user['additional']['user']['userID'])      && !empty($user['additional']['user']['userID'])    ? $user['additional']['user']['userID']     : $user['additional']['user']['customerId'];
+            $user['additional']['user']['firstname']    = isset($user['additional']['user']['firstname'])   && !empty($user['additional']['user']['firstname']) ? $user['additional']['user']['firstname']  : $user['billingaddress']['firstname'];
+            $user['additional']['user']['lastname']     = isset($user['additional']['user']['lastname'])    && !empty($user['additional']['user']['lastname'])  ? $user['additional']['user']['lastname']   : $user['billingaddress']['lastname'];
+
+        } else {
+            $user = Shopware()->Modules()->Admin()->sGetUserData();
+            $user['additional']['user']['userID']       = isset($user['additional']['user']['userID'])      && !empty($user['additional']['user']['userID'])    ? $user['additional']['user']['userID']     : $user['additional']['user']['customerId'];
+            $user['additional']['user']['firstname']    = isset($user['additional']['user']['firstname'])   && !empty($user['additional']['user']['firstname']) ? $user['additional']['user']['firstname']  : $user['billingaddress']['firstname'];
+            $user['additional']['user']['lastname']     = isset($user['additional']['user']['lastname'])    && !empty($user['additional']['user']['lastname'])  ? $user['additional']['user']['lastname']   : $user['billingaddress']['lastname'];
+        }
+        return $user;
+    }
 }

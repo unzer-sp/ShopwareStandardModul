@@ -100,6 +100,8 @@
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
     {elseif $payment_mean.name == "hgw_san"}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_san.tpl" pm='san'}
+    {elseif $payment_mean.name == "hgw_ivpd"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_ivpd.tpl" pm='ivpd'}
     {else}
         {$smarty.block.parent}
     {/if}

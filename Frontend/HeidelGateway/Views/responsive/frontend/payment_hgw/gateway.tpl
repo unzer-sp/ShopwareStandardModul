@@ -302,6 +302,8 @@
 					{include file="frontend/register/hp_payment_papg.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
 				{elseif $pm == 'san'}
 					{include file="frontend/register/hp_payment_san.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
+                {elseif $pm == 'ivpd'}
+                    {include file="frontend/register/hp_payment_ivpd.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
                 {elseif $pm == 'hpr'}
                     {include file="frontend/register/hp_payment_hpr.tpl" pm=$pm grid=$grid classname=$classname}
 				{else}

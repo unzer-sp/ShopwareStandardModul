@@ -2067,7 +2067,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             }else{
 
                 if (Shopware()->Session()->wantEasy) {
-                    if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+//                    if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                         exit();

@@ -713,7 +713,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '17.10.10':
                 // updatefix 17.09.19
                 try {
-                    $msg .= '* update 17.09.30 <br />';
+                    $msg .= '* update 17.10.10 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

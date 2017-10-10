@@ -1798,7 +1798,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($request->getControllerName() == 'account' &&  $action == 'savePayment')
             )
             {
-                if (!empty($request->getPost("CUSTOMER_ACCEPT_PRIVACY_POLICY")))
+                if ($request->getPost("CUSTOMER_ACCEPT_PRIVACY_POLICY") == "TRUE")
                 {
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';

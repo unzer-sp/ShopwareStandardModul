@@ -2167,7 +2167,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
                         // redirect to EasyCredit
-                        if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+                        if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
                             Shopware()->Session()->HPdidRequest = 'TRUE';
                         }
                     }
@@ -2241,7 +2241,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         )
         {
             // redirect to EasyCredit
-            if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+            if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
                 Shopware()->Session()->HPdidRequest = 'TRUE';
                 return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
             }
@@ -2307,7 +2307,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         ($args->getSubject()->Request()->getControllerName() == 'checkout')
         )
         {
-            if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+            if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
                 Shopware()->Session()->HPdidRequest = 'TRUE';
                 return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
             }

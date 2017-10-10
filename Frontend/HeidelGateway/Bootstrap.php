@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.10';
+		return '17.10.11';
 	}
 
 	/**
@@ -714,6 +714,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 // updatefix 17.09.19
                 try {
                     $msg .= '* update 17.10.10 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '17.10.11':
+                // hotfix for unneccassary payment calls for EasyCredit
+                try {
+                    $msg .= '* update 17.10.11 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -2279,37 +2287,46 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
         );
 
-        // prepare data and do request
-        $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
-        $responseHpr 	= $this->doRequest($requestData);
-
-        //preparing OptIn-text to show
-        $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
-
-        $optinText = str_replace('{', '', $optinText);
-        $optinText = str_replace('"optin": "', '', $optinText);
-        $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
-        $optinText = str_replace('"', '', $optinText);
-        $optinText = str_replace('}', '', $optinText);
-
- 		//expand template
-        $view->configOptInText = $optinText;
-
-        if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-            $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
-        }else{
-            $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+        $allPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
+        foreach($allPayments as $key => $value){
+            $avPayments[$value['name']] = $value;
         }
-        $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
-
-        if (
-        ($args->getSubject()->Request()->getControllerName() == 'checkout')
-        )
+        // only do Request if EasyCredit is active
+        if(array_key_exists('hgw_hpr',$avPayments))
         {
-            if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
-                Shopware()->Session()->HPdidRequest = 'TRUE';
-                return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+            // prepare data and do request
+            $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
+            $responseHpr 	= $this->doRequest($requestData);
+
+            //preparing OptIn-text to show
+            $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
+
+            $optinText = str_replace('{', '', $optinText);
+            $optinText = str_replace('"optin": "', '', $optinText);
+            $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
+            $optinText = str_replace('"', '', $optinText);
+            $optinText = str_replace('}', '', $optinText);
+
+            //expand template
+            $view->configOptInText = $optinText;
+
+            if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
+                $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
+            }else{
+                $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+            }
+            $view->extendsTemplate('register/hp_payment_hpr.tpl');
+
+
+            if (
+            ($args->getSubject()->Request()->getControllerName() == 'checkout')
+            )
+            {
+                if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
+                    Shopware()->Session()->HPdidRequest = 'TRUE';
+                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                }
             }
         }
     }

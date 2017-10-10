@@ -158,6 +158,20 @@ document.asyncReady(function () {
                 } else {
                     $(".hgw_required").removeAttr("required");
                 }
+
+                if(pm.indexOf("hgw_ivpd"))
+                {
+                    console.log("Treffer")
+                    if(jQuery('.newreg_ivpd').is(":visible")) {
+
+                        var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+                        var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+                        var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+
+                        jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                    }
+                }
+
             }
 
             if (jQuery("input[type='submit'], .right").val() == "Weiter") {
@@ -215,6 +229,23 @@ document.asyncReady(function () {
             jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
 
+        jQuery('.newreg_ivpd').click(function (e) {
+            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+
+            jQuery('#birthdate_papd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+        });
+
+        if(jQuery('.newreg_ivpd').is(":visible")) {
+
+            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+
+            jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+        }
+
         jQuery('.newreg_san').click(function (e) {
             $(".hgw_required").attr("required","required");
             var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
@@ -269,6 +300,23 @@ document.asyncReady(function () {
 
                 jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             }
+
+            jQuery('.newreg_ivpg').click(function (e) {
+                var birthDay = jQuery(".newreg_ivpg [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_ivpg [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_ivpg [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_ivpg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            });
+
+            if (jQuery('.newreg_ivpg')) {
+                var birthDay = jQuery(".newreg_ivpg [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_ivpg [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_ivpg [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_ivpg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            }
+
         }); // ende ajaxComplete
     } else { // if SW-Version <= 5.2
 
@@ -659,6 +707,16 @@ function valShippingPaymentForm() {
                     return false;
                 }
             }
+
+            if(pm = 'ivpd'){
+                // var errors = valPayolutionDirect();
+
+                if(errors.length >0)
+                {
+                    return false;
+                }
+            }
+
         }
 
         if ((jQuery('div.hgw_' + pm + ' .has--error').length > 0)) {
@@ -813,4 +871,49 @@ function valSantander() {
     }
     return errors;
 }
+
+function valPayolutionDirect() {
+    var errors = {};
+    var i = 0;
+
+    // validation of salutation
+    var salutation = $('.hgw_val_ivpd select[name="NAME.SALUTATION"]').val();
+    if(salutation == undefined || salutation == "-")
+    {
+        $('.newreg_ivpd #salutation').parent('.js--fancy-select').addClass("has--error");
+        errors[i++] = '.msg_salut';
+    } else {
+        $('.newreg_ivpd #salutation').parent('.js--fancy-select').removeClass('has--error');
+    }
+
+    // validation of birthdate
+    var birthdate = $('#birthdate_san').val();
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+        var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val()-1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+        if(age < 18){
+
+            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+
+            errors[i++] = '.msg_dob';
+        }else{
+            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        errors[i++] = '.msg_dob';
+    }
+    return errors;
+}
+
+
 

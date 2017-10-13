@@ -2,6 +2,7 @@
 	<div class="{$grid} {$classname}" style='background-color: transparent;'>
 		<!--<div class="newreg_{$pm}" style="width: 22rem;">-->
 		<!--<div class="newreg_{$pm}" id="payType" style="width: 30rem;">-->
+
 		<!--<img src="{$logoLink}" alt="Santander-Logo">-->
 		<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">
 		<div class="newreg_{$pm}" id="payType">
@@ -89,6 +90,8 @@
 
 				</div>
             {/if}
+			<input type="hidden" name="BRAND" id="handover_brand" value="SANTANDER">
+
 			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 		</div>
 	</div>

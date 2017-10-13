@@ -18,14 +18,13 @@
                     {/if}	<!-- salutation == mrs -->
                 {else}
                     <select id="salutation" class="hgw_val_ivpd" name="NAME.SALUTATION">
+                        <option value="UNKNOWN">{s name='hp_accSal_unknown' namespace='frontend/register/hp_payment'}{/s}</option>
                         <option value="MR">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
                         <option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
                     </select><br />
                 {/if} <!-- if isset salutation -->
-                {if isset($accountHolder)}
-                    <input type="text" value="{$accountHolder}" disabled><br />
-                {/if}
 
+                <input type="text" value="{$accountHolder}" disabled><br />
             </div>
             <br />
             <label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
@@ -41,7 +40,13 @@
             {else}
                 <input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivpd" value="-">
             {/if}
+            {if isset($optinText)}
+                <p>
+                    {$optinText}
+                </p>
+            {/if}
 
+            <input type="hidden" name="BRAND" id="handover_brand" value="PAYOLUTION_DIRECT">
             <p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
         </div>
     </div>

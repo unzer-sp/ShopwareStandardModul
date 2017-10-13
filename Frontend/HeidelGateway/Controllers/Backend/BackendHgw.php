@@ -109,7 +109,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 $payName = str_replace('hgw_', '', $payName);
             }
 
-// 			switch($trans->payName){
             switch($payName){
 				case 'pay':
 					$payName = 'va';
@@ -161,6 +160,17 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$sw::$requestUrl = $sw::$test_url;
 			}
 
+            // setting Basket-Id for Payolution
+            if($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
+            {
+                /**
+                 * @todo Herausfinden welche Artikel im Basket sind
+                 */
+                $basketId = Shopware()->Plugins()->Frontend()->HeidelGateway()->getBasketId();
+                $data['BASKET_ID'] = $basketId['basketId'];
+            }
+mail("sascha.pflueger@heidelpay.de","BackendHgw 166",print_r($data,1));
+mail("sascha.pflueger@heidelpay.de","BackendHgw 167",print_r($basketId,1));
 			foreach($data as $key => $value){
 				if(is_int(strpos($key, 'CLEARING_'))){ unset($data[$key]); continue; }
 				if(is_int(strpos($key, 'ACCOUNT_'))){ unset($data[$key]); continue; }
@@ -171,7 +181,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$data[$newKey] = $value;
 				unset($data[$key]);
 			}
-				
+//mail("sascha.pflueger@heidelpay.de","BackendHgw 177 Kontrolle Parameter",print_r($data,1));
 			$resp = $this->callDoRequest($data);
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
 				
@@ -312,6 +322,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					$payInfo = $this->getPayInfo($value['PAYMENT_CODE'], $beLocaleId);
 					if($payName == 'papg'){ $payName = 'iv'; $papg = true; }
 					if($payName == 'san'){ $payName = 'iv'; $san = true; }
+					if($payName == 'ivpd'){ $payName = 'iv'; $ivpd = true; }
 					switch($payName){
 						case 'cc':
 						case 'dc':
@@ -415,6 +426,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					}
 					if($papg){ $payName = 'papg'; $papg = false; }
 					if($payName == 'san'){ $payName = 'iv'; unset($san); }
+					if($payName == 'ivpd'){ $payName = 'iv'; unset($ivpd); }
 				}
 
 				$btns['rf']['trans'][0]['maxRf'] = number_format($maxRf, 2,'.','');

@@ -333,11 +333,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						($activePayment != 'mk') &&
                         ($activePayment != 'mpa')&&
                         ($activePayment != 'san')&&
+                        ($activePayment != 'ivpd')&&
                         ($activePayment != 'hpr')
 						){
 
 							//adding a basketId for santander / papg payment
-							if($activePayment == 'san' || $activePayment == 'papg') {
+							if($activePayment == 'san' || $activePayment == 'papg' || $activePayment == 'ivpd') {
 								$basketId = self::getBasketId();
 									
 								if($basketId['result'] == 'NOK'){
@@ -494,7 +495,45 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 //                        }
 
                     }
+                    /* ******************************************************** */
 
+                    if($activePayment == 'ivpd') {
+                        $basketId = self::getBasketId();
+
+                        if($basketId['result'] == 'NOK'){
+                            return $this->forward('fail');
+                        }else{
+                            $basketId = $basketId['basketId'];
+                        }
+                        $ppd_crit['BASKET.ID'] = $basketId;
+
+                        $regDataParameters = json_decode($regData["payment_data"]);
+
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
+                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
+
+                        //fetching count of orders of customer
+                        $countOrderForCustomer = '';
+                        $sql = 'SELECT COUNT(id) FROM `s_order` WHERE userID ="'.$user['additional']['user']['userID'].'" AND ordernumber != "0"';
+                        $countOrderForCustomer = Shopware()->Db()->fetchRow($sql);
+
+                        $ppd_crit['RISKINFORMATION.CUSTOMERGUESTCHECKOUT']  = $user['additional']['user']['accountmode'] == '0' ?  'FALSE':'TRUE';
+                        $ppd_crit['RISKINFORMATION.CUSTOMERSINCE'] 		    = $user['additional']['user']['firstlogin'];
+                        $ppd_crit['RISKINFORMATION.CUSTOMERORDERCOUNT'] 	= $countOrderForCustomer['COUNT(id)'];
+                        $ppd_crit['CRITERION.USER_ID'] 	= $user['additional']['user']['id'];
+
+                        //to prevent sending request to paymentgateway if browser-back-button was pushed
+//                        if(
+//                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
+//                            empty($ppd_crit["NAME.SALUTATION"]) ||
+//                            empty($ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"])
+//                        )
+//                        {
+//                            $this->forward('fail');
+//                        }
+
+                    }
+                    /* ******************************************************** */
                     if ($activePayment == 'hpr') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
@@ -579,9 +618,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 				}
 
-				elseif(in_array($activePayment, array('pp', 'iv', 'papg', 'san')) && empty($response['ACCOUNT.BRAND'])){
+				elseif(in_array($activePayment, array('pp', 'iv', 'papg', 'san', 'ivpd')) && empty($response['ACCOUNT.BRAND'])){
 
-                    if($activePayment == "san")
+                    if($activePayment == "san" || $activePayment == "ivpd")
                     {
                         return $this->redirect($response['FRONTEND_REDIRECT_URL']);
                     }
@@ -601,7 +640,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							'{IDENTIFICATION_SHORTID}'		=> "\n".$response['IDENTIFICATION_SHORTID'],
 					);
 
-					if(($activePayment == 'iv') || ($activePayment == 'papg') || ($activePayment == 'san') || ($activePayment == 'pp')){
+					if(
+					    ($activePayment == 'pp') ||
+                        ($activePayment == 'iv') ||
+                        ($activePayment == 'papg') ||
+                        ($activePayment == 'san') ||
+                        ($activePayment == 'ivpd')
+                    ){
 						$comment = '<strong>'.$this->getSnippet('InvoiceHeader', $locId).":</strong>";
 						$comment.= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
 
@@ -620,6 +665,22 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $comment = '<strong>'.$this->getSnippet('InvoiceHeader', $locId).":</strong>";
                         $comment.= strtr($this->getSnippet('PrepaymentSanText', $locId), $repl);
+
+                    }elseif($activePayment == 'ivpd'){
+                        $repl = array(
+                            '{AMOUNT}'						=> $this->hgw()->formatNumber($this->getAmount()),
+                            '{CURRENCY}'					=> $this->getCurrencyShortName(),
+                            '{CONNECTOR_ACCOUNT_COUNTRY}'	=> $response['CONNECTOR_ACCOUNT_COUNTRY']."\n",
+                            '{CONNECTOR_ACCOUNT_HOLDER}'	=> $response['CONNECTOR_ACCOUNT_HOLDER']."\n",
+//                            '{CONNECTOR_ACCOUNT_NUMBER}'	=> $response['CONNECTOR_ACCOUNT_NUMBER']."\n",
+//                            '{CONNECTOR_ACCOUNT_BANK}'		=> $response['CONNECTOR_ACCOUNT_BANK']."\n",
+                            '{CONNECTOR_ACCOUNT_IBAN}'		=> $response['CONNECTOR_ACCOUNT_IBAN']."\n",
+                            '{CONNECTOR_ACCOUNT_BIC}'		=> $response['CONNECTOR_ACCOUNT_BIC']."\n\n",
+                            '{CONNECTOR_ACCOUNT_USAGE}'		=> "\n".$response['CONNECTOR_ACCOUNT_USAGE'],
+                        );
+
+                        $comment = '<strong>'.$this->getSnippet('InvoiceHeader', $locId).":</strong>";
+                        $comment.= strtr($this->getSnippet('PrepaymentIvpdText', $locId), $repl);
 
                     }else{
 						$comment = strtr($this->getSnippet('PrepaymentText', $locId), $repl);
@@ -703,7 +764,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		try{
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
-
+mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
 				$flag = ENT_COMPAT;
 				$enc = 'UTF-8';
 				if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
@@ -939,6 +1000,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$resp['FRONTEND_MODE']				= $this->Request()->getPost('FRONTEND_MODE') == true ? $this->Request()->getPost('FRONTEND_MODE') : '';
 			$resp['FRONTEND_ENABLED']			= $this->Request()->getPost('FRONTEND_ENABLED') == true ? $this->Request()->getPost('FRONTEND_ENABLED') : '';
 			$resp['FRONTEND_LANGUAGE']			= $this->Request()->getPost('FRONTEND_LANGUAGE') == true ? $this->Request()->getPost('FRONTEND_LANGUAGE') : '';
+			$resp['FRONTEND_CUSTOMERTEXT']		= $this->Request()->getPost('FRONTEND_CUSTOMERTEXT') == true ? $this->Request()->getPost('FRONTEND_CUSTOMERTEXT') : '';
 
 			$resp['ACCOUNT_EXPIRY_MONTH']		= $this->Request()->getPost('ACCOUNT_EXPIRY_MONTH') == true ? $this->Request()->getPost('ACCOUNT_EXPIRY_MONTH') : '';
 			$resp['ACCOUNT_EXPIRY_YEAR']		= $this->Request()->getPost('ACCOUNT_EXPIRY_YEAR') == true ? $this->Request()->getPost('ACCOUNT_EXPIRY_YEAR') : '';
@@ -1838,7 +1900,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 								Shopware()->Session()->sOrderVariables['prepaymentText'] = $comment;
 								// Santander saving birthdate
 								$nameOfCriterion = 'CRITERION_INSURANCE-RESERVATION';
-								if ($parameters->$nameOfCriterion == 'ACCEPTED'|| $parameters->ACCOUNT_BRAND == 'SANTANDER') {
+								if (
+								    $parameters->$nameOfCriterion == 'ACCEPTED'||
+                                    $parameters->ACCOUNT_BRAND == 'SANTANDER' ||
+                                    $parameters->ACCOUNT_BRAND == 'PAYOLUTION_DIRECT'
+                                ) {
 									$birthdayCmsArray = explode('-', $parameters->NAME_BIRTHDATE);
 									if (!empty($birthdayCmsArray)) {
 										$birthdate['salut'] 	= $parameters->NAME_SALUTATION;
@@ -1885,6 +1951,19 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                             '{CONNECTOR_ACCOUNT_USAGE}'		=> "\n".$parameters->CONNECTOR_ACCOUNT_USAGE,
                                         );
                                     }
+
+                                    if($parameters->ACCOUNT_BRAND == "PAYOLUTION_DIRECT")
+                                    {
+                                        $repl = array(
+                                            '{AMOUNT}'						=> str_replace(".",",",$parameters->PRESENTATION_AMOUNT),
+                                            '{CURRENCY}'					=> $parameters->PRESENTATION_CURRENCY,
+                                            '{CONNECTOR_ACCOUNT_COUNTRY}'	=> $parameters->CONNECTOR_ACCOUNT_COUNTRY."\n",
+                                            '{CONNECTOR_ACCOUNT_HOLDER}'	=> $parameters->CONNECTOR_ACCOUNT_HOLDER."\n",
+                                            '{CONNECTOR_ACCOUNT_IBAN}'		=> $parameters->CONNECTOR_ACCOUNT_IBAN."\n",
+                                            '{CONNECTOR_ACCOUNT_BIC}'		=> $parameters->CONNECTOR_ACCOUNT_BIC."\n\n",
+                                            '{CONNECTOR_ACCOUNT_USAGE}'		=> "\n".$parameters->CONNECTOR_ACCOUNT_USAGE,
+                                        );
+                                    }
 									
 									$orderNum = $this->getOrder($transactionId);
 									$prepayment = array();
@@ -1897,7 +1976,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                                     if($parameters->ACCOUNT_BRAND == "SANTANDER"){
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment,'invoiceSanHeidelpay');
-                                    }else{
+                                    } elseif ($parameters->ACCOUNT_BRAND == "PAYOLUTION_DIRECT") {
+                                        $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment,'invoiceIvpdHeidelpay');
+                                    }
+                                    else{
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment);
                                     }
 								}
@@ -3011,7 +3093,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			if($fromBootstrap){
 				$ppd_crit['CRITERION.SECRET'] = self::createSecretHash($tempID);
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
-
 				$errorMsg = self::getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}else{
 				$ppd_crit['CRITERION.SECRET'] = $this->createSecretHash($tempID);
@@ -3472,10 +3553,14 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						//Santander
 						$payType = 'san';
 				
-					} else {
+					} elseif ($resp['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT'){
+                        //Payolution
+                        $payType = 'ivpd';
+                        $resp['ACCOUNT_BRAND'] = 'PAYOLUTION_DIRECT';
+                    } else {
 						// case CMS / Universum
 						$payType = 'papg';
-						$resp['ACCOUNT_BRAND'] = 'CMS';
+						$resp['ACCOUNT_BRAND'] = 'CMS/PNO/UNIV';
 					}
 					break;
 			}

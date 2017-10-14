@@ -1788,7 +1788,12 @@ mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
 								'{IDENTIFICATION_SHORTID}'		=> "\n".$parameters->IDENTIFICATION_SHORTID,
 						);
 
-                        if((strtolower($payType) == 'iv') || (strtolower($payType) == 'papg') || (strtolower($payType) == 'pp')) {
+                        if(
+                            (strtolower($payType) == 'iv') ||
+                            (strtolower($payType) == 'papg') ||
+                            (strtolower($payType) == 'ivpd') ||
+                            (strtolower($payType) == 'pp')
+                        ) {
                             $comment .= '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
                             $comment .= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
 
@@ -1809,7 +1814,18 @@ mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
                                 /**
                                  * @todo Swi Case für IVPD um richtigen Text zu laden
                                  */
-                                $comment .= strtr($this->getSnippet('PrepaymentSanText', $locId), $repl);
+                                switch ($parameters->ACCOUNT_BRAND){
+                                    case 'SANTANDER':
+                                        $comment .= strtr($this->getSnippet('PrepaymentSanText', $locId), $repl);
+                                        break;
+                                    case 'PAYOLUTION_DIRECT':
+                                        $comment .= strtr($this->getSnippet('PrepaymentIvpdText', $locId), $repl);
+                                        break;
+                                    default:
+                                        $comment .= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
+                                        break;
+                                }
+
                             }
 						}else{
 							$comment.= strtr($this->getSnippet('PrepaymentText', $locId), $repl);

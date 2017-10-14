@@ -169,8 +169,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 $basketId = Shopware()->Plugins()->Frontend()->HeidelGateway()->getBasketId();
                 $data['BASKET_ID'] = $basketId['basketId'];
             }
-mail("sascha.pflueger@heidelpay.de","BackendHgw 166",print_r($data,1));
-mail("sascha.pflueger@heidelpay.de","BackendHgw 167",print_r($basketId,1));
+//mail("sascha.pflueger@heidelpay.de","BackendHgw 166",print_r($data,1));
+//mail("sascha.pflueger@heidelpay.de","BackendHgw 167",print_r($basketId,1));
 			foreach($data as $key => $value){
 				if(is_int(strpos($key, 'CLEARING_'))){ unset($data[$key]); continue; }
 				if(is_int(strpos($key, 'ACCOUNT_'))){ unset($data[$key]); continue; }
@@ -182,6 +182,7 @@ mail("sascha.pflueger@heidelpay.de","BackendHgw 167",print_r($basketId,1));
 				unset($data[$key]);
 			}
 //mail("sascha.pflueger@heidelpay.de","BackendHgw 184 Kontrolle Parameter",print_r($data,1));
+mail("saschapflueger@me.com","BackendHgw 184 Kontrolle Parameter",print_r($data,1));
 			$resp = $this->callDoRequest($data);
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
 				

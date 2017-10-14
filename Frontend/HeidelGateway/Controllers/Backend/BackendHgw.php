@@ -181,7 +181,7 @@ mail("sascha.pflueger@heidelpay.de","BackendHgw 167",print_r($basketId,1));
 				$data[$newKey] = $value;
 				unset($data[$key]);
 			}
-//mail("sascha.pflueger@heidelpay.de","BackendHgw 177 Kontrolle Parameter",print_r($data,1));
+//mail("sascha.pflueger@heidelpay.de","BackendHgw 184 Kontrolle Parameter",print_r($data,1));
 			$resp = $this->callDoRequest($data);
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
 				

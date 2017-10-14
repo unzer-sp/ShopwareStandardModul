@@ -1792,7 +1792,7 @@ mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
                             $comment .= '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
                             $comment .= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
 
-                            if($parameters->ACCOUNT_BRAND == "SANTANDER")
+                            if($parameters->ACCOUNT_BRAND == "SANTANDER" || $parameters->ACCOUNT_BRAND == "PAYOLUTION_DIRECT")
                             {
                                 $repl = array(
                                     '{AMOUNT}'						=> str_replace(".",",",$this->hgw()->formatNumber($this->getAmount())),
@@ -1806,6 +1806,9 @@ mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
                                     '{CONNECTOR_ACCOUNT_USAGE}'		=> "\n".$parameters->CONNECTOR_ACCOUNT_USAGE,
                                 );
                                 $comment = '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
+                                /**
+                                 * @todo Swi Case für IVPD um richtigen Text zu laden
+                                 */
                                 $comment .= strtr($this->getSnippet('PrepaymentSanText', $locId), $repl);
                             }
 						}else{

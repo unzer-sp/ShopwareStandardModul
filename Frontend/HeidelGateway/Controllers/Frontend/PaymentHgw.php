@@ -508,9 +508,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit['BASKET.ID'] = $basketId;
 
                         $regDataParameters = json_decode($regData["payment_data"]);
-
-                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
-                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
+mail('saschapflueger@googlemail.com','511 PaymentHgw regData Params',print_r($regDataParameters,1));
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formatted;
+                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
 
                         //fetching count of orders of customer
                         $countOrderForCustomer = '';
@@ -764,7 +764,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		try{
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
-mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
+//mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
 				$flag = ENT_COMPAT;
 				$enc = 'UTF-8';
 				if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }

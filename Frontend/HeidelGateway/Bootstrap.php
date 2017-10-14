@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.15';
+		return '17.10.17';
 	}
 
 	/**
@@ -729,7 +729,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 //            case '17.10.12':
 //            case '17.10.14':
-            case '17.10.15':
+            case '17.10.17':
                 // Introducing Paymentmethod "Payolution direct"
                 try{
                     $this->addSnippets();
@@ -772,7 +772,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 	protected function update171012()
     {
-        // alterRGTable161027()
         try {
             // checks weather the regdata-table can receive Santander transactions
             $alterRegTable = false;
@@ -790,7 +789,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             }
 
             if ($alterRegTable) {
-                $this->update171012();
+                $this->alterRGTable171012();
             }
             $alterRegTable = false;
         } catch (Exception $e) {

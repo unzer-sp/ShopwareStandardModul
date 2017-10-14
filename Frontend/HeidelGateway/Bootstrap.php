@@ -1944,9 +1944,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $user = self::formatUserInfos($user);
 
                     $payment_data = [
-                        "NAME_SALUTATION"                   => $salutation,
-                        "NAME_BIRTHDATE"                    => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
-                        "NAME_SALUTATION"                   =>
+                        "day"       => $nameBirthdateDay,
+                        "month"     => $nameBirthdateMonth,
+                        "year"      => $nameBirthdateYear,
+                        "formated"  => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
+                        "salut"     =>
                             $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
                     ];
 
@@ -2886,7 +2888,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			);
 
 			$shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
-mail("sascha.pflueger@heidelpay.de","prepareBasketData Basket",print_r($shoppingCart,1));
+//mail("sascha.pflueger@heidelpay.de","prepareBasketData Basket",print_r($shoppingCart,1));
+mail("saschapflueger@googlemail.com","prepareBasketData Basket",print_r($shoppingCart,1));
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());

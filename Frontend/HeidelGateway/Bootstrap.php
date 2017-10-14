@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.17';
+		return '17.10.18';
 	}
 
 	/**
@@ -729,11 +729,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 //            case '17.10.12':
 //            case '17.10.14':
-            case '17.10.17':
+            case '17.10.18':
                 // Introducing Paymentmethod "Payolution direct"
                 try{
                     $this->addSnippets();
                     $this->createPayments();
+                    $this->createTable();
                     $this->update171012();
                     $this->installInvoiceIvpdMail();
 
@@ -1623,7 +1624,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         }
 						// is necessary to get the data into the invoice template
 						$view->assign('Containers', $containers);
-
+                /**
+                 * @todo wahrscheinlich wird beim generieren keine Transaktion gefunden
+                 * ggf prüfen was in $transdata enthalten ist
+                 */
 						$trans = $this->getTransactionByTransType($document->_order->order['transactionID'], 'PA');
 						$transData = json_decode($trans['jsonresponse'], true);
 

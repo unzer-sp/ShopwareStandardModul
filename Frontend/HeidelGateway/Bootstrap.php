@@ -58,7 +58,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$hp_logo 	= base64_encode(file_get_contents(dirname(__FILE__) . '/img/heidelpay.png'));
 		return array(
 				'version' => $this->getVersion(),
-				'autor' => 'Heidelberger Payment GmbH (AN)',
+				'autor' => 'Heidelberger Payment GmbH (SP)',
 				'label' => $this->getLabel(),
 				'source' => "Default",
 				'description' => '<p><img src="data:image/png;base64,' .$hp_logo. '" /></p>

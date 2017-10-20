@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.18';
+		return '17.10.16';
 	}
 
 	/**
@@ -120,7 +120,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$this->createRGTable();
 			$this->alterRGTable();
-			$msg .= '* create reg table<br />';
+			$this->alterRGTable171012();
+			$msg .= '* create / alter reg table<br />';
 		}catch(Exception $e){
 			$this->logError($msg, $e);
 		}
@@ -159,12 +160,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$this->createLoggingUser();
 			$msg .= '* create backend user for logs<br />';
 		}catch(Exception $e){
-			$this->logError($msg, $e);
-		}
-		try {
-			$this->alterRGTable161027();
-			$msg .= '* alter registration table<br />';
-		}catch (Exception $e){
 			$this->logError($msg, $e);
 		}
 
@@ -727,9 +722,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-//            case '17.10.12':
-//            case '17.10.14':
-            case '17.10.18':
+
+            case '17.10.16':
                 // Introducing Paymentmethod "Payolution direct"
                 try{
                     $this->addSnippets();
@@ -752,7 +746,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 17.10.14 <br />';
+                    $msg .= '* update 17.10.16 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -1630,7 +1624,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                  */
 						$trans = $this->getTransactionByTransType($document->_order->order['transactionID'], 'PA');
 						$transData = json_decode($trans['jsonresponse'], true);
-
+mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transData,1));
 						$paymentInstruction['amount'] 			= htmlentities($transData['CLEARING_AMOUNT'], ENT_QUOTES, 'UTF-8');
 						$paymentInstruction['currency'] 		= htmlentities($transData['CLEARING_CURRENCY'], ENT_QUOTES, 'UTF-8');
 						$paymentInstruction['country'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_COUNTRY'], ENT_QUOTES, 'UTF-8');
@@ -2763,6 +2757,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $countOrderForCustomer = '';
                         $sql = 'SELECT COUNT(id) FROM `s_order` WHERE userID ="'.$user['additional']['user']['userID'].'" AND ordernumber != "0"';
                         $countOrderForCustomer = Shopware()->Db()->fetchRow($sql);
+                        $countryId = $user['shippingaddress']['countryID'] != '' ? $user['shippingaddress']['countryID'] : $user['billingaddress']['countryID'];
+                        $countryInfo = Shopware()->Modules()->Admin()->sGetCountry($countryId);
+
+                        $ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
+                        $ppd_user['NAME.GIVEN']			= $user['shippingaddress']['firstname'] != '' ? $user['shippingaddress']['firstname'] : $user['billingaddress']['firstname'];
+                        $ppd_user['NAME.FAMILY']		= $user['shippingaddress']['lastname'] != '' ? $user['shippingaddress']['lastname'] : $user['billingaddress']['lastname'];
+                        $ppd_user['ADDRESS.STREET'] 	= $user['shippingaddress']['street'] != '' ? $user['shippingaddress']['street'] : $user['billingaddress']['street'];
+                        $ppd_user['ADDRESS.STREET'] 	.= $user['shippingaddress']['streetnumber'] != '' ? $user['shippingaddress']['streetnumber'] : $user['billingaddress']['streetnumber'];
+                        $ppd_user['ADDRESS.ZIP'] 		= $user['shippingaddress']['zipcode'] != '' ? $user['shippingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
+                        $ppd_user['ADDRESS.CITY'] 		= $user['shippingaddress']['city'] != '' ? $user['shippingaddress']['city'] : $user['billingaddress']['city'];
 
                         $ppd_user['RISKINFORMATION.CUSTOMERGUESTCHECKOUT']  = $user['additional']['user']['accountmode'] == '0' ?  'FALSE':'TRUE';
                         $ppd_user['RISKINFORMATION.CUSTOMERSINCE'] 		    = $user['additional']['user']['firstlogin'];
@@ -2809,7 +2813,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
 			$user == NULL	?	$user = Shopware()->Modules()->Admin()->sGetUserData()	: $user;
-
+//mail("sascha.pflueger@heidelpay.de","prepareBasketData 2816 Basket",print_r($basket,1));
+//mail("sascha.pflueger@heidelpay.de","prepareBasketData 2817 user",print_r($user,1));
             $shippingCostVariable = Shopware()->Session()->sOrderVariables;
             $shippingCostArray = $shippingCostVariable->sBasket;
 
@@ -2892,8 +2897,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			);
 
 			$shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
-//mail("sascha.pflueger@heidelpay.de","prepareBasketData Basket",print_r($shoppingCart,1));
-mail("saschapflueger@googlemail.com","prepareBasketData Basket",print_r($shoppingCart,1));
+//mail("sascha.pflueger@heidelpay.de","prepareBasketData Basket 2889 ",print_r($shoppingCart,1));
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());
@@ -2998,6 +3002,13 @@ mail("saschapflueger@googlemail.com","prepareBasketData Basket",print_r($shoppin
 	 */
 	public function doRequest($params = array(), $url = NULL){
 		try{
+
+		    if($params['PAYMENT.CODE'] == 'IV.PA')
+		    {
+		        mail("sascha.pflueger@heidelpay.de","doRequest params",print_r($params,1));
+		        mail("sascha.pflueger@heidelpay.de","doRequest session",print_r($_SESSION,1));
+            }
+
 		    if($url == NULL){ $url = self::$requestUrl; }
 			$client = new Zend_Http_Client($url, array(
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,

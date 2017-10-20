@@ -508,7 +508,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit['BASKET.ID'] = $basketId;
 
                         $regDataParameters = json_decode($regData["payment_data"]);
-mail('saschapflueger@googlemail.com','511 PaymentHgw regData Params',print_r($regDataParameters,1));
+
                         $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formatted;
                         $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
 
@@ -694,7 +694,8 @@ mail('saschapflueger@googlemail.com','511 PaymentHgw regData Params',print_r($re
 					$response['TRANSACTION_SOURCE'] = 'GATEWAY';
 
 					$this->hgw()->saveRes($response);
-					$this->saveOrder($transactionId, $paymentUniqueId, $paymentStatus,false);
+					$return = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatus,false);
+mail("sascha.pflueger@heidelpay.de","698 saveOrder",print_r($return,1));
 					// add infos to order
 					$params = array(
 							'comment' => $comment,
@@ -723,8 +724,8 @@ mail('saschapflueger@googlemail.com','511 PaymentHgw regData Params',print_r($re
 						$paymentStatus = '18';
 					}
 					Shopware()->Session()->HPTrans = $paymentUniqueId;
-					$this->saveOrder($transactionId, $paymentUniqueId, $paymentStatus);
-
+					$return = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatus);
+mail("sascha.pflueger@heidelpay.de","727 saveOrder",print_r($return,1));
 					$params = array(
 							'o_attr1' => $response['IDENTIFICATION_SHORTID'],
 							'o_attr2' => $response['IDENTIFICATION_UNIQUEID'],
@@ -1482,7 +1483,8 @@ mail('saschapflueger@googlemail.com','511 PaymentHgw regData Params',print_r($re
 				if(empty($response['IDENTIFICATION_UNIQUEID'])){ $response['IDENTIFICATION_UNIQUEID'] = ' '; }
 			}
 
-			$this->saveOrder($response['IDENTIFICATION_TRANSACTIONID'], $response['IDENTIFICATION_UNIQUEID'], $status);
+			$return = $this->saveOrder($response['IDENTIFICATION_TRANSACTIONID'], $response['IDENTIFICATION_UNIQUEID'], $status);
+mail("sascha.pflueger@heidelpay.de","1486 saveOrder",print_r($return,1));
 			$params = array(
 					'o_attr1' => $response['IDENTIFICATION_SHORTID'],
 					'o_attr2' => $response['IDENTIFICATION_UNIQUEID'],
@@ -1848,8 +1850,8 @@ mail('saschapflueger@googlemail.com','511 PaymentHgw regData Params',print_r($re
 						}
 
 						Shopware()->Session()->HPTrans = $parameters->IDENTIFICATION_UNIQUEID;
-						$this->saveOrder($parameters->IDENTIFICATION_TRANSACTIONID, $parameters->IDENTIFICATION_UNIQUEID, $paymentStatus);
-
+						$return = $this->saveOrder($parameters->IDENTIFICATION_TRANSACTIONID, $parameters->IDENTIFICATION_UNIQUEID, $paymentStatus);
+mail("sascha.pflueger@heidelpay.de","1853 saveOrder",print_r($return,1));
 						Shopware()->Session()->sOrderVariables['sTransactionumber'] = $parameters->IDENTIFICATION_TRANSACTIONID;
 
 						switch (strtolower($payType)) {
@@ -2697,7 +2699,8 @@ mail('saschapflueger@googlemail.com','511 PaymentHgw regData Params',print_r($re
 						if($transType == 'PA'){ $paymentStatus = 18; } // 'Reserviert'
 						if($data['PROCESSING_STATUS_CODE'] == "80"){ $paymentStatus = 21; } // 'Überprüfung notwendig'
 
-						$this->saveOrder($transactionID, $uniqueID, $paymentStatus);
+						$return = $this->saveOrder($transactionID, $uniqueID, $paymentStatus);
+mail("sascha.pflueger@heidelpay.de","2702 saveOrder",print_r($return,1));
 						if($data['PROCESSING_STATUS_CODE'] != "80"){ $setComment = true; }
 					}
 				}

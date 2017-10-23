@@ -3003,11 +3003,11 @@ mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transDat
 	public function doRequest($params = array(), $url = NULL){
 		try{
 
-		    if($params['PAYMENT.CODE'] == 'IV.PA')
-		    {
-		        mail("sascha.pflueger@heidelpay.de","doRequest params",print_r($params,1));
-		        mail("sascha.pflueger@heidelpay.de","doRequest session",print_r($_SESSION,1));
-            }
+//		    if($params['PAYMENT.CODE'] == 'IV.PA')
+//		    {
+//		        mail("sascha.pflueger@heidelpay.de","doRequest params",print_r($params,1));
+//		        mail("sascha.pflueger@heidelpay.de","doRequest session",print_r($_SESSION,1));
+//            }
 
 		    if($url == NULL){ $url = self::$requestUrl; }
 			$client = new Zend_Http_Client($url, array(

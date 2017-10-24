@@ -337,8 +337,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         ($activePayment != 'hpr')
 						){
 
-							//adding a basketId for santander / papg payment
-							if($activePayment == 'san' || $activePayment == 'papg' || $activePayment == 'ivpd') {
+							//adding a basketId for papg payment
+							if($activePayment == 'papg') {
 								$basketId = self::getBasketId();
 									
 								if($basketId['result'] == 'NOK'){
@@ -478,11 +478,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $regDataParameters = json_decode($regData["payment_data"]);
 
-                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formated;
+                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
                         $ppd_crit["CUSTOMER.OPTIN"] = $regDataParameters->CUSTOMER_OPTIN;
                         $ppd_crit["CUSTOMER.OPTIN_2"] = $regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY;
                         $ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"] = $regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY;
-                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
 
                         //to prevent sending request to paymentgateway if browser-back-button was pushed
 //                        if(
@@ -509,7 +509,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $regDataParameters = json_decode($regData["payment_data"]);
 
-                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formatted;
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formated;
                         $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
 
                         //fetching count of orders of customer
@@ -695,7 +695,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 					$this->hgw()->saveRes($response);
 					$return = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatus,false);
-mail("sascha.pflueger@heidelpay.de","698 saveOrder",print_r($return,1));
+
 					// add infos to order
 					$params = array(
 							'comment' => $comment,
@@ -725,7 +725,7 @@ mail("sascha.pflueger@heidelpay.de","698 saveOrder",print_r($return,1));
 					}
 					Shopware()->Session()->HPTrans = $paymentUniqueId;
 					$return = $this->saveOrder($transactionId, $paymentUniqueId, $paymentStatus);
-mail("sascha.pflueger@heidelpay.de","727 saveOrder",print_r($return,1));
+
 					$params = array(
 							'o_attr1' => $response['IDENTIFICATION_SHORTID'],
 							'o_attr2' => $response['IDENTIFICATION_UNIQUEID'],
@@ -765,8 +765,7 @@ mail("sascha.pflueger@heidelpay.de","727 saveOrder",print_r($return,1));
 		try{
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
-//mail("sascha.pflueger@heidelpay.de","responseAction",print_r($_POST,1));
-				$flag = ENT_COMPAT;
+    			$flag = ENT_COMPAT;
 				$enc = 'UTF-8';
 				if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
 				$resp['REQUEST_VERSION']			= $this->Request()->getPost('REQUEST_VERSION') == true ? htmlspecialchars($this->Request()->getPost('REQUEST_VERSION'), $flag, $enc) : '';
@@ -1484,7 +1483,7 @@ mail("sascha.pflueger@heidelpay.de","727 saveOrder",print_r($return,1));
 			}
 
 			$return = $this->saveOrder($response['IDENTIFICATION_TRANSACTIONID'], $response['IDENTIFICATION_UNIQUEID'], $status);
-mail("sascha.pflueger@heidelpay.de","1486 saveOrder",print_r($return,1));
+
 			$params = array(
 					'o_attr1' => $response['IDENTIFICATION_SHORTID'],
 					'o_attr2' => $response['IDENTIFICATION_UNIQUEID'],
@@ -1851,7 +1850,7 @@ mail("sascha.pflueger@heidelpay.de","1486 saveOrder",print_r($return,1));
 
 						Shopware()->Session()->HPTrans = $parameters->IDENTIFICATION_UNIQUEID;
 						$return = $this->saveOrder($parameters->IDENTIFICATION_TRANSACTIONID, $parameters->IDENTIFICATION_UNIQUEID, $paymentStatus);
-mail("sascha.pflueger@heidelpay.de","1853 saveOrder",print_r($return,1));
+
 						Shopware()->Session()->sOrderVariables['sTransactionumber'] = $parameters->IDENTIFICATION_TRANSACTIONID;
 
 						switch (strtolower($payType)) {
@@ -2700,7 +2699,7 @@ mail("sascha.pflueger@heidelpay.de","1853 saveOrder",print_r($return,1));
 						if($data['PROCESSING_STATUS_CODE'] == "80"){ $paymentStatus = 21; } // 'Überprüfung notwendig'
 
 						$return = $this->saveOrder($transactionID, $uniqueID, $paymentStatus);
-mail("sascha.pflueger@heidelpay.de","2702 saveOrder",print_r($return,1));
+
 						if($data['PROCESSING_STATUS_CODE'] != "80"){ $setComment = true; }
 					}
 				}

@@ -301,20 +301,20 @@ document.asyncReady(function () {
                 jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             }
 
-            jQuery('.newreg_ivpg').click(function (e) {
-                var birthDay = jQuery(".newreg_ivpg [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_ivpg [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_ivpg [name = 'Date_Year']").val();
+            jQuery('.newreg_ivpd').click(function (e) {
+                var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
 
-                jQuery('#birthdate_ivpg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             });
 
-            if (jQuery('.newreg_ivpg')) {
-                var birthDay = jQuery(".newreg_ivpg [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_ivpg [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_ivpg [name = 'Date_Year']").val();
+            if (jQuery('.newreg_ivpd')) {
+                var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
 
-                jQuery('#birthdate_ivpg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             }
 
         }); // ende ajaxComplete
@@ -878,7 +878,7 @@ function valPayolutionDirect() {
 
     // validation of salutation
     var salutation = $('.hgw_val_ivpd select[name="NAME.SALUTATION"]').val();
-    if(salutation == undefined || salutation == "-")
+    if(salutation == undefined || salutation == "UNKNOWN")
     {
         $('.newreg_ivpd #salutation').parent('.js--fancy-select').addClass("has--error");
         errors[i++] = '.msg_salut';

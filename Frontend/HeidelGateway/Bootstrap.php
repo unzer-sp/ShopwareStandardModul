@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.16';
+		return '17.10.12';
 	}
 
 	/**
@@ -723,15 +723,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '17.10.16':
+            case '17.10.12':
                 // Introducing Paymentmethod "Payolution direct"
                 try{
                     $this->addSnippets();
                     $this->createPayments();
-                    $this->createTable();
                     $this->update171012();
                     $this->installInvoiceIvpdMail();
-
                     $form->setElement('text', 'HGW_IVPD_CHANNEL',
                         array(
                             'label'=>'Payolution branded Channel',
@@ -746,7 +744,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 17.10.16 <br />';
+                    $msg .= '* update 17.10.12 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -787,6 +785,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 $this->alterRGTable171012();
             }
             $alterRegTable = false;
+
+            // inserting IVPD - Mail
+            $sql = "
+				INSERT INTO `s_core_documents_box` (`documentID`, `name`, `style`, `value`)
+					SELECT '1', 'Hgw_IVPD_Content_Info', ?, ?
+					FROM `s_core_documents_box`
+					WHERE NOT EXISTS (SELECT `name` FROM `s_core_documents_box` WHERE name='Hgw_IVPD_Content_Info')
+					LIMIT 1;
+			";
+            Shopware()->Db()->query($sql, array(
+                '.payment_instruction, .payment_instruction td, .payment_instruction tr{ margin: 0; padding: 0; border: 0; font-size:10px; font: inherit; vertical-align: baseline; } .payment_note{ font-size: 10px; color: #333; } .payment_account{ margin: 5px 0 5px 5px; padding: 0; } .payment_account tr, .payment_account td{ margin: 0; padding: 0; border: 0; font-size:10px; font: inherit; vertical-align: baseline; } .payment_account td{ padding: 0 5px 0 0; }',
+                '<br/><div>Bitte &uuml;berweisen Sie den Rechnungsbetrag mit Zahlungsziel innerhalb von 7 Tagen auf folgendes Konto:<table class="payment_account"><tr><td>Kontoinhaber:</td><td>{$instruction.holder}</td></tr><tr><td>IBAN:</td><td>{$instruction.iban}</td></tr><tr><td>BIC:</td><td>{$instruction.bic}</td></tr></table>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{$instruction.connectorAccountUsage}</strong></div>'
+            ));
         } catch (Exception $e) {
             $this->logError('update171012() fehlgeschlagen bei Update 171014|', $e);
         }
@@ -1196,9 +1207,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             // create db entry for additional Santander invoice text, if not already set
             $sql = "
 				INSERT INTO `s_core_documents_box` (`documentID`, `name`, `style`, `value`)
-					SELECT '1', 'Hgw_IVPG_Content_Info', ?, ?
+					SELECT '1', 'Hgw_IVPD_Content_Info', ?, ?
 					FROM `s_core_documents_box`
-					WHERE NOT EXISTS (SELECT `name` FROM `s_core_documents_box` WHERE name='Hgw_IVPG_Content_Info')
+					WHERE NOT EXISTS (SELECT `name` FROM `s_core_documents_box` WHERE name='Hgw_IVPD_Content_Info')
 					LIMIT 1;
 			";
             Shopware()->Db()->query($sql, array(
@@ -1220,7 +1231,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$sql = "CREATE TABLE IF NOT EXISTS `s_plugin_hgw_regdata` (
 				`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 				`userID` bigint(20) UNSIGNED NOT NULL,
-				`payType` enum('cc','dc','dd','va','mpa','papg','san','ivpg') NOT NULL,
+				`payType` enum('cc','dc','dd','va','mpa','papg','san','ivpd') NOT NULL,
 				`uid` varchar(32) NOT NULL,
 				`cardnr` varchar(25) NOT NULL,
 				`expMonth` tinyint(2) UNSIGNED NOT NULL,
@@ -1624,7 +1635,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                  */
 						$trans = $this->getTransactionByTransType($document->_order->order['transactionID'], 'PA');
 						$transData = json_decode($trans['jsonresponse'], true);
-mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transData,1));
+
 						$paymentInstruction['amount'] 			= htmlentities($transData['CLEARING_AMOUNT'], ENT_QUOTES, 'UTF-8');
 						$paymentInstruction['currency'] 		= htmlentities($transData['CLEARING_CURRENCY'], ENT_QUOTES, 'UTF-8');
 						$paymentInstruction['country'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_COUNTRY'], ENT_QUOTES, 'UTF-8');
@@ -1834,8 +1845,8 @@ mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transDat
                                                     $registratedData = json_decode($regData['payment_data'],true);
 
                                                     if((isset($registratedData)) && ($registratedData != '')){
-                                                        $view->salutation	= $registratedData['NAME_SALUTATION'];
-                                                        $view->birthdate	= $registratedData['NAME_BIRTHDATE'];
+                                                        $view->salutation	= $registratedData['salut'];
+                                                        $view->birthdate	= $registratedData['formated'];
                                                     }
 
                                                     $view->optinText        = $getFormUrl['CONFIG_OPTIN_TEXT'];
@@ -1946,8 +1957,8 @@ mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transDat
                         "month"     => $nameBirthdateMonth,
                         "year"      => $nameBirthdateYear,
                         "formated"  => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
-                        "salut"     =>
-                            $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
+                        "salut"     => $salutation
+
                     ];
 
                     $sql = '
@@ -2813,8 +2824,7 @@ mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transDat
 		try{
 			$basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
 			$user == NULL	?	$user = Shopware()->Modules()->Admin()->sGetUserData()	: $user;
-//mail("sascha.pflueger@heidelpay.de","prepareBasketData 2816 Basket",print_r($basket,1));
-//mail("sascha.pflueger@heidelpay.de","prepareBasketData 2817 user",print_r($user,1));
+
             $shippingCostVariable = Shopware()->Session()->sOrderVariables;
             $shippingCostArray = $shippingCostVariable->sBasket;
 
@@ -2897,7 +2907,7 @@ mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transDat
 			);
 
 			$shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
-//mail("sascha.pflueger@heidelpay.de","prepareBasketData Basket 2889 ",print_r($shoppingCart,1));
+
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());
@@ -3002,13 +3012,6 @@ mail("sascha.pflueger@heidelpay.de","Bootstrap 1627 transData",print_r($transDat
 	 */
 	public function doRequest($params = array(), $url = NULL){
 		try{
-
-//		    if($params['PAYMENT.CODE'] == 'IV.PA')
-//		    {
-//		        mail("sascha.pflueger@heidelpay.de","doRequest params",print_r($params,1));
-//		        mail("sascha.pflueger@heidelpay.de","doRequest session",print_r($_SESSION,1));
-//            }
-
 		    if($url == NULL){ $url = self::$requestUrl; }
 			$client = new Zend_Http_Client($url, array(
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,

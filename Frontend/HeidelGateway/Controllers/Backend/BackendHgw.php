@@ -138,7 +138,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
             }
 
 			$data = $transaction[0];
-//mail("sascha.pflueger@heidelpay.de","BackendHgw 141 Kontrolle Parameter",print_r($data,1));
 
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
 			$data['USER_LOGIN'] = trim($this->FrontendConfigHGW()->HGW_USER_LOGIN);
@@ -165,61 +164,36 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
             if($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
             {
                 /**
-                 * @todo Einbau Basket-ApiCall für FN und RV
-                 */
+                * @todo Einbau Basket-ApiCall für FN und RV
+                */
+                $live_url_basket	= 'https://heidelpay.hpcgw.net/ngw/basket/';
+                $test_url_basket	= 'https://test-heidelpay.hpcgw.net/ngw/basket/';
+
                 // fetch all articles for Basket-Api-Call from order
                 $orderDetails = $this->fetchOrderDetailsBySwOrderId($data['IDENTIFICATION_UNIQUEID']);
 
-                // prepare Basicdata for Basket-Api-Call
-                $shoppingCart['authentication'] = array(
-                    'sender' 		=> trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER),
-                    'login'			=> trim($this->FrontendConfigHGW()->HGW_USER_LOGIN),
-                    'password'		=> trim($this->FrontendConfigHGW()->HGW_USER_PW),
-                );
-                // prepare hole basket data
-                $amountNet 		= !empty($orderDetails[0]["invoice_amount_net"])  ? str_replace(',','.',$orderDetails[0]["invoice_amount_net"]*100): "";
-                $amountGross 	= !empty($orderDetails[0]["invoice_amount"])      ? str_replace(',','.',$orderDetails[0]["invoice_amount"]*100): "";
-                $amountVat 		= $amountGross - $amountNet;
+                // prepare data for heidelpay-basket-api call
+                $dataForBasketApi = self::prepareBackendBasketData($orderDetails);
 
-                $shoppingCart['basket'] = [
-                    'amountTotalNet' => $amountNet,
-                    'amountTotalVat' => $amountVat,
-                    'currencyCode'   => !empty($orderDetails[0]["currency"])  ? str_replace(',','.',$orderDetails[0]["currency"]): "",
+                // send heidelpay-basket-api call to receive a BASKET.ID
+                $ta_mode = $this->FrontendConfigHGW()->HGW_TRANSACTION_MODE;
+                $origRequestUrl = $sw::$requestUrl;
 
-                ];
-
-                //prepare item basket data
-                $count = 1;
-                foreach ($orderDetails as $singleArticle)
-                {
-                    /**
-                     * @todo Daten für Basket richtig befüllt
-                     */
-                    $shoppingCart['basket']['basketItems'][] = array(
-                        'position'				=> $count,
-                        'basketItemReferenceId' => $count,
-                        'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['articleordernumber'],
-                        'unit'					=> $singleArticle['unit'],
-                        'quantity'				=> $singleArticle['quantity'],
-                        'vat'					=> $singleArticle['tax_rate'],
-                        'amountGross'			=> floor(bcmul($singleArticle['price'], 100, 10)),
-                        'amountNet'				=> floor(bcmul((($singleArticle['price']/ (100+$singleArticle['tax_rate']))*100) , 100, 10)),
-                        'amountVat'				=> round(bcmul($singleArticle['price'] - (($singleArticle['price']/ (100+$singleArticle['tax_rate']))*100),100,10)),
-                        'amountPerUnit'			=> floor(bcmul(($singleArticle['price']), 100, 10)),
-                        'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
-                        'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
-
-                    );
-
-                    $count ++;
-                    $basketTotalData['basket']['itemCount'] = $count-1;
+                if(is_numeric($ta_mode) && (($ta_mode == 0) || ($ta_mode == 3))){
+                    $sw::$requestUrl = $live_url_basket;
+                }else{
+                    $sw::$requestUrl = $test_url_basket;
                 }
 
-                $basketReturn = $shoppingCart;
-                mail("sascha.pflueger@heidelpay.de","220 Kontrolle basketTotalData",print_r($basketReturn,1));
+                $params['raw']= $dataForBasketApi;
+                $response = $this->callDoRequest($params);
+                // switch back to post url, after basket request is sent
+                $sw::$requestUrl = $origRequestUrl;
 
-
-                return;
+                if(!empty($response['basketId']))
+                {
+                    $data['BASKET_ID'] = $response['basketId'];
+                }
             }
 
 			foreach($data as $key => $value){
@@ -808,6 +782,78 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
         $orderdetails = Shopware()->Db()->fetchAll($sql,$uniqueId);
 
         return $orderdetails;
+    }
+
+    /**
+     * prepareBackendBasketData prepares basket data for basket-api-call from a given array
+     * @param $orderDetails
+     * @return array
+     */
+    protected function prepareBackendBasketData($orderDetails)
+    {
+        // prepare Basicdata for Basket-Api-Call
+        $shoppingCart['authentication'] = array(
+            'sender' 		=> trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER),
+            'login'			=> trim($this->FrontendConfigHGW()->HGW_USER_LOGIN),
+            'password'		=> trim($this->FrontendConfigHGW()->HGW_USER_PW),
+        );
+        // prepare hole basket data
+        $amountNet 		= !empty($orderDetails[0]["invoice_amount_net"])  ? str_replace(',','.',$orderDetails[0]["invoice_amount_net"]*100): "";
+        $amountGross 	= !empty($orderDetails[0]["invoice_amount"])      ? str_replace(',','.',$orderDetails[0]["invoice_amount"]*100): "";
+        $amountVat 		= $amountGross - $amountNet;
+
+        $shoppingCart['basket'] = [
+            'amountTotalNet' => $amountNet,
+            'amountTotalVat' => $amountVat,
+            'currencyCode'   => !empty($orderDetails[0]["currency"])  ? str_replace(',','.',$orderDetails[0]["currency"]): "",
+
+        ];
+
+        //prepare item basket data
+        $count = 1;
+        foreach ($orderDetails as $singleArticle)
+        {
+            $shoppingCart['basket']['basketItems'][] = array(
+                'position'				=> $count,
+                'basketItemReferenceId' => $count,
+                'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['articleordernumber'],
+                'unit'					=> $singleArticle['unit'],
+                'quantity'				=> $singleArticle['quantity'],
+                'vat'					=> $singleArticle['tax_rate'],
+                'amountGross'			=> floor(bcmul($singleArticle['price'], 100, 10)),
+                'amountNet'				=> floor(bcmul((($singleArticle['price']/ (100+$singleArticle['tax_rate']))*100) , 100, 10)),
+                'amountVat'				=> round(bcmul($singleArticle['price'] - (($singleArticle['price']/ (100+$singleArticle['tax_rate']))*100),100,10)),
+                'amountPerUnit'			=> floor(bcmul(($singleArticle['price']), 100, 10)),
+                'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
+
+            );
+
+            $count ++;
+
+        }
+
+        if(array_key_exists("0",$orderDetails))
+        {
+            $shoppingCart['basket']['basketItems'][] = array(
+                'position'				=> $count,
+                'basketItemReferenceId' => $count,
+                'articleId'				=> "SwShipping",
+                'unit'					=> "stk",
+                'quantity'				=> "1",
+                'vat'					=> $orderDetails[0]['tax_rate'],
+                'amountGross'			=> floor(bcmul($orderDetails[0]['invoice_shipping'], 100, 10)),
+                'amountNet'				=> floor(bcmul($orderDetails[0]['invoice_shipping_net'] , 100, 10)),
+                'amountVat'				=> round(bcmul( $orderDetails[0]['invoice_shipping']- $orderDetails[0]['invoice_shipping_net'],100,10)),
+                'amountPerUnit'			=> floor(bcmul(($orderDetails[0]['invoice_shipping']), 100, 10)),
+                'type'					=> "shipment",
+                'title'					=> "Shipping Costs"
+
+            );
+        }
+        $shoppingCart['basket']['itemCount'] = $count;
+        $basketReturn = $shoppingCart;
+        return $basketReturn;
     }
 
 

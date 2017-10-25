@@ -1945,7 +1945,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year')) : '';
                     $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
                     $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
-                    $salutation         = $request->getPost('NAME.SALUTATION') == true ? htmlspecialchars($request->getPost('NAME.SALUTATION'), $flag, $enc) : '';
+                    $salutation         = $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : '';
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
 

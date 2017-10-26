@@ -478,7 +478,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $regDataParameters = json_decode($regData["payment_data"]);
 
-                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formated;
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formatted;
                         $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
                         $ppd_crit["CUSTOMER.OPTIN"] = $regDataParameters->CUSTOMER_OPTIN;
                         $ppd_crit["CUSTOMER.OPTIN_2"] = $regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY;
@@ -509,7 +509,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $regDataParameters = json_decode($regData["payment_data"]);
 
-                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formated;
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formatted;
                         $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
 
                         //fetching count of orders of customer
@@ -3702,7 +3702,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		return $transactionResult;
 	}
 	
-	/** converts two given strings in a well formated (YYYY-MM-DD) array
+	/** converts two given strings in a well formatted (YYYY-MM-DD) array
 	 * 
 	 * @param string $birthdate
 	 * @param string $salutation

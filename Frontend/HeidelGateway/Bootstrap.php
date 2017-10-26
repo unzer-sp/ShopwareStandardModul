@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.09.30';
+		return '17.10.26';
 	}
 
 	/**
@@ -691,6 +691,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
+            case '17.09.19':
             case '17.09.25':
                 // Compatibility for Shopware 4.3.6 - 5.3.3
                 // Some changes in Js
@@ -707,6 +708,31 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->addSnippets();
                     $this->installInvoiceSanMail();
                     $msg .= '* update 17.09.30 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '17.10.10':
+                // updatefix 17.09.19
+                try {
+                    $msg .= '* update 17.10.10 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '17.10.11':
+                // hotfix for unneccassary payment calls for EasyCredit
+                try {
+                    $msg .= '* update 17.10.11 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '17.10.26':
+                // Resolves a problem while generating PFD-invoice for Santander
+                // Compatibility with SW 5.3.4
+                try {
+                    $msg .= '* update 17.10.26 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -1541,9 +1567,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             $view->assign('Containers', $containerData);
                         }
 
-						$containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
-						$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
-						$view->assign('Containers', $containerData);
+//						$containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
+//						$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
+//						$view->assign('Containers', $containerData);
 			}
 		}catch(Exception $e){
 			$this->Logging('onBeforeRenderDocument | '.$e->getMessage());
@@ -1790,7 +1816,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($request->getControllerName() == 'account' &&  $action == 'savePayment')
             )
             {
-                if (!empty($request->getPost("CUSTOMER_ACCEPT_PRIVACY_POLICY")))
+                if ($request->getPost("CUSTOMER_ACCEPT_PRIVACY_POLICY") == "TRUE")
                 {
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
@@ -2053,7 +2079,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             }else{
 
                 if (Shopware()->Session()->wantEasy) {
-                    if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+//                    if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                         exit();
@@ -2152,7 +2179,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
                         // redirect to EasyCredit
-                        if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+                        if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
                             Shopware()->Session()->HPdidRequest = 'TRUE';
                         }
                     }
@@ -2226,7 +2253,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         )
         {
             // redirect to EasyCredit
-            if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
+            if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
                 Shopware()->Session()->HPdidRequest = 'TRUE';
                 return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
             }
@@ -2264,37 +2291,46 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
         );
 
-        // prepare data and do request
-        $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
-        $responseHpr 	= $this->doRequest($requestData);
-
-        //preparing OptIn-text to show
-        $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
-
-        $optinText = str_replace('{', '', $optinText);
-        $optinText = str_replace('"optin": "', '', $optinText);
-        $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
-        $optinText = str_replace('"', '', $optinText);
-        $optinText = str_replace('}', '', $optinText);
-
- 		//expand template
-        $view->configOptInText = $optinText;
-
-        if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-            $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
-        }else{
-            $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+        $allPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
+        foreach($allPayments as $key => $value){
+            $avPayments[$value['name']] = $value;
         }
-        $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
-
-        if (
-        ($args->getSubject()->Request()->getControllerName() == 'checkout')
-        )
+        // only do Request if EasyCredit is active
+        if(array_key_exists('hgw_hpr',$avPayments))
         {
-            if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
-                Shopware()->Session()->HPdidRequest = 'TRUE';
-                return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+            // prepare data and do request
+            $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
+            $responseHpr 	= $this->doRequest($requestData);
+
+            //preparing OptIn-text to show
+            $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
+
+            $optinText = str_replace('{', '', $optinText);
+            $optinText = str_replace('"optin": "', '', $optinText);
+            $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
+            $optinText = str_replace('"', '', $optinText);
+            $optinText = str_replace('}', '', $optinText);
+
+            //expand template
+            $view->configOptInText = $optinText;
+
+            if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
+                $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
+            }else{
+                $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+            }
+            $view->extendsTemplate('register/hp_payment_hpr.tpl');
+
+
+            if (
+            ($args->getSubject()->Request()->getControllerName() == 'checkout')
+            )
+            {
+                if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
+                    Shopware()->Session()->HPdidRequest = 'TRUE';
+                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                }
             }
         }
     }
@@ -4050,7 +4086,11 @@ Mit freundlichen Gruessen
         );
 	}
 
-	public static function formatUserInfos($user = null)
+    /** formatUserInfos() to normalize $userArray given from Shopware in different ways in Shopware 5.1.6
+     * @param null $user
+     * @return normalzed User Array
+     */
+    public static function formatUserInfos($user = null)
     {
         $userGiven = $user;
         if($userGiven != null)

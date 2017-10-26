@@ -4089,4 +4089,26 @@ Mit freundlichen Gruessen
 			$user['shippingaddress']['countryID']
         );
 	}
+
+    /** formatUserInfos() to normalize $userArray given from Shopware in different ways in Shopware 5.1.6
+     * @param null $user
+     * @return normalzed User Array
+     */
+    public static function formatUserInfos($user = null)
+    {
+        $userGiven = $user;
+        if($userGiven != null)
+        {
+            $user['additional']['user']['userID']       = isset($user['additional']['user']['userID'])      && !empty($user['additional']['user']['userID'])    ? $user['additional']['user']['userID']     : $user['additional']['user']['customerId'];
+            $user['additional']['user']['firstname']    = isset($user['additional']['user']['firstname'])   && !empty($user['additional']['user']['firstname']) ? $user['additional']['user']['firstname']  : $user['billingaddress']['firstname'];
+            $user['additional']['user']['lastname']     = isset($user['additional']['user']['lastname'])    && !empty($user['additional']['user']['lastname'])  ? $user['additional']['user']['lastname']   : $user['billingaddress']['lastname'];
+
+        } else {
+            $user = Shopware()->Modules()->Admin()->sGetUserData();
+            $user['additional']['user']['userID']       = isset($user['additional']['user']['userID'])      && !empty($user['additional']['user']['userID'])    ? $user['additional']['user']['userID']     : $user['additional']['user']['customerId'];
+            $user['additional']['user']['firstname']    = isset($user['additional']['user']['firstname'])   && !empty($user['additional']['user']['firstname']) ? $user['additional']['user']['firstname']  : $user['billingaddress']['firstname'];
+            $user['additional']['user']['lastname']     = isset($user['additional']['user']['lastname'])    && !empty($user['additional']['user']['lastname'])  ? $user['additional']['user']['lastname']   : $user['billingaddress']['lastname'];
+        }
+        return $user;
+    }
 }

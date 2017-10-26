@@ -138,7 +138,15 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
             }
 
 			$data = $transaction[0];
-
+            $formerPaTransaction = $data;
+            /**
+             * @todo für voll REV (RV) soll kein Basket mitgesendet werden
+             * Daher hier den Originalen Betrag abfangen und vor Basket-Api-Call
+             * mit Betrag für RV vergleichen 
+             * Wenn PA-Betrag = RV-Betrag ($amount) sende keinen Basket
+             * 
+             */
+mail("sascha.pflueger@heidelpay.de","Ursprungstransaktion",print_r($formerPaTransaction,1));
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
 			$data['USER_LOGIN'] = trim($this->FrontendConfigHGW()->HGW_USER_LOGIN);
 			$data['USER_PWD'] = trim($this->FrontendConfigHGW()->HGW_USER_PW);
@@ -149,53 +157,83 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 //			$data['IDENTIFICATION_REFERENCEID'] = $trans->uid;
             $data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
 
-			unset($data['FRONTEND_RESPONSE_URL']);
-			unset($data['FRONTEND_CSS_PATH']);
-			unset($data['ACCOUNT_NUMBER']);
-				
-			$sw = Shopware()->Plugins()->Frontend()->HeidelGateway();
+            // switching request-url
+			$hgwBootstrapVariables = Shopware()->Plugins()->Frontend()->HeidelGateway();
 			if(strtoupper($data['TRANSACTION_MODE']) == 'LIVE'){
-				$sw::$requestUrl = $sw::$live_url;
+                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$live_url;
 			}else{
-				$sw::$requestUrl = $sw::$test_url;
+                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url;
 			}
 
             // setting Basket-Id for Payolution
-            if($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
+            if(
+                ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
+               // || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
+            )
             {
                 /**
-                * @todo Einbau Basket-ApiCall für FN und RV
-                */
-                $live_url_basket	= 'https://heidelpay.hpcgw.net/ngw/basket/';
-                $test_url_basket	= 'https://test-heidelpay.hpcgw.net/ngw/basket/';
-
-                // fetch all articles for Basket-Api-Call from order
-                $orderDetails = $this->fetchOrderDetailsBySwOrderId($data['IDENTIFICATION_UNIQUEID']);
-
-                // prepare data for heidelpay-basket-api call
-                $dataForBasketApi = self::prepareBackendBasketData($orderDetails);
-
-                // send heidelpay-basket-api call to receive a BASKET.ID
-                $ta_mode = $this->FrontendConfigHGW()->HGW_TRANSACTION_MODE;
-                $origRequestUrl = $sw::$requestUrl;
-
-                if(is_numeric($ta_mode) && (($ta_mode == 0) || ($ta_mode == 3))){
-                    $sw::$requestUrl = $live_url_basket;
-                }else{
-                    $sw::$requestUrl = $test_url_basket;
-                }
-
-                $params['raw']= $dataForBasketApi;
-                $response = $this->callDoRequest($params);
-                // switch back to post url, after basket request is sent
-                $sw::$requestUrl = $origRequestUrl;
-
-                if(!empty($response['basketId']))
+                 * @todo Einbau Basket-ApiCall für FN und RV
+                 */
+                switch ($data['PAYMENT_CODE'])
                 {
-                    $data['BASKET_ID'] = $response['basketId'];
+
+                    case 'IV.RV':
+                    case 'IV.FN':
+                        // checking if a full reversal sould be done
+                        if ($formerPaTransaction['PRESENTATION_AMOUNT'] == $data['PRESENTATION_AMOUNT'])
+                        {
+                            // sende leeren Basket mit
+mail("sascha.pflueger@heidelpay.de","VOLLstorno",print_r("",1));
+                        } else {
+                            // sende restlichen Basket mit
+                            // fetch all articles for Basket-Api-Call from order
+                            $orderDetails = $this->fetchOrderDetailsByUniqueId($data['IDENTIFICATION_UNIQUEID']);
+
+                            // prepare data for heidelpay-basket-api call
+                            $dataForBasketApi = self::prepareBackendBasketData($orderDetails);
+
+                            // send heidelpay-basket-api call to receive a BASKET.ID
+                            $ta_mode = $this->FrontendConfigHGW()->HGW_TRANSACTION_MODE;
+                            $origRequestUrl = $hgwBootstrapVariables::$requestUrl;
+
+                            if(is_numeric($ta_mode) && (($ta_mode == 0) || ($ta_mode == 3))){
+                                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$live_url_basket;
+                            }else{
+                                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url_basket;
+                            }
+mail("sascha.pflueger@heidelpay.de","Daten an BasketApi",print_r($dataForBasketApi,1));
+                            // do Basket-Api-Request
+                            $params['raw']= $dataForBasketApi;
+                            $response = $this->callDoRequest($params);
+mail("sascha.pflueger@heidelpay.de","Response von BasketApi",print_r($response,1));
+
+                            // switch back to post url, after basket request is sent
+                            $hgwBootstrapVariables::$requestUrl = $origRequestUrl;
+
+                            if(!empty($response['basketId']))
+                            {
+                                $data['BASKET_ID'] = $response['basketId'];
+                            }
+                        }
+
+                        break;
                 }
+
+
+
+
+
+
             }
 
+            // deleting unneccessary Data
+            unset($data['FRONTEND_RESPONSE_URL']);  unset($data['FRONTEND_CSS_PATH']);          unset($data['ACCOUNT_NUMBER']);
+            unset($data['CRITERION_DBONRG']);       unset($data['CRITERION_SHIPPAY']);          unset($data['CRITERION_GATEWAY']);
+            unset($data['CRITERION_WALLET']);       unset($data['CRITERION_WALLET_PAYNAME']);   unset($data['CUSTOMER_OPTIN']);
+            unset($data['CUSTOMER_OPTIN_2']);       unset($data['CONFIG_OPTIN_TEXT']);          unset($data['var.Register']);
+            unset($data['var.sTarget']);            unset($data['var.sepa']);                   unset($data['._csrf_token']);
+
+            // prepare parameters for sending and replace all "_" with "."
 			foreach($data as $key => $value){
 				if(is_int(strpos($key, 'CLEARING_'))){ unset($data[$key]); continue; }
 				if(is_int(strpos($key, 'ACCOUNT_'))){ unset($data[$key]); continue; }
@@ -206,7 +244,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$data[$newKey] = $value;
 				unset($data[$key]);
 			}
-
+mail("sascha.pflueger@heidelpay.de","Data für Request FIN / REV",print_r($data,1));
+//return;
 			$resp = $this->callDoRequest($data);
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
 				
@@ -770,7 +809,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
      * @param $identificationUniqueId
      * @return array
      */
-	protected function fetchOrderDetailsBySwOrderId($identificationUniqueId)
+	protected function fetchOrderDetailsByUniqueId($identificationUniqueId)
     {
         $sql = 'SELECT * FROM `s_order` 
                 INNER JOIN `s_order_details` 
@@ -791,6 +830,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
      */
     protected function prepareBackendBasketData($orderDetails)
     {
+
         // prepare Basicdata for Basket-Api-Call
         $shoppingCart['authentication'] = array(
             'sender' 		=> trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER),
@@ -828,6 +868,10 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
 
             );
+
+            if($shoppingCart['basket']['basketItems'][$count]['type'] == "voucher") {
+                $shoppingCart['basket']['basketItems'][$count]['articleId'] = "voucher";
+            }
 
             $count ++;
 

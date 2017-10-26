@@ -692,6 +692,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '17.09.19':
+            case '17.09.25':
                 // Compatibility for Shopware 4.3.6 - 5.3.3
                 // Some changes in Js
                 try {
@@ -710,6 +711,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
+
             case '17.10.10':
                 // updatefix 17.09.19
                 try {
@@ -1824,15 +1826,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
-                    //User-Indexe bei SW.516 leer
-                    if (empty($user['additional']['user']['userID']))
-                    {
-                        $user['additional']['user']['userID'] = $user['additional']['user']['customerId'];
-                        $user['additional']['user']['firstname'] = $user['billingaddress']['firstname'];
-                        $user['additional']['user']['lastname'] = $user['billingaddress']['lastname'];
-                        $user['additional']['user']['email'] = $user['additional']['user']['email'];
 
-                    }
+                    // Benoetigte User-Indexe bei SW.516 anders vergeben
+                    $user = self::formatUserInfos($user);
 
                     $payment_data = [
                         "NAME_BIRTHDATE"                    => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
@@ -1861,7 +1857,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'expMonth' 	=> "0",
                         'expYear' 	=> "0",
                         'brand' 	=> "SANTANDER",
-                        'owner' 	=> $user['additional']['user']['firstname'],
+                        'owner' 	=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
                         'kto' 		=> "0",
                         'blz' 		=> "0",
                         'chan' 		=> $config->HGW_SAN_CHANNEL,
@@ -1874,7 +1870,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'expMonthNew' 	=> "0",
                         'expYearNew' 	=> "0",
                         'brandNew'		=> "SANTANDER",
-                        'ownerNew'		=> $user['additional']['user']['firstname'],
+                        'ownerNew'		=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
                         'ktoNew' 		=> "0",
                         'blzNew' 		=> "0",
                         'chanNew' 		=> $config->HGW_SAN_CHANNEL,

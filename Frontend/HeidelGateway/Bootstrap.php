@@ -1557,9 +1557,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             $view->assign('Containers', $containerData);
                         }
 
-						$containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
-						$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
-						$view->assign('Containers', $containerData);
+//						$containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
+//						$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
+//						$view->assign('Containers', $containerData);
 			}
 		}catch(Exception $e){
 			$this->Logging('onBeforeRenderDocument | '.$e->getMessage());

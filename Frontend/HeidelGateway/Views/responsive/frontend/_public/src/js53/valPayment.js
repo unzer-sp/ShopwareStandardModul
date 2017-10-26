@@ -161,7 +161,7 @@ document.asyncReady(function () {
 
                 if(pm.indexOf("hgw_ivpd"))
                 {
-                    console.log("Treffer")
+                    //setting Birthdate to hidden input
                     if(jQuery('.newreg_ivpd').is(":visible")) {
 
                         var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
@@ -170,6 +170,30 @@ document.asyncReady(function () {
 
                         jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
                     }
+
+                    //validation of inputs
+                    var errorsIvpd = valPayolutionDirect();
+console.log(errorsIvpd);
+                    if(errorsIvpd.length >0)
+                    {
+                        return false;
+                    }
+
+                    if((jQuery('.'+"hgw_ivpd"+'  .has--error').length > 0)){
+                        jQuery('#payment .alert .alert--content ul li').remove();
+
+                        jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+                        jQuery.each(errorsIvpd, function(key, value){
+                            jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+                        });
+
+                        jQuery('.alert').removeClass("is--hidden");
+                        jQuery('html, body').animate({scrollTop: 0}, 0);
+
+                        return false;
+                    }
+
+
                 }
 
             }
@@ -266,7 +290,6 @@ document.asyncReady(function () {
             $(".hgw_required").removeAttr("required");
         }
 
-        /* ************************************************ */
         jQuery('.newreg_dd').click(function (e) {
             var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
             var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
@@ -282,7 +305,6 @@ document.asyncReady(function () {
 
             jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
-        /* ************************************************ */
 
         $( document ).ajaxComplete(function() {
             jQuery('.newreg_dd').click(function (e) {
@@ -405,6 +427,11 @@ document.asyncReady(function () {
                                     // change form action
                                     changeUrl(checkedOpt, orgLink);
                                 }
+
+                                if (checkedOpt.indexOf('ivpd') != '-1') {
+                                    // change form action
+                                    changeUrl(checkedOpt, orgLink);
+                                }
                             });
                         });
                     }
@@ -489,6 +516,23 @@ document.asyncReady(function () {
             var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
 
             jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+        }
+
+        jQuery('.newreg_ivpd').click(function (e) {
+
+            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+
+            jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+        });
+
+        if (jQuery('.newreg_ivpd')) {
+            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+
+            jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
     }
 });
@@ -585,6 +629,13 @@ function valForm() {
                             var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
                             var errors = valBirthdate(age);
                         }
+
+                        if (pm == 'ivpd') {
+                            var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val() - 1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
+                            var today = new Date();
+                            var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+                            var errors = valBirthdate(age);
+                        }
                     }
                 } else {
                     checkedOpt = checkedOpt.replace('radio', '').trim();
@@ -628,6 +679,7 @@ function valForm() {
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm() {
+console.log("valGatewayForm");
     checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('_') + 1);
 
@@ -672,6 +724,7 @@ function valGatewayForm() {
 
 // VALIDATE FORM ON SHIPPINGPAYMENT
 function valShippingPaymentForm() {
+console.log("valShippingPaymentForm");
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
 
@@ -709,7 +762,7 @@ function valShippingPaymentForm() {
             }
 
             if(pm = 'ivpd'){
-                // var errors = valPayolutionDirect();
+                var errors = valPayolutionDirect();
 
                 if(errors.length >0)
                 {
@@ -875,7 +928,7 @@ function valSantander() {
 function valPayolutionDirect() {
     var errors = {};
     var i = 0;
-
+console.log("valPayolutionDirect");
     // validation of salutation
     var salutation = $('.hgw_val_ivpd select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "UNKNOWN")
@@ -887,7 +940,7 @@ function valPayolutionDirect() {
     }
 
     // validation of birthdate
-    var birthdate = $('#birthdate_san').val();
+    var birthdate = $('#birthdate_ivpd').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {
         var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val()-1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.12';
+		return '17.10.26';
 	}
 
 	/**
@@ -692,7 +692,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 // Compatibility for Shopware 4.3.6 - 5.3.3
                 // Some changes in Js
                 try {
-                    $msg .= '* update 17.09.25 <br />';
+                    $msg .= '* update 17.09.19 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -724,6 +724,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '17.10.12':
+            case '17.10.26':
+                // resolves a problem while generating Santander-PDF-invoice
                 // Introducing Paymentmethod "Payolution direct"
                 try{
                     $this->addSnippets();
@@ -1667,9 +1669,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             $view->assign('Containers', $containerData);
                         }
 
-						$containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
-						$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
-						$view->assign('Containers', $containerData);
+//						$containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
+//						$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
+//						$view->assign('Containers', $containerData);
 			}
 		}catch(Exception $e){
 			$this->Logging('onBeforeRenderDocument | '.$e->getMessage());
@@ -1846,7 +1848,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                                                     if((isset($registratedData)) && ($registratedData != '')){
                                                         $view->salutation	= $registratedData['salut'];
-                                                        $view->birthdate	= $registratedData['formated'];
+                                                        $view->birthdate	= $registratedData['formatted'];
                                                     }
 
                                                     $view->optinText        = $getFormUrl['CONFIG_OPTIN_TEXT'];
@@ -1956,7 +1958,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         "day"       => $nameBirthdateDay,
                         "month"     => $nameBirthdateMonth,
                         "year"      => $nameBirthdateYear,
-                        "formated"  => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
+                        "formatted"  => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
                         "salut"     => $salutation
 
                     ];

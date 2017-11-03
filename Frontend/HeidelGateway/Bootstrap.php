@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version numberf
 	 */
 	public function getVersion(){
-		return '17.10.26';
+		return '17.11.06';
 	}
 
 	/**
@@ -729,6 +729,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '17.10.26':
+            case '17.11.06':
                 // Resolves a problem while generating PFD-invoice for Santander
                 // Compatibility with SW 5.3.4
                 try {

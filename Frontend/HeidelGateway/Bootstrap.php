@@ -748,7 +748,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				'success' => true,
 				'message' => $msg,
 				'invalidateCache' => array('frontend'),
-
 		);
 	}
 

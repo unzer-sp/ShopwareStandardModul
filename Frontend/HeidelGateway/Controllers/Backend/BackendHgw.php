@@ -118,6 +118,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					$payName = 'ot';
 					break;
 				case 'bs':
+                case 'san':
+                case 'ivpd':
 					$payName = 'iv';
 					break;
 				case 'mpa':
@@ -139,14 +141,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 
 			$data = $transaction[0];
             $formerPaTransaction = $data;
-            /**
-             * @todo für voll REV (RV) soll kein Basket mitgesendet werden
-             * Daher hier den Originalen Betrag abfangen und vor Basket-Api-Call
-             * mit Betrag für RV vergleichen 
-             * Wenn PA-Betrag = RV-Betrag ($amount) sende keinen Basket
-             * 
-             */
-mail("sascha.pflueger@heidelpay.de","Ursprungstransaktion",print_r($formerPaTransaction,1));
+
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
 			$data['USER_LOGIN'] = trim($this->FrontendConfigHGW()->HGW_USER_LOGIN);
 			$data['USER_PWD'] = trim($this->FrontendConfigHGW()->HGW_USER_PW);
@@ -154,7 +149,6 @@ mail("sascha.pflueger@heidelpay.de","Ursprungstransaktion",print_r($formerPaTran
 			$data['PRESENTATION_AMOUNT'] = $amount;
 			$data['FRONTEND_ENABLED'] = 'false';
 			$data['FRONTEND_MODE'] = 'DEFAULT';
-//			$data['IDENTIFICATION_REFERENCEID'] = $trans->uid;
             $data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
 
             // switching request-url
@@ -176,16 +170,14 @@ mail("sascha.pflueger@heidelpay.de","Ursprungstransaktion",print_r($formerPaTran
                  */
                 switch ($data['PAYMENT_CODE'])
                 {
-
+                    case 'IV.FI':
                     case 'IV.RV':
-                    case 'IV.FN':
                         // checking if a full reversal sould be done
                         if ($formerPaTransaction['PRESENTATION_AMOUNT'] == $data['PRESENTATION_AMOUNT'])
                         {
-                            // sende leeren Basket mit
-mail("sascha.pflueger@heidelpay.de","VOLLstorno",print_r("",1));
+                            // take basket-id from PA-transaction
+                            $data['BASKET_ID'] = $formerPaTransaction['BASKET_ID'];
                         } else {
-                            // sende restlichen Basket mit
                             // fetch all articles for Basket-Api-Call from order
                             $orderDetails = $this->fetchOrderDetailsByUniqueId($data['IDENTIFICATION_UNIQUEID']);
 
@@ -201,11 +193,9 @@ mail("sascha.pflueger@heidelpay.de","VOLLstorno",print_r("",1));
                             }else{
                                 $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url_basket;
                             }
-mail("sascha.pflueger@heidelpay.de","Daten an BasketApi",print_r($dataForBasketApi,1));
                             // do Basket-Api-Request
                             $params['raw']= $dataForBasketApi;
                             $response = $this->callDoRequest($params);
-mail("sascha.pflueger@heidelpay.de","Response von BasketApi",print_r($response,1));
 
                             // switch back to post url, after basket request is sent
                             $hgwBootstrapVariables::$requestUrl = $origRequestUrl;
@@ -215,15 +205,10 @@ mail("sascha.pflueger@heidelpay.de","Response von BasketApi",print_r($response,1
                                 $data['BASKET_ID'] = $response['basketId'];
                             }
                         }
-
+                        break;
+                    default:
                         break;
                 }
-
-
-
-
-
-
             }
 
             // deleting unneccessary Data
@@ -244,8 +229,7 @@ mail("sascha.pflueger@heidelpay.de","Response von BasketApi",print_r($response,1
 				$data[$newKey] = $value;
 				unset($data[$key]);
 			}
-mail("sascha.pflueger@heidelpay.de","Data für Request FIN / REV",print_r($data,1));
-//return;
+
 			$resp = $this->callDoRequest($data);
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
 				
@@ -431,24 +415,82 @@ mail("sascha.pflueger@heidelpay.de","Data für Request FIN / REV",print_r($data,
 							break;
 						case 'bs':
 						case 'iv':
-							if($payInfo['payType'] == 'pa'){
-								$btns['rv']['active'] = $btns['fi']['active'] = 'true';
+mail("sascha.pflueger@heidelpay.de","BackendHgw 418",print_r($ivpd,1));
+mail("sascha.pflueger@heidelpay.de","BackendHgw 419",print_r($san,1));
+						    if($ivpd || $san)
+						    {
+                                if($payInfo['payType'] == 'pa'){
+                                    $btns['rv']['active'] = $btns['fi']['active'] = 'true';
 
-								$maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
-								$btns['rv']['trans'][] = $btns['fi']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
-							}
-							if($payInfo['payType'] == 'rc'){
-								$btns['rv']['active'] = $btns['fi']['active'] = 'false';
-								$btns['rf']['active'] = 'true';
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['trans'][] = $btns['fi']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+                                if($payInfo['payType'] == 'rc'){
+                                    $btns['rv']['active'] = $btns['fi']['active'] = 'false';
+                                    $btns['rf']['active'] = 'true';
 
-								if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
-								$btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
-							}
-							if($payInfo['payType'] == 'fi'){
-								//$btns['rv']['active'] = $btns['fi']['active'] = 'false';
+                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+                                    $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+                                if($payInfo['payType'] == 'fi') {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+
+                                    if (
+                                    $ivpd
+//                                || $san
+                                    ) {
+                                        $btns['fi']['active'] = $btns['rv']['active'] = 'false';
+                                        $btns['rf']['active'] = 'true';
+
+                                        if (!isset($maxRf)) {
+                                            $maxRf = $value['PRESENTATION_AMOUNT'];
+                                        }
+                                        $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                    } else {
+                                        $btns['fi']['active'] = 'false';
+                                        $btns['rv']['active'] = 'true';
+                                    }
+                                }
+                            }
+                            else {
+                                $btns['rv']['active'] = $btns['fi']['active'] = 'false';
 								$btns['fi']['active'] = 'false';
 								$btns['rv']['active'] = 'true';
-							}
+                            }
+
+//                            if($payInfo['payType'] == 'pa'){
+//								$btns['rv']['active'] = $btns['fi']['active'] = 'true';
+//
+//								$maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+//								$btns['rv']['trans'][] = $btns['fi']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+//							}
+//							if($payInfo['payType'] == 'rc'){
+//								$btns['rv']['active'] = $btns['fi']['active'] = 'false';
+//								$btns['rf']['active'] = 'true';
+//
+//								if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+//								$btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+//							}
+//							if($payInfo['payType'] == 'fi'){
+//                                $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+//
+//							    if(
+//							        $ivpd
+////                                || $san
+//                                ){
+//                                    $btns['fi']['active'] =  $btns['rv']['active'] ='false';
+//                                    $btns['rf']['active'] = 'true';
+//
+//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+//                                    $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+//                                } else {
+//                                    $btns['fi']['active'] = 'false';
+//                                    $btns['rv']['active'] = 'true';
+//                                }
+								//$btns['rv']['active'] = $btns['fi']['active'] = 'false';
+//								$btns['fi']['active'] = 'false';
+//								$btns['rv']['active'] = 'true';
+//							}
 							break;
 						case 'pp':
 							if($payInfo['payType'] == 'pa'){
@@ -488,9 +530,11 @@ mail("sascha.pflueger@heidelpay.de","Data für Request FIN / REV",print_r($data,
 						if($maxRv <= 0){ $btns['rv']['active'] = 'false'; }
 						if($maxFi <= 0){ $btns['fi']['active'] = 'false'; }
 					}
-					if($papg){ $payName = 'papg'; $papg = false; }
-					if($payName == 'san'){ $payName = 'iv'; unset($san); }
-					if($payName == 'ivpd'){ $payName = 'iv'; unset($ivpd); }
+					if($papg)   { $payName = 'papg'; $papg = false; }
+					if($san)    { $payName = 'san'; $san = false; }
+					if($ivpd)   { $payName = 'ivpd'; $ivpd = false; }
+//					if($payName == 'san'){ $payName = 'iv'; unset($san); }
+//					if($payName == 'ivpd'){ $payName = 'iv'; unset($ivpd); }
 				}
 
 				$btns['rf']['trans'][0]['maxRf'] = number_format($maxRf, 2,'.','');
@@ -522,7 +566,7 @@ mail("sascha.pflueger@heidelpay.de","Data für Request FIN / REV",print_r($data,
 			$buttonTable .= '</tr></table>';
 			$buttonRet['ref'] = $reference;
 			$buttonRet['table'] = $buttonTable;
-				
+
 			return $buttonRet;
 		}catch(Exception $e){
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getButtons (BE) | '.$e->getMessage());

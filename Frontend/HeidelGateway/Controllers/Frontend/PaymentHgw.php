@@ -406,10 +406,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 									$dobPapg = json_decode($regData['payment_data'], true);
 								}
 
-								if((isset($dobPapg)) && ($dobPapg['formatted'] != '')){
-									$ppd_crit['NAME.BIRTHDATE'] = $dobPapg['formatted'];
-									$this->View()->salutation	= $dobPapg['salut'];
-									$this->View()->birthdate	= $dobPapg['formatted'];
+								if((isset($dobPapg)) && ($dobPapg['NAME_BIRTHDATE'] != '')){
+									$ppd_crit['NAME.BIRTHDATE'] = $dobPapg['NAME_BIRTHDATE'];
+									$this->View()->salutation	= $dobPapg['NAME_SALUTATION'];
+									$this->View()->birthdate	= $dobPapg['NAME_BIRTHDATE'];
 								}
 
 								$this->View()->accountHolder = $getFormUrl['ACCOUNT_HOLDER'];
@@ -478,11 +478,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $regDataParameters = json_decode($regData["payment_data"]);
 
-                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formatted;
-                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
-                        $ppd_crit["CUSTOMER.OPTIN"] = $regDataParameters->CUSTOMER_OPTIN;
-                        $ppd_crit["CUSTOMER.OPTIN_2"] = $regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY;
-                        $ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"] = $regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY;
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
+                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
+                        $ppd_crit["CUSTOMER.OPTIN"] = strtoupper($regDataParameters->CUSTOMER_OPTIN);
+                        $ppd_crit["CUSTOMER.OPTIN_2"] = strtoupper($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY);
+                        $ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"] = strtoupper($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY);
 
                         //to prevent sending request to paymentgateway if browser-back-button was pushed
 //                        if(
@@ -493,9 +493,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 //                        {
 //                            $this->forward('fail');
 //                        }
-
                     }
-                    /* ******************************************************** */
 
                     if($activePayment == 'ivpd') {
                         $basketId = self::getBasketId();
@@ -509,8 +507,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $regDataParameters = json_decode($regData["payment_data"]);
 
-                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->formatted;
-                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->salut;
+                        $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
+                        $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
 
                         //fetching count of orders of customer
                         $countOrderForCustomer = '';
@@ -533,7 +531,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 //                        }
 
                     }
-                    /* ******************************************************** */
+
                     if ($activePayment == 'hpr') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
@@ -1616,7 +1614,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		$address['birthdate']['day']		= $postData['Date_Day'];
 		$address['birthdate']['month']		= $postData['Date_Month'];
 		$address['birthdate']['year']		= $postData['Date_Year'];
-		$address['birthdate']['formatted']	= $postData['Date_Year'].'-'.$postData['Date_Month'].'-'.$postData['Date_Day'];
+		$address['birthdate']['NAME_BIRTHDATE']	= $postData['Date_Year'].'-'.$postData['Date_Month'].'-'.$postData['Date_Day'];
 
 		if($this->saveRegData($resp, '', '', $address, true) === false){
 			return $this->forward('fail');
@@ -1812,9 +1810,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                     '{CONNECTOR_ACCOUNT_USAGE}'		=> "\n".$parameters->CONNECTOR_ACCOUNT_USAGE,
                                 );
                                 $comment = '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
-                                /**
-                                 * @todo Swi Case für IVPD um richtigen Text zu laden
-                                 */
+
                                 switch ($parameters->ACCOUNT_BRAND){
                                     case 'SANTANDER':
                                         $comment .= strtr($this->getSnippet('PrepaymentSanText', $locId), $repl);
@@ -1829,6 +1825,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                             }
 						}else{
+                            $comment = '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
 							$comment.= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
 						}
 							
@@ -1927,14 +1924,18 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                 ) {
 									$birthdayCmsArray = explode('-', $parameters->NAME_BIRTHDATE);
 									if (!empty($birthdayCmsArray)) {
-										$birthdate['salut'] 	= $parameters->NAME_SALUTATION;
-										$birthdate['day'] 		= $birthdayCmsArray[2];
-										$birthdate['month']		= $birthdayCmsArray[1];
-										$birthdate['year'] 		= $birthdayCmsArray[0];
-										$birthdate['formatted'] = $parameters->NAME_BIRTHDATE;
+										$birthdate['NAME_SALUTATION'] 	= $parameters->NAME_SALUTATION;
+//										$birthdate['day'] 		        = $birthdayCmsArray[2];
+//										$birthdate['month']		        = $birthdayCmsArray[1];
+//										$birthdate['year'] 		        = $birthdayCmsArray[0];
+										$birthdate['NAME_BIRTHDATE']    = $parameters->NAME_BIRTHDATE;
+										if($parameters->ACCOUNT_BRAND == 'SANTANDER'){
+                                            $birthdate['CUSTOMER_OPTIN'] 	                = strtoupper($parameters->CUSTOMER_OPTIN);
+                                            $birthdate['CUSTOMER_ACCEPT_PRIVACY_POLICY'] 	= strtoupper($parameters->CUSTOMER_OPTIN_2);
+                                        }
 										
 										$parametersToSaveCms = json_decode($transaction['jsonresponse'],1);
-										
+
 										try{
 											$this->saveRegData($parametersToSaveCms, '', '',$birthdate);
 										} catch (Exception $e){
@@ -2063,11 +2064,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							case 'SANTANDER':
 								$birthdayArray = explode('-', $parameters->NAME_BIRTHDATE);
 								if (!empty($birthdayArray)) {
-									$birthdate['salut'] 	= $parameters->NAME_SALUTATION;
-									$birthdate['day'] 		= $birthdayArray[2];
-									$birthdate['month'] 	= $birthdayArray[1];
-									$birthdate['year'] 		= $birthdayArray[0];
-									$birthdate['formatted'] = $parameters->NAME_BIRTHDATE;
+									$birthdate['NAME_SALUTATION'] 	= $parameters->NAME_SALUTATION;
+									$birthdate['day'] 		        = $birthdayArray[2];
+									$birthdate['month'] 	        = $birthdayArray[1];
+									$birthdate['year'] 		        = $birthdayArray[0];
+									$birthdate['NAME_BIRTHDATE']    = $parameters->NAME_BIRTHDATE;
 
 									$parametersToSave = json_decode($transaction['jsonresponse'],1);
 
@@ -2144,13 +2145,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                             $birthdayArray = explode('-', $parameters->NAME_BIRTHDATE);
                             $address = array(
-                                'salut' => $parameters->NAME_SALUTATION,
+                                'NAME_SALUTATION' => $parameters->NAME_SALUTATION,
                                 'birthdate' =>
                                     array(
                                         'day' => $birthdayArray[2],
                                         'month' => $birthdayArray[1],
                                         'year' => $birthdayArray[0],
-                                        'formatted' => $parameters->NAME_BIRTHDATE
+                                        'NAME_BIRTHDATE' => $parameters->NAME_BIRTHDATE
                                     )
                             );
                             $this->saveRegData(json_decode($transaction['jsonresponse'], 1), $kto, $blz, $address);
@@ -3717,11 +3718,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		$dataToSave = array();
 		if (self::Config()->HGW_DD_GUARANTEE_MODE == 1){
 			$dateOfBirth 			= explode('-',$birthdate);
-			$dataToSave['salut'] 	= $salutation;
-			$dataToSave['day']		= $dateOfBirth[2];
-			$dataToSave['month']	= $dateOfBirth[1];
-			$dataToSave['year']		= $dateOfBirth[0];
-			$dataToSave['formatted']= $birthdate;
+			$dataToSave['NAME_SALUTATION'] 	= $salutation;
+			$dataToSave['day']		        = $dateOfBirth[2];
+			$dataToSave['month']	        = $dateOfBirth[1];
+			$dataToSave['year']		        = $dateOfBirth[0];
+			$dataToSave['NAME_BIRTHDATE']   = $birthdate;
 		} else {
 			$dataToSave = NULL;
 		}

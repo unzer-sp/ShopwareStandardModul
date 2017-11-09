@@ -734,7 +734,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->installInvoiceIvpdMail();
                     $form->setElement('text', 'HGW_IVPD_CHANNEL',
                         array(
-                            'label'=>'Payolution branded Channel',
+                            'label'=>'Payolution Direct Channel',
                             'value'=>'',
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
@@ -746,7 +746,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 17.10.12 <br />';
+                    $msg .= '* update 17.10.26 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -1631,10 +1631,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         }
 						// is necessary to get the data into the invoice template
 						$view->assign('Containers', $containers);
-                /**
-                 * @todo wahrscheinlich wird beim generieren keine Transaktion gefunden
-                 * ggf prüfen was in $transdata enthalten ist
-                 */
+
 						$trans = $this->getTransactionByTransType($document->_order->order['transactionID'], 'PA');
 						$transData = json_decode($trans['jsonresponse'], true);
 
@@ -1815,7 +1812,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                     if((isset($dobSan)) && ($dobSan['NAME_BIRTHDATE'] != '')){
                                                         $ppd_crit['NAME.BIRTHDATE'] = $dobSan['NAME_BIRTHDATE'];
                                                         $view->salutation	= $dobSan['NAME_SALUTATION'];
-                                                        $view->birthdate	= $dobSan['NAME_BIRTHDATE'];
+                                                        $view->birthdate_san	= $dobSan['NAME_BIRTHDATE'];
                                                     }
 
                                                     $sanJson 			= json_decode($getFormUrl['CONFIG_OPTIN_TEXT'],true);
@@ -1827,8 +1824,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                     $view->optinLink 		    = isset($sanJson['santander_iv_de_werbewiderspruch_link']) ? $sanJson['santander_iv_de_werbewiderspruch_link'] : $sanJson['santander_iv_de_adv_link'];
 
                                                     $view->accountHolder	    = $getFormUrl['ACCOUNT_HOLDER'];
-                                                    $view->checkOptin           = $dobSan['CUSTOMER_OPTIN'];
-                                                    $view->checkPrivacyPolicy   = $dobSan['CUSTOMER_ACCEPT_PRIVACY_POLICY'];
+                                                    $view->checkOptin           = strtoupper($dobSan['CUSTOMER_OPTIN']);
+                                                    $view->checkPrivacyPolicy   = strtoupper($dobSan['CUSTOMER_ACCEPT_PRIVACY_POLICY']);
 
 //                                                    $view->privacy_policy 	= $privacy_policy;
                                                     $view->privacy_policy_text 	= isset($sanJson['santander_iv_de_datenschutzbestimmungen_optin_text']) ? $sanJson['santander_iv_de_datenschutzbestimmungen_optin_text'] : $sanJson['santander_iv_de_privpol_text'];
@@ -1838,7 +1835,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                                                 }
 
-                                                /* **************************************************************************** */
                                                 if($pm == 'ivpd')
                                                 {
                                                     $regData = $this->getRegData($user['additional']['user']['id'], $pm);
@@ -1847,15 +1843,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                     $registratedData = json_decode($regData['payment_data'],true);
 
                                                     if((isset($registratedData)) && ($registratedData != '')){
-                                                        $view->salutation	= $registratedData['salut'];
-                                                        $view->birthdate	= $registratedData['formatted'];
+                                                        $view->salutation	= $registratedData['NAME_SALUTATION'];
+                                                        $view->birthdate_ivpd	= $registratedData['NAME_BIRTHDATE'];
                                                     }
 
                                                     $view->optinText        = $getFormUrl['CONFIG_OPTIN_TEXT'];
                                                     $view->accountHolder    = $getFormUrl['ACCOUNT_HOLDER'];
                                                 }
-                                                /* **************************************************************************** */
-
 
                                                 if(((isset($bookingMode)) && (($bookingMode == '3') || ($bookingMode == '4'))) && Shopware()->Modules()->Admin()->sCheckUser()){
 
@@ -1937,6 +1931,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($request->getControllerName() == 'account' &&  $action == 'savePayment')
             )
             {
+                mail("sascha.pflueger@heidelpay.de","TEST",print_r($_POST,1));
                 /* ********************************************************************* */
                 // check if IVPD is active
                 if($request->getPost("BRAND") == "PAYOLUTION_DIRECT")
@@ -1944,10 +1939,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     //save Birthdate to DB
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
-                    $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year')) : '';
-                    $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
-                    $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
+//                    $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year')) : '';
+//                    $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
+//                    $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
                     $salutation         = $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : '';
+                    $nameBirthdate      = $request->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($request->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
 
@@ -1955,11 +1951,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $user = self::formatUserInfos($user);
 
                     $payment_data = [
-                        "day"       => $nameBirthdateDay,
-                        "month"     => $nameBirthdateMonth,
-                        "year"      => $nameBirthdateYear,
-                        "formatted"  => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
-                        "salut"     => $salutation
+//                        "day"       => $nameBirthdateDay,
+//                        "month"     => $nameBirthdateMonth,
+//                        "year"      => $nameBirthdateYear,
+                        "NAME_BIRTHDATE"  => $nameBirthdate,
+                        "NAME_SALUTATION" => $salutation
 
                     ];
 
@@ -2015,10 +2011,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 {
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
-                    $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year')) : '';
-                    $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
-                    $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
-
+                    if(!empty($request->getPost("NAME_BIRTHDATE"))){
+                        $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
+                    } else {
+                        $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'), $flag, $enc) : '';
+                        $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
+                        $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
+                        $nameBirthdate = $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay;
+                    }
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
 
@@ -2026,15 +2026,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $user = self::formatUserInfos($user);
 
                     $payment_data = [
-                        "NAME_BIRTHDATE"                    => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
+                        "NAME_BIRTHDATE"                    => $nameBirthdate,
                         "CUSTOMER_OPTIN"                    =>
-                            $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars($request->getPost('CUSTOMER_OPTIN'), $flag, $enc) : 'FALSE',
+                            $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')), $flag, $enc) : 'FALSE',
                         "CUSTOMER_ACCEPT_PRIVACY_POLICY"    =>
-                            $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY'), $flag, $enc) : 'FALSE',
+                            $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY')), $flag, $enc) : 'FALSE',
                         "NAME_SALUTATION"                   =>
                             $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
                     ];
-
+mail("sascha.pflueger@heidelpay.de","2031 bootstrap",print_r($payment_data,1));
                     $sql = '
 			                INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
 					        `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
@@ -2738,6 +2738,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			if(Shopware()->Modules()->Admin()->sCheckUser()){
 				if($user == NULL){ $user = Shopware()->Modules()->Admin()->sGetUserData(); }
                 // use shipping adress instead of billing adress, if set/possible
+                $ppd_user['CRITERION.USER_ID']	= $user['additional']['user']['userID'];
 				if($pm == 'va'  || $pm == 'mpa'){
 
 					$countryId = $user['shippingaddress']['countryID'] != '' ? $user['shippingaddress']['countryID'] : $user['billingaddress']['countryID'];
@@ -2773,6 +2774,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $countryId = $user['shippingaddress']['countryID'] != '' ? $user['shippingaddress']['countryID'] : $user['billingaddress']['countryID'];
                         $countryInfo = Shopware()->Modules()->Admin()->sGetCountry($countryId);
 
+                        $ppd_user['CRITERION.USER_ID']	= $user['additional']['user']['userID'];
                         $ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
                         $ppd_user['NAME.GIVEN']			= $user['shippingaddress']['firstname'] != '' ? $user['shippingaddress']['firstname'] : $user['billingaddress']['firstname'];
                         $ppd_user['NAME.FAMILY']		= $user['shippingaddress']['lastname'] != '' ? $user['shippingaddress']['lastname'] : $user['billingaddress']['lastname'];
@@ -3037,7 +3039,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			if(array_key_exists('raw', $params)){
 				$res = json_decode($response->getBody(), true);
 				if($response->isError()){
-					self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
+					self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
 				}
 				return $res;
 				exit;
@@ -3049,7 +3051,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			parse_str($res, $result);
 
 			if(($result['PROCESSING_RESULT'] == 'NOK') && ($result['PROCESSING_STATUS'] == 'REJECTED_VALIDATION')){
-				self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$result['PROCESSING_RETURN']);
+				self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$result['PROCESSING_RETURN']);
 			}
 
 			if($this->Config()->HGW_DEBUG > 0 && Shopware()->Front()->Request()->getActionName() == 'gateway'){
@@ -3074,7 +3076,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			return $result;
 		}catch(Exception $e){
-			self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$e->getMessage());
+			self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$e->getMessage());
 			return;
 		}
 	}

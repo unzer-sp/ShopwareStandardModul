@@ -46,7 +46,7 @@
                 </p>
             {/if}
 
-            <input type="hidden" name="BRAND" id="handover_brand" value="PAYOLUTION_DIRECT">
+            <input type="hidden" name="BRAND" id="handover_brand_ivpd" value="PAYOLUTION_DIRECT">
             <p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
         </div>
     </div>

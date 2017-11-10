@@ -102,6 +102,7 @@ $(document).ready(function(){
             if(pm.indexOf("hgw_ivpd") > 0)
             {
                 var errorsPayolution = valPayolutionDirect();
+console.log(errorsPayolution);
                 if((jQuery('.'+"hgw_ivpd"+'  .instyle_error').length > 0)){
                     jQuery('.error ul li').remove();
                     jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
@@ -212,7 +213,7 @@ $(document).ready(function(){
 
             jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
-    }
+    });
 
     //setting Checkbox for EasyCredit not Required
     jQuery('#hgw_cb_hpr').removeAttr("required");
@@ -242,6 +243,7 @@ $(document).ready(function(){
 
 // VALIDATE FORM
 function valForm(){
+console.log("valForm");
 	if(jQuery('.payment_method input:radio:checked').length != 0){
 		var checkedOpt = jQuery('.payment_method input:radio:checked').attr('class');
 		if(checkedOpt != undefined){
@@ -255,6 +257,7 @@ function valForm(){
 
 					// check if 'newreg' is shown
 					if(jQuery('.newreg_'+pm).is(':visible')){
+
 						// set 'error' to empty inputs
 						jQuery('div .'+checkedOpt).find('input').each(function(){
 							if(jQuery(this).val() == ''){
@@ -276,6 +279,14 @@ function valForm(){
 							var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
 							var errors = valBirthdate(age);
 						}
+                        if(pm == 'ivpd'){
+                            console.log("DRIN");
+                            var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val()-1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
+                            var today = new Date();
+                            var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+                            var errors = valPayolutionDirect();
+
+                        }
 					}
 				}else{
 					checkedOpt = checkedOpt.replace('radio','').trim();
@@ -284,14 +295,14 @@ function valForm(){
 				if((jQuery('div.'+checkedOpt+' .instyle_error').length > 0)){
 					jQuery('.error ul li').remove();
 					jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
-					
+                    console.log(errors);
 					jQuery.each(errors, function(key, value){
 						jQuery('.error ul').append('<li>'+jQuery(value).html()+'</li>');
 					});
 					
 					jQuery('#center .error').show();
 					jQuery('html, body').animate({ scrollTop: 0 }, 0);
-					
+
 					return false;
 				}else{
 					// disable all other input fields
@@ -314,6 +325,7 @@ function valForm(){
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm(){
+console.log("valGatewayForm");
 	checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
 	var pm = checkedOpt.substr(checkedOpt.indexOf('_')+1);
 
@@ -487,14 +499,14 @@ function valPayolutionDirect() {
     var salutation = $('.hgw_val_ivpd select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "UNKNOWN")
     {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').addClass("has--error");
+        $('.newreg_ivpd #salutation').parent('.js--fancy-select').addClass("instyle_error");
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').removeClass('has--error');
+        $('.newreg_ivpd #salutation').parent('.js--fancy-select').removeClass('instyle_error');
     }
 
     // validation of birthdate
-    var birthdate = $('#birthdate_san').val();
+    var birthdate = $('#birthdate_ivpd').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {
         var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val()-1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
@@ -502,23 +514,25 @@ function valPayolutionDirect() {
         var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
         if(age < 18){
 
-            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
 
             errors[i++] = '.msg_dob';
         }else{
-            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('instyle_error');
+        jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('instyle_error');
+        jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
+    console.log("valPayolution");
+    console.log(errors);
     return errors;
 }
 

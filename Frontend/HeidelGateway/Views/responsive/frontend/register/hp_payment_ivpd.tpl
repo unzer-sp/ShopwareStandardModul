@@ -28,14 +28,14 @@
             </div>
             <br />
             <label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-            {if isset($birthdate)}
-                {assign var=payment_data value=$birthdate}
+            {if isset($birthdate_ivpd)}
+                {assign var=payment_data value=$birthdate_ivpd}
                 {html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {else}
                 {html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {/if}
 
-            {if isset($birthdate)}
+            {if isset($birthdate_ivpd)}
                 <input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivpd" value="{$birthdate}">
             {else}
                 <input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivpd" value="-">
@@ -46,7 +46,7 @@
                 </p>
             {/if}
 
-            <input type="hidden" name="BRAND" id="handover_brand" value="PAYOLUTION_DIRECT">
+            <input type="hidden" name="BRAND" id="handover_brand_ivpd" value="PAYOLUTION_DIRECT">
             <p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
         </div>
     </div>

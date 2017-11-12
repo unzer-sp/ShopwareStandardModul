@@ -679,7 +679,6 @@ function valForm() {
                     jQuery('.payment--method .block select').attr('disabled', 'disabled');
                     jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
                     jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
-                console.log("671");
                 }
             }
         }
@@ -696,7 +695,6 @@ function valForm() {
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm() {
-console.log("valGatewayForm");
     checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('_') + 1);
 
@@ -741,7 +739,6 @@ console.log("valGatewayForm");
 
 // VALIDATE FORM ON SHIPPINGPAYMENT
 function valShippingPaymentForm() {
-console.log("valShippingPaymentForm");
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
 
@@ -757,7 +754,7 @@ console.log("valShippingPaymentForm");
                     jQuery(this).removeClass('has--error');
                 }
             });
-console.log(pm);
+
             if (pm == 'dd') {
                 var errors = valInputDdIban(jQuery('.newreg_' + pm + ' #iban').val(), pm);
             }
@@ -780,7 +777,6 @@ console.log(pm);
 
             if(pm == 'ivpd'){
                 var errors = valPayolutionDirect();
-console.log("780");
                 if(errors.length >0)
                 {
                     return false;
@@ -815,7 +811,6 @@ console.log("780");
             jQuery('.payment--method .block select').attr('disabled', 'disabled');
             jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
             jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
-        console.log("840");
         }
     }
 }
@@ -950,7 +945,6 @@ function valSantander() {
 function valPayolutionDirect() {
     var errors = {};
     var i = 0;
-console.log("valPayolutionDirect");
     // validation of salutation
     var salutation = $('.hgw_val_ivpd select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "UNKNOWN")

@@ -122,7 +122,7 @@ $(document).ready(function(){
                 var pm = $('input:radio:checked').attr('class');
 
                 if(pm != undefined) {
-                    if(pm.indexOf("hgw_san") > 0)
+                    if(pm.indexOf("hgw_san") != -1)
                     {
                         var errorsSan = valSantander();
                         if((jQuery('.'+"hgw_san"+'  .has--error').length > 0)){
@@ -140,7 +140,7 @@ $(document).ready(function(){
                         }
                     }
 
-                    if(pm.indexOf("hgw_ivpd"))
+                    if(pm.indexOf("hgw_ivpd") != -1)
                     {
                         //setting Birthdate to hidden input
                         if(jQuery('.newreg_ivpd').is(":visible")) {
@@ -154,7 +154,6 @@ $(document).ready(function(){
 
                         //validation of inputs
                         var errorsIvpd = valPayolutionDirect();
-                        console.log(errorsIvpd);
                         if(errorsIvpd.length >0)
                         {
                             return false;
@@ -566,7 +565,7 @@ function changeUrl(checkedOpt, orgLink){
 
 }
 
-// VALIDATE FORM
+// VALIDATE FORM on Responsive-Theme Account site
 function valForm(){
     if(jQuery('.register--payment input:radio:checked').length != 0){
         var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
@@ -747,7 +746,7 @@ function valShippingPaymentForm(){
                 }
             }
 
-            if(pm = 'ivpd'){
+            if(pm == 'ivpd'){
                 var errors = valPayolutionDirect();
 
                 if(errors.length >0)
@@ -856,13 +855,12 @@ function valBirthdate(age){
 }
 
 function valSantander() {
-
     var errors = {};
     var i = 0;
 
     // validation of salutation
     var salutation = $('select[name="NAME.SALUTATION"]').val();
-    if(salutation == undefined || salutation == "-")
+    if(salutation == undefined || salutation == "UNKNOWN")
     {
         $('.newreg_san #salutation').parent('.js--fancy-select').addClass("has--error");
         errors[i++] = '.msg_salut';

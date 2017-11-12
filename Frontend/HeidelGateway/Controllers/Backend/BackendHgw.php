@@ -415,8 +415,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 							break;
 						case 'bs':
 						case 'iv':
-mail("sascha.pflueger@heidelpay.de","BackendHgw 418",print_r($ivpd,1));
-mail("sascha.pflueger@heidelpay.de","BackendHgw 419",print_r($san,1));
 						    if($ivpd || $san)
 						    {
                                 if($payInfo['payType'] == 'pa'){

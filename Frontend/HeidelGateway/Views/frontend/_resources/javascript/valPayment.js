@@ -102,7 +102,6 @@ $(document).ready(function(){
             if(pm.indexOf("hgw_ivpd") > 0)
             {
                 var errorsPayolution = valPayolutionDirect();
-console.log(errorsPayolution);
                 if((jQuery('.'+"hgw_ivpd"+'  .instyle_error').length > 0)){
                     jQuery('.error ul li').remove();
                     jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
@@ -243,7 +242,6 @@ console.log(errorsPayolution);
 
 // VALIDATE FORM
 function valForm(){
-console.log("valForm");
 	if(jQuery('.payment_method input:radio:checked').length != 0){
 		var checkedOpt = jQuery('.payment_method input:radio:checked').attr('class');
 		if(checkedOpt != undefined){
@@ -280,7 +278,6 @@ console.log("valForm");
 							var errors = valBirthdate(age);
 						}
                         if(pm == 'ivpd'){
-                            console.log("DRIN");
                             var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val()-1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
                             var today = new Date();
                             var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
@@ -295,7 +292,6 @@ console.log("valForm");
 				if((jQuery('div.'+checkedOpt+' .instyle_error').length > 0)){
 					jQuery('.error ul li').remove();
 					jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
-                    console.log(errors);
 					jQuery.each(errors, function(key, value){
 						jQuery('.error ul').append('<li>'+jQuery(value).html()+'</li>');
 					});
@@ -325,7 +321,6 @@ console.log("valForm");
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm(){
-console.log("valGatewayForm");
 	checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
 	var pm = checkedOpt.substr(checkedOpt.indexOf('_')+1);
 
@@ -531,8 +526,6 @@ function valPayolutionDirect() {
         jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
-    console.log("valPayolution");
-    console.log(errors);
     return errors;
 }
 

@@ -1699,8 +1699,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			Shopware()->Template()->addTemplateDir(dirname(__FILE__).'/Views/');
 			$this->View()->back2basket = 1;
-
-			$this->View()->ErrorMessage = $this->getHPErrorMsg(Shopware()->Session()->HPError);
+			$this->View()->ErrorMessage = Shopware()->Session()->HPError;
             $this->View()->sErrorMessage = $this->getHPErrorMsg(Shopware()->Session()->HPError);
 			unset(Shopware()->Session()->HPError);
 		}catch(Exception $e){
@@ -1922,22 +1921,19 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                     $parameters->ACCOUNT_BRAND == 'SANTANDER' ||
                                     $parameters->ACCOUNT_BRAND == 'PAYOLUTION_DIRECT'
                                 ) {
-									$birthdayCmsArray = explode('-', $parameters->NAME_BIRTHDATE);
-									if (!empty($birthdayCmsArray)) {
-										$birthdate['NAME_SALUTATION'] 	= $parameters->NAME_SALUTATION;
-//										$birthdate['day'] 		        = $birthdayCmsArray[2];
-//										$birthdate['month']		        = $birthdayCmsArray[1];
-//										$birthdate['year'] 		        = $birthdayCmsArray[0];
-										$birthdate['NAME_BIRTHDATE']    = $parameters->NAME_BIRTHDATE;
+									$birthdayArray = explode('-', $parameters->NAME_BIRTHDATE);
+									if (!empty($birthdayArray)) {
+										$regDataParams['NAME_SALUTATION'] 	= $parameters->NAME_SALUTATION;
+                                        $regDataParams['NAME_BIRTHDATE']    = $parameters->NAME_BIRTHDATE;
 										if($parameters->ACCOUNT_BRAND == 'SANTANDER'){
-                                            $birthdate['CUSTOMER_OPTIN'] 	                = strtoupper($parameters->CUSTOMER_OPTIN);
-                                            $birthdate['CUSTOMER_ACCEPT_PRIVACY_POLICY'] 	= strtoupper($parameters->CUSTOMER_OPTIN_2);
+                                            $regDataParams['CUSTOMER_OPTIN'] 	                = strtoupper($parameters->CUSTOMER_OPTIN);
+                                            $regDataParams['CUSTOMER_ACCEPT_PRIVACY_POLICY'] 	= strtoupper($parameters->CUSTOMER_OPTIN_2);
                                         }
-										
-										$parametersToSaveCms = json_decode($transaction['jsonresponse'],1);
+
+										$parametersToSave = json_decode($transaction['jsonresponse'],1);
 
 										try{
-											$this->saveRegData($parametersToSaveCms, '', '',$birthdate);
+											$this->saveRegData($parametersToSave, '', '',$regDataParams);
 										} catch (Exception $e){
 											$this->hgw()->Logging('successAction CMS / Santander | saving birthdate to Db failed | '.$e->getMessage());
 										}
@@ -1999,6 +1995,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment,'invoiceSanHeidelpay');
                                     } elseif ($parameters->ACCOUNT_BRAND == "PAYOLUTION_DIRECT") {
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment,'invoiceIvpdHeidelpay');
+                                        /**
+                                         * @todo einbau von Payolution E-Mail
+                                         */
                                     }
                                     else{
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment);

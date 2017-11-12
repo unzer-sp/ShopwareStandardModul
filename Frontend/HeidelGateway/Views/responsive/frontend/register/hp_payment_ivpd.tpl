@@ -4,7 +4,7 @@
             {* Code Sascha *}
             <div>
                 <label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-                {if isset($salutation)}
+                {if isset($salutation_ivpd)}
                     {if ($salutation == "MRS")}
                         <select id="salutation" class="hgw_val_ivpd" name="NAME.SALUTATION">
                             <option value="MR" >{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>

@@ -8,8 +8,8 @@
 		<div class="newreg_{$pm}" id="payType">
 			<div>
 				<label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-                {if isset($salutation)}
-                    {if ($salutation == "MR")}
+                {if isset($salutation_san)}
+                    {if ($salutation_san == "MR")}
 						<select id="salutation" name="NAME.SALUTATION" class="hgw_val_san">
 							<option value="MR" selected="selected">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
 							<option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>

@@ -4,8 +4,8 @@
             {* Code Sascha *}
             <div>
                 <label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-                {if isset($salutation)}
-                    {if ($salutation == "MRS")}
+                {if isset($salutation_ivpd)}
+                    {if ($salutation_ivpd == "MRS")}
                         <select id="salutation" class="hgw_val_ivpd" name="NAME.SALUTATION">
                             <option value="MR" >{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
                             <option value="MRS" selected="selected">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
@@ -28,15 +28,15 @@
             </div>
             <br />
             <label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-            {if isset($birthdate)}
-                {assign var=payment_data value=$birthdate}
+            {if isset($birthdate_ivpd)}
+                {assign var=payment_data value=$birthdate_ivpd}
                 {html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {else}
                 {html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {/if}
 
             {if isset($birthdate)}
-                <input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivpd" value="{$birthdate}">
+                <input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivpd" value="{$birthdate_ivpd}">
             {else}
                 <input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivpd" value="-">
             {/if}

@@ -6,8 +6,8 @@
 		<div class="newreg_{$pm}" id="payType" style="width: 30rem;">
 			<div>
 				<label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-				{if isset($salutation)}
-					{if ($salutation == "MR")}
+				{if isset($salutation_san)}
+					{if ($salutation_san == "MR")}
 						<select id="salutation" name="NAME.SALUTATION">
 							<option value="MR" selected="selected">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
 							<option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
@@ -31,14 +31,14 @@
 				
 			</div>
 			<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-			{if isset($birthdate)}
-				{assign var=payment_data value=$birthdate}
+			{if isset($birthdate_san)}
+				{assign var=payment_data value=$birthdate_san}
 				{html_select_date|utf8_encode time=$payment_data start_year='-18' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 			{else}
 				{html_select_date|utf8_encode start_year='-18' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 			{/if}
-			{if isset($birthdate)}
-				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="{$birthdate}">
+			{if isset($birthdate_san)}
+				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="{$birthdate_san}">
 			{else}
 				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="">
 			{/if}
@@ -78,7 +78,8 @@
 					</p>
 
 				</div>
-			{/if}		
+			{/if}
+			<input type="hidden" name="BRAND" id="handover_brand_san" value="SANTANDER">
 			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 		</div>
 	</div>

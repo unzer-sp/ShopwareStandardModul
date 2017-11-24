@@ -1,7 +1,6 @@
 {block name="hp_payment_papg"}
 	<div class="{$grid} {$classname}" style='background-color: transparent;'>
 		<div class="newreg_{$pm}" id="payType" style="width: 30rem;">
-			{* Code Sascha *}
 			<div>
 				<label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
 				{if isset($salutation)}

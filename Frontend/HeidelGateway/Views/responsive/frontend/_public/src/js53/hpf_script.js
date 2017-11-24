@@ -254,10 +254,10 @@ document.asyncReady(function() {
                         // disable all other input fields
                         jQuery('.payment--method input').attr('disabled', 'disabled');
                         jQuery('.payment--method select').attr('disabled', 'disabled');
-                        // jQuery(checkedOpt).parents('.payment--method').find('input').removeAttr('disabled');
                         jQuery(".hgw_"+activePm).parents('.payment--method').find('input').removeAttr('disabled');
-                        // jQuery(checkedOpt).parents('.payment--method').find('select').removeAttr('disabled');
                         jQuery(".hgw_"+activePm).parents('.payment--method').find('select').removeAttr('disabled');
+                        jQuery(checkedOpt).parents('.payment--method').find('select').removeAttr('disabled');
+                        jQuery(checkedOpt).parents('.payment--method').find('input').removeAttr('disabled');
                         // save the form data in an object
                         // var data = {};
                         var data = new Object();

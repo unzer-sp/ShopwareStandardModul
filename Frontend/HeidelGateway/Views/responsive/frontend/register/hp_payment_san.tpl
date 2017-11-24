@@ -2,26 +2,27 @@
 	<div class="{$grid} {$classname}" style='background-color: transparent;'>
 		<!--<div class="newreg_{$pm}" style="width: 22rem;">-->
 		<!--<div class="newreg_{$pm}" id="payType" style="width: 30rem;">-->
+
 		<!--<img src="{$logoLink}" alt="Santander-Logo">-->
 		<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">
 		<div class="newreg_{$pm}" id="payType">
 			<div>
 				<label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-                {if isset($salutation)}
-                    {if ($salutation == "MR")}
-						<select id="salutation" name="NAME.SALUTATION">
+                {if isset($salutation_san)}
+                    {if ($salutation_san == "MR")}
+						<select id="salutation" name="NAME.SALUTATION" class="hgw_val_san">
 							<option value="MR" selected="selected">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
 							<option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
 						</select><br />
                     {else}
-						<select id="salutation" name="NAME.SALUTATION">
+						<select id="salutation" name="NAME.SALUTATION" class="hgw_val_san">
 							<option value="MR">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
 							<option value="MRS" selected="selected">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
 						</select><br />
                     {/if}	<!-- salutation == mr -->
                 {else}
-					<select id="salutation" class="hgw_required" name="NAME.SALUTATION">
-						<option value="-">{s name='hp_accSal_gender' namespace='frontend/register/hp_payment'}{/s}</option>
+					<select id="salutation" class="hgw_required hgw_val_san" name="NAME.SALUTATION">
+						<option value="UNKNOWN">{s name='hp_accSal_gender' namespace='frontend/register/hp_payment'}{/s}</option>
 						<option value="MR">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
 						<option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
 					</select><br />
@@ -38,8 +39,8 @@
             {*{assign var=payment_data value=$birthdate}*}
             {*{html_select_date|utf8_encode time=$payment_data start_year='-18' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}*}
             {*{else}*}
-            {if isset($birthdate)}
-                {assign var=payment_data value=$birthdate}
+            {if isset($birthdate_san)}
+                {assign var=payment_data value=$birthdate_san}
                 {html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {else}
                 {html_select_date|utf8_encode start_year='-10' end_year='-100' display_days="false" reverse_years='true' day_value_format='%02d' field_order='DMY'}
@@ -89,6 +90,7 @@
 
 				</div>
             {/if}
+			<input type="hidden" name="BRAND" id="handover_brand_san" value="SANTANDER">
 			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 		</div>
 	</div>

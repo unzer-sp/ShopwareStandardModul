@@ -750,7 +750,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 17.11.07 <br />';
+                    $msg .= '* update 17.11.24 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

@@ -133,13 +133,14 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					break;
 			}
 
-            if (isset($trans->uid) && (!empty($trans->uid))) {
-                $transaction = $this->getTransactions($transID, $trans->uid);
+            if (isset($trans->uid) && (!empty($trans->uid)))
+            {
+                $transactions = $this->getTransactions($transID, $trans->uid, $meth);
             } else {
-                $transaction = $this->getTransactions($transID);
+                $transactions = $this->getTransactions($transID,NULL, $meth);
             }
 
-			$data = $transaction[0];
+            $data = $transactions[0];
             $formerPaTransaction = $data;
 
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
@@ -159,23 +160,28 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url;
 			}
 
+            /**
+             * @ToDo Eventuell für IV.RF zuvor aus der IV.PA den Brand laden, da dieser in IV.RC nicht mitgeschickt wird vom Payment
+             * nur dann kann unten stehende Abfrage funktionieren
+             */
+//mail("demo@heidelpay.de","167",print_r($data,1));
             // setting Basket-Id for Payolution
             if(
                 ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
-               // || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
+             || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
             )
             {
-                /**
-                 * @todo Einbau Basket-ApiCall für FN und RV
-                 */
+
+                // call Heidelpay-Basket-Api
                 switch ($data['PAYMENT_CODE'])
                 {
                     case 'IV.FI':
                     case 'IV.RV':
+                    case 'IV.RF': // kann nicht reinlaufen weil bei RC bei Payolution und Santander kein ACCOUNT.BRAND mit geschickt wird
                         // checking if a full reversal sould be done
                         if ($formerPaTransaction['PRESENTATION_AMOUNT'] == $data['PRESENTATION_AMOUNT'])
                         {
-                            // take basket-id from PA-transaction
+                            // take basket-id from PA-transactions
                             $data['BASKET_ID'] = $formerPaTransaction['BASKET_ID'];
                         } else {
                             // fetch all articles for Basket-Api-Call from order
@@ -212,6 +218,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
             }
 
             // deleting unneccessary Data
+            unset($data['IDENTIFICATION_UNIQUEID']);
             unset($data['FRONTEND_RESPONSE_URL']);  unset($data['FRONTEND_CSS_PATH']);          unset($data['ACCOUNT_NUMBER']);
             unset($data['CRITERION_DBONRG']);       unset($data['CRITERION_SHIPPAY']);          unset($data['CRITERION_GATEWAY']);
             unset($data['CRITERION_WALLET']);       unset($data['CRITERION_WALLET_PAYNAME']);   unset($data['CUSTOMER_OPTIN']);
@@ -257,78 +264,106 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 		}
 	}
 
-	/*
+    /*
 	 * Method to get all transaction with the same IDENTIFICATION_TRANSACTIONID
 	 * if second pram is set, the method returns just the selected transaction
 	 * @param string $transID
 	 * @param string $uiD
 	 * @return array $transactions
 	 */
-	public function getTransactions($transID, $uid = NULL){
-		try{
-			$table = $this->FrontendConfigHGW()->HGW_SECURITY_SENDER;
+    public function getTransactions($transID, $uid = NULL, $method = NULL){
+        try{
+            $table = $this->FrontendConfigHGW()->HGW_SECURITY_SENDER;
 
-			// check new DB-Table for transactions
-			$sql = '
-				SELECT `jsonresponse` FROM `s_plugin_hgw_transactions`
-				WHERE `transactionid` = ?
-			';
-			$params[] = $transID;
-				
-			if(($uid != NULL) && ($uid != '')){
-				$sql .= 'AND `uniqueid` = ?';
-				$params[] = $uid;
-			}
-			$sql .= 'ORDER BY `datetime` DESC';
-				
-			try{
-				$data = Shopware()->Db()->fetchAll($sql, $params);
-				// check old DB-Table for transactions
-				unset($params);
+            // check new DB-Table for transactions
 
-				$sql = 'SHOW TABLES LIKE "'.$table.'"';
-				$check = Shopware()->Db()->fetchAll($sql);
-				if(!empty($check)){
-					$sql = '
+            $sql = '';
+            $params[] = $transID;
+
+            /* ********************* neuer Code ********************* */
+            switch ($method)
+            {
+                case 'rf':
+                    $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ? '
+                        .'AND `payment_type` = "RC" '
+                        .'OR `payment_type` = "DB" '
+                        .'OR `payment_type` = "CP" '
+                        .'OR `payment_type` = "RB" ';
+                    if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `uniqueid` = ?';
+                        $params[] = $uid;
+                    }
+                    $sql .= 'ORDER BY `datetime` DESC';
+
+                    break;
+                case 'rv':
+                    $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ?'
+                        .'AND `payment_type` = "PA" ';
+                    if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `uniqueid` = ?';
+                        $params[] = $uid;
+                    }
+                    $sql .= 'ORDER BY `datetime` DESC';
+                    break;
+                default:
+                    $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ?';
+                    if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `uniqueid` = ?';
+                        $params[] = $uid;
+                    }
+                    $sql .= 'ORDER BY `datetime` DESC';
+                    break;
+            }
+            /* ********************* Ende neuer Code ********************* */
+
+            try{
+                $data = Shopware()->Db()->fetchAll($sql, $params);
+                // check old DB-Table for transactions
+                unset($params);
+
+                $sql = 'SHOW TABLES LIKE "'.$table.'"';
+                $check = Shopware()->Db()->fetchAll($sql);
+                if(!empty($check)){
+                    $sql = '
 						SELECT `SERIAL` FROM '.$table.'
 						WHERE `IDENTIFICATION_TRANSACTIONID` = ?
 					';
-					$params[] = $transID;
-					if(($uid != NULL) && ($uid != '')){
-						$sql .= 'AND `IDENTIFICATION_UNIQUEID` = ?';
-						$params[] = $uid;
-					}
-					$sql .= 'ORDER BY `created` DESC';
-					$data = array_merge($data, Shopware()->Db()->fetchAll($sql, $params));
-				}
-			}catch(Exception $e){
-				if(count($data) == '0'){
-					Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
-					return $transactions;
-				}
-			}
-				
-			foreach($data as $key => $value){
-				if(isset($value['jsonresponse'])){
-					$transactions[] = json_decode($value['jsonresponse'], true);
-				}elseif(isset($value['SERIAL'])){
-					$transactions[] = unserialize($value['SERIAL']);
-				}
-			}
+                    $params[] = $transID;
+                    if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `IDENTIFICATION_UNIQUEID` = ?';
+                        $params[] = $uid;
+                    }
+                    $sql .= 'ORDER BY `created` DESC';
+                    $data = array_merge($data, Shopware()->Db()->fetchAll($sql, $params));
+                }
+            }catch(Exception $e){
+                if(count($data) == '0'){
+                    Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
+//                    return $transactions;
+                    return $data;
+                }
+            }
 
-			foreach($transactions as $tKey => $transaction){
-				foreach($transaction as $transKey => $transVal){
-					$transaction[$transKey] = urldecode($transVal);
-				}
-				$transactions[$tKey] = $transaction;
-			}
+            foreach($data as $key => $value){
+                if(isset($value['jsonresponse'])){
+                    $transactions[] = json_decode($value['jsonresponse'], true);
+                }elseif(isset($value['SERIAL'])){
+                    $transactions[] = unserialize($value['SERIAL']);
+                }
+            }
 
-			return $transactions;
-		}catch(Exception $e){
-			Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
-			return;
-		}
-	}
+            foreach($transactions as $tKey => $transaction){
+                foreach($transaction as $transKey => $transVal){
+                    $transaction[$transKey] = urldecode($transVal);
+                }
+                $transactions[$tKey] = $transaction;
+            }
+            return $transactions;
+        }catch(Exception $e){
+            Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
+            return;
+        }
+    }
 
 	/*
 	 * Method to generate the html code for the transaction buttons
@@ -435,7 +470,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 
                                     if (
                                     $ivpd
-//                                || $san
+                                || $san
                                     ) {
                                         $btns['fi']['active'] = $btns['rv']['active'] = 'false';
                                         $btns['rf']['active'] = 'true';
@@ -531,8 +566,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					if($papg)   { $payName = 'papg'; $papg = false; }
 					if($san)    { $payName = 'san'; $san = false; }
 					if($ivpd)   { $payName = 'ivpd'; $ivpd = false; }
-//					if($payName == 'san'){ $payName = 'iv'; unset($san); }
-//					if($payName == 'ivpd'){ $payName = 'iv'; unset($ivpd); }
 				}
 
 				$btns['rf']['trans'][0]['maxRf'] = number_format($maxRf, 2,'.','');
@@ -847,7 +880,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 	}
 
     /** fetchOrderByUniqueId()
-     * fetches the id from datatable s_order for a specific temporaryId / UiniqueId
+     * fetches the id from datatable s_order for a specific temporaryId / UniqueId
      * @param $identificationUniqueId
      * @return array
      */

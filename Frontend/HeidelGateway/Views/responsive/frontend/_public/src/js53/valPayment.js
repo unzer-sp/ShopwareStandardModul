@@ -37,6 +37,7 @@ document.asyncReady(function () {
                 $.ajaxSetup({
                     beforeSend: function (event, xhr, settings) {
                         // check for right ajax request
+
                         if (xhr.data != undefined) {
                             // just execute if hgw pay. method is selected
                             if (clicked.indexOf('hgw_') != -1) {
@@ -62,7 +63,6 @@ document.asyncReady(function () {
                         //     $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
                         // }
                     }
-
                     /* ********************* */
                     // function set birthdate for santander
                     if(jQuery('.newreg_san').is(":visible")) {
@@ -108,7 +108,6 @@ document.asyncReady(function () {
 
                         // just call changeUrl() after all animations are done
                         $(document).promise().done(function () {
-                            // $(document).ready(function(){
                             document.asyncReady(function () {
                                 // $(document).reuse();
                                 // $(document).ibanCheck();
@@ -135,7 +134,6 @@ document.asyncReady(function () {
 
         // Function to set Birthdate in hidden field for Chrome on mac
         jQuery("input[type='submit'], .right").click(function (e) {
-
             var pm = $('input:radio:checked').attr('class');
 
             if(pm != undefined) {
@@ -195,6 +193,11 @@ document.asyncReady(function () {
 
                         return false;
                     }
+                }else {
+                    $(".newreg_ivpd #handover_brand_ivpd").attr('disabled', 'disabled');
+                    $(".newreg_ivpd .js--fancy-select").attr('disabled', 'disabled');
+                    $("#birthdate_ivpd").attr('disabled', 'disabled');
+                    $(".hgw_val_ivpd #salutation").attr('disabled', 'disabled');
                 }
             }
 
@@ -206,8 +209,7 @@ document.asyncReady(function () {
                 pm = jQuery("#payType").attr("class");
                 pm = pm.substr(7);
 
-
-                if (jQuery(".newreg_" + pm) > 0) {
+                if (jQuery(".newreg_" + pm).is(":visible")) {
                     birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
                     birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
                     birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
@@ -228,26 +230,37 @@ document.asyncReady(function () {
                     $(".hgw_required").attr("required", "required");
                 }
             } else {
-                pm = jQuery("#payType").attr("class");
-                if (pm != undefined) {
-                    pm = pm.substr(7);
-                    if (pm != "san") {
-                        $(".hgw_required").removeAttr("required");
-                        $("#handover_brand_san").attr('disabled', 'disabled');
-                    } else {
-                        $(".hgw_required").attr("required", "required");
-                    }
+                var cssClasses = jQuery('input:radio:checked').attr('class');
+                if (cssClasses != undefined)
+                {
+                    var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
+                    pm = cssClasses.substring(indexOfHgw+4);
 
-                    if(pm != "ivpd"){
-                        $(".newreg_ivpd #handover_brand_ivpd").attr('disabled', 'disabled');
-                        $(".newreg_ivpd .js--fancy-select").attr('disabled', 'disabled');
-                        $(".newreg_ivpd .hgw_val_ivpd").attr('disabled', 'disabled');
-                        $(".newreg_ivpd #birthdate_ivpd").attr('disabled', 'disabled');
+                    if (pm != undefined) {
+                        //pm = pm.substr(7);
+                        if (pm != "san") {
+                            $(".hgw_required").removeAttr("required");
+                            $("#handover_brand_san").attr('disabled', 'disabled');
+                        } else {
+                            $(".hgw_required").attr("required", "required");
+                        }
+
+                        if(pm != "ivpd"){
+                            $(".newreg_ivpd #handover_brand_ivpd").attr('disabled', 'disabled');
+                            $(".newreg_ivpd .js--fancy-select").attr('disabled', 'disabled');
+                            $(".newreg_ivpd .hgw_val_ivpd").attr('disabled', 'disabled');
+                            $(".newreg_ivpd #birthdate_ivpd").attr('disabled', 'disabled');
+                        }
                     }
                 }
-
             }
-        });
+
+            // disable all other input fields
+            jQuery('.payment--method input').attr('disabled', 'disabled');
+            jQuery('.payment--method select').attr('disabled', 'disabled');
+            jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
+            jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+        }); // Ende input:submitt:right
 
         jQuery('.newreg_papg').click(function (e) {
 
@@ -351,201 +364,212 @@ document.asyncReady(function () {
 
                 jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             }
+            // getting PaymentMetod
+            var cssClasses = jQuery('input:radio:checked').attr('class');
+            if (cssClasses != undefined) {
+                var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
+                pm = cssClasses.substring(indexOfHgw + 4);
 
+                // disable all other input fields
+                jQuery('.payment--method input').attr('disabled', 'disabled');
+                jQuery('.payment--method select').attr('disabled', 'disabled');
+                jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
+                jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+            }
         }); // ende ajaxComplete
     } else { // if SW-Version <= 5.2
 
-        var orgLink = jQuery('form.payment').attr('action');
-        // SELECT PAYMENT
-        if (window.location.pathname.indexOf('gateway') == '-1') {
-            // save original form action
-            var orgLink = jQuery('form.payment').attr('action');
-            if (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1') {
-                $(document).reuse();
-
-                // change checked option
-                jQuery('.register--payment').click(function () {
-                    // change form action
-                    var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
-                    changeUrl(checkedOpt, orgLink);
-                });
-            } else {
-                var clicked = '';
-                $(this).click(function (e) {
-                    clicked = e.target.className;
-                });
-
-                jQuery('.payment--method-list').click(function () {
-                    // change form action
-                    var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
-                    changeUrl(checkedOpt, orgLink);
-
-                });
-
-                // set original form action (before AJAX is sent)
-                $.ajaxSetup({
-                    beforeSend: function (event, xhr, settings) {
-
-                        // check for right ajax request
-                        if (xhr.data != undefined) {
-                            // just execute if hgw pay. method is selected
-                            if (clicked.indexOf('hgw_') != -1) {
-                                xhr.data += '&hgw=1';
-
-                                if (this.url != orgLink) {
-                                    this.url = orgLink;
-                                    jQuery('form.payment').attr('action', orgLink);
-                                }
-                            }
-                        }
-                    },
-                });
-
-                $(document).ajaxComplete(function (event, xhr, settings) {
-                    if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
-                        // load fancy-js for select boxes
-                        if (swVersion >= '5.1') {
-                            jQuery('select:not([data-no-fancy-select="true"])').swSelectboxReplacement();
-                        } else {
-                            jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
-                        }
-
-                        // set width for XS-State (with SW-Statemanger)
-                        StateManager.registerListener({
-                            state: 'xs',
-                            enter: function () {
-                                jQuery('.js--fancy-select').attr('style', 'width:100%;');
-                            },
-                            exit: function () {
-                                jQuery('.js--fancy-select').removeAttr('style');
-                            }
-                        });
-                        // add validation for form
-                        jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
-                        // just call changeUrl() after all animations are done
-                        $(document).promise().done(function () {
-                            // $(document).ready(function(){
-                            document.asyncReady(function () {
-                                var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
-                                $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function () {
-                                    // change form action
-                                    changeUrl(checkedOpt, orgLink);
-                                });
-                                if (checkedOpt.indexOf('papg') != '-1') {
-                                    // change form action
-                                    changeUrl(checkedOpt, orgLink);
-                                }
-
-                                if (checkedOpt.indexOf('san') != '-1') {
-                                    // change form action
-                                    changeUrl(checkedOpt, orgLink);
-                                }
-
-                                if (checkedOpt.indexOf('ivpd') != '-1') {
-                                    // change form action
-                                    changeUrl(checkedOpt, orgLink);
-                                }
-                            });
-                        });
-                    }
-                });
-            }
-        }
-
-        //Function to set Birthdate in hidden field for Chrome on mac
-        jQuery("input[type='submit'], .right").click(function (e) {
-            //jQuery(".content--wrapper").click(function(e){
-            if (jQuery("input[type='submit'], .right").val() == "Weiter") {
-                var birthDay = null;
-                var birthMonth = null;
-                var birthYear = null;
-                var pm = null;
-                pm = jQuery("#payType").attr("class");
-                pm = pm.substr(7);
-
-                if (jQuery(".newreg_" + pm) > 0) {
-                    birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
-                    birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                    birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
-                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                }
-
-                if (birthYear == null) {
-                    jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
-                    var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
-                    var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                    var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
-                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                }
-            }
-        });
-
-        jQuery('.newreg_dd').click(function (e) {
-
-            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
-
-            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        });
-
-        if (jQuery('.newreg_dd')) {
-            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
-
-            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        }
-
-        jQuery('.newreg_san').click(function (e) {
-
-            var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-
-            jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        });
-
-        if (jQuery('.newreg_san')) {
-            var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-
-            jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        }
-
-        jQuery('.newreg_papg').click(function (e) {
-
-            var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
-
-            jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        });
-
-        if (jQuery('.newreg_papg')) {
-            var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
-
-            jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        }
-
-        jQuery('.newreg_ivpd').click(function (e) {
-
-            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
-
-            jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        });
-
-        if (jQuery('.newreg_ivpd')) {
-            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
-            jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-        }
+    //     var orgLink = jQuery('form.payment').attr('action');
+    //     // SELECT PAYMENT
+    //     if (window.location.pathname.indexOf('gateway') == '-1') {
+    //         // save original form action
+    //         var orgLink = jQuery('form.payment').attr('action');
+    //         if (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1') {
+    //             $(document).reuse();
+    //
+    //             // change checked option
+    //             jQuery('.register--payment').click(function () {
+    //                 // change form action
+    //                 var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
+    //                 changeUrl(checkedOpt, orgLink);
+    //             });
+    //         } else {
+    //             var clicked = '';
+    //             $(this).click(function (e) {
+    //                 clicked = e.target.className;
+    //             });
+    //
+    //             jQuery('.payment--method-list').click(function () {
+    //                 // change form action
+    //                 var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
+    //                 changeUrl(checkedOpt, orgLink);
+    //
+    //             });
+    //
+    //             // set original form action (before AJAX is sent)
+    //             $.ajaxSetup({
+    //                 beforeSend: function (event, xhr, settings) {
+    //
+    //                     // check for right ajax request
+    //                     if (xhr.data != undefined) {
+    //                         // just execute if hgw pay. method is selected
+    //                         if (clicked.indexOf('hgw_') != -1) {
+    //                             xhr.data += '&hgw=1';
+    //
+    //                             if (this.url != orgLink) {
+    //                                 this.url = orgLink;
+    //                                 jQuery('form.payment').attr('action', orgLink);
+    //                             }
+    //                         }
+    //                     }
+    //                 },
+    //             });
+    //
+    //             $(document).ajaxComplete(function (event, xhr, settings) {
+    //                 if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
+    //                     // load fancy-js for select boxes
+    //                     if (swVersion >= '5.1') {
+    //                         jQuery('select:not([data-no-fancy-select="true"])').swSelectboxReplacement();
+    //                     } else {
+    //                         jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
+    //                     }
+    //
+    //                     // set width for XS-State (with SW-Statemanger)
+    //                     StateManager.registerListener({
+    //                         state: 'xs',
+    //                         enter: function () {
+    //                             jQuery('.js--fancy-select').attr('style', 'width:100%;');
+    //                         },
+    //                         exit: function () {
+    //                             jQuery('.js--fancy-select').removeAttr('style');
+    //                         }
+    //                     });
+    //                     // add validation for form
+    //                     jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
+    //                     // just call changeUrl() after all animations are done
+    //                     $(document).promise().done(function () {
+    //                         // $(document).ready(function(){
+    //                         document.asyncReady(function () {
+    //                             var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
+    //                             $('input[class*="reues"]:checkbox, input[name*="ACCOUNT"], select[name*="ACCOUNT"], input[name*="CONTACT"]').click(function () {
+    //                                 // change form action
+    //                                 changeUrl(checkedOpt, orgLink);
+    //                             });
+    //                             if (checkedOpt.indexOf('papg') != '-1') {
+    //                                 // change form action
+    //                                 changeUrl(checkedOpt, orgLink);
+    //                             }
+    //
+    //                             if (checkedOpt.indexOf('san') != '-1') {
+    //                                 // change form action
+    //                                 changeUrl(checkedOpt, orgLink);
+    //                             }
+    //
+    //                             if (checkedOpt.indexOf('ivpd') != '-1') {
+    //                                 // change form action
+    //                                 changeUrl(checkedOpt, orgLink);
+    //                             }
+    //                         });
+    //                     });
+    //                 }
+    //             });
+    //         }
+    //     }
+    //
+    //     //Function to set Birthdate in hidden field for Chrome on mac
+    //     jQuery("input[type='submit'], .right").click(function (e) {
+    //         //jQuery(".content--wrapper").click(function(e){
+    //         if (jQuery("input[type='submit'], .right").val() == "Weiter") {
+    //             var birthDay = null;
+    //             var birthMonth = null;
+    //             var birthYear = null;
+    //             var pm = null;
+    //             pm = jQuery("#payType").attr("class");
+    //             pm = pm.substr(7);
+    //
+    //             if (jQuery(".newreg_" + pm) > 0) {
+    //                 birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
+    //                 birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+    //                 birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
+    //                 jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //             }
+    //
+    //             if (birthYear == null) {
+    //                 jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
+    //                 var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
+    //                 var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+    //                 var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
+    //                 jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //             }
+    //         }
+    //     });
+    //
+    //     jQuery('.newreg_dd').click(function (e) {
+    //
+    //         var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+    //
+    //         jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     });
+    //
+    //     if (jQuery('.newreg_dd')) {
+    //         var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+    //
+    //         jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     }
+    //
+    //     jQuery('.newreg_san').click(function (e) {
+    //
+    //         var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+    //
+    //         jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     });
+    //
+    //     if (jQuery('.newreg_san')) {
+    //         var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+    //
+    //         jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     }
+    //
+    //     jQuery('.newreg_papg').click(function (e) {
+    //
+    //         var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
+    //
+    //         jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     });
+    //
+    //     if (jQuery('.newreg_papg')) {
+    //         var birthDay = jQuery(".newreg_papg [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_papg [name = 'Date_Year']").val();
+    //
+    //         jQuery('#birthdate_papg').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     }
+    //
+    //     jQuery('.newreg_ivpd').click(function (e) {
+    //
+    //         var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+    //
+    //         jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     });
+    //
+    //     if (jQuery('.newreg_ivpd')) {
+    //         var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+    //         var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+    //         var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+    //         jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //     }
     }
 });
 
@@ -937,7 +961,6 @@ function valSantander() {
         $(".hgw_san #hgw_privacyPolicy").attr("required","required");
 
         errors[i++] = '.msg_cb';
-        $('.hgw_san #hgw_privacyPolicy').attr("required","required");
     }
     return errors;
 }
@@ -981,7 +1004,61 @@ function valPayolutionDirect() {
         jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
         errors[i++] = '.msg_dob';
     }
+
+    //validation of Phonenumber for NL-Customers
+    if($("#phone_ivpd").is(":visible"))
+    {
+        var phoneNumber = $("#phone_ivpd").val();
+        if (valPhoneNumber(phoneNumber) != false) {
+            $("#phone_ivpd").val(valPhoneNumber(phoneNumber));
+            jQuery('.hgw_ivpd .register--phone').removeClass('has--error');
+        } else {
+            errors[i++] = '.msg_phone';
+            jQuery('.hgw_ivpd #phone_ivpd').addClass('has--error');
+        }
+    }
+
     return errors;
+}
+
+/**
+ * valPhoneNumber
+ * in case of valid Number this functins returns a cleaned telephonenumber in format 004912345678
+ * @param telephoneNumber
+ * @return bool
+ */
+function valPhoneNumber(telephoneNumber) {
+    // checks weather function gets a phonenumber
+    if (telephoneNumber.length === 0) {
+        return false;
+    } else {
+        //preparing phonenumber-string to check it
+        //removes all Whitespaces in telephonenumber
+        var regEx = / /g;
+        var cleanedPhoneNumber = telephoneNumber.replace(regEx, "");
+        //removes all "+" in telephonenumber
+        regEx = /\+/g;
+        cleanedPhoneNumber = cleanedPhoneNumber.replace(regEx, "00");
+        //removes all "/" in telephonenumber
+        regEx = /\//g;
+        cleanedPhoneNumber = cleanedPhoneNumber.replace(regEx, "");
+        //removes all "-" in telephonenumber
+        regEx = /\-/g;
+        cleanedPhoneNumber = cleanedPhoneNumber.replace(regEx, "");
+        //removes all "(" in telephonenumber
+        regEx = /\(/g;
+        cleanedPhoneNumber = cleanedPhoneNumber.replace(regEx, "");
+        //removes all ")" in telephonenumber
+        regEx = /\)/g;
+        cleanedPhoneNumber = cleanedPhoneNumber.replace(regEx, "");
+
+        if (cleanedPhoneNumber.match(/[0-9]{6,20}/)) {
+            return cleanedPhoneNumber;
+        } else {
+            return false;
+        }
+    }
+
 }
 
 

@@ -948,5 +948,6 @@ function valPayolutionDirect() {
         jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
         errors[i++] = '.msg_dob';
     }
+
     return errors;
 }

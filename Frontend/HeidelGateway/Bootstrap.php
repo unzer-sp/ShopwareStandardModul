@@ -689,6 +689,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '17.09.19':
+            case '17.09.25':
                 // Compatibility for Shopware 4.3.6 - 5.3.3
                 // Some changes in Js
                 try {
@@ -707,6 +708,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
+
             case '17.10.10':
                 // updatefix 17.09.19
                 try {
@@ -765,7 +767,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				'success' => true,
 				'message' => $msg,
 				'invalidateCache' => array('frontend'),
-
 		);
 	}
 
@@ -1940,6 +1941,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $contactPhone       = $request->getPost('CONTACT_PHONE') == true ? htmlspecialchars($request->getPost('CONTACT_PHONE'), $flag, $enc) : '';
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
+
                     // Benoetigte User-Indexe bei SW.516 anders vergeben
                     $user = self::formatUserInfos($user);
 

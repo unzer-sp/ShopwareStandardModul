@@ -48,9 +48,9 @@
 				{if isset($regData)}
 					<!--{assign var=payment_data value=$regData|json_decode:1}-->
 					{assign var=birthdate value=$regData}
-					{html_select_date|utf8_encode time=$birthdate.birthdate.formatted start_year='-18' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
+					{html_select_date|utf8_encode time=$birthdate.birthdate.formatted start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 				{else}
-					{html_select_date|utf8_encode start_year='-18' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
+					{html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 				{/if}
 				<input type="hidden" id="birthdate_dd" value="" name="NAME.BIRTHDATE">
 			</div>

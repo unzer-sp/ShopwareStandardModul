@@ -30,7 +30,7 @@
 				{assign var=payment_data value=$birthdate}
 				{html_select_date|utf8_encode time=$payment_data start_year='-18' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 			{else}
-				{html_select_date|utf8_encode start_year='-18' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
+				{html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 			{/if}
 			{if isset($formUrl)}
 				<input type="hidden" class="formUrl" value="{$formUrl['papg']}">

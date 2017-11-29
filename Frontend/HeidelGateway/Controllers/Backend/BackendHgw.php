@@ -164,7 +164,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
              * @ToDo Eventuell für IV.RF zuvor aus der IV.PA den Brand laden, da dieser in IV.RC nicht mitgeschickt wird vom Payment
              * nur dann kann unten stehende Abfrage funktionieren
              */
-//mail("demo@heidelpay.de","167",print_r($data,1));
+
             // setting Basket-Id for Payolution
             if(
                 ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
@@ -178,12 +178,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                     case 'IV.FI':
                     case 'IV.RV':
                     case 'IV.RF': // kann nicht reinlaufen weil bei RC bei Payolution und Santander kein ACCOUNT.BRAND mit geschickt wird
-                        // checking if a full reversal sould be done
-                        if ($formerPaTransaction['PRESENTATION_AMOUNT'] == $data['PRESENTATION_AMOUNT'])
-                        {
-                            // take basket-id from PA-transactions
-                            $data['BASKET_ID'] = $formerPaTransaction['BASKET_ID'];
-                        } else {
                             // fetch all articles for Basket-Api-Call from order
                             $orderDetails = $this->fetchOrderDetailsByUniqueId($data['IDENTIFICATION_UNIQUEID']);
 
@@ -210,7 +204,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                             {
                                 $data['BASKET_ID'] = $response['basketId'];
                             }
-                        }
                         break;
                     default:
                         break;

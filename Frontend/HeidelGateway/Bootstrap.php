@@ -729,10 +729,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '17.10.26':
             case '17.11.07':
             case '17.11.08':
-            case '17.11.24':
+            case '17.11.28':
                 // resolves a problem while generating Santander-PDF-invoice
                 // Introducing Paymentmethod "Payolution direct"
                 // fixes Errors with SW 5.3.4 jQueryAsync-Functionality
+                // adding phonenumber to each payment request if available
                 try{
                     $this->addSnippets();
                     $this->createPayments();
@@ -752,20 +753,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 17.11.24 <br />';
+                    $msg .= '* update 17.11.28 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
-                }
-
-            case '17.11.25':
-            case '17.11.26':
-            case '17.11.28':
-                // adding E-Mail to Payolution for Orderconfirmation
-                // adding phonenumber to each payment request if available
-                try {
-                    $this->createEvents();
-                } catch (Exception $e) {
-                    $this->logError($msg,$e);
                 }
 
     		// overwrite $msg if update was successful

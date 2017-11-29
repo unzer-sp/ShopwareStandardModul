@@ -757,7 +757,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-
+            case '17.11.27':
+                //adding phone number to all requests
+                try {
+                    $msg .= '* update 17.11.27 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}
@@ -2732,7 +2738,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$ppd_user['ADDRESS.STREET'] 	.= $user['shippingaddress']['streetnumber'] != '' ? $user['shippingaddress']['streetnumber'] : $user['billingaddress']['streetnumber'];
 					$ppd_user['ADDRESS.ZIP'] 		= $user['shippingaddress']['zipcode'] != '' ? $user['shippingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
 					$ppd_user['ADDRESS.CITY'] 		= $user['shippingaddress']['city'] != '' ? $user['shippingaddress']['city'] : $user['billingaddress']['city'];
-                    $ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
+          $ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
+
 				}else{
 					$countryInfo = Shopware()->Modules()->Admin()->sGetCountry($user['billingaddress']['countryID']);
 					if (strtoupper($user['billingaddress']['salutation']) == 'MS') {
@@ -2746,7 +2753,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
 					$ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
 					$ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
-                    $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
+          $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
 
 					if($pm == 'san' || $pm == 'ivpd')
 					{
@@ -2758,7 +2765,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $countryInfo = Shopware()->Modules()->Admin()->sGetCountry($countryId);
 
                         $ppd_user['CRITERION.USER_ID']	= $user['additional']['user']['userID'];
-                        $ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
+                        $ppd_us er['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
                         $ppd_user['NAME.GIVEN']			= $user['shippingaddress']['firstname'] != '' ? $user['shippingaddress']['firstname'] : $user['billingaddress']['firstname'];
                         $ppd_user['NAME.FAMILY']		= $user['shippingaddress']['lastname'] != '' ? $user['shippingaddress']['lastname'] : $user['billingaddress']['lastname'];
                         $ppd_user['ADDRESS.STREET'] 	= $user['shippingaddress']['street'] != '' ? $user['shippingaddress']['street'] : $user['billingaddress']['street'];

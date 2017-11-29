@@ -22,10 +22,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 	/**
 	 * Method to return Versionnumber
-	 * @return string version numberf
+	 * @return string version number
 	 */
 	public function getVersion(){
-		return '17.11.27';
+		return '17.11.28';
 	}
 
 	/**
@@ -729,10 +729,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '17.10.26':
             case '17.11.07':
             case '17.11.08':
-            case '17.11.24':
+            case '17.11.28':
                 // resolves a problem while generating Santander-PDF-invoice
                 // Introducing Paymentmethod "Payolution direct"
                 // fixes Errors with SW 5.3.4 jQueryAsync-Functionality
+                // adding phonenumber to each payment request if available
                 try{
                     $this->addSnippets();
                     $this->createPayments();
@@ -752,7 +753,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 17.11.24 <br />';
+                    $msg .= '* update 17.11.28 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -961,6 +962,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'Theme_Compiler_Collect_Plugin_Less',
 					'addLessFiles'
 					);
+
             // Register your custom JS files, so that they are processed into JS and included in the module template (SW5)
 //            $this->subscribeEvent(
 //                'Theme_Compiler_Collect_Plugin_Javascript',
@@ -1685,7 +1687,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * Event for custom code
 	 */
 	public function onPostDispatch(Enlight_Event_EventArgs $args){
-
 		$request = $args->getSubject()->Request();
 		$response = $args->getSubject()->Response();
 		$config = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
@@ -2738,6 +2739,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$ppd_user['ADDRESS.ZIP'] 		= $user['shippingaddress']['zipcode'] != '' ? $user['shippingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
 					$ppd_user['ADDRESS.CITY'] 		= $user['shippingaddress']['city'] != '' ? $user['shippingaddress']['city'] : $user['billingaddress']['city'];
           $ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
+
 				}else{
 					$countryInfo = Shopware()->Modules()->Admin()->sGetCountry($user['billingaddress']['countryID']);
 					if (strtoupper($user['billingaddress']['salutation']) == 'MS') {

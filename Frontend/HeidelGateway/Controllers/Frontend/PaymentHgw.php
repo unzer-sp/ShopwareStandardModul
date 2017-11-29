@@ -1937,10 +1937,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                     if($parameters->ACCOUNT_BRAND == "SANTANDER"){
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment,'invoiceSanHeidelpay');
                                     } elseif ($parameters->ACCOUNT_BRAND == "PAYOLUTION_DIRECT") {
+                                        // send E-Mail to customer
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment,'invoiceIvpdHeidelpay');
-                                        /**
-                                         * @todo einbau von Payolution E-Mail
-                                         */
+                                        // send E-Mail to Payolution-E-Mail-Adress
                                     }
                                     else{
                                         $this->prepaymentMail($orderNum['ordernumber'], $user['additional']['user']['email'], $prepayment);

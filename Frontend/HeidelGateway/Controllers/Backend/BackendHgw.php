@@ -164,7 +164,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
              * @ToDo Eventuell für IV.RF zuvor aus der IV.PA den Brand laden, da dieser in IV.RC nicht mitgeschickt wird vom Payment
              * nur dann kann unten stehende Abfrage funktionieren
              */
-//mail("demo@heidelpay.de","167",print_r($data,1));
+
             // setting Basket-Id for Payolution
             if(
                 ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
@@ -243,7 +243,10 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$sql .= 'SET `Request` = ? WHERE `temporaryID` = ?';
 				Shopware()->Db()->query($sql, array(serialize($resp), $resp['IDENTIFICATION_TRANSACTIONID']));
 			}
-				
+
+            /**
+             * @todo ggf Einbau Aenderung Bezahlstatus an Bestellung
+             */
 			$transactions = $this->getTransactions($transID);
 			$transTable = $this->getTransTable($transactions, $beLocaleId, true);
 			$retArr['transTable'] = $transTable;

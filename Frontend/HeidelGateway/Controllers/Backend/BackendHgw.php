@@ -243,7 +243,10 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$sql .= 'SET `Request` = ? WHERE `temporaryID` = ?';
 				Shopware()->Db()->query($sql, array(serialize($resp), $resp['IDENTIFICATION_TRANSACTIONID']));
 			}
-				
+
+            /**
+             * @todo ggf Einbau Aenderung Bezahlstatus an Bestellung
+             */
 			$transactions = $this->getTransactions($transID);
 			$transTable = $this->getTransTable($transactions, $beLocaleId, true);
 			$retArr['transTable'] = $transTable;

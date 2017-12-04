@@ -3801,7 +3801,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$prms_subject 	= 'Zahldaten zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
 			$prms_content 	= 'Sehr geehrter Kunde,
 
-vielen Dank fuer Ihre Bestellung in userem Shop.
+vielen Dank fuer Ihre Bestellung in unserem Shop.
 
 Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.
 
@@ -3822,7 +3822,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
 			$prms_ishtml 		= 1;
 			$prms_attachment 	= '';
 			$prms_mailtype 		= 1;
@@ -3855,7 +3855,7 @@ Mit freundlichen Gruessen
             $prms_subject 	= 'Zahldaten zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
             $prms_content 	= 'Sehr geehrter Kunde,
 
-vielen Dank fuer Ihre Bestellung in userem Shop.
+vielen Dank fuer Ihre Bestellung in unserem Shop.
 
 Bitte nutzen Sie zum Bezahlen Ihrer Bestellung folgende Bezahldaten.
 
@@ -3877,7 +3877,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
             $prms_ishtml 		= 1;
             $prms_attachment 	= '';
             $prms_mailtype 		= 1;
@@ -3910,7 +3910,7 @@ Mit freundlichen Gruessen
             $prms_subject 	= 'Zahldaten zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
             $prms_content 	= 'Sehr geehrter Kunde,
 
-vielen Dank fuer Ihre Bestellung in userem Shop.
+vielen Dank fuer Ihre Bestellung in unserem Shop.
 
 Bitte nutzen Sie zum Bezahlen Ihrer Bestellung folgende Bezahldaten.
 
@@ -3929,7 +3929,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$CONNECTOR_ACCOUNT_USAGE}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$CONNECTOR_ACCOUNT_USAGE}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
             $prms_ishtml 		= 1;
             $prms_attachment 	= '';
             $prms_mailtype 		= 1;
@@ -3962,7 +3962,7 @@ Mit freundlichen Gruessen
 			$prms_subject 			= 'Barcode Download zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
 			$prms_content 			= 'Sehr geehrter Kunde,
 
-vielen Dank fuer Ihre Bestellung in userem Shop.
+vielen Dank fuer Ihre Bestellung in unserem Shop.
 
 Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgenden Barcode.
 
@@ -3983,7 +3983,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgenden Barcode.<br/><br/><a href"{$CRITERION_BARPAY_PAYCODE_URL}" target="_blank">{$CRITERION_BARPAY_PAYCODE_URL}</a><br/><br/><p>Drucken Sie den Barcode aus oder speichern Sie diesen auf Ihrem mobilen Endger&auml;t.</p><p>Gehen Sie nun zu einer Kasse der <b>18.000 Akzeptanzstellen in Deutschland</b> undbezahlen Sie ganz einfach in bar. </p><p>In dem Augenblick, wenn der Rechnungsbetrag beglichen wird, erh&auml;lt der Online-H&auml;ndler die Information &uuml;ber den Zahlungseingang. Die bestellte Ware oder Dienstleistung geht umgehend in den Versand.</p><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgenden Barcode.<br/><br/><a href"{$CRITERION_BARPAY_PAYCODE_URL}" target="_blank">{$CRITERION_BARPAY_PAYCODE_URL}</a><br/><br/><p>Drucken Sie den Barcode aus oder speichern Sie diesen auf Ihrem mobilen Endger&auml;t.</p><p>Gehen Sie nun zu einer Kasse der <b>18.000 Akzeptanzstellen in Deutschland</b> undbezahlen Sie ganz einfach in bar. </p><p>In dem Augenblick, wenn der Rechnungsbetrag beglichen wird, erh&auml;lt der Online-H&auml;ndler die Information &uuml;ber den Zahlungseingang. Die bestellte Ware oder Dienstleistung geht umgehend in den Versand.</p><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
 			$prms_ishtml 				= 1;
 			$prms_attachment 	= '';
 			$prms_mailtype 			= 1;

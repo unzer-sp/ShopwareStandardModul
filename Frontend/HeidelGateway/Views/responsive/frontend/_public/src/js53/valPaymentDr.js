@@ -248,6 +248,10 @@ $(document).ready(function(){
                     jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
                 }
                 // disable all other input fields
+                var cssClasses = jQuery('input:radio:checked').attr('class');
+                var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
+                pm = cssClasses.substring(indexOfHgw + 4);
+
                 jQuery('.payment--method input').attr('disabled', 'disabled');
                 jQuery('.payment--method select').attr('disabled', 'disabled');
                 jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');

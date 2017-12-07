@@ -3857,9 +3857,9 @@ Mit freundlichen Gruessen
 
 vielen Dank fuer Ihre Bestellung in unserem Shop.
 
-Bitte nutzen Sie zum Bezahlen Ihrer Bestellung folgende Bezahldaten.
+Bezahlen Sie bequem nach Warenerhalt. Alle Zahlungsdetails können Sie später auch Ihrer Rechnung entnehmen. Ab Rechnungsdatum haben Sie 30 Tage Zeit, diese zu begleichen.
 
-Zahlungsziel: Innerhalb 30 Tage
+Zahlungsziel: 30 Tage nach Warenerhalt
 Betrag: {$AMOUNT} {$CURRENCY}
 Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}
 Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}

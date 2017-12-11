@@ -149,7 +149,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$data['PAYMENT_CODE'] = strtoupper($payName).'.'.strtoupper($meth);
 			$data['PRESENTATION_AMOUNT'] = $amount;
 			$data['FRONTEND_ENABLED'] = 'false';
-			$data['FRONTEND_MODE'] = 'DEFAULT';
+//			$data['FRONTEND_MODE'] = 'DEFAULT';
+			$data['FRONTEND_MODE'] = 'WHITELABEL';
             $data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
 
             // switching request-url

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '17.11.28';
+		return '17.12.12';
 	}
 
 	/**
@@ -730,6 +730,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '17.11.07':
             case '17.11.08':
             case '17.11.28':
+            case '17.12.12':
                 // resolves a problem while generating Santander-PDF-invoice
                 // Introducing Paymentmethod "Payolution direct"
                 // fixes Errors with SW 5.3.4 jQueryAsync-Functionality
@@ -746,14 +747,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-//                    $form->setElement('text', 'HGW_IVPD_EMAIL',
-//                        array(
-//                            'label'=>'Payolution E-Mail',
-//                            'value'=>'',
-//                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
-//                        )
-//                    );
-                    $msg .= '* update 17.11.28 <br />';
+
+                    $msg .= '* update 17.12.12 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -1361,8 +1356,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setElement('text', 'HGW_MPA_CHANNEL', array('label'=>'MasterPass Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_HPR_CHANNEL', array('label'=>'EasyCredit Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array('label' => 'Gesicherte Lastschrift', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use direct debit with guarantee.'));
-
-//			$form->setElement('text', 'HGW_IVPD_EMAIL',array('label'=>'Payolution E-Mail','value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 
             $bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
 			$form->setElement('select', 'HGW_CC_BOOKING_MODE', array(
@@ -4166,7 +4159,6 @@ Mit freundlichen Gruessen
 							'HGW_PP_CHANNEL' 		=> array('label' => 'Vorkasse Channel'),
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Rechnung Channel'),
                             'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Rechnungskauf Channel'),
-//                            'HGW_IVPD_EMAIL' 		=> array('label' => 'Payolution E-Mail-Adresse'),
                             'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
 							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofortüberweisung Channel'),
@@ -4255,7 +4247,6 @@ Mit freundlichen Gruessen
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Invoice Channel'),
 							'HGW_PAPG_CHANNEL', array('label'=> 'Invoice with guarantee Channel'),
                             'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Invoice Payment Channel'),
-//                            'HGW_IVPD_EMAIL' 		=> array('label' => 'Payolution email-address'),
                             'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Banking Channel'),
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(

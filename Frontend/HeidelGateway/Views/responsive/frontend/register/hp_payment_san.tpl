@@ -63,7 +63,9 @@
 							weitergegeben werden. Die Santander darf diese Daten gerne dazu nutzen, um mich über Produkte der
 							Santander zu informieren. Natürlich kann ich meine Einwilligung jederzeit mit Wirkung für die Zukunft
 							widerrufen. Ausführliche Informationen zu dieser Einwilligung sowie die Möglichkeit zum Widerruf
-							finde ich <!--<a href="{$optinLink}" target="_blank">hier</a>.</strong>--><a href="https://www.santander.de/applications/rechnungskauf/werbewiderspruch/" target="_blank">hier</a>.</strong>
+							finde ich <!--<a href="{$optinLink}" target="_blank">hier</a>.</strong>-->
+							<a href="https://www.santander.de/applications/rechnungskauf/werbewiderspruch/" target="_blank">hier</a>.
+						</strong>
 						</br>
 
 					</p>
@@ -82,7 +84,9 @@
 							gemäß den näheren Bestimmungen des beigefügten <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Einwilligungserklärungstextes</a> sowie an die darin
 							genannten Auskunfteien und in die Durchführung einer automatisierten Entscheidung ein.</strong>
 						</br>
-						Nähere Informationen finden Sie in den <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Datenschutzhinweisen</a> der Santander für den Rechnungs-/Ratenkauf.
+						Nähere Informationen finden Sie in den
+						<a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Datenschutzhinweisen</a>
+						der Santander für den Rechnungs-/Ratenkauf.
 						<!--<a href="{$privacy_policy_link}" target="_blank">Weitere Informationen zum Datenschutz</a>-->
 					</p>
 					<!--</div>-->

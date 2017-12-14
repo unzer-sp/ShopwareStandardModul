@@ -42,15 +42,15 @@
 			{else}
 				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="">
 			{/if}
-			{if isset($optin)}
+            {if isset($optin)}
 				<div>
 					<p>
 						<label for="hgw_adv_san">{s name='hp_sanAdvPermission' namespace='frontend/register/hp_payment'}{/s}:</label></br>
-						{if $checkOptin == "TRUE"}
+                        {if $checkOptin == "TRUE"}
 							<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox" checked="checked">
-						{else}
+                        {else}
 							<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox">
-						{/if}
+                        {/if}
                         {* $optinText *}
 						<strong>Ja, ich bin damit einverstanden, dass meine Daten an die Santander Consumer Bank AG („Santander“)
 							weitergegeben werden. Die Santander darf diese Daten gerne dazu nutzen, um mich über Produkte der
@@ -61,7 +61,7 @@
 						</strong>
 						</br>
 					</p>
-						<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label></br>
+					<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label></br>
 
 					<p id="hgw_ParaPrivacyPolicy">
                         {if $checkPrivacyPolicy == "TRUE" }
@@ -82,7 +82,7 @@
 					</p>
 
 				</div>
-			{/if}		
+            {/if}
 			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 		</div>
 	</div>

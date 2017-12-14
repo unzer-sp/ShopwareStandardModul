@@ -733,6 +733,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 // Resolves a problem while generating PFD-invoice for Santander
                 // Compatibility with SW 5.3.4
                 try {
+                    $this->installInvoiceSanMail();
                     $msg .= '* update 17.10.26 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);

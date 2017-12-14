@@ -740,6 +740,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->createPayments();
                     $this->update171012();
                     $this->installInvoiceIvpdMail();
+                    $this->installInvoiceSanMail();
                     $form->setElement('text', 'HGW_IVPD_CHANNEL',
                         array(
                             'label'=>'Payolution Direct Channel',
@@ -3848,7 +3849,7 @@ Mit freundlichen Gruessen
             $prms_subject 	= 'Zahldaten zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
             $prms_content 	= 'Sehr geehrter Kunde,
 
-vielen Dank fuer Ihre Bestellung in unserem Shop.
+vielen Dank fuer Ihre Bestellung in userem Shop.
 
 Bezahlen Sie bequem nach Warenerhalt. Alle Zahlungsdetails können Sie später auch Ihrer Rechnung entnehmen. Ab Rechnungsdatum haben Sie 30 Tage Zeit, diese zu begleichen.
 
@@ -3870,7 +3871,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bezahlen Sie bequem nach Warenerhalt. Alle Zahlungsdetails können Sie später auch Ihrer Rechnung entnehmen. Ab Rechnungsdatum haben Sie 30 Tage Zeit, diese zu begleichen.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$CONNECTOR_ACCOUNT_USAGE}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
             $prms_ishtml 		= 1;
             $prms_attachment 	= '';
             $prms_mailtype 		= 1;

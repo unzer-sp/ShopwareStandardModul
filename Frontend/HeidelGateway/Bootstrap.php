@@ -3565,9 +3565,9 @@ Mit freundlichen Gruessen
 
 vielen Dank fuer Ihre Bestellung in userem Shop.
 
-Bitte nutzen Sie zum Bezahlen Ihrer Bestellung folgende Bezahldaten.
+Bezahlen Sie bequem nach Warenerhalt. Alle Zahlungsdetails können Sie später auch Ihrer Rechnung entnehmen. Ab Rechnungsdatum haben Sie 30 Tage Zeit, diese zu begleichen.
 
-Zahlungsziel: Innerhalb 30 Tage
+Zahlungsziel: 30 Tage nach Warenerhalt
 Betrag: {$AMOUNT} {$CURRENCY}
 Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}
 Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}
@@ -3585,7 +3585,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bezahlen Sie bequem nach Warenerhalt. Alle Zahlungsdetails können Sie später auch Ihrer Rechnung entnehmen. Ab Rechnungsdatum haben Sie 30 Tage Zeit, diese zu begleichen.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$CONNECTOR_ACCOUNT_USAGE}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
             $prms_ishtml 		= 1;
             $prms_attachment 	= '';
             $prms_mailtype 		= 1;

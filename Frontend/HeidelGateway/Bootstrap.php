@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '17.12.12';
+		return '17.12.15';
 	}
 
 	/**
@@ -731,6 +731,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '17.11.08':
             case '17.11.28':
             case '17.12.12':
+            case '17.12.15':
                 // resolves a problem while generating Santander-PDF-invoice
                 // Introducing Paymentmethod "Payolution direct"
                 // fixes Errors with SW 5.3.4 jQueryAsync-Functionality
@@ -749,7 +750,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         )
                     );
 
-                    $msg .= '* update 17.12.12 <br />';
+                    $msg .= '* update 17.12.15 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

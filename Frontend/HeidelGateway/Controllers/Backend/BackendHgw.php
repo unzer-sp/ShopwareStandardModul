@@ -447,7 +447,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 							break;
 						case 'bs':
 						case 'iv':
-						    if($ivpd || $san)
+                            if($ivpd || $san)
 						    {
                                 if($payInfo['payType'] == 'pa'){
                                     $btns['rv']['active'] = $btns['fi']['active'] = 'true';
@@ -465,10 +465,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                 if($payInfo['payType'] == 'fi') {
                                     $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
 
-                                    if (
-                                    $ivpd
-                                || $san
-                                    ) {
+                                    if ($ivpd || $san) {
                                         $btns['fi']['active'] = $btns['rv']['active'] = 'false';
                                         $btns['rf']['active'] = 'true';
 
@@ -477,9 +474,34 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                         }
                                         $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
                                     } else {
+
                                         $btns['fi']['active'] = 'false';
                                         $btns['rv']['active'] = 'true';
                                     }
+                                }
+                            } elseif ($papg) {
+                                if ($payInfo['payType'] == 'pa') {
+                                    $btns['rf']['active'] =
+                                    $btns['rv']['active'] =
+                                    $btns['fi']['active'] = 'true';
+
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['trans'][] = $btns['fi']['trans'][] = $this->storeTrans($value,$payName, $payInfo);
+                                }
+                                if ($payInfo['payType'] == 'rc') {
+                                    $btns['rv']['active'] = $btns['fi']['active'] = 'false';
+                                    $btns['rf']['active'] = 'true';
+
+                                    if (!isset($maxRf)) {
+                                        $maxRf = $value['PRESENTATION_AMOUNT'];
+                                    }
+                                    $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+                                if ($payInfo['payType'] == 'fi') {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['active'] = $btns['fi']['active'] = 'false';
+                                    $btns['rf']['active'] = 'true';
+//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
                                 }
                             }
                             else {
@@ -594,7 +616,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$buttonTable .= '</tr></table>';
 			$buttonRet['ref'] = $reference;
 			$buttonRet['table'] = $buttonTable;
-
 			return $buttonRet;
 		}catch(Exception $e){
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getButtons (BE) | '.$e->getMessage());

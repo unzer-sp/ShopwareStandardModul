@@ -74,6 +74,16 @@ $(document).ready(function(){
                             jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                         }
 
+                        // function set birthdate for payolution direct
+                        if(jQuery('.newreg_ivpd').is(":visible")) {
+
+                            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                        }
+
                         if(((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)){
                             // load fancy-js for select boxes
                             if(swVersion >= '5.1'){

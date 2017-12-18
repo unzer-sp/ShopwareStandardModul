@@ -63,6 +63,7 @@ document.asyncReady(function () {
                         //     $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
                         // }
                     }
+
                     /* ********************* */
                     // function set birthdate for santander
                     if(jQuery('.newreg_san').is(":visible")) {
@@ -132,8 +133,11 @@ document.asyncReady(function () {
             }
         }
 
+        // jQuery(".btn.is--primary.is--icon-right.is--large.right.main--actions").click(function (e) {
+        //    alert("treffer");
+        // });
         // Function to set Birthdate in hidden field for Chrome on mac
-        jQuery("input[type='submit'], .right").click(function (e) {
+        jQuery("button[type='submit'], .right").click(function (e) {
             var pm = $('input:radio:checked').attr('class');
 
             if(pm != undefined) {
@@ -366,15 +370,18 @@ document.asyncReady(function () {
             }
             // getting PaymentMetod
             var cssClasses = jQuery('input:radio:checked').attr('class');
-            if (cssClasses != undefined) {
-                var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
-                pm = cssClasses.substring(indexOfHgw + 4);
 
-                // disable all other input fields
-                jQuery('.payment--method input').attr('disabled', 'disabled');
-                jQuery('.payment--method select').attr('disabled', 'disabled');
-                jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
-                jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+            if (cssClasses != undefined) {
+                if(cssClasses.indexOf("hgw_")){
+                    var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
+                    pm = cssClasses.substring(indexOfHgw + 4);
+
+                    // disable all other input fields
+                    jQuery('.payment--method .method--bankdata input').attr('disabled', 'disabled');
+                    jQuery('.payment--method .method--bankdata select').attr('disabled', 'disabled');
+                    jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
+                    jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+                }
             }
         }); // ende ajaxComplete
     } else { // if SW-Version <= 5.2

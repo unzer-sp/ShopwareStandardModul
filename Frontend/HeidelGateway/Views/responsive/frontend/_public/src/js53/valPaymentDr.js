@@ -247,15 +247,27 @@ $(document).ready(function(){
                     jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
                     jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
                 }
-                // disable all other input fields
-                var cssClasses = jQuery('input:radio:checked').attr('class');
-                var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
-                pm = cssClasses.substring(indexOfHgw + 4);
 
-                jQuery('.payment--method input').attr('disabled', 'disabled');
-                jQuery('.payment--method select').attr('disabled', 'disabled');
-                jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
-                jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
+                if(jQuery("#confirm--form").is(":visible") == false )
+                {
+                    // getting payment method
+                    if(jQuery('input:radio:checked').attr('class') == undefined)
+                    {
+                        var cssClasses = jQuery('#payType').attr('class');
+                        var indexOfHgw = cssClasses.indexOf("newreg_");
+                        pm = cssClasses.substring(indexOfHgw + 7);
+                    } else {
+                        var cssClasses = jQuery('input:radio:checked').attr('class');
+                        var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
+                        pm = cssClasses.substring(indexOfHgw + 4);
+                    }
+                    // disable all other input fields
+                    jQuery('.payment--method input').attr('disabled', 'disabled');
+                    jQuery('.payment--method select').attr('disabled', 'disabled');
+                    jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
+                    jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
+                }
+
             }); // Ende input:submitt:right
 
 

@@ -597,10 +597,10 @@ function valShippingPaymentForm() {
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
 
     // disable all other input fields
-    jQuery('.payment--method input').attr('disabled', 'disabled');
-    jQuery('.payment--method select').attr('disabled', 'disabled');
-    jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
-    jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+    jQuery('.payment--method .block input').attr('disabled', 'disabled');
+    jQuery('.payment--method .block select').attr('disabled', 'disabled');
+    jQuery(".hgw_"+pm).parents('.payment--method .block').find('input').removeAttr('disabled');
+    jQuery(".hgw_"+pm).parents('.payment--method .block').find('select').removeAttr('disabled');
 
     // remove check vor cc and dc
     if ((pm != 'cc') && (pm != 'dc')) {
@@ -842,6 +842,7 @@ function valPayolutionDirect() {
             jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
             jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
             jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('#birthdate_ivpd').removeClass('has--error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD

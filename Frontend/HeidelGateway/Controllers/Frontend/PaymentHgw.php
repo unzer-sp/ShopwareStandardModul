@@ -2478,7 +2478,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	public function notifyAction(){
 		try{
 			if($this->Request()->isPost()){
-				$order				= array();
+				$order			= array();
 				$sessionID 		= $this->Request()->getPost('CRITERION_SESS');
 				$postData 		= $this->Request()->getPost();
 				$setComment = true;
@@ -2504,7 +2504,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$setComment = false;
 				}
 
-				if(!empty($order)){
+				if(!empty($order))
+				{
 					$this->updateOrderStatus($postData, $order, $setComment);
 				}else{
 					$this->hgw()->Logging('updateOrderStatus() failed because $order was empty.');

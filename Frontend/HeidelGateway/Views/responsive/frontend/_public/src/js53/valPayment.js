@@ -210,29 +210,41 @@ document.asyncReady(function () {
                 var birthMonth = null;
                 var birthYear = null;
                 var pm = null;
-                pm = jQuery("#payType").attr("class");
-                pm = pm.substr(7);
 
-                if (jQuery(".newreg_" + pm).is(":visible")) {
-                    birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
-                    birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                    birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
-                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                }
 
-                if (birthYear == null) {
-                    jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
-                    var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
-                    var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
-                    var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
-                    jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
-                }
-
-                if (pm != "san") {
-                    $(".hgw_required").removeAttr("required");
+                if(jQuery("#payType").attr("class") == undefined){
+                    var classes = jQuery(".payment_method.debit").attr("class");
+                    var indexOfHgw = jQuery(".payment_method.debit").attr("class").indexOf("hgw_");
+                    pm = classes.substring(indexOfHgw+4);
                 } else {
-                    $(".hgw_required").attr("required", "required");
+                    pm = jQuery("#payType").attr("class");
+                    pm = pm.substr(7);
                 }
+
+                if(pm != undefined)
+                {
+                    if (jQuery(".newreg_" + pm).is(":visible")) {
+                        birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
+                        birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                        birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").val();
+                        jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    }
+
+                    if (birthYear == null) {
+                        jQuery(".newreg_" + pm + " [name = 'Date_Year']").val(jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text());
+                        var birthYear = jQuery(".newreg_" + pm + " [name = 'Date_Year']").next("div.js--fancy-select-text").text();
+                        var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
+                        var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
+                        jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    }
+
+                    if (pm != "san") {
+                        $(".hgw_required").removeAttr("required");
+                    } else {
+                        $(".hgw_required").attr("required", "required");
+                    }
+                }
+
             } else {
                 var cssClasses = jQuery('input:radio:checked').attr('class');
                 if (cssClasses != undefined)

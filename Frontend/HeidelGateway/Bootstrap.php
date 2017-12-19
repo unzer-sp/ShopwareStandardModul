@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '17.12.18';
+		return '17.12.19';
 	}
 
 	/**
@@ -755,7 +755,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '17.12.18':
+            case '17.12.19':
                 // Hotfix for switching to other PaymentMethods
                 // Fix in BackendHgw for fin-transactions by payolution and santander and IVPG
                 try{

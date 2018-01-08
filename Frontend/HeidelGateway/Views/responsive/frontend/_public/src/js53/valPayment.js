@@ -274,8 +274,10 @@ document.asyncReady(function () {
             // disable all other input fields
             jQuery('.payment--method input').attr('disabled', 'disabled');
             jQuery('.payment--method select').attr('disabled', 'disabled');
-            jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
-            jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+            // jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
+            // jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+            jQuery("input:radio:checked").parent().parent().find('input').removeAttr('disabled');
+            jQuery("input:radio:checked").parent().parent().find('select').removeAttr('disabled');
         }); // Ende input:submitt:right
 
         jQuery('.newreg_papg').click(function (e) {
@@ -391,8 +393,10 @@ document.asyncReady(function () {
                     // disable all other input fields
                     jQuery('.payment--method .method--bankdata input').attr('disabled', 'disabled');
                     jQuery('.payment--method .method--bankdata select').attr('disabled', 'disabled');
-                    jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
-                    jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+                    // jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
+                    // jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+                    jQuery("input:radio:checked").parent().parent().find('input').removeAttr('disabled');
+                    jQuery("input:radio:checked").parent().parent().find('select').removeAttr('disabled');
                 }
             }
         }); // ende ajaxComplete

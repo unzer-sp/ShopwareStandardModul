@@ -264,6 +264,7 @@ $(document).ready(function(){
                     // disable all other input fields
                     jQuery('.payment--method input').attr('disabled', 'disabled');
                     jQuery('.payment--method select').attr('disabled', 'disabled');
+                    jQuery("input:radio").removeAttr('disabled');
                     jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
                     jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
                 }
@@ -531,6 +532,7 @@ function valForm() {
                     // jQuery('.register--payment input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
                     jQuery('.payment--method .block input').attr('disabled', 'disabled');
                     jQuery('.payment--method .block select').attr('disabled', 'disabled');
+                    jQuery("input:radio").removeAttr('disabled');
                     jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
                     jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
                 }
@@ -599,6 +601,7 @@ function valShippingPaymentForm() {
     // disable all other input fields
     jQuery('.payment--method .block input').attr('disabled', 'disabled');
     jQuery('.payment--method .block select').attr('disabled', 'disabled');
+    jQuery("input:radio").removeAttr('disabled');
     jQuery(".hgw_"+pm).parents('.payment--method .block').find('input').removeAttr('disabled');
     jQuery(".hgw_"+pm).parents('.payment--method .block').find('select').removeAttr('disabled');
 
@@ -682,6 +685,7 @@ function valShippingPaymentForm() {
             // disable all other input fields
             jQuery('.payment--method .block input').attr('disabled', 'disabled');
             jQuery('.payment--method .block select').attr('disabled', 'disabled');
+            jQuery("input:radio").removeAttr('disabled');
             jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
             jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
         }

@@ -276,6 +276,7 @@ document.asyncReady(function () {
             jQuery('.payment--method select').attr('disabled', 'disabled');
             // jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
             // jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+            jQuery("input:radio").removeAttr('disabled');
             jQuery("input:radio:checked").parent().parent().find('input').removeAttr('disabled');
             jQuery("input:radio:checked").parent().parent().find('select').removeAttr('disabled');
         }); // Ende input:submitt:right
@@ -395,6 +396,7 @@ document.asyncReady(function () {
                     jQuery('.payment--method .method--bankdata select').attr('disabled', 'disabled');
                     // jQuery(".hgw_"+pm).parents('.payment--method').find('input').removeAttr('disabled');
                     // jQuery(".hgw_"+pm).parents('.payment--method').find('select').removeAttr('disabled');
+                    jQuery("input:radio").removeAttr('disabled');
                     jQuery("input:radio:checked").parent().parent().find('input').removeAttr('disabled');
                     jQuery("input:radio:checked").parent().parent().find('select').removeAttr('disabled');
                 }

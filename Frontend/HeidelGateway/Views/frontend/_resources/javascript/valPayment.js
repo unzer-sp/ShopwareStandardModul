@@ -43,23 +43,15 @@ $(document).ready(function(){
 					}else{
 						var reuse = false;
 					}
-					
-					// if(formUrl != null){
-					// 	if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
-					// 		jQuery('form.payment').attr('action', orgLink);
-					// 	}else{
-					// 		jQuery('form.payment').attr('action', formUrl[pm]);
-					// 	}
-					// }
 
-					if( (formUrl != null)&& (formUrl != undefined) ){
-
-                        if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
-                            jQuery('form.payment').attr('action', orgLink);
-                        }else{
-                            jQuery('form.payment').attr('action', formUrl[pm]);
-                        }
-                    }
+                    // if( (formUrl != null)&& (formUrl != undefined) ){
+                    //
+                    //     if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
+                    //         jQuery('form.payment').attr('action', orgLink);
+                    //     }else{
+                    //         jQuery('form.payment').attr('action', formUrl[pm]);
+                    //     }
+                    // }
 				}else{
 					jQuery('form.payment').attr('action', orgLink);
 					hideForm();
@@ -143,6 +135,12 @@ $(document).ready(function(){
 					jQuery("#birthdate_"+pm).val(birthYear+'-'+birthMonth+'-'+birthDay);
 			}
 		}
+
+        // // disable all other input fields
+        jQuery('.payment_method input').attr('disabled', 'disabled');
+        jQuery('.payment_method select').attr('disabled', 'disabled');
+        jQuery('.payment_method input:radio:checked').parents('.grid_15').find('input').removeAttr('disabled');
+        jQuery('.payment_method input:radio:checked').parents('.grid_15').find('select').removeAttr('disabled');
 	});
 	
 	jQuery('.newreg_dd').click(function(e){

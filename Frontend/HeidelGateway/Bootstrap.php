@@ -1939,6 +1939,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             if(
                 ($request->getControllerName() == 'checkout' &&  $action == 'saveShippingPayment') ||
                 ($request->getControllerName() == 'account' &&  $action == 'savePayment')
+                /* *********************** */
+//                || ($request->getControllerName() == 'checkout' &&  $action == 'payment')
             )
             {
                 /* ********************************************************************* */

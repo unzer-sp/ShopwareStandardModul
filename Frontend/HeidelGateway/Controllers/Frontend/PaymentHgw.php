@@ -132,7 +132,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 
 			if($activePayment == 'pay'){ $activePayment = va; }
-
 			// BookingMode: CC, DC, DD, VA
 			if(in_array($activePayment, $bookingMode)){
 				$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
@@ -305,6 +304,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						$frame[$activePayment] = false;
 
 					}
+					
+					if ($activePayment == 'va') {
+					    $this->redirect($getFormUrl['FRONTEND_REDIRECT_URL']);
+                    }
 
 					$cssVar = 'HGW_HPF_'.strtoupper($config['PAYMENT.METHOD']).'_CSS';
 					$params['FRONTEND.CSS_PATH']	=	$this->Config()->$cssVar;
@@ -420,7 +423,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						}
 					}
 
-					$request = $this->Request()->getPost();
+//					$request = $this->Request()->getPost();
 
                     if($activePayment == 'san') {
                         $basketId = self::getBasketId();

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.01.10';
+		return '18.01.17';
 	}
 
 	/**
@@ -770,7 +770,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-
+            case '18.01.17':
+                // Paypal direct redirection without e-mail-entry
+                // Fix for guest-customer-checkout with emotion templates
+                try{
+                    $msg .= '* update 18.01.17 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}
@@ -1751,7 +1758,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						if(($config->HGW_VA_BOOKING_MODE == '3') || ($config->HGW_VA_BOOKING_MODE == '4')){ $view->heidel_bm_va = true; }
 						
 						setlocale(LC_TIME, Shopware()->Locale()->getLanguage(), Shopware()->Shop()->getLocale()->getLocale());
-						
+
 						$view->heidel_iban	= $config->HGW_IBAN;
 						$view->action 		= $action;
 						$view->lang			= Shopware()->Locale()->getLanguage();
@@ -1935,113 +1942,41 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						}
 			}
 
-            // Case for Santander to save Values to DB to use them in Request on gatewayAction()
             if(
-                ($request->getControllerName() == 'checkout' &&  $action == 'saveShippingPayment') ||
-                ($request->getControllerName() == 'account' &&  $action == 'savePayment')
-                /* *********************** */
-//                || ($request->getControllerName() == 'checkout' &&  $action == 'payment')
+                ($request->getControllerName() == 'checkout' &&  $action == 'payment')
             )
             {
-                /* ********************************************************************* */
-                // check if IVPD is active
-                if($request->getPost("BRAND") == "PAYOLUTION_DIRECT")
-                {
-                    //save Birthdate to DB
-                    $flag = ENT_COMPAT;
-                    $enc = 'UTF-8';
-                    $salutation         = $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : '';
-                    $nameBirthdate      = $request->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($request->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
-                    $contactPhone       = $request->getPost('CONTACT_PHONE') == true ? htmlspecialchars($request->getPost('CONTACT_PHONE'), $flag, $enc) : '';
-                    //daten in DB Speichern
-                    $user = Shopware()->Modules()->Admin()->sGetUserData();
+                if (
+                    ($user['additional']['payment']['name'] == "hgw_san") ||
+                    ($user['additional']['payment']['name'] == "hgw_ivpd")
+                ) {
+                    switch ($request->getPost("BRAND")) {
+                        case 'SANTANDER':
+                            $flag = ENT_COMPAT;
+                            $enc = 'UTF-8';
+                            if (!empty($request->getPost("NAME_BIRTHDATE"))) {
+                                $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
+                            }
+                            //daten in DB Speichern
+                            $user = Shopware()->Modules()->Admin()->sGetUserData();
 
-                    // Benoetigte User-Indexe bei SW.516 anders vergeben
-                    $user = self::formatUserInfos($user);
+                            // Benoetigte User-Indexe bei SW.516 anders vergeben
+                            $user = self::formatUserInfos($user);
 
-                    $payment_data = [
-                        "NAME_BIRTHDATE"  => $nameBirthdate,
-                        "NAME_SALUTATION" => $salutation,
-                        "CONTACT_PHONE"   => $contactPhone
-                    ];
+                            $payment_data = [
+                                "NAME_BIRTHDATE" => $nameBirthdate,
+                                "CUSTOMER_OPTIN" =>
+                                    $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')),
+                                        $flag, $enc) : 'FALSE',
+                                "CUSTOMER_ACCEPT_PRIVACY_POLICY" =>
+                                    $request->getPost('CUSTOMER_OPTIN_2') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN_2')),
+                                        $flag, $enc) : 'FALSE',
+                                "NAME_SALUTATION" =>
+                                    $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'),
+                                        $flag, $enc) : 'MR',
+                            ];
 
-                    $sql = '
-			          INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
-					  `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
-				      VALUES (:userID, :payType , :uid, :cardnr, :expMonth, :expYear, :brand, :owner,
-					  :kto, :blz, :chan, :shippingHash, :email, :payment_data)
-			          ON DUPLICATE KEY UPDATE
-					  uid = :uidNew, cardnr = :cardnrNew, expMonth = :expMonthNew, expYear = :expYearNew, brand = :brandNew, owner = :ownerNew,
-					  kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
-
-                    $params = array(
-                        'userID' 	=> $user['additional']['user']['userID'],
-                        'payType' 	=> "ivpd",
-                        'uid' 		=> "0",
-                        'cardnr' 	=> "0",
-                        'expMonth' 	=> "0",
-                        'expYear' 	=> "0",
-                        'brand' 	=> "PAYOLUTION_DIRECT",
-                        'owner' 	=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
-                        'kto' 		=> "0",
-                        'blz' 		=> "0",
-                        'chan' 		=> $config->HGW_IVPD_CHANNEL,
-                        'shippingHash' => "0",
-                        'email' 	=> $user['additional']['user']['email'],
-                        'payment_data' => json_encode($payment_data),
-
-                        'uidNew' 		=> "0",
-                        'cardnrNew' 	=> "0",
-                        'expMonthNew' 	=> "0",
-                        'expYearNew' 	=> "0",
-                        'brandNew'		=> "PAYOLUTION_DIRECT",
-                        'ownerNew'		=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
-                        'ktoNew' 		=> "0",
-                        'blzNew' 		=> "0",
-                        'chanNew' 		=> $config->HGW_IVPD_CHANNEL,
-                        'shippingHashNew'=> "0",
-                        'emailNew' 		=> $user['additional']['user']['email'],
-                        'payment_dataNew' => json_encode($payment_data)
-                    );
-
-                    try {
-                        Shopware()->Db()->query($sql, $params);
-                    }
-                    catch (Exception $e) {
-                        $this->logError("IVPD saving to DB | ". $e->getMessage());
-                    }
-                }
-
-                // Case for Santander
-                if ($request->getPost("BRAND") == "SANTANDER")
-                {
-                    $flag = ENT_COMPAT;
-                    $enc = 'UTF-8';
-                    if(!empty($request->getPost("NAME_BIRTHDATE"))){
-                        $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
-                    } else {
-                        $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'), $flag, $enc) : '';
-                        $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
-                        $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
-                        $nameBirthdate = $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay;
-                    }
-                    //daten in DB Speichern
-                    $user = Shopware()->Modules()->Admin()->sGetUserData();
-
-                    // Benoetigte User-Indexe bei SW.516 anders vergeben
-                    $user = self::formatUserInfos($user);
-
-                    $payment_data = [
-                        "NAME_BIRTHDATE"                    => $nameBirthdate,
-                        "CUSTOMER_OPTIN"                    =>
-                            $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')), $flag, $enc) : 'FALSE',
-                        "CUSTOMER_ACCEPT_PRIVACY_POLICY"    =>
-                            $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY')), $flag, $enc) : 'FALSE',
-                        "NAME_SALUTATION"                   =>
-                            $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
-                    ];
-
-                    $sql = '
+                            $sql = '
 			                INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
 					        `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
 				            VALUES (:userID, :payType , :uid, :cardnr, :expMonth, :expYear, :brand, :owner,
@@ -2050,41 +1985,270 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					        uid = :uidNew, cardnr = :cardnrNew, expMonth = :expMonthNew, expYear = :expYearNew, brand = :brandNew, owner = :ownerNew,
 					        kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
 
-                    $params = array(
-                        'userID' 	=> $user['additional']['user']['userID'],
-                        'payType' 	=> "san",
-                        'uid' 		=> "0",
-                        'cardnr' 	=> "0",
-                        'expMonth' 	=> "0",
-                        'expYear' 	=> "0",
-                        'brand' 	=> "SANTANDER",
-                        'owner' 	=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
-                        'kto' 		=> "0",
-                        'blz' 		=> "0",
-                        'chan' 		=> $config->HGW_SAN_CHANNEL,
-                        'shippingHash' => "0",
-                        'email' 	=> $user['additional']['user']['email'],
-                        'payment_data' => json_encode($payment_data),
+                            $params = array(
+                                'userID' => $user['additional']['user']['userID'],
+                                'payType' => "san",
+                                'uid' => "0",
+                                'cardnr' => "0",
+                                'expMonth' => "0",
+                                'expYear' => "0",
+                                'brand' => "SANTANDER",
+                                'owner' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                                'kto' => "0",
+                                'blz' => "0",
+                                'chan' => $config->HGW_SAN_CHANNEL,
+                                'shippingHash' => "0",
+                                'email' => $user['additional']['user']['email'],
+                                'payment_data' => json_encode($payment_data),
 
-                        'uidNew' 		=> "0",
-                        'cardnrNew' 	=> "0",
-                        'expMonthNew' 	=> "0",
-                        'expYearNew' 	=> "0",
-                        'brandNew'		=> "SANTANDER",
-                        'ownerNew'		=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
-                        'ktoNew' 		=> "0",
-                        'blzNew' 		=> "0",
-                        'chanNew' 		=> $config->HGW_SAN_CHANNEL,
-                        'shippingHashNew'=> "0",
-                        'emailNew' 		=> $user['additional']['user']['email'],
-                        'payment_dataNew' => json_encode($payment_data)
-                    );
+                                'uidNew' => "0",
+                                'cardnrNew' => "0",
+                                'expMonthNew' => "0",
+                                'expYearNew' => "0",
+                                'brandNew' => "SANTANDER",
+                                'ownerNew' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                                'ktoNew' => "0",
+                                'blzNew' => "0",
+                                'chanNew' => $config->HGW_SAN_CHANNEL,
+                                'shippingHashNew' => "0",
+                                'emailNew' => $user['additional']['user']['email'],
+                                'payment_dataNew' => json_encode($payment_data)
+                            );
 
-                    try {
-                        Shopware()->Db()->query($sql, $params);
+                            try {
+                                Shopware()->Db()->query($sql, $params);
+                            } catch (Exception $e) {
+                                $this->logError("San saving to DB | " . $e->getMessage());
+                            }
+                            break;
+
+                        case 'PAYOLUTION_DIRECT':
+                            $flag = ENT_COMPAT;
+                            $enc = 'UTF-8';
+                            if (!empty($request->getPost("NAME_BIRTHDATE"))) {
+                                $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
+                            }
+                            //daten in DB Speichern
+                            $user = Shopware()->Modules()->Admin()->sGetUserData();
+
+                            // Benoetigte User-Indexe bei SW.516 anders vergeben
+                            $user = self::formatUserInfos($user);
+
+                            $payment_data = [
+                                "NAME_BIRTHDATE" => $nameBirthdate,
+                                "NAME_SALUTATION" =>
+                                    $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'),
+                                        $flag, $enc) : 'MR',
+                            ];
+
+                            $sql = '
+			                INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
+					        `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
+				            VALUES (:userID, :payType , :uid, :cardnr, :expMonth, :expYear, :brand, :owner,
+					        :kto, :blz, :chan, :shippingHash, :email, :payment_data)
+			                ON DUPLICATE KEY UPDATE
+					        uid = :uidNew, cardnr = :cardnrNew, expMonth = :expMonthNew, expYear = :expYearNew, brand = :brandNew, owner = :ownerNew,
+					        kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
+
+                            $params = array(
+                                'userID' => $user['additional']['user']['userID'],
+                                'payType' => "ivpd",
+                                'uid' => "0",
+                                'cardnr' => "0",
+                                'expMonth' => "0",
+                                'expYear' => "0",
+                                'brand' => "PAYOLUTION",
+                                'owner' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                                'kto' => "0",
+                                'blz' => "0",
+                                'chan' => $config->HGW_SAN_CHANNEL,
+                                'shippingHash' => "0",
+                                'email' => $user['additional']['user']['email'],
+                                'payment_data' => json_encode($payment_data),
+
+                                'uidNew' => "0",
+                                'cardnrNew' => "0",
+                                'expMonthNew' => "0",
+                                'expYearNew' => "0",
+                                'brandNew' => "PAYOLUTION",
+                                'ownerNew' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                                'ktoNew' => "0",
+                                'blzNew' => "0",
+                                'chanNew' => $config->HGW_SAN_CHANNEL,
+                                'shippingHashNew' => "0",
+                                'emailNew' => $user['additional']['user']['email'],
+                                'payment_dataNew' => json_encode($payment_data)
+                            );
+
+                            try {
+                                Shopware()->Db()->query($sql, $params);
+                            } catch (Exception $e) {
+                                $this->logError("IVPD saving to DB | " . $e->getMessage());
+                            }
+                            break;
+                        default:
+                            break;
                     }
-                    catch (Exception $e) {
-                        $this->logError("San saving to DB | ". $e->getMessage());
+
+                }
+            }
+
+            // Case for Santander to save Values to DB to use them in Request on gatewayAction()
+            if(
+                ($request->getControllerName() == 'checkout' &&  $action == 'saveShippingPayment') ||
+                ($request->getControllerName() == 'account' &&  $action == 'savePayment')
+            ) {
+                if (
+                    ($user['additional']['payment']['name'] == "hgw_san") ||
+                    ($user['additional']['payment']['name'] == "hgw_ivpd")
+                ) {
+                    // check if IVPD is active
+                    if ($request->getPost("BRAND") == "PAYOLUTION_DIRECT") {
+                        //save Birthdate to DB
+                        $flag = ENT_COMPAT;
+                        $enc = 'UTF-8';
+                        $salutation = $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'),
+                            $flag, $enc) : '';
+                        $nameBirthdate = $request->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($request->getPost('NAME_BIRTHDATE'),
+                            $flag, $enc) : '';
+                        $contactPhone = $request->getPost('CONTACT_PHONE') == true ? htmlspecialchars($request->getPost('CONTACT_PHONE'),
+                            $flag, $enc) : '';
+                        //daten in DB Speichern
+                        $user = Shopware()->Modules()->Admin()->sGetUserData();
+
+                        // Benoetigte User-Indexe bei SW.516 anders vergeben
+                        $user = self::formatUserInfos($user);
+
+                        $payment_data = [
+                            "NAME_BIRTHDATE" => $nameBirthdate,
+                            "NAME_SALUTATION" => $salutation,
+                            "CONTACT_PHONE" => $contactPhone
+                        ];
+
+                        $sql = '
+			          INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
+					  `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
+				      VALUES (:userID, :payType , :uid, :cardnr, :expMonth, :expYear, :brand, :owner,
+					  :kto, :blz, :chan, :shippingHash, :email, :payment_data)
+			          ON DUPLICATE KEY UPDATE
+					  uid = :uidNew, cardnr = :cardnrNew, expMonth = :expMonthNew, expYear = :expYearNew, brand = :brandNew, owner = :ownerNew,
+					  kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
+
+                        $params = array(
+                            'userID' => $user['additional']['user']['userID'],
+                            'payType' => "ivpd",
+                            'uid' => "0",
+                            'cardnr' => "0",
+                            'expMonth' => "0",
+                            'expYear' => "0",
+                            'brand' => "PAYOLUTION_DIRECT",
+                            'owner' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                            'kto' => "0",
+                            'blz' => "0",
+                            'chan' => $config->HGW_IVPD_CHANNEL,
+                            'shippingHash' => "0",
+                            'email' => $user['additional']['user']['email'],
+                            'payment_data' => json_encode($payment_data),
+
+                            'uidNew' => "0",
+                            'cardnrNew' => "0",
+                            'expMonthNew' => "0",
+                            'expYearNew' => "0",
+                            'brandNew' => "PAYOLUTION_DIRECT",
+                            'ownerNew' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                            'ktoNew' => "0",
+                            'blzNew' => "0",
+                            'chanNew' => $config->HGW_IVPD_CHANNEL,
+                            'shippingHashNew' => "0",
+                            'emailNew' => $user['additional']['user']['email'],
+                            'payment_dataNew' => json_encode($payment_data)
+                        );
+
+                        try {
+                            Shopware()->Db()->query($sql, $params);
+                        } catch (Exception $e) {
+                            $this->logError("IVPD saving to DB | " . $e->getMessage());
+                        }
+                    }
+
+                    // Case for Santander
+                    if ($request->getPost("BRAND") == "SANTANDER") {
+                        $flag = ENT_COMPAT;
+                        $enc = 'UTF-8';
+                        if (!empty($request->getPost("NAME_BIRTHDATE"))) {
+                            $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
+                        } else {
+                            $nameBirthdateYear = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'),
+                                $flag, $enc) : '';
+                            $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'),
+                                $flag, $enc) : '';
+                            $nameBirthdateDay = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'),
+                                $flag, $enc) : '';
+                            $nameBirthdate = $nameBirthdateYear . "-" . $nameBirthdateMonth . "-" . $nameBirthdateDay;
+                        }
+                        //daten in DB Speichern
+                        $user = Shopware()->Modules()->Admin()->sGetUserData();
+
+                        // Benoetigte User-Indexe bei SW.516 anders vergeben
+                        $user = self::formatUserInfos($user);
+
+                        $payment_data = [
+                            "NAME_BIRTHDATE" => $nameBirthdate,
+                            "CUSTOMER_OPTIN" =>
+                                $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')),
+                                    $flag, $enc) : 'FALSE',
+                            "CUSTOMER_ACCEPT_PRIVACY_POLICY" =>
+                                $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY')),
+                                    $flag, $enc) : 'FALSE',
+                            "NAME_SALUTATION" =>
+                                $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'),
+                                    $flag, $enc) : 'MR',
+                        ];
+
+                        $sql = '
+			                INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
+					        `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
+				            VALUES (:userID, :payType , :uid, :cardnr, :expMonth, :expYear, :brand, :owner,
+					        :kto, :blz, :chan, :shippingHash, :email, :payment_data)
+			                ON DUPLICATE KEY UPDATE
+					        uid = :uidNew, cardnr = :cardnrNew, expMonth = :expMonthNew, expYear = :expYearNew, brand = :brandNew, owner = :ownerNew,
+					        kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
+
+                        $params = array(
+                            'userID' => $user['additional']['user']['userID'],
+                            'payType' => "san",
+                            'uid' => "0",
+                            'cardnr' => "0",
+                            'expMonth' => "0",
+                            'expYear' => "0",
+                            'brand' => "SANTANDER",
+                            'owner' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                            'kto' => "0",
+                            'blz' => "0",
+                            'chan' => $config->HGW_SAN_CHANNEL,
+                            'shippingHash' => "0",
+                            'email' => $user['additional']['user']['email'],
+                            'payment_data' => json_encode($payment_data),
+
+                            'uidNew' => "0",
+                            'cardnrNew' => "0",
+                            'expMonthNew' => "0",
+                            'expYearNew' => "0",
+                            'brandNew' => "SANTANDER",
+                            'ownerNew' => $user['additional']['user']['lastname'] . ' ' . $user['additional']['user']['firstname'],
+                            'ktoNew' => "0",
+                            'blzNew' => "0",
+                            'chanNew' => $config->HGW_SAN_CHANNEL,
+                            'shippingHashNew' => "0",
+                            'emailNew' => $user['additional']['user']['email'],
+                            'payment_dataNew' => json_encode($payment_data)
+                        );
+
+                        try {
+                            Shopware()->Db()->query($sql, $params);
+                        } catch (Exception $e) {
+                            $this->logError("San saving to DB | " . $e->getMessage());
+                        }
                     }
                 }
             }
@@ -2467,7 +2631,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
     public function onPostDispatchFrontendCheckoutAccount(Enlight_Event_EventArgs $args)
     {
         $view = $args->getSubject()->View();
-
         $user = Shopware()->Modules()->Admin()->sGetUserData();
         $basket	= Shopware()->Modules()->Basket()->sGetBasket();
         $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();

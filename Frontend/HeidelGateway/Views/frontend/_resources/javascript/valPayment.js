@@ -75,10 +75,12 @@ $(document).ready(function(){
         if(pm != undefined) {
             if(pm.indexOf("hgw_san") > 0)
             {
+                // validation of Santander Inputs
                 var errorsSan = valSantander();
+                // adding failure-messages
                 if((jQuery('.'+"hgw_san"+'  .instyle_error').length > 0)){
                     jQuery('.error ul li').remove();
-					jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
+                    jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
 
                     jQuery.each(errorsSan, function(key, value){
                         jQuery('.error ul').append('<li>'+jQuery(value).html()+'</li>');
@@ -88,9 +90,34 @@ $(document).ready(function(){
                     jQuery('html, body').animate({ scrollTop: 0 }, 0);
 
                     return false;
-
                 }
+
+                var birthday = $(".hgw_san [name='Date_Day']").val();
+                var birthmonth = $(".hgw_san [name = 'Date_Month']").val();
+                var birthyear = $(".hgw_san [name = 'Date_Year']").val();
+                var birthdate = birthyear + '-' + birthmonth + '-' + birthday;
+                var salutation = $('.hgw_san #salutation').val();
+                var adv_permission = $('#hgw_adv_san').val();
+                var priv_policy = $('#hgw_privacyPolicy').val();
+
+                if (adv_permission == 'on') {
+                    adv_permission = "TRUE";
+                } else {
+                    adv_permission = "FALSE";
+                }
+                if (priv_policy == 'on') {
+                    priv_policy = "TRUE";
+                } else {
+                    priv_policy = "FALSE";
+                }
+
+                $(".button-right.large").append('<input type="hidden" name="BRAND" id="handover_brand_san" value="SANTANDER">');
+                $(".button-right.large").append('<input type="hidden" name="NAME.BIRTHDATE" value="' + birthdate + '">');
+                $(".button-right.large").append('<input type="hidden" name="NAME.SALUTATION" value="' + salutation + '">');
+                $(".button-right.large").append('<input type="hidden" name="CUSTOMER.OPTIN" value="' + adv_permission + '">');
+                $(".button-right.large").append('<input type="hidden" name="CUSTOMER.OPTIN_2" value="' + priv_policy + '">');
             }
+
             if(pm.indexOf("hgw_ivpd") > 0)
             {
                 var errorsPayolution = valPayolutionDirect();
@@ -108,6 +135,16 @@ $(document).ready(function(){
                     return false;
 
                 }
+
+                var birthday = $(".newreg_ivpd [name='Date_Day']").val();
+                var birthmonth = $(".newreg_ivpd [name = 'Date_Month']").val();
+                var birthyear = $(".newreg_ivpd [name = 'Date_Year']").val();
+                var birthdate = birthyear+'-'+birthmonth+'-'+birthday;
+                var salutation = $('.newreg_ivpd #salutation').val();
+
+                $(".button-right.large").append('<input type="hidden" name="BRAND" id="handover_brand_ivpd" value="PAYOLUTION_DIRECT">');
+                $(".button-right.large").append('<input type="hidden" name="NAME.BIRTHDATE" value="'+birthdate+'">');
+                $(".button-right.large").append('<input type="hidden" name="NAME.SALUTATION" value="'+salutation+'">');
             }
 
         }
@@ -161,7 +198,7 @@ $(document).ready(function(){
 		var formurlpapg = jQuery('.newreg_papg .formurl').val();
 		jQuery('form.payment').attr('action', formurlpapg);
 	});
-			
+
 	jQuery('.button-right, .large, .right').click(function(e) {
 		if (jQuery('.radio.hgw_papg').is(':checked')) {
 			var birthday = jQuery(".newreg_papg [name='Date_Day']").val();
@@ -183,7 +220,7 @@ $(document).ready(function(){
 		var formurlsan = jQuery('.newreg_san .formurl').val();
 		jQuery('form.payment').attr('action', formurlsan);
 	});
-			
+
 	jQuery('.button-right.large.right').click(function(e) {
 		if (jQuery('.radio.hgw_san').is(':checked')) {
 			var birthday = jQuery(".newreg_san [name='Date_Day']").val();

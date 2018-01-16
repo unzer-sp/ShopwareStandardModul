@@ -1946,6 +1946,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($request->getControllerName() == 'checkout' &&  $action == 'payment')
             )
             {
+                //getting user to get payment method
+                $user = Shopware()->Modules()->Admin()->sGetUserData();
+
                 if (
                     ($user['additional']['payment']['name'] == "hgw_san") ||
                     ($user['additional']['payment']['name'] == "hgw_ivpd")

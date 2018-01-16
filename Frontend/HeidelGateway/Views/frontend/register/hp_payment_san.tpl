@@ -35,7 +35,7 @@
                 {assign var=payment_data value=$birthdate}
                 {html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {else}
-                {html_select_date|utf8_encode time="YYYY-MM-DD" start_year='-10' day_empty="bitte w&auml;len" end_year='-100' reverse_years='true' day_value_format='%02d'  field_order='DMY'}
+                {html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben"}
             {/if}
             {if isset($birthdate)}
 				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="{$birthdate}">
@@ -67,7 +67,8 @@
                         {if $checkPrivacyPolicy == "TRUE" }
 							<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" checked="checked">
                         {else}
-							<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox">
+                            {*<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox">*}
+                            <input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" class="checkbox">
                         {/if}
 
                         {* $privacy_policy_text *}

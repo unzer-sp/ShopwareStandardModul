@@ -43,7 +43,7 @@
                 {assign var=payment_data value=$birthdate_san}
                 {html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {else}
-                {html_select_date|utf8_encode start_year='-10' end_year='-100' display_days="false" reverse_years='true' day_value_format='%02d' field_order='DMY'}
+				{html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben"}
             {/if}
             {if isset($birthdate)}
 				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="{$birthdate}">

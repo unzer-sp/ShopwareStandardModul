@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.01.17';
+		return '22.01.17';
 	}
 
 	/**
@@ -778,6 +778,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
+            case '22.01.17':
+                // Try to fix abborded Orders and create them via Push-message
+                try{
+                    $msg .= '* update 22.01.17 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}

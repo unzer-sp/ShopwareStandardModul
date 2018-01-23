@@ -142,7 +142,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 
             $data = $transactions[0];
             $formerPaTransaction = $data;
-
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
 			$data['USER_LOGIN'] = trim($this->FrontendConfigHGW()->HGW_USER_LOGIN);
 			$data['USER_PWD'] = trim($this->FrontendConfigHGW()->HGW_USER_PW);
@@ -286,7 +285,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                         .'AND (`payment_type` = "PA" '
                         .'OR `payment_type` = "DB" '
                         .'OR `payment_type` = "CP" '
-                        .'OR `payment_type` = "RB") ';
+                        .'OR `payment_type` = "RB" '
+                        .'OR `payment_type` = "RC" '
+                        .') ';
                    /* if(($uid != NULL) && ($uid != '')){
                         $sql .= 'AND `uniqueid` = ? ';
                         $params[] = $uid;

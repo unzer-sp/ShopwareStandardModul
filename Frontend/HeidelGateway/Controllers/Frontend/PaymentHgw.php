@@ -2222,7 +2222,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			->Models()
 			->getRepository('Shopware\Models\Order\Order')
 			->findOneBy(array('transactionId' => $transactionID));
-
+//$debugOrderModel = \Doctrine\Common\Util\Debug::dump($orderModel);
+//mail("sascha.pflueger@heidelpay.de","addOrderInfos 2225",print_r($debugOrderModel,1));
 			if($status == '12'){ $orderModel->setClearedDate(date('d.m.Y H:i:s')); }
 			// if internalComment is set, read old commment and add time stamp
 			$alterWert = $orderModel->getInternalComment();
@@ -2607,13 +2608,10 @@ mail("sascha.pflueger@heidelpay.de","rawnotifyAction PUSH ankunft",print_r($xmlD
 						$paymentStatus = 12 ; // default payment status is 12 - 'Komplett bezahlt'
 						if($transType == 'PA'){ $paymentStatus = 18; } // 'Reserviert'
 						if($data['PROCESSING_STATUS_CODE'] == "80"){ $paymentStatus = 21; } // 'Überprüfung notwendig'
-mail("sascha.pflueger@heidelpay.de","updateOrderStatus",print_r($data,1));
 						try{
                             $return = $this->saveOrder($transactionID, $uniqueID, $paymentStatus);
                         } catch (Exception $e){
-mail("sascha.pflueger@heidelpay.de","updateOrderStatus Catch",print_r($e,1));
                             $this->convertOrder($data['CRITERION_TEMPORDER']);
-mail("sascha.pflueger@heidelpay.de","updateOrderStatus Catch Durch",print_r("",1));
                         }
 
 						if($data['PROCESSING_STATUS_CODE'] != "80"){ $setComment = true; }
@@ -3716,6 +3714,9 @@ mail("sascha.pflueger@heidelpay.de","convertOrder BEGINN",print_r($temporaryID,1
                 // Set new ordernumber to the order and its details
 //                $orderModel = Shopware()->Models()->find(\Shopware\Models\Order\Order::class, $temporaryID);
                 $orderModel = new Shopware\Models\Order\Order();
+
+                $orderModel->
+
                 $orderModel->setTemporaryId($temporaryID);
                 $orderModel->setNumber($newOrderNumber);
                 foreach ($orderModel->getDetails() as $detailModel) {
@@ -3769,22 +3770,19 @@ mail("sascha.pflueger@heidelpay.de","convertOrder BEGINN",print_r($temporaryID,1
                 $shippingAddress = array_map(function ($value) {
                     return (string)$value;
                 }, $result[0]['customer']['defaultShippingAddress']);
-
                 // Create new entry in s_order_shippingaddress
                 $shippingModel = new Shopware\Models\Order\Shipping();
                 $shippingModel->fromArray($shippingAddress);
-mail("sascha.pflueger@heidelpay.de","Ablauf 3775",print_r($shippingModel,1));
 //                $shippingModel->setCountry(Shopware()->Models()->find(\Shopware\Models\Country\Country::class,
 //                    $result[0]['customer']['defaultShippingAddress']['countryId']));
-
 //                $countryModel = new Shopware\Models\Country\Country();
                 $shippingModel->setCountry($result[0]['customer']['defaultShippingAddress']['countryId']);
 
-
-mail("sascha.pflueger@heidelpay.de","Ablauf 3779",print_r($shippingModel,1));
                 $shippingModel->setCustomer($customer);
                 $shippingModel->setOrder($orderModel);
-mail("sascha.pflueger@heidelpay.de","Ablauf 3782 ShippingModel",print_r($shippingModel,1));
+$debugging = \Doctrine\Common\Util\Debug::dump($shippingModel);
+mail("sascha.pflueger@heidelpay.de","Ablauf 3781 ShippingModel",$debugging);
+mail("sascha.pflueger@heidelpay.de","Ablauf 3782 Customer",print_r($result[0],1));
                 Shopware()->Models()->persist($shippingModel);
                 /* ********************************************* */
                 /* Hier noch fehlerhaft
@@ -3793,8 +3791,10 @@ mail("sascha.pflueger@heidelpay.de","Ablauf 3782 ShippingModel",print_r($shippin
                 /* ********************************************* */
                 // Finally set the order to be a regular order
 //                $statusModel = Shopware()->Models()->find(\Shopware\Models\Order\Status::class, 1);
+
                 $statusModel = new Shopware\Models\Order\Status();
-mail("sascha.pflueger@heidelpay.de","Ablauf 3790",print_r($statusModel,1));
+$debugging = \Doctrine\Common\Util\Debug::dump($statusModel);
+mail("sascha.pflueger@heidelpay.de","Ablauf 3784 Debugging",$debugging);
                 $orderModel->setOrderStatus($statusModel);
 
                 Shopware()->Models()->flush();
@@ -3803,7 +3803,7 @@ mail("sascha.pflueger@heidelpay.de","Ablauf 3790",print_r($statusModel,1));
             }
 
         } catch (Exception $e){
-            mail("sascha.pflueger@heidelpay.de","convertOrder FEHLER",print_r($e,1));
+            mail("sascha.pflueger@heidelpay.de","convertOrder FEHLER",print_r($e->getMessage(),1));
         }
     }
 

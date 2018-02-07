@@ -160,11 +160,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url;
 			}
 
-            /**
-             * @ToDo Eventuell für IV.RF zuvor aus der IV.PA den Brand laden, da dieser in IV.RC nicht mitgeschickt wird vom Payment
-             * nur dann kann unten stehende Abfrage funktionieren
-             */
-mail("sascha.pflueger@heidelpay.de","BackendHgw 167 Transaktionen",print_r($transactions,1));
             // setting Basket-Id for Payolution
             if(
                 ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
@@ -179,7 +174,7 @@ mail("sascha.pflueger@heidelpay.de","BackendHgw 167 Transaktionen",print_r($tran
                 {
                     case 'IV.FI':
                     case 'IV.RV':
-                    case 'IV.RF': // kann nicht reinlaufen weil bei RC bei Payolution und Santander kein ACCOUNT.BRAND mit geschickt wird
+                    case 'IV.RF':
                             // fetch all articles for Basket-Api-Call from order
                             $orderDetails = $this->fetchOrderDetailsByUniqueId($data['IDENTIFICATION_UNIQUEID']);
 
@@ -601,7 +596,7 @@ mail("sascha.pflueger@heidelpay.de","BackendHgw 167 Transaktionen",print_r($tran
 				$btns['cp']['trans'][0]['maxCp'] = number_format($maxCp, 2,'.','');
 				$btns['fi']['trans'][0]['maxFi'] = number_format($maxFi, 2,'.','');
 			}
-mail("sascha.pflueger@heidelpay.de","BackendHgw getButtons 604",print_r($btns,1));
+
 			if($this->showButtons){
 				$buttonTable = '';
 			}else{

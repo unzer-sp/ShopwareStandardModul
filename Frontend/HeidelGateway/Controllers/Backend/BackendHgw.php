@@ -164,11 +164,13 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
              * @ToDo Eventuell für IV.RF zuvor aus der IV.PA den Brand laden, da dieser in IV.RC nicht mitgeschickt wird vom Payment
              * nur dann kann unten stehende Abfrage funktionieren
              */
-
+mail("sascha.pflueger@heidelpay.de","BackendHgw 167 Transaktionen",print_r($transactions,1));
             // setting Basket-Id for Payolution
             if(
                 ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
              || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
+             || ($data['CRITERION_IVBRAND'] == 'PAYOLUTION')
+             || ($data['CRITERION_IVBRAND'] == 'SANTANDER')
             )
             {
 
@@ -458,7 +460,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                 }
                                 if($payInfo['payType'] == 'rc'){
                                     $btns['rv']['active'] = $btns['fi']['active'] = 'false';
-//                                    $btns['rf']['active'] = 'true';
+                                    $btns['rf']['active'] = 'true';
 
                                     if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
                                     $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
@@ -599,7 +601,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$btns['cp']['trans'][0]['maxCp'] = number_format($maxCp, 2,'.','');
 				$btns['fi']['trans'][0]['maxFi'] = number_format($maxFi, 2,'.','');
 			}
-
+mail("sascha.pflueger@heidelpay.de","BackendHgw getButtons 604",print_r($btns,1));
 			if($this->showButtons){
 				$buttonTable = '';
 			}else{

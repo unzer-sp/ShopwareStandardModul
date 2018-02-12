@@ -925,7 +925,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
      */
     protected function prepareBackendBasketData($orderDetails)
     {
-       // prepare Basicdata for Basket-Api-Call
+        // prepare Basicdata for Basket-Api-Call
         $shoppingCart['authentication'] = array(
             'sender' 		=> trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER),
             'login'			=> trim($this->FrontendConfigHGW()->HGW_USER_LOGIN),

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.02.12';
+		return '18.02.13';
 	}
 
 	/**
@@ -781,6 +781,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
+            case '18.02.13':
+                // renaming Sofortüberweisung to "Sofort"
+                try{
+//                    $this->addPluginTranslation();
+//                    $this->createPayments();
+                    $this->renamePayments();
+                    $msg .= '* update 18.02.13 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}
@@ -793,6 +804,27 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				'invalidateCache' => array('frontend'),
 		);
 	}
+
+	protected function renamePayments()
+    {
+        // getting paymentmeanname for Frontend
+        $sql = "SELECT * FROM `s_core_paymentmeans` WHERE `name` = 'hgw_sue';";
+        $hgwSufuData = Shopware()->Db()->fetchRow($sql);
+
+        if($hgwSufuData['description'] = "Heidelpay CD-Edition Sofort&uuml;berweisung")
+        {
+            // changing name of Sofü to "Sofort"
+            $sql = "UPDATE s_core_paymentmeans 
+              SET description = 'Heidelpay CD-Edition Sofort' 
+              WHERE description = 'Heidelpay CD-Edition Sofort&uuml;berweisung'";
+            try{
+                Shopware()->Db()->query($sql);
+            } catch (Exception $e)
+            {
+                $this->logError('renamePayments Failure SoFu | Message:', $e);
+            }
+        }
+    }
 
 	protected function update171012()
     {
@@ -3269,7 +3301,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			);
 			$inst[] = array(
 					'name'			=> 'sue',
-					'description'	=> 'Heidelpay CD-Edition Sofort&uuml;berweisung',
+					'description'	=> 'Heidelpay CD-Edition Sofort',
 					'trans_desc' 	=> 'Heidelpay CD-Edition Sofort Banking',
 			);
 			$inst[] = array(
@@ -4189,7 +4221,7 @@ Mit freundlichen Gruessen
                             'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Rechnungskauf Channel'),
                             'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
-							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofortüberweisung Channel'),
+							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Channel'),
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Kreditkarten Buchungsmodus',

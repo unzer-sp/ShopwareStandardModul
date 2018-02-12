@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.02.12';
+		return '18.02.13';
 	}
 
 	/**
@@ -55,13 +55,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function getInfo(){
 		$prefix 	= substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'));
-		$hp_logo 	= base64_encode(file_get_contents(dirname(__FILE__) . '/img/heidelpay.png'));
+//		$hp_logo 	= base64_encode(file_get_contents(dirname(__FILE__) . '/img/heidelpay.png'));
+		$hp_logo 	= dirname(__FILE__) . '/img/heidelpay.png';
 		return array(
 				'version' => $this->getVersion(),
 				'autor' => 'Heidelberger Payment GmbH (SP)',
 				'label' => $this->getLabel(),
 				'source' => "Default",
-				'description' => '<p><img src="data:image/png;base64,' .$hp_logo. '" /></p>
+//				'description' => '<p><img src="data:image/png;base64,' .$hp_logo. '" /></p>
+				'description' => '<p><img src='.$hp_logo.' /></p>
 			<p style="font-size:12px; font-weight: bold;">Heidelberger Payment GmbH - Ihr Full Service Payment Provider - alles aus einer Hand</p>
 			<p style="font-size:12px">Die Heidelberger Payment GmbH kurz: Heidelpay bietet als BaFin-zertifizierter Payment Service Provider alles was zum Online-Payment geh&ouml;rt.<br><br><a href="http://testshops.heidelpay.de/contactform/?campaign=shopware4.0&shop=shopware4.0" target="_blank" style="font-size: 12px; color: #000; font-weight: bold;">&gt;&gt;&gt; Informationen anfordern &lt;&lt;&lt;</a><br/></p><br /><p style="font-size:12px">Das Leistungsspektrum des PCI DSS zertifizierten Unternehmens reicht von weltweiten e-Payment L&ouml;sungen, inklusive eines vollst&auml;ndigen Debitorenmanagement-, Risk- und Fraud- Systems bis hin zu einem breiten Angebot alternativer Bezahlverfahren - schnell, sicher, einfach und umfassend - alles aus einer Hand.</p><br/><a href="http://www.heidelpay.de" style="font-size: 12px; color: #000; font-weight: bold;">www.heidelpay.de</a><br/><br/><p style="font-size: 12px; color: #f00; font-weight: bold;">Hinweis:</p><p style="font-size:12px">Um unser "Heidelpay Backend" Plug-in nutzen zu k&ouml;nnen, beantragen Sie bitte die Aufschaltung von Push-Benachrichtigungen bei unserem Technischen Support. Wenden Sie sich hierf&uuml;r bitte per E-Mail an support@heidelpay.de oder Telefon +49 (0) 6221 65170-10 an uns. Bitte notieren Sie sich Sie sich vorher die URL ihres e-Shops plus dem Webpfad zur Heidelpay Action und teilen Sie uns diese dann mit, als Beispiel:<br/><br/><b>https://www.meinshop.de/PaymentHgw/rawnotify</b><br/><br/><br />
 			Testdaten entnehmen Sie bitte unserer <a href="https://dev.heidelpay.de/testumgebung/" style="color: #000; font-weight: bold;" target="_blank">Dokumentation</a>.</p>',
@@ -781,6 +783,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
+            case '18.02.13':
+                // renaming Sofortüberweisung to "Sofort"
+                try{
+//                    $this->addPluginTranslation();
+//                    $this->createPayments();
+                    $this->renamePayments();
+                    $msg .= '* update 18.02.13 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}
@@ -793,6 +806,27 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				'invalidateCache' => array('frontend'),
 		);
 	}
+
+	protected function renamePayments()
+    {
+        // getting paymentmeanname for Frontend
+        $sql = "SELECT * FROM `s_core_paymentmeans` WHERE `name` = 'hgw_sue';";
+        $hgwSufuData = Shopware()->Db()->fetchRow($sql);
+
+        if($hgwSufuData['description'] = "Heidelpay CD-Edition Sofort&uuml;berweisung")
+        {
+            // changing name of Sofü to "Sofort"
+            $sql = "UPDATE s_core_paymentmeans 
+              SET description = 'Heidelpay CD-Edition Sofort' 
+              WHERE description = 'Heidelpay CD-Edition Sofort&uuml;berweisung'";
+            try{
+                Shopware()->Db()->query($sql);
+            } catch (Exception $e)
+            {
+                $this->logError('renamePayments Failure SoFu | Message:', $e);
+            }
+        }
+    }
 
 	protected function update171012()
     {
@@ -3269,7 +3303,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			);
 			$inst[] = array(
 					'name'			=> 'sue',
-					'description'	=> 'Heidelpay CD-Edition Sofort&uuml;berweisung',
+					'description'	=> 'Heidelpay CD-Edition Sofort',
 					'trans_desc' 	=> 'Heidelpay CD-Edition Sofort Banking',
 			);
 			$inst[] = array(
@@ -4189,7 +4223,7 @@ Mit freundlichen Gruessen
                             'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Rechnungskauf Channel'),
                             'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
-							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofortüberweisung Channel'),
+							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Channel'),
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Kreditkarten Buchungsmodus',

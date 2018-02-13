@@ -786,8 +786,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.02.13':
                 // renaming Sofortüberweisung to "Sofort"
                 try{
-//                    $this->addPluginTranslation();
-//                    $this->createPayments();
                     $this->renamePayments();
                     $msg .= '* update 18.02.13 <br />';
                 } catch (Exception $e) {

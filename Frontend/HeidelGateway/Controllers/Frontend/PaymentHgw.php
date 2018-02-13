@@ -423,8 +423,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						}
 					}
 
-//					$request = $this->Request()->getPost();
-
                     if($activePayment == 'san') {
                         $basketId = self::getBasketId();
 
@@ -445,14 +443,14 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit["CRITERION.IVBRAND"] = "SANTANDER";
 
                         //to prevent sending request to paymentgateway if browser-back-button was pushed
-//                        if(
-//                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
-//                            empty($ppd_crit["NAME.SALUTATION"]) ||
-//                            empty($ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"])
-//                        )
-//                        {
-//                            $this->forward('fail');
-//                        }
+                        if(
+                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
+                            empty($ppd_crit["NAME.SALUTATION"]) ||
+                            empty($ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"])
+                        )
+                        {
+                            return $this->forward('missinginput');
+                        }
                     }
 
                     if($activePayment == 'ivpd') {
@@ -483,13 +481,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit["CRITERION.IVBRAND"] = "PAYOLUTION";
 
                         //to prevent sending request to paymentgateway if browser-back-button was pushed
-//                        if(
-//                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
-//                            empty($ppd_crit["NAME.SALUTATION"])
-//                        )
-//                        {
-//                            $this->forward('fail');
-//                        }
+                        if(
+                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
+                            empty($ppd_crit["NAME.SALUTATION"])
+                        )
+                        {
+                            return $this->forward('missinginput');
+                        }
 
                     }
 
@@ -535,6 +533,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}elseif($response['PROCESSING_RESULT'] == "NOK"){
                 $this->hgw()->saveRes($response);
 				Shopware()->Session()->HPError = $response['PROCESSING_RETURN_CODE'];
+
 				return $this->forward('fail');
 			}
 
@@ -715,6 +714,18 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		}
 	}
 
+
+    public function missinginputAction()
+    {
+        /*
+         * @todo Switch / case für Shopware()->Shop()->getTemplate()->getVersion()
+         */
+        return $this->redirect(array(
+            'forceSecure' => 1,
+            'action' => 'shippingPayment',
+            'controller' => 'checkout'
+        ));
+	}
 	/**
 	 * response action method for the reponse call of a debitfrom heidelpay
 	 */

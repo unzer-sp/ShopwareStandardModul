@@ -3,7 +3,7 @@
 		<!--<div class="newreg_{$pm}" style="width: 22rem;">-->
 		<!--<div class="newreg_{$pm}" id="payType" style="width: 30rem;">-->
 
-		<img src="{$logoLink}" alt="Santander-Logo">
+		<img src="{$logoLink_San}" alt="Santander-Logo">
 		<!--<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">-->
 		<div class="newreg_{$pm}" id="payType">
 			<div>
@@ -27,8 +27,8 @@
 						<option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
 					</select><br />
                 {/if} <!-- if isset salutation -->
-                {if isset($accountHolder)}
-					<input type="text" value="{$accountHolder}" disabled><br />
+                {if isset($accountHolder_San)}
+					<input type="text" value="{$accountHolder_San}" disabled><br />
                 {/if}
 
 			</div>
@@ -45,27 +45,27 @@
             {else}
 				{html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben"}
             {/if}
-            {if isset($birthdate)}
-				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="{$birthdate}">
+            {if isset($birthdate_san)}
+				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="{$birthdate_san}">
             {else}
 				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="-">
             {/if}
-            {if isset($optin)}
+            {if isset($optin_San)}
 				<div>
 					<p>
 						<label for="hgw_adv_san">{s name='hp_sanAdvPermission' namespace='frontend/register/hp_payment'}{/s}:</label></br>
-                        {if $checkOptin == "TRUE"}
+                        {if $checkOptin_San == "TRUE"}
 							<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox" checked="checked">
                         {else}
 							<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox">
                         {/if}
-						<strong>{$optinText}</strong>
-						<!--<strong>Ja, ich bin damit einverstanden, dass meine Daten an die Santander Consumer Bank AG („Santander“)
+						<!--<strong>{* $optinText_San *}</strong>-->
+						<strong>Ja, ich bin damit einverstanden, dass meine Daten an die Santander Consumer Bank AG („Santander“)
 							weitergegeben werden. Die Santander darf diese Daten gerne dazu nutzen, um mich über Produkte der
 							Santander zu informieren. Natürlich kann ich meine Einwilligung jederzeit mit Wirkung für die Zukunft
 							widerrufen. Ausführliche Informationen zu dieser Einwilligung sowie die Möglichkeit zum Widerruf
-							finde ich <a href="{$optinLink}" target="_blank">hier</a>.</strong><a href="https://www.santander.de/applications/rechnungskauf/werbewiderspruch/" target="_blank">hier</a>.
-						</strong>-->
+							finde ich </strong><a href="https://www.santander.de/applications/rechnungskauf/werbewiderspruch/" target="_blank">hier</a>.
+						</strong>
 						</br>
 
 					</p>
@@ -73,22 +73,21 @@
 					<!--<div id="hgw_privacyPolicy" style="height:160px;width:30 rem;overflow:auto;">-->
 					<!--<div id="hgw_privacyPolicy">-->
 					<p id="hgw_ParaPrivacyPolicy">
-                        {if $checkPrivacyPolicy == "TRUE" }
+                        {if $checkPrivacyPolicy_San == "TRUE" }
 							<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" checked="checked">
                         {else}
 							<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox">
                         {/if}
 
-						<strong>{$privacy_policy_text}</strong>
-						<!--<strong>Ich willige in die Übermittlung meiner personenbezogenen Daten an die Santander Consumer Bank AG
+						<!--<strong>{* $privacy_policy_text_San *}</strong>-->
+						<strong>Ich willige in die Übermittlung meiner personenbezogenen Daten an die Santander Consumer Bank AG
 							gemäß den näheren Bestimmungen des beigefügten <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Einwilligungserklärungstextes</a> sowie an die darin
-							genannten Auskunfteien und in die Durchführung einer automatisierten Entscheidung ein.</strong>-->
+							genannten Auskunfteien und in die Durchführung einer automatisierten Entscheidung ein.</strong>
 						</br>
-						<!--Nähere Informationen finden Sie in den <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Datenschutzhinweisen</a> der Santander für den Rechnungs-/Ratenkauf.-->
-						Nähere Informationen finden Sie in den <a href="{$privacy_policy_link}" target="_blank">Datenschutzhinweisen</a> der Santander für den Rechnungs-/Ratenkauf.
+						<!--Nähere Informationen finden Sie in den <a href="{$privacy_policy_link}" target="_blank">Datenschutzhinweisen</a> der Santander für den Rechnungs-/Ratenkauf.-->
+						Nähere Informationen finden Sie in den <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Datenschutzhinweisen</a> der Santander für den Rechnungs-/Ratenkauf.
 					</p>
 					<!--</div>-->
-
 				</div>
             {/if}
 			<input type="hidden" name="BRAND" id="handover_brand_san" value="SANTANDER">

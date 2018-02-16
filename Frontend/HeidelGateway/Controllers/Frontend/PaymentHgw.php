@@ -399,9 +399,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 				}else{
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
-
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
-
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
 
 					if($activePayment == 'mpa'){
@@ -438,8 +436,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
                         $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
                         $ppd_crit["CUSTOMER.OPTIN"] = strtoupper($regDataParameters->CUSTOMER_OPTIN);
-                        $ppd_crit["CUSTOMER.OPTIN_2"] = strtoupper($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY);
-                        $ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"] = strtoupper($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY);
+                        $ppd_crit["CUSTOMER.OPTIN_2"] =
+                            strtoupper(($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "ON") || ($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "TRUE") ? "TRUE" : "FALSE");
+                        $ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"] =
+                            strtoupper(($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "ON") || ($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "TRUE") ? "TRUE" : "FALSE");
                         $ppd_crit["CRITERION.IVBRAND"] = "SANTANDER";
 
                         //to prevent sending request to paymentgateway if browser-back-button was pushed
@@ -462,7 +462,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             $basketId = $basketId['basketId'];
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
-
                         $regDataParameters = json_decode($regData["payment_data"]);
 
                         $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
@@ -714,17 +713,42 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		}
 	}
 
-
+    /**
+     * Function redirects to payment method choice in case of missing birthdate fpr Santander oder Payolution
+     */
     public function missinginputAction()
     {
-        /*
-         * @todo Switch / case für Shopware()->Shop()->getTemplate()->getVersion()
-         */
-        return $this->redirect(array(
-            'forceSecure' => 1,
-            'action' => 'shippingPayment',
-            'controller' => 'checkout'
-        ));
+        try{
+            switch (Shopware()->Shop()->getTemplate()->getVersion()){
+                // Emotion Template
+                case "2":
+                    return $this->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'account',
+                        'action' => 'payment'
+                    ));
+                    break;
+                // Responsive Template
+                case "3":
+                    return $this->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'checkout',
+                        'action' => 'shippingPayment'
+                    ));
+                    break;
+                // other Templates
+                default:
+                    return $this->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'checkout',
+                        'action' => 'shippingPayment'
+                    ));
+                    break;
+            }
+        } catch (Exception $e) {
+            $this->hgw()->Logging('missinginputAction | '.$e->getMessage());
+        }
+
 	}
 	/**
 	 * response action method for the reponse call of a debitfrom heidelpay
@@ -817,8 +841,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['ADDRESS_ZIP']				= $this->Request()->getPost('ADDRESS_ZIP') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_ZIP'), $flag, $enc) : '';
 				$resp['ADDRESS_COUNTRY']			= $this->Request()->getPost('ADDRESS_COUNTRY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_COUNTRY'), $flag, $enc) : '';
 
-                $resp['CUSTOMER_OPTIN']			    = $this->Request()->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN'), $flag, $enc) : '';
-                $resp['CUSTOMER_OPTIN_2']			= $this->Request()->getPost('CUSTOMER_OPTIN_2') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN_2'), $flag, $enc) : '';
+                $resp['CUSTOMER_OPTIN']			    = $this->Request()->getPost('CUSTOMER_OPTIN') == true ? strtoupper(htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN'), $flag, $enc)) : '';
+                $resp['CUSTOMER_OPTIN_2']			= $this->Request()->getPost('CUSTOMER_OPTIN_2') == true ? strtoupper(htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN_2'), $flag, $enc)) : '';
 
                 $resp['CONTACT_EMAIL']				= $this->Request()->getPost('CONTACT_EMAIL') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_EMAIL'), $flag, $enc) : '';
 				$resp['CONTACT_PHONE']				= $this->Request()->getPost('CONTACT_PHONE') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_PHONE'), $flag, $enc) : '';
@@ -902,7 +926,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 * response action method for the reponse call of a registration from heidelpay
 	 */
 	public function responseRegAction() {
-
 		// setting csrf-Token is required
 		if($this->Request()->getPost('__csrf_token')){
 			$token = 'X-CSRF-Token';

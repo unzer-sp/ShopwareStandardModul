@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.02.13';
+		return '18.02.15';
 	}
 
 	/**
@@ -792,6 +792,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
+            case '18.02.15':
+                // prevents a payment request for Santander and Payolution in case of no birthdate is stored
+                // fixes for payment method santander for Emotion templates
+                // changes in Santander templates for both templatefiles
+                try{
+                    $msg .= '* update 18.02.15 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
     		// overwrite $msg if update was successful
 			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
 		}
@@ -811,7 +821,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $sql = "SELECT * FROM `s_core_paymentmeans` WHERE `name` = 'hgw_sue';";
         $hgwSufuData = Shopware()->Db()->fetchRow($sql);
 
-        if($hgwSufuData['description'] = "Heidelpay CD-Edition Sofort&uuml;berweisung")
+        if($hgwSufuData['description'] == "Heidelpay CD-Edition Sofort&uuml;berweisung")
         {
             // changing name of Sofü to "Sofort"
             $sql = "UPDATE s_core_paymentmeans 
@@ -1869,19 +1879,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                     $optin 				= $sanJson['optin'];
 //                                                    $privacy_policy 	= $sanJson['privacy_policy'];
 
-                                                    $view->optin 			    = $optin;
-                                                    $view->optinText 		    = isset($sanJson['santander_iv_de_werbewiderspruch_optin_text']) ? $sanJson['santander_iv_de_werbewiderspruch_optin_text'] : $sanJson['santander_iv_de_adv_text'];
-                                                    $view->optinLink 		    = isset($sanJson['santander_iv_de_werbewiderspruch_link']) ? $sanJson['santander_iv_de_werbewiderspruch_link'] : $sanJson['santander_iv_de_adv_link'];
+                                                    $view->optin_San 			    = $optin;
+                                                    $view->optinText_San		    = isset($sanJson['santander_iv_de_werbewiderspruch_optin_text']) ? $sanJson['santander_iv_de_werbewiderspruch_optin_text'] : $sanJson['santander_iv_de_adv_text'];
+                                                    $view->optinLink_San		    = isset($sanJson['santander_iv_de_werbewiderspruch_link']) ? $sanJson['santander_iv_de_werbewiderspruch_link'] : $sanJson['santander_iv_de_adv_link'];
 
-                                                    $view->accountHolder	    = $getFormUrl['ACCOUNT_HOLDER'];
-                                                    $view->checkOptin           = strtoupper($dobSan['CUSTOMER_OPTIN']);
-                                                    $view->checkPrivacyPolicy   = strtoupper($dobSan['CUSTOMER_ACCEPT_PRIVACY_POLICY']);
+                                                    $view->accountHolder_San	    = $getFormUrl['ACCOUNT_HOLDER'];
+                                                    $view->checkOptin_San           = strtoupper($dobSan['CUSTOMER_OPTIN']);
+                                                    $view->checkPrivacyPolicy_San   = strtoupper($dobSan['CUSTOMER_ACCEPT_PRIVACY_POLICY']);
 
 //                                                    $view->privacy_policy 	= $privacy_policy;
-                                                    $view->privacy_policy_text 	= isset($sanJson['santander_iv_de_datenschutzbestimmungen_optin_text']) ? $sanJson['santander_iv_de_datenschutzbestimmungen_optin_text'] : $sanJson['santander_iv_de_privpol_text'];
-                                                    $view->privacy_policy_link 	= isset($sanJson['santander_iv_de_datenschutzbestimmungen_link']) ? $sanJson['santander_iv_de_datenschutzbestimmungen_link'] : $sanJson['santander_iv_de_privpol_link'];
+                                                    $view->privacy_policy_text_San 	= isset($sanJson['santander_iv_de_datenschutzbestimmungen_optin_text']) ? $sanJson['santander_iv_de_datenschutzbestimmungen_optin_text'] : $sanJson['santander_iv_de_privpol_text'];
+                                                    $view->privacy_policy_link_San 	= isset($sanJson['santander_iv_de_datenschutzbestimmungen_link']) ? $sanJson['santander_iv_de_datenschutzbestimmungen_link'] : $sanJson['santander_iv_de_privpol_link'];
 
-                                                    $view->logoLink             = isset($sanJson['santander_iv_logo_link']) ? $sanJson['santander_iv_logo_link'] : $sanJson['santander_iv_img_link'];
+                                                    $view->logoLink_San             = isset($sanJson['santander_iv_logo_link']) ? $sanJson['santander_iv_logo_link'] : $sanJson['santander_iv_img_link'];
 
                                                 }
 
@@ -1980,12 +1990,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             // Case for Santander to save Values to DB to use them in Request on gatewayAction()
             if(
                 ($request->getControllerName() == 'checkout' &&  $action == 'saveShippingPayment') ||
+                ($request->getControllerName() == 'checkout' &&  $action == 'payment') ||
                 ($request->getControllerName() == 'account' &&  $action == 'savePayment')
+
             )
             {
-                /* ********************************************************************* */
+                //load Userdata to check payment method
+                $user = Shopware()->Modules()->Admin()->sGetUserData();
+
                 // check if IVPD is active
-                if($request->getPost("BRAND") == "PAYOLUTION_DIRECT")
+                if(
+                    ($request->getPost("BRAND") == "PAYOLUTION_DIRECT") &&
+                    ($user['additional']['payment']['name'] == "hgw_ivpd")
+                )
                 {
                     //save Birthdate to DB
                     $flag = ENT_COMPAT;
@@ -1994,8 +2011,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $nameBirthdate      = $request->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($request->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
                     $contactPhone       = $request->getPost('CONTACT_PHONE') == true ? htmlspecialchars($request->getPost('CONTACT_PHONE'), $flag, $enc) : '';
                     //daten in DB Speichern
-                    $user = Shopware()->Modules()->Admin()->sGetUserData();
-
                     // Benoetigte User-Indexe bei SW.516 anders vergeben
                     $user = self::formatUserInfos($user);
 
@@ -2053,7 +2068,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
                 // Case for Santander
-                if ($request->getPost("BRAND") == "SANTANDER")
+                if (
+                    ($request->getPost("BRAND") == "SANTANDER") &&
+                    ($user['additional']['payment']['name'] == "hgw_san")
+                )
                 {
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
@@ -2071,14 +2089,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     // Benoetigte User-Indexe bei SW.516 anders vergeben
                     $user = self::formatUserInfos($user);
 
+                    $customerOptIn  = $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')), $flag, $enc) : 'FALSE';
+                    $customerOptIn2 = $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY')), $flag, $enc) : null;
+                    if(empty($customerOptIn2) || $customerOptIn2 == null)
+                    {
+                        $customerOptIn2 = $request->getPost('CUSTOMER_OPTIN_2') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN_2')), $flag, $enc) : 'FALSE';
+                    }
                     $payment_data = [
                         "NAME_BIRTHDATE"                    => $nameBirthdate,
-                        "CUSTOMER_OPTIN"                    =>
-                            $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')), $flag, $enc) : 'FALSE',
-                        "CUSTOMER_ACCEPT_PRIVACY_POLICY"    =>
-                            $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY')), $flag, $enc) : 'FALSE',
-                        "NAME_SALUTATION"                   =>
-                            $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
+                        "CUSTOMER_OPTIN"                    => $customerOptIn,
+                        "CUSTOMER_ACCEPT_PRIVACY_POLICY"    => $customerOptIn2,
+                        "NAME_SALUTATION"                   => $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
                     ];
 
                     $sql = '
@@ -2938,7 +2959,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			} else {
 				$amountTotalVat = $basket['sAmountTax'];
 			}
-	
+
 			// adding total amounts basket-Api-information
 			$basketTotalData['basket'] = array(
 			

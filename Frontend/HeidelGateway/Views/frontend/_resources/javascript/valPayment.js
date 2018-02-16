@@ -69,14 +69,13 @@ $(document).ready(function(){
 	
 	//Function to set Birthdate in hidden field for Chrome on mac
 	jQuery("input[type='submit'], .right").click(function(e){
-
         var pm = $('input:radio:checked').attr('class');
-
         if(pm != undefined) {
             if(pm.indexOf("hgw_san") > 0)
             {
                 // validation of Santander Inputs
                 var errorsSan = valSantander();
+
                 // adding failure-messages
                 if((jQuery('.'+"hgw_san"+'  .instyle_error').length > 0)){
                     jQuery('.error ul li').remove();
@@ -100,12 +99,12 @@ $(document).ready(function(){
                 var adv_permission = $('#hgw_adv_san').val();
                 var priv_policy = $('#hgw_privacyPolicy').val();
 
-                if (adv_permission == 'on') {
+                if (adv_permission == 'on' || adv_permission == 'TRUE') {
                     adv_permission = "TRUE";
                 } else {
                     adv_permission = "FALSE";
                 }
-                if (priv_policy == 'on') {
+                if (priv_policy == 'on' || priv_policy == 'TRUE') {
                     priv_policy = "TRUE";
                 } else {
                     priv_policy = "FALSE";

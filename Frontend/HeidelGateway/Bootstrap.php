@@ -2935,6 +2935,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 				$count++;
 			};
+
 			// adding shipping costs as an article
 			$shoppingCart['basket']['basketItems'][] = array(
 					'position'				=> $count,
@@ -2961,13 +2962,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 			// adding total amounts basket-Api-information
-			$basketTotalData['basket'] = array(
-			
-					'amountTotalNet'	=> str_replace('.','',$basket['AmountNetNumeric']*100),
-					'amountTotalVat'	=> str_replace(',','.',$amountTotalVat)* 100,
-					'currencyCode'		=> Shopware()->Currency()->getShortName(),
-					'itemCount'			=> count($shoppingCart['basket']['basketItems']),
-			);
+            $amountTotalNet      = number_format($basket['AmountNetNumeric'], 4,".","");
+            $amountTotalNet      = bcmul($amountTotalNet, 100, 0);
+
+            $amountTotalGross    = number_format($basket["AmountNumeric"], 4,".","");
+            $amountTotalGross    = bcmul($amountTotalGross, 100, 0);
+
+            $amountTotalVatCalc 		= number_format(bcsub($amountTotalGross,$amountTotalNet),0,".","");
+            $basketTotalData['basket'] = [
+                'amountTotalNet' => $amountTotalNet,
+                'amountTotalVat' => $amountTotalVatCalc,
+                'currencyCode'   => !empty($basket["sCurrencyName"])  ? $basket["sCurrencyName"]: "EUR",
+                'itemCount'		 => count($shoppingCart['basket']['basketItems']),
+            ];
 
 			$shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
 

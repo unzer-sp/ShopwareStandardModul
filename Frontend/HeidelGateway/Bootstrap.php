@@ -2976,8 +2976,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'itemCount'		 => count($shoppingCart['basket']['basketItems']),
             ];
 
-			$shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
-
+            $shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());

@@ -84,6 +84,14 @@ $(document).ready(function(){
                             jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
                         }
 
+                        jQuery('.newreg_ivpd').click(function(e){
+                            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                        });
+
                         if(((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)){
                             // load fancy-js for select boxes
                             if(swVersion >= '5.1'){
@@ -128,7 +136,6 @@ $(document).ready(function(){
 
             //Function to set Birthdate in hidden field for Chrome on mac
             jQuery("input[type='submit'], .right").click(function(e){
-
                 var pm = $('input:radio:checked').attr('class');
 
                 if(pm != undefined) {
@@ -161,7 +168,6 @@ $(document).ready(function(){
 
                             jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
                         }
-
                         //validation of inputs
                         var errorsIvpd = valPayolutionDirect();
                         if(errorsIvpd.length >0)
@@ -192,7 +198,6 @@ $(document).ready(function(){
                     var pm = null;
                     pm = jQuery("#payType").attr("class");
                     pm = pm.substr(7);
-
                     if(jQuery(".newreg_"+pm) > 0) {
                         birthDay = jQuery(".newreg_"+pm+" [name='Date_Day']").val();
                         birthMonth = jQuery(".newreg_"+pm+" [name = 'Date_Month']").val();

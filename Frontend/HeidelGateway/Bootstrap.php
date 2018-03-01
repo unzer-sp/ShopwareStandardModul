@@ -5,8 +5,8 @@
 * @category Shopware
 * @package Shopware_Plugins
 * @subpackage Plugin
-* @link http://www.heidelpay.de
-* @copyright Copyright (c) 2016, Heidelberger Payment GmbH
+* @link http://www.heidelpay.com
+* @copyright Copyright (c) 2018, heidelpay GmbH
 * @author Jens Richter / Sascha Pflueger
 */
 require_once __DIR__ . '/Components/CSRFWhitelistAware.php';
@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.03.01';
+		return '18.03.12';
 	}
 
 	/**
@@ -59,18 +59,37 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$hp_logo 	= dirname(__FILE__) . '/img/heidelpay.png';
 		return array(
 				'version' => $this->getVersion(),
-				'autor' => 'Heidelberger Payment GmbH (SP)',
+				'autor' => 'heidelpay GmbH (SP)',
 				'label' => $this->getLabel(),
 				'source' => "Default",
-//				'description' => '<p><img src="data:image/png;base64,' .$hp_logo. '" /></p>
-				'description' => '<p><img src='.$hp_logo.' /></p>
-			<p style="font-size:12px; font-weight: bold;">Heidelberger Payment GmbH - Ihr Full Service Payment Provider - alles aus einer Hand</p>
-			<p style="font-size:12px">Die Heidelberger Payment GmbH kurz: Heidelpay bietet als BaFin-zertifizierter Payment Service Provider alles was zum Online-Payment geh&ouml;rt.<br><br><a href="http://testshops.heidelpay.de/contactform/?campaign=shopware4.0&shop=shopware4.0" target="_blank" style="font-size: 12px; color: #000; font-weight: bold;">&gt;&gt;&gt; Informationen anfordern &lt;&lt;&lt;</a><br/></p><br /><p style="font-size:12px">Das Leistungsspektrum des PCI DSS zertifizierten Unternehmens reicht von weltweiten e-Payment L&ouml;sungen, inklusive eines vollst&auml;ndigen Debitorenmanagement-, Risk- und Fraud- Systems bis hin zu einem breiten Angebot alternativer Bezahlverfahren - schnell, sicher, einfach und umfassend - alles aus einer Hand.</p><br/><a href="http://www.heidelpay.de" style="font-size: 12px; color: #000; font-weight: bold;">www.heidelpay.de</a><br/><br/><p style="font-size: 12px; color: #f00; font-weight: bold;">Hinweis:</p><p style="font-size:12px">Um unser "Heidelpay Backend" Plug-in nutzen zu k&ouml;nnen, beantragen Sie bitte die Aufschaltung von Push-Benachrichtigungen bei unserem Technischen Support. Wenden Sie sich hierf&uuml;r bitte per E-Mail an support@heidelpay.de oder Telefon +49 (0) 6221 65170-10 an uns. Bitte notieren Sie sich Sie sich vorher die URL ihres e-Shops plus dem Webpfad zur Heidelpay Action und teilen Sie uns diese dann mit, als Beispiel:<br/><br/><b>https://www.meinshop.de/PaymentHgw/rawnotify</b><br/><br/><br />
-			Testdaten entnehmen Sie bitte unserer <a href="https://dev.heidelpay.de/testumgebung/" style="color: #000; font-weight: bold;" target="_blank">Dokumentation</a>.</p>',
+				'description' =>
+                    '<p style="font-size:12px">
+                        <img src="' .$hp_logo. '"/><br/> 
+                        Die heidelpay GmbH kurz: heidelpay bietet als BaFin-zertifizierter Payment Service Provider 
+                        alles was zum Online-Payment geh&ouml;rt.<br><br>
+                        <a href="http://testshops.heidelpay.de/contactform/?campaign=shopware4.0&shop=shopware" target="_blank" style="font-size: 12px; color: #000; font-weight: bold;">&gt;&gt;&gt; Informationen anfordern &lt;&lt;&lt;</a><br/>
+                    </p>
+                    <br />
+                    <p style="font-size:12px">
+                        Das Leistungsspektrum des PCI DSS zertifizierten Unternehmens reicht von weltweiten e-Payment L&ouml;sungen, 
+                        inklusive eines vollst&auml;ndigen Debitorenmanagement-, Risk- und Fraud- Systems bis hin zu einem breiten 
+                        Angebot alternativer Bezahlverfahren - schnell, sicher, einfach und umfassend - alles aus einer Hand.
+                     </p>
+                     <br/>
+                     <a href="http://www.heidelpay.com" style="font-size: 12px; color: #000; font-weight: bold;">www.heidelpay.com</a><br/><br/>
+                     <p style="font-size: 12px; color: #f00; font-weight: bold;">
+                        Für Fragen zu der Funktion des Plugins oder der Zahlungsabwicklung wenden Sie sich bitte an<br/> 
+                        E-Mail: <a href="mailto:support@heidelpay.com">support@heidelpay.com</a><br/>Telefon: <a href="tel:+4962216471100">+49 (0) 6221 64 71 100</a>.<br/> 
+                        Bitte notieren Sie sich Sie sich vorher die URL Ihres e-Shops sowie die Version Ihres Shopware-Systems und teilen Sie uns diese dann mit, 
+                        als Beispiel:<br/>
+                        <b>https://www.meinshop.de/</b><br/>
+                        <b>Shopware 5.3.5</b><br/>
+                        Testdaten entnehmen Sie bitte unserer <a href="https://dev.heidelpay.de/testumgebung/" style="color: #000; font-weight: bold;" target="_blank">Dokumentation</a>.
+                     </p>',
 				'license' => 'commercial',
-				'copyright' => 'Copyright © '.date("Y").', Heidelberger Payment GmbH',
-				'support' => 'support@heidelpay.de',
-				'link' => 'http://www.heidelpay.de/'
+				'copyright' => 'Copyright © '.date("Y").', heidelpay GmbH',
+				'support' => 'support@heidelpay.com',
+				'link' => 'http://www.heidelpay.com/'
 		);
 	}
 
@@ -800,6 +819,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 try{
                     $this->addSnippets();
                     $msg .= '* update 18.03.01 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '18.03.12':
+                // rebranding of heidelpay Company
+                try{
+                    $msg .= '* update 18.03.12 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

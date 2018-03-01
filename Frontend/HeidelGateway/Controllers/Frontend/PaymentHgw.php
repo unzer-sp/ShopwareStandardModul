@@ -5,9 +5,9 @@
 * @category Shopware
 * @package Shopware_Plugins
 * @subpackage Plugin
-* @link http://www.heidelpay.de
-* @copyright Copyright (c) 2016, Heidelberger Payment GmbH
-* @author Jens Richter / Andreas Nemet / Sasscha Pflüger
+* @link http://www.heidelpay.com
+* @copyright Copyright (c) 2018, heidelpay GmbH
+* @author Jens Richter / Sascha Pflueger
 */
 use Shopware\Components\CSRFWhitelistAware;
 

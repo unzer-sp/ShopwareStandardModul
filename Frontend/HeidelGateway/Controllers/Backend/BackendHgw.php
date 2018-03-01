@@ -5,9 +5,9 @@
 * @category Shopware
 * @package Shopware_Plugins
 * @subpackage Plugin
-* @link http://www.heidelpay.de
-* @copyright Copyright (c) 2016, Heidelberger Payment GmbH
-* @author Jens Richter / Andreas Nemet
+* @link http://www.heidelpay.com
+* @copyright Copyright (c) 2016, heidelpay GmbH
+* @author Jens Richter / Sascha Pflueger
 */
 
 class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backend_ExtJs implements Enlight_Hook{

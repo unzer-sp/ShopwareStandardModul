@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.02.15';
+		return '18.03.01';
 	}
 
 	/**
@@ -793,11 +793,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '18.02.15':
+            case '18.03.01':
                 // prevents a payment request for Santander and Payolution in case of no birthdate is stored
                 // fixes for payment method santander for Emotion templates
                 // changes in Santander templates for both templatefiles
                 try{
-                    $msg .= '* update 18.02.15 <br />';
+                    $this->addSnippets();
+                    $msg .= '* update 18.03.01 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

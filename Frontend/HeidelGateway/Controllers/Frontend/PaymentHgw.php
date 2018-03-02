@@ -2722,6 +2722,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 						case 'RV':
 							$params['internalcomment'] = 'Reversal '.$comment;
+							$params['cleared'] = $this->hgw()->Config()->HGW_CHB_STATUS;
 							break;
 
 						case 'CB':

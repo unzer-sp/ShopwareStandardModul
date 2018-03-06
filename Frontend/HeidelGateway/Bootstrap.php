@@ -191,493 +191,493 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		return array('success' => true, 'invalidateCache' => array('frontend'));
 	}
 
-	/**
-	 * Plugin update method
-	 * @param string $oldVersion - old module version
-	 * @return bool
-	 */
-	public function update($oldVersion){
+    /**
+     * Plugin update method
+     * @param string $oldVersion - old module version
+     * @return bool
+     */
+    public function update($oldVersion){
 
-		$msg = 'Update Fehler. Alte Modulversion: '.$oldVersion.'<br />';
-		$form = $this->Form();
-		switch($oldVersion){
-			case '14.05.08':
-			case '14.05.15':
-			case '14.05.22':
-			case '14.06.03':
-				try{
-					$msg .= '* update 14.06.03<br />';
-					$form->setElement('select', 'HGW_MOBILE_CSS', array(
-							'label' => 'activate mobile CSS',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.06.10':
-			case '14.06.18':
-				try{
-					$msg .= '* update 14.06.18<br />';
-					$this->createEvents();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.06.27':
-			case '14.07.07':
-			case '14.07.08':
-			case '14.07.09':
-				try{
-					$msg .= '* update 14.07.09<br />';
-					$this->installDirectDebitMail();
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.11':
-				try{
-					$msg .= '* update 14.08.11<br />';
-					$this->installPrepaymentMail();
-					$this->installBarPayMail();
-					$this->installDirectDebitMail();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.13':
-				try{
-					$msg .= '* update 14.08.13<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_PF_CHANNEL', array(
-							'label'=>'PostFinance Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.15':
-				try{
-					$msg .= '* update 14.08.15<br />';
-					$this->getInfo();
-					$this->createLoggingUser();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.22':
-				try{
-					$msg .= '* update 14.08.22<br />';
-					$form->setElement('select', 'HGW_PP_MAIL', array(
-							'label' => 'Send pay data via mail',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Send payment information in additional email. Available for BarPay, Prepayment and Direct Debit.'
-					));
-					$form->setElement('select', 'HGW_IBAN', array(
-							'label' => 'Show IBAN?',
-							'value' => 2,
-							'store' => array(array(0, 'No'), array(1, 'Yes'), array(2, 'Both')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Show IBAN or Account / Bank no.? Valid for Direct Debit and Sofort Banking.'
-					));
-					$form->setElement('select', 'HGW_TRANSACTION_MODE', array(
-							'label' => 'Sandbox mode',
-							'value' => 1,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'If enabled, all transaction will be send to Heidelpay Sandbox. Otherwise all transactions are real transactions and each transaction is charged.'
-					));
-					$form->setElement('select', 'HGW_VA_BOOKING_MODE', array(
-							'label' => 'PayPal booking mode',
-							'value' => 1,
-							'store' => array(array(1, 'debit'), array(2, 'reservation'), array(3, 'registration with debit'), array(4, 'registration with reservation')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => '<b>Please note: PayPal Account needs to be configured for recurring transactions, if you want use the registration feature.<b>'
-					));
-					$this->installPrepaymentMail();
-					$this->installBarPayMail();
-					$this->installDirectDebitMail();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.25':
-				// moved getFormUrl and preparePostData to controller
-			case '14.09.02':
-			case '14.09.17':
-			case '14.10.15':
-				try{
-					$msg .= '* update 14.10.15<br />';
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.11.19':
-			case '14.12.10':
-			case '14.12.22':
-				try{
-					$msg .= '* update 14.12.22<br />';
-					$this->createEvents();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.01.30':
-				try{
-					$msg .= '* update 15.01.30<br />';
-					if($this->assertRequiredPluginsPresent(array('HeidelActions'))){
-						throw new Enlight_Exception("Please uninstall Heidelpay Backend Plugin (HeidelActions)");
-					}
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.02.12':
-			case '15.02.23':
-			case '15.03.04':
-			case '15.03.06':
-			case '15.03.12':
-				try{
-					$msg .= '* update 15.03.12<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_GIR_CHANNEL', array(
-							'label'=>'Giropay Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.03.17':
-				try{
-					$msg .= '* update 15.03.17<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_IDE_CHANNEL', array(
-							'label'=>'Ideal Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.03.19':
-			case '15.04.09':
-				try{
-					$msg .= '* update 15.04.09<br />';
-					$this->createTransactionsTable();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.04.20':
-			case '15.04.22':
-				try{
-					$msg .= '* update 15.04.22<br />';
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.04.28':
-			case '15.05.04':
-			case '15.05.11':
-			case '15.05.13':
-			case '15.05.18':
-				try{
-					$msg .= '* update 15.05.18<br />';
-					$this->createPayments();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.05.27':
-			case '15.05.29':
-			case '15.06.03':
-			case '15.06.10':
-			case '15.06.17':
-			case '15.06.30':
-			case '15.07.07':
-			case '15.08.28':
-			case '15.09.02':
-				try{
-					$msg .= '* update 15.09.02<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_MPA_CHANNEL', array(
-							'label'=>'MasterPass Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-					$form->setElement('select', 'HGW_MPA_BOOKING_MODE', array(
-							'label' => 'MasterPass booking mode',
-							'value' => 1,
-							'store' => array(array(1, 'debit'), array(2, 'reservation')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
-					$this->alterRGTable();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.09.07':
-			case '15.09.08':
-			case '15.09.10':
-				try{
-					$msg .= '* update 15.09.10<br />';
-					$this->addPluginTranslation();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.09.14':
-			case '15.09.15':
-				try{
-					$msg .= '* update 15.09.15<br />';
-					$this->createPayments();
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.09.18':
-			case '15.09.21':
-			case '15.09.22':
-			case '15.09.25':
-			case '15.10.07':
-			case '15.10.08':
-			case '15.10.14':
-			case '15.10.16':
-			case '15.10.19':
-				try{
-					$msg .= '* update 15.10.19<br />';
-					$form->setElement('select', 'HGW_CHB_STATUS', array(
-							'label' => 'Chargeback State',
-							'value' => 35,
-							'store' => 'base.PaymentStatus',
-							'displayField' => 'description',
-							'valueField' => 'id',
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'This state is set if a direct debit is bounced or at a credit card chargeback'
-					));
-					$this->addPluginTranslation();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.10.27':
-			case '15.11.02':
-			case '15.11.17':
-				try{
-					$msg .= '* update 15.11.17<br />';
-					$this->createTable();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.11.30':
-			case '15.12.02':
-			case '16.02.22':
-			case '16.03.10':
-			case '16.03.22':
-				try{
-					$msg .= '* update 16.03.22<br />';
-					$this->createEvents();
-					$this->addSnippets();
-					$this->alterRGTable();
-					$this->deactivateYapital();
-					$form->setElement('text', 'HGW_HPF_CC_CSS', array(
-							'label'=>'Path to hPF CSS for creditcard',
-							'value'=> '',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our creditcard form.'
-					));
-					$form->setElement('text', 'HGW_HPF_DC_CSS', array(
-							'label'=>'Path to hPF CSS for debitcard',
-							'value'=> '',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our debitcard form.'
-					));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.04.08':
-				try{
-					$msg .= '* update 16.04.08<br />';
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.04.25':
-				try{
-					$msg .= '* update 16.04.25<br />';
-					$this->addSnippets();
-					$this->createPayments();
-					$this->addPluginTranslation();
-					$this->alterRGTable();
-					$form->setElement('text', 'HGW_PAPG_CHANNEL', array(
-							'label'=>'Gesicherter Rechnungskauf',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
-					));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.06.06':
-			case '16.06.16':
-				try {
-					$msg .= '* Update 16.06.16';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_P24_CHANNEL', array(
-							'label'=>'Przelewy24 Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
+        $msg = 'Update Fehler. Alte Modulversion: '.$oldVersion.'<br />';
+        $form = $this->Form();
+        switch($oldVersion){
+            case '14.05.08':
+            case '14.05.15':
+            case '14.05.22':
+            case '14.06.03':
+                try{
+                    $msg .= '* update 14.06.03<br />';
+                    $form->setElement('select', 'HGW_MOBILE_CSS', array(
+                        'label' => 'activate mobile CSS',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.06.10':
+            case '14.06.18':
+                try{
+                    $msg .= '* update 14.06.18<br />';
+                    $this->createEvents();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.06.27':
+            case '14.07.07':
+            case '14.07.08':
+            case '14.07.09':
+                try{
+                    $msg .= '* update 14.07.09<br />';
+                    $this->installDirectDebitMail();
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.11':
+                try{
+                    $msg .= '* update 14.08.11<br />';
+                    $this->installPrepaymentMail();
+                    $this->installBarPayMail();
+                    $this->installDirectDebitMail();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.13':
+                try{
+                    $msg .= '* update 14.08.13<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_PF_CHANNEL', array(
+                        'label'=>'PostFinance Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.15':
+                try{
+                    $msg .= '* update 14.08.15<br />';
+                    $this->getInfo();
+                    $this->createLoggingUser();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.22':
+                try{
+                    $msg .= '* update 14.08.22<br />';
+                    $form->setElement('select', 'HGW_PP_MAIL', array(
+                        'label' => 'Send pay data via mail',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Send payment information in additional email. Available for BarPay, Prepayment and Direct Debit.'
+                    ));
+                    $form->setElement('select', 'HGW_IBAN', array(
+                        'label' => 'Show IBAN?',
+                        'value' => 2,
+                        'store' => array(array(0, 'No'), array(1, 'Yes'), array(2, 'Both')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Show IBAN or Account / Bank no.? Valid for Direct Debit and Sofort Banking.'
+                    ));
+                    $form->setElement('select', 'HGW_TRANSACTION_MODE', array(
+                        'label' => 'Sandbox mode',
+                        'value' => 1,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'If enabled, all transaction will be send to Heidelpay Sandbox. Otherwise all transactions are real transactions and each transaction is charged.'
+                    ));
+                    $form->setElement('select', 'HGW_VA_BOOKING_MODE', array(
+                        'label' => 'PayPal booking mode',
+                        'value' => 1,
+                        'store' => array(array(1, 'debit'), array(2, 'reservation'), array(3, 'registration with debit'), array(4, 'registration with reservation')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => '<b>Please note: PayPal Account needs to be configured for recurring transactions, if you want use the registration feature.<b>'
+                    ));
+                    $this->installPrepaymentMail();
+                    $this->installBarPayMail();
+                    $this->installDirectDebitMail();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.25':
+                // moved getFormUrl and preparePostData to controller
+            case '14.09.02':
+            case '14.09.17':
+            case '14.10.15':
+                try{
+                    $msg .= '* update 14.10.15<br />';
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.11.19':
+            case '14.12.10':
+            case '14.12.22':
+                try{
+                    $msg .= '* update 14.12.22<br />';
+                    $this->createEvents();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.01.30':
+                try{
+                    $msg .= '* update 15.01.30<br />';
+                    if($this->assertRequiredPluginsPresent(array('HeidelActions'))){
+                        throw new Enlight_Exception("Please uninstall Heidelpay Backend Plugin (HeidelActions)");
+                    }
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.02.12':
+            case '15.02.23':
+            case '15.03.04':
+            case '15.03.06':
+            case '15.03.12':
+                try{
+                    $msg .= '* update 15.03.12<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_GIR_CHANNEL', array(
+                        'label'=>'Giropay Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.03.17':
+                try{
+                    $msg .= '* update 15.03.17<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_IDE_CHANNEL', array(
+                        'label'=>'Ideal Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.03.19':
+            case '15.04.09':
+                try{
+                    $msg .= '* update 15.04.09<br />';
+                    $this->createTransactionsTable();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.04.20':
+            case '15.04.22':
+                try{
+                    $msg .= '* update 15.04.22<br />';
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.04.28':
+            case '15.05.04':
+            case '15.05.11':
+            case '15.05.13':
+            case '15.05.18':
+                try{
+                    $msg .= '* update 15.05.18<br />';
+                    $this->createPayments();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.05.27':
+            case '15.05.29':
+            case '15.06.03':
+            case '15.06.10':
+            case '15.06.17':
+            case '15.06.30':
+            case '15.07.07':
+            case '15.08.28':
+            case '15.09.02':
+                try{
+                    $msg .= '* update 15.09.02<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_MPA_CHANNEL', array(
+                        'label'=>'MasterPass Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                    $form->setElement('select', 'HGW_MPA_BOOKING_MODE', array(
+                        'label' => 'MasterPass booking mode',
+                        'value' => 1,
+                        'store' => array(array(1, 'debit'), array(2, 'reservation')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
+                    $this->alterRGTable();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.09.07':
+            case '15.09.08':
+            case '15.09.10':
+                try{
+                    $msg .= '* update 15.09.10<br />';
+                    $this->addPluginTranslation();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.09.14':
+            case '15.09.15':
+                try{
+                    $msg .= '* update 15.09.15<br />';
+                    $this->createPayments();
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.09.18':
+            case '15.09.21':
+            case '15.09.22':
+            case '15.09.25':
+            case '15.10.07':
+            case '15.10.08':
+            case '15.10.14':
+            case '15.10.16':
+            case '15.10.19':
+                try{
+                    $msg .= '* update 15.10.19<br />';
+                    $form->setElement('select', 'HGW_CHB_STATUS', array(
+                        'label' => 'Chargeback State',
+                        'value' => 35,
+                        'store' => 'base.PaymentStatus',
+                        'displayField' => 'description',
+                        'valueField' => 'id',
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'This state is set if a direct debit is bounced or at a credit card chargeback'
+                    ));
+                    $this->addPluginTranslation();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.10.27':
+            case '15.11.02':
+            case '15.11.17':
+                try{
+                    $msg .= '* update 15.11.17<br />';
+                    $this->createTable();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.11.30':
+            case '15.12.02':
+            case '16.02.22':
+            case '16.03.10':
+            case '16.03.22':
+                try{
+                    $msg .= '* update 16.03.22<br />';
+                    $this->createEvents();
+                    $this->addSnippets();
+                    $this->alterRGTable();
+                    $this->deactivateYapital();
+                    $form->setElement('text', 'HGW_HPF_CC_CSS', array(
+                        'label'=>'Path to hPF CSS for creditcard',
+                        'value'=> '',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our creditcard form.'
+                    ));
+                    $form->setElement('text', 'HGW_HPF_DC_CSS', array(
+                        'label'=>'Path to hPF CSS for debitcard',
+                        'value'=> '',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our debitcard form.'
+                    ));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.04.08':
+                try{
+                    $msg .= '* update 16.04.08<br />';
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.04.25':
+                try{
+                    $msg .= '* update 16.04.25<br />';
+                    $this->addSnippets();
+                    $this->createPayments();
+                    $this->addPluginTranslation();
+                    $this->alterRGTable();
+                    $form->setElement('text', 'HGW_PAPG_CHANNEL', array(
+                        'label'=>'Gesicherter Rechnungskauf',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                    ));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.06.06':
+            case '16.06.16':
+                try {
+                    $msg .= '* Update 16.06.16';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_P24_CHANNEL', array(
+                        'label'=>'Przelewy24 Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
-			case '16.07.01':
-				try {
-					$msg .= '* Update 16.07.01';
-					$this->createPayments();
-					$form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array(
-							'label' => 'Direct Debit guarantee mode',
-							'value' => 2,
-							'store' => array( array(1, 'Yes'), array(2, 'No')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Please consider, that a special contract is needed'
-					));
+            case '16.07.01':
+                try {
+                    $msg .= '* Update 16.07.01';
+                    $this->createPayments();
+                    $form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array(
+                        'label' => 'Direct Debit guarantee mode',
+                        'value' => 2,
+                        'store' => array( array(1, 'Yes'), array(2, 'No')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Please consider, that a special contract is needed'
+                    ));
 
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
-			case '16.07.15':
-				try {
-					$this->createPayments();
-					$msg .= '* Update 16.07.15';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.08.01':
-			case '16.08.06':
-			case '16.08.08':
-				try {
-					$msg .= '* Update 16.08.08';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.08.30':
-			case '16.09.14':
-			case '16.09.21':
-				try {
-					$msg .= '* Update 16.09.14';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.09.30':
-			case '16.10.01':
-				try{
-					$msg .= '* update 16.10.01<br />';
-					$this->createPayments();
-					$this->addSnippets();
-					$form->setElement('text', 'HGW_EPS_CHANNEL', array(
-							'label'=>'EPS Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.10.11':
-				try{
-					$msg .= '* update 16.10.11<br />';
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.10.31':
-				try{
-					$msg .= '* update 16.10.31 <br />';
-					$form = $this->update161028($form);
+            case '16.07.15':
+                try {
+                    $this->createPayments();
+                    $msg .= '* Update 16.07.15';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.08.01':
+            case '16.08.06':
+            case '16.08.08':
+                try {
+                    $msg .= '* Update 16.08.08';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.08.30':
+            case '16.09.14':
+            case '16.09.21':
+                try {
+                    $msg .= '* Update 16.09.14';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.09.30':
+            case '16.10.01':
+                try{
+                    $msg .= '* update 16.10.01<br />';
+                    $this->createPayments();
+                    $this->addSnippets();
+                    $form->setElement('text', 'HGW_EPS_CHANNEL', array(
+                        'label'=>'EPS Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.10.11':
+                try{
+                    $msg .= '* update 16.10.11<br />';
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.10.31':
+                try{
+                    $msg .= '* update 16.10.31 <br />';
+                    $form = $this->update161028($form);
 
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-				// new method responseRegAction added and changed precedure after sending transaction to payment
-			case '16.11.18':
-				try {
-					$msg .= '* update 16.11.18 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.11.29':
-				try {
-					$msg .= '* update 16.11.18 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.12.04':
-				// Fix for reregistration in Emotiontemplate
-				try {
-					$msg .= '* update 16.12.04 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '17.01.09':
-				// only version number changed
-				try {
-					$msg .= '* update 17.01.09 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '17.01.20':
-			case '17.01.25':
-			case '17.01.31':
-			case '17.02.21':
-			case '17.02.23':
-				// issues in Emotion-template with redirection after registration
-				// recreated checkoutflow for both templates
-				// added Basket-API for Santander-Payment
-				try {
-					$msg .= '* update 17.02.21 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-				
-			case '17.03.13':
-			case '17.03.15':
-			case '17.03.16':
-			case '17.04.01':
-			case '17.04.10':
-				// changes for invoice payment - set payment-status after ACK-transaction to "review necessary"
-				// changes for prepayment - to show accountinfo to customers and merchant
-				// changes for prepayment - removed view of Short ID uppon the prepayment text in view "Orders" for customers
-				// changes in heidelpays Basket-Api use
-				// Fix for AboCommerce users
-				// IV-payments will not longer marked as paid by push RESs, only RC will mark an order to paid
-				// set HP-Basket-Api-calls for santander, invoice with gurantee (papg) and direct debit with insurance
-				// did some code refactoring from if/elseif to switch/case
-				// changed some responseparameter names
-				// added 3 new switches for sending prepayment-, invoice- and directDebit-Emails or not
-				// changed font-size of Invoice-PDF-Template 
-				try {
-					$form->setElement('select', 'HGW_IV_MAIL', array(
-							'label' => 'Zahlungsinformationen für Rechnung per Mail senden',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Zahlungsinformationen für Rechnung, gesicherte Rechnung und Santander in einer zusätzlicher Mail versenden.'
-					));
-					$form->setElement('select', 'HGW_DD_MAIL', array(
-							'label' => 'Zahlungsinformationen für Lastschrift per Mail senden',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Zahlungsinformationen für Lastschrift in einer zusätzlicher Mail versenden.'
-					));
-					$form->setElement('select', 'HGW_PP_MAIL', array(
-							'label' => 'Zahlungsinformationen für Vorkasse per Mail senden',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Zahlungsinformationen für Vorkasse in einer zusätzlicher Mail versenden.'
-					));
-					$this->updateInvoiceTemplates();
-					$msg .= '* update 17.04.10 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '17.04.19':
-			case '17.07.26':
-				// fix for missing articleId for shippment-article for secured invoice-payment
-				// fix for missing articleId for voucher for secured invoive-payment
-				// fix in JS for parsing error while setting CSRF-Token in JS of hp_payment.tpl
-				try {
-					$msg .= '* update 17.07.26 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            // new method responseRegAction added and changed precedure after sending transaction to payment
+            case '16.11.18':
+                try {
+                    $msg .= '* update 16.11.18 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.11.29':
+                try {
+                    $msg .= '* update 16.11.18 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.12.04':
+                // Fix for reregistration in Emotiontemplate
+                try {
+                    $msg .= '* update 16.12.04 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '17.01.09':
+                // only version number changed
+                try {
+                    $msg .= '* update 17.01.09 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '17.01.20':
+            case '17.01.25':
+            case '17.01.31':
+            case '17.02.21':
+            case '17.02.23':
+                // issues in Emotion-template with redirection after registration
+                // recreated checkoutflow for both templates
+                // added Basket-API for Santander-Payment
+                try {
+                    $msg .= '* update 17.02.21 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '17.03.13':
+            case '17.03.15':
+            case '17.03.16':
+            case '17.04.01':
+            case '17.04.10':
+                // changes for invoice payment - set payment-status after ACK-transaction to "review necessary"
+                // changes for prepayment - to show accountinfo to customers and merchant
+                // changes for prepayment - removed view of Short ID uppon the prepayment text in view "Orders" for customers
+                // changes in heidelpays Basket-Api use
+                // Fix for AboCommerce users
+                // IV-payments will not longer marked as paid by push RESs, only RC will mark an order to paid
+                // set HP-Basket-Api-calls for santander, invoice with gurantee (papg) and direct debit with insurance
+                // did some code refactoring from if/elseif to switch/case
+                // changed some responseparameter names
+                // added 3 new switches for sending prepayment-, invoice- and directDebit-Emails or not
+                // changed font-size of Invoice-PDF-Template
+                try {
+                    $form->setElement('select', 'HGW_IV_MAIL', array(
+                        'label' => 'Zahlungsinformationen für Rechnung per Mail senden',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Zahlungsinformationen für Rechnung, gesicherte Rechnung und Santander in einer zusätzlicher Mail versenden.'
+                    ));
+                    $form->setElement('select', 'HGW_DD_MAIL', array(
+                        'label' => 'Zahlungsinformationen für Lastschrift per Mail senden',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Zahlungsinformationen für Lastschrift in einer zusätzlicher Mail versenden.'
+                    ));
+                    $form->setElement('select', 'HGW_PP_MAIL', array(
+                        'label' => 'Zahlungsinformationen für Vorkasse per Mail senden',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Zahlungsinformationen für Vorkasse in einer zusätzlicher Mail versenden.'
+                    ));
+                    $this->updateInvoiceTemplates();
+                    $msg .= '* update 17.04.10 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '17.04.19':
+            case '17.07.26':
+                // fix for missing articleId for shippment-article for secured invoice-payment
+                // fix for missing articleId for voucher for secured invoive-payment
+                // fix in JS for parsing error while setting CSRF-Token in JS of hp_payment.tpl
+                try {
+                    $msg .= '* update 17.07.26 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
             case '17.08.20':
                 //Compatibility for Shopware 5.3
@@ -793,56 +793,35 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '18.02.12':
+            case '18.02.15':
+            case '18.03.01':
+            case '18.03.06':
                 // Changes for sending Basket-Api-Request for Santander and Payolution in BackendHgw
                 // function convertOrder() converts a abborded order into a regular order from a pushmessage
                 // Paypal direct redirect without entering e-mail-address in shop
-                try{
-                    $msg .= '* update 18.02.12 <br />';
-                } catch (Exception $e) {
-                    $this->logError($msg, $e);
-                }
-
-            case '18.02.13':
-                // renaming Sofortüberweisung to "Sofort"
-                try{
-                    //$this->renamePayments();
-                    $msg .= '* update 18.02.13 <br />';
-                } catch (Exception $e) {
-                    $this->logError($msg, $e);
-                }
-
-            case '18.02.15':
-            case '18.03.01':
                 // prevents a payment request for Santander and Payolution in case of no birthdate is stored
                 // fixes for payment method santander for Emotion templates
                 // changes in Santander templates for both templatefiles
-                try{
-                    $this->addSnippets();
-                    $msg .= '* update 18.03.01 <br />';
-                } catch (Exception $e) {
-                    $this->logError($msg, $e);
-                }
-
-            case '18.03.12':
                 // rebranding of heidelpay Company
                 try{
-                    $msg .= '* update 18.03.12 <br />';
+                    $this->addSnippets();
+                    $msg .= '* update 18.03.06 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
 
-    		// overwrite $msg if update was successful
-			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
-		}
+                // overwrite $msg if update was successful
+                $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
+        }
 
-		$form->save();
-		$this->Logging($msg);
-		return array(
-				'success' => true,
-				'message' => $msg,
-				'invalidateCache' => array('frontend'),
-		);
-	}
+        $form->save();
+        $this->Logging($msg);
+        return array(
+            'success' => true,
+            'message' => $msg,
+            'invalidateCache' => array('frontend'),
+        );
+    }
 
 	protected function renamePayments()
     {

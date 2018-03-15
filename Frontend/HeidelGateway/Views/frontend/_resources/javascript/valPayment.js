@@ -69,7 +69,7 @@ $(document).ready(function(){
 	
 	//Function to set Birthdate in hidden field for Chrome on mac
 	jQuery("input[type='submit'], .right").click(function(e){
-        var pm = $('input:radio:checked').attr('class');
+		var pm = $('input:radio:checked').attr('class');
         if(pm != undefined) {
             if(pm.indexOf("hgw_san") > 0)
             {
@@ -271,6 +271,50 @@ $(document).ready(function(){
             jQuery('.EasyPermission').remove();
         }
     }
+
+    // Event before swiching payment method
+    $.ajaxSetup({
+        beforeSend: function(event, xhr, settings){
+            // check chosen payment method
+            var chosenPaymentMethod = $('input:radio:checked').attr('class');
+
+            if(chosenPaymentMethod != undefined){
+                var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
+                chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+
+                //setting Payolution-checkbox to required if payolution is chosen
+                if(chosenPaymentMethod == 'ivpd'){
+                    $('#hgw_privpol_ivpd').attr("required","required");
+                    $('#hgw_privpol_ivpd').prop("required","required");
+                } else {
+                    $('#hgw_privpol_ivpd').prop("required",null);
+                    $('#hgw_privpol_ivpd').removeAttr("required");
+                }
+            } else {
+                $('#hgw_privpol_ivpd').prop("required",null);
+                $('#hgw_privpol_ivpd').removeAttr("required");
+            }
+
+
+        },
+        complete: function(event, xhr, settings){
+            var chosenPaymentMethod = $('input:radio:checked').attr('class');
+            // check chosen payment method
+            if(chosenPaymentMethod != undefined){
+                var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
+                chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+
+                //setting Payolution-checkbox to required if payolution is chosen
+                if(chosenPaymentMethod == 'ivpd'){
+                    $('#hgw_privpol_ivpd').attr("required","required");
+                    $('#hgw_privpol_ivpd').prop("required","required");
+                } else {
+                    $('#hgw_privpol_ivpd').prop("required",null);
+                    $('#hgw_privpol_ivpd').removeAttr("required");
+                }
+            }
+        },
+    });
 
 });
 
@@ -559,6 +603,27 @@ function valPayolutionDirect() {
         jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('instyle_error');
         jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
         errors[i++] = '.msg_dob';
+    }
+
+    //validation of Checkbox
+    if(document.getElementById("hgw_privpol_ivpd").checked){
+        $('#hgw_privpol_ivpd').removeAttr("required");
+    } else {
+        $('#hgw_privpol_ivpd').attr("required","required");
+        errors[i++] = 'msg_cb';
+    }
+
+    //validation of Phonenumber for NL-Customers
+    if($("#phone_ivpd").is(":visible"))
+    {
+        var phoneNumber = $("#phone_ivpd").val();
+        if (valPhoneNumber(phoneNumber) != false) {
+            $("#phone_ivpd").val(valPhoneNumber(phoneNumber));
+            jQuery('.hgw_ivpd .register--phone').removeClass('has--error');
+        } else {
+            errors[i++] = '.msg_phone';
+            jQuery('.hgw_ivpd #phone_ivpd').addClass('has--error');
+        }
     }
     return errors;
 }

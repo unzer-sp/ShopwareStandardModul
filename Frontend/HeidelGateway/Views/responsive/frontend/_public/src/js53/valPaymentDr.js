@@ -1,15 +1,12 @@
 $(document).ready(function(){
-    // var documentReadyVar = true;
     if(swVersion.substring(0,3) >= '5.2'){
         var token = jQuery('input[name="__csrf_token"]').val();
-
         if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
             var orgLink = jQuery('form.payment').attr('action');
             // SELECT PAYMENT
             if(window.location.pathname.indexOf('gateway') == '-1'){
                 // save original form action
                 var orgLink = jQuery('form.payment').attr('action');
-
                 if(window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1'){
                     $(document).reuse();
 
@@ -115,6 +112,28 @@ $(document).ready(function(){
                         }
                     });
                 }
+                /**
+                 * @todo
+                 * Zahlartwechsel von Heidelpay-Zahlart auf SW-Zahlart wirft noch "An invalid form control with name='cbIvpd' is not focusable".
+                 *
+                 */
+                // case to set or remove required attribute for payolution checkbox
+                var paymentMethod = $('input:radio:checked').attr('class');
+                if(paymentMethod != undefined) {
+                    if(paymentMethod.indexOf("hgw_") != -1){
+                        // payment is payolution
+                        $('#hgw_privpol_ivpd').attr("required","required");
+                    } else {
+                        // payment is from heidelpay but not payolution
+                        $('#hgw_privpol_ivpd').removeAttr("required");
+                    }
+                } else {
+                    //payment is not one of heidelpay's
+                    $('#hgw_privpol_ivpd').removeAttr("required");
+                }
+
+
+
             }
 
             //Function to set Birthdate in hidden field for Chrome on mac
@@ -123,6 +142,8 @@ $(document).ready(function(){
                 if(pm != undefined) {
                     if(pm.indexOf("hgw_san") != -1)
                     {
+                        $('#hgw_privpol_ivpd').attr("required","required");
+
                         var errorsSan = valSantander();
                         if((jQuery('.'+"hgw_san"+'  .has--error').length > 0)){
                             jQuery('#payment .alert .alert--content ul li').remove();
@@ -179,12 +200,15 @@ $(document).ready(function(){
                             return false;
                         }
                     }  else {
-
+                        $('#hgw_privpol_ivpd').removeAttr("required");
                         $(".newreg_ivpd #handover_brand_ivpd").attr('disabled', 'disabled');
                         $(".newreg_ivpd .js--fancy-select").attr('disabled', 'disabled');
                         $("#birthdate_ivpd").attr('disabled', 'disabled');
                         $(".hgw_val_ivpd #salutation").attr('disabled', 'disabled');
                     }
+                } else {
+                    // case for other payment methods than heidelpay's on account/payment
+                    $('#hgw_privpol_ivpd').removeAttr("required");
                 }
 
                 if(jQuery("input[type='submit'], .right").val() == "Weiter") {
@@ -216,6 +240,12 @@ $(document).ready(function(){
                         } else {
                             $(".hgw_required").attr("required", "required");
                         }
+
+                        if (pm != "ivpd") {
+                            $("#hgw_privpol_ivpd").removeAttr("required");
+                        } else {
+                            $("#hgw_privpol_ivpd").attr("required", "required");
+                        }
                     }
 
                     var cssClasses = jQuery('input:radio:checked').attr('class');
@@ -240,12 +270,13 @@ $(document).ready(function(){
                             }
                         }
                     }
-
-                    // disable all other input fields
-                    jQuery('.payment--method input').attr('disabled', 'disabled');
-                    jQuery('.payment--method select').attr('disabled', 'disabled');
-                    jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
-                    jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
+                    if(pm.indexOf("hgw_") != -1) {
+                        // disable all other input fields
+                        jQuery('.payment--method input').attr('disabled', 'disabled');
+                        jQuery('.payment--method select').attr('disabled', 'disabled');
+                        jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
+                        jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
+                    }
                 }
 
                 if(jQuery("#confirm--form").is(":visible") == false )
@@ -261,12 +292,16 @@ $(document).ready(function(){
                         var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
                         pm = cssClasses.substring(indexOfHgw + 4);
                     }
-                    // disable all other input fields
-                    jQuery('.payment--method input').attr('disabled', 'disabled');
-                    jQuery('.payment--method select').attr('disabled', 'disabled');
-                    jQuery("input:radio").removeAttr('disabled');
-                    jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
-                    jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
+
+                    if(pm.indexOf("hgw_") != -1) {
+                        // disable all other input fields
+                        jQuery('.payment--method input').attr('disabled', 'disabled');
+                        jQuery('.payment--method select').attr('disabled', 'disabled');
+                        jQuery("input:radio").removeAttr('disabled');
+                        jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
+                        jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
+                    }
+
                 }
 
             }); // Ende input:submitt:right
@@ -360,6 +395,40 @@ $(document).ready(function(){
 
 
     }
+
+    // Event before swiching payment method
+    $.ajaxSetup({
+        beforeSend: function(event, xhr, settings){
+            // check chosen payment method
+            var chosenPaymentMethod = $('input:radio:checked').attr('class');
+            var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
+            chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+
+            //setting Payolution-checkbox to required if payolution is chosen
+            if(chosenPaymentMethod == 'ivpd'){
+                $('#hgw_privpol_ivpd').attr("required","required");
+                $('#hgw_privpol_ivpd').prop("required","required");
+            } else {
+                $('#hgw_privpol_ivpd').prop("required",null);
+                $('#hgw_privpol_ivpd').removeAttr("required");
+            }
+
+        },
+        complete: function(event, xhr, settings){
+            var chosenPaymentMethod = $('input:radio:checked').attr('class');
+            var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
+            chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+
+            //setting Payolution-checkbox to required if payolution is chosen
+            if(chosenPaymentMethod == 'ivpd'){
+                $('#hgw_privpol_ivpd').attr("required","required");
+                $('#hgw_privpol_ivpd').prop("required","required");
+            } else {
+                $('#hgw_privpol_ivpd').prop("required",null);
+                $('#hgw_privpol_ivpd').removeAttr("required");
+            }
+        },
+    });
 });
 // // REUSE PAYMENT
 jQuery.fn.reuse = function(){
@@ -597,7 +666,6 @@ function valGatewayForm() {
 function valShippingPaymentForm() {
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
-
     // disable all other input fields
     jQuery('.payment--method .block input').attr('disabled', 'disabled');
     jQuery('.payment--method .block select').attr('disabled', 'disabled');
@@ -854,6 +922,14 @@ function valPayolutionDirect() {
         jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
         jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
         errors[i++] = '.msg_dob';
+    }
+
+    //validation of Checkbox
+    if(document.getElementById("hgw_privpol_ivpd").checked){
+        $('#hgw_privpol_ivpd').removeAttr("required");
+    } else {
+        $('#hgw_privpol_ivpd').attr("required","required");
+        errors[i++] = 'msg_cb';
     }
 
     //validation of Phonenumber for NL-Customers

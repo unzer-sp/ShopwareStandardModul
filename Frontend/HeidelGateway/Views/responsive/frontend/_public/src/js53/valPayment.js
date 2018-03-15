@@ -4,7 +4,6 @@ document.asyncReady(function () {
         if (orgLink == 'undefined') {
             var orglink = jQuery('form[name="shippingPaymentForm"]').attr('action');
         }
-
         // SELECT PAYMENT
         if (window.location.pathname.indexOf('gateway') == '-1') {
             // save original form action
@@ -37,15 +36,10 @@ document.asyncReady(function () {
                 $.ajaxSetup({
                     beforeSend: function (event, xhr, settings) {
                         // check for right ajax request
-
                         if (xhr.data != undefined) {
                             // just execute if hgw pay. method is selected
                             if (clicked.indexOf('hgw_') != -1) {
                                 xhr.data += '&hgw=1';
-
-                                // if ($("#shippingPaymentForm input[name='__csrf_token']").length == 0) {
-                                //     $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
-                                // }
 
                                 if (this.url != orgLink) {
                                     this.url = orgLink;
@@ -57,14 +51,6 @@ document.asyncReady(function () {
                 });
 
                 $(document).ajaxComplete(function (event, xhr, settings) {
-                    // fix for missing csrf-Token
-                    if (swVersion >= '5.2') {
-                        // if ($(" shippingPaymentForm input[name='__csrf_token']").length == 0) {
-                        //     $('.shipping-payment--information').append('<input type="hidden" name="__csrf_token" value="' + token + '">');
-                        // }
-                    }
-
-                    /* ********************* */
                     // function set birthdate for santander
                     if(jQuery('.newreg_san').is(":visible")) {
                         $(".hgw_required").attr("required","required");
@@ -84,7 +70,6 @@ document.asyncReady(function () {
 
                         jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
                     }
-                    /* ********************* */
 
                     if (((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)) {
                         // load fancy-js for select boxes
@@ -131,11 +116,23 @@ document.asyncReady(function () {
                     }
                 });
             }
+            // case to set or remove required attribute for payolution checkbos
+            var paymentMethod = $('input:radio:checked').attr('class');
+            if(paymentMethod != undefined) {
+
+                if(paymentMethod.indexOf("hgw_") != -1){
+                    // payment is payolution
+                    $('#hgw_privpol_ivpd').attr("required","required");
+                } else {
+                    // payment is from heidelpay but not payolution
+                    $('#hgw_privpol_ivpd').removeAttr("required");
+                }
+            } else {
+                //payment is not one of heidelpay's
+                $('#hgw_privpol_ivpd').removeAttr("required");
+            }
         }
 
-        // jQuery(".btn.is--primary.is--icon-right.is--large.right.main--actions").click(function (e) {
-        //    alert("treffer");
-        // });
         // Function to set Birthdate in hidden field for Chrome on mac
         jQuery("button[type='submit'], .right").click(function (e) {
             var pm = $('input:radio:checked').attr('class');
@@ -198,11 +195,15 @@ document.asyncReady(function () {
                         return false;
                     }
                 }else {
+                    $('#hgw_privpol_ivpd').removeAttr("required");
                     $(".newreg_ivpd #handover_brand_ivpd").attr('disabled', 'disabled');
                     $(".newreg_ivpd .js--fancy-select").attr('disabled', 'disabled');
                     $("#birthdate_ivpd").attr('disabled', 'disabled');
                     $(".hgw_val_ivpd #salutation").attr('disabled', 'disabled');
                 }
+            } else {
+                // case for other payment methods than heidelpay's on account/payment
+                $('#hgw_privpol_ivpd').removeAttr("required");
             }
 
             if (jQuery("input[type='submit'], .right").val() == "Weiter") {
@@ -403,7 +404,42 @@ document.asyncReady(function () {
             }
         }); // ende ajaxComplete
     }
+
+    // Event before swiching payment method
+    $.ajaxSetup({
+        beforeSend: function(event, xhr, settings){
+            // check chosen payment method
+            var chosenPaymentMethod = $('input:radio:checked').attr('class');
+            var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
+            chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+
+            //setting Payolution-checkbox to required if payolution is chosen
+            if(chosenPaymentMethod == 'ivpd'){
+                $('#hgw_privpol_ivpd').attr("required","required");
+                $('#hgw_privpol_ivpd').prop("required","required");
+            } else {
+                $('#hgw_privpol_ivpd').prop("required",null);
+                $('#hgw_privpol_ivpd').removeAttr("required");
+            }
+
+        },
+        complete: function(event, xhr, settings){
+            var chosenPaymentMethod = $('input:radio:checked').attr('class');
+            var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
+            chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+
+            //setting Payolution-checkbox to required if payolution is chosen
+            if(chosenPaymentMethod == 'ivpd'){
+                $('#hgw_privpol_ivpd').attr("required","required");
+                $('#hgw_privpol_ivpd').prop("required","required");
+            } else {
+                $('#hgw_privpol_ivpd').prop("required",null);
+                $('#hgw_privpol_ivpd').removeAttr("required");
+            }
+        },
+    });
 });
+
 
 // function to toggle between registrated payment data and enter new paymentdata
 function hgwToggleReuse (pm)
@@ -839,6 +875,14 @@ function valPayolutionDirect() {
         errors[i++] = '.msg_dob';
     }
 
+    //validation of Checkbox
+    if(document.getElementById("hgw_privpol_ivpd").checked){
+        $('#hgw_privpol_ivpd').removeAttr("required");
+    } else {
+        $('#hgw_privpol_ivpd').attr("required","required");
+        errors[i++] = 'msg_cb';
+    }
+
     //validation of Phonenumber for NL-Customers
     if($("#phone_ivpd").is(":visible"))
     {
@@ -851,7 +895,6 @@ function valPayolutionDirect() {
             jQuery('.hgw_ivpd #phone_ivpd').addClass('has--error');
         }
     }
-
     return errors;
 }
 

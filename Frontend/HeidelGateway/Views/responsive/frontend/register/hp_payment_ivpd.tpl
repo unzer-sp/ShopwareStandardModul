@@ -49,9 +49,10 @@
             </div>
 
             {if isset($optinText)}
-                <p>
+                <div>
+                    <label for="hgw_privpol_ivpd">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s} *:</label></br>
                     {$optinText}
-                </p>
+                </div>
             {/if}
 
             <input type="hidden" name="BRAND" id="handover_brand_ivpd" value="PAYOLUTION_DIRECT">

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.03.12';
+		return '18.03.16';
 	}
 
 	/**
@@ -806,6 +806,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 try{
                     $this->addSnippets();
                     $msg .= '* update 18.03.06 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '18.03.16':
+                // added Checkbox for Payolution
+                // refactoring EasyCredit max limit
+                // some minor JS-changes
+                try{
+                    $this->addSnippets();
+                    $msg .= '* update 18.03.16<br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -1782,7 +1793,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
                 $shippingAmount = $shipping['value'];
 
-                if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 3000) {
+                if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 5000) {
                     $view->activeEasy = "TRUE";
                     $view->easyAmount = $basketAmount+$shippingAmount;
                 } else {
@@ -1920,7 +1931,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                     {
                                                         $view->showPhoneEntry = "TRUE";
                                                     }
-                                                    $view->optinText        = $getFormUrl['CONFIG_OPTIN_TEXT'];
+                                                    $payolutionText = $getFormUrl['CONFIG_OPTIN_TEXT'];
+
+                                                    $replaceText = '<p id="payolutiontext"><input type="checkbox" id="hgw_privpol_ivpd" name="cbIvpd" class="checkbox">  ';
+                                                    $searchText = '<p id="payolutiontext">';
+                                                    $textToShow = str_ireplace($searchText,$replaceText,$payolutionText);
+
+                                                    $view->optinText        = $textToShow;
                                                     $view->accountHolder    = $getFormUrl['ACCOUNT_HOLDER'];
                                                 }
 
@@ -2245,7 +2262,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
         $shippingAmount = $shipping['value'];
 
-        if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 3000)
+        if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 5000)
         {
             $view->activeEasy = "TRUE";
             $view->easyAmount = $basketAmount+$shippingAmount;
@@ -3582,8 +3599,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.171','Please choose another payment method');
 		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.300.101','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.300.101','Please choose another payment method');
-        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge (200 - 3.000 EUR) ');
-        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of 200 and 3000 EUR');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge (200 - 5000 EUR) ');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of 200 and 5000 EUR');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.153','Die verwendete Adresse wurde nicht gefunden');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.153','Sorry, your address could not be found');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.152','Die verwendete Adresse wurde nicht gefunden');

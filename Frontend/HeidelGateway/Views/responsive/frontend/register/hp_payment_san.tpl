@@ -1,10 +1,7 @@
 {block name="hp_payment_san"}
 	<div class="{$grid} {$classname}" style='background-color: transparent;'>
-		<!--<div class="newreg_{$pm}" style="width: 22rem;">-->
-		<!--<div class="newreg_{$pm}" id="payType" style="width: 30rem;">-->
-
-		<img src="{$logoLink_San}" alt="Santander-Logo">
-		<!--<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">-->
+		<!--<img src="{$logoLink_San}" alt="Santander-Logo">-->
+		<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">
 		<div class="newreg_{$pm}" id="payType">
 			<div>
 				<label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />

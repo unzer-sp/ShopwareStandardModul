@@ -279,8 +279,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
             {
                 case 'rf':
                     $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ? '
-                        .'AND (`payment_type` = "PA" '
-                        .'OR `payment_type` = "DB" '
+                        .'AND (`payment_type` = "DB" '
                         .'OR `payment_type` = "CP" '
                         .'OR `payment_type` = "RB" '
                         .'OR `payment_type` = "RC" '

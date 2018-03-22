@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.03.16';
+		return '18.04.03';
 	}
 
 	/**
@@ -810,13 +810,35 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.03.16':
+            case '18.03.12':
                 // added Checkbox for Payolution
                 // refactoring EasyCredit max limit
                 // some minor JS-changes
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.03.16<br />';
+                    $msg .= '* update 18.03.12 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '18.03.23':
+                // added Checkbox for Payolution
+                // refactoring EasyCredit max limit
+                // some minor JS-changes
+                try{
+                    $this->addSnippets();
+                    $msg .= '* update 18.03.23 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '18.04.03':
+                // added Checkbox for Payolution
+                // refactoring request for EasyCredit in Emotion-Template
+                // some JS-changes for validation of checkboxes and paymentmethods for all Sw-versions and templates
+
+                try{
+                    $msg .= '* update 18.04.03 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -2555,67 +2577,69 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $view = $args->getSubject()->View();
 
         $user = Shopware()->Modules()->Admin()->sGetUserData();
-        $basket	= Shopware()->Modules()->Basket()->sGetBasket();
-        $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
 
-        $configData = $this->ppd_config('5', 'HPR');
-        $userData 	= $this->ppd_user($user,'hpr');
+        if($user['additional']['payment']['name'] == "hgw_hpr"){
+            $basket	= Shopware()->Modules()->Basket()->sGetBasket();
+            $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
+            $configData = $this->ppd_config('5', 'HPR');
+            $userData 	= $this->ppd_user($user,'hpr');
 
-        $konfiguration = self::Config();
-        $secret = $konfiguration['HGW_SECRET'];
+            $konfiguration = self::Config();
+            $secret = $konfiguration['HGW_SECRET'];
 
-        $additional = array(
-            'PRESENTATION.AMOUNT' 	=> $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
-            'PRESENTATION.CURRENCY' => Shopware()->Currency()->getShortName(),
-            'IDENTIFICATION.TRANSACTIONID' => Shopware()->SessionID(),
-            'CRITERION.SECRET' 		=> hash('sha512', Shopware()->SessionID().$secret),
-            'CRITERION.SESS'		=> Shopware()->Session()->sessionId,
-            'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ? 'TRUE' : 'FALSE',
-            'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
-            'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> empty($countOrderForCustomer['COUNT(id)']) ? "0" : $countOrderForCustomer['COUNT(id)'],
+            $additional = array(
+                'PRESENTATION.AMOUNT' 	=> $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
+                'PRESENTATION.CURRENCY' => Shopware()->Currency()->getShortName(),
+                'IDENTIFICATION.TRANSACTIONID' => Shopware()->SessionID(),
+                'CRITERION.SECRET' 		=> hash('sha512', Shopware()->SessionID().$secret),
+                'CRITERION.SESS'		=> Shopware()->Session()->sessionId,
+                'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ? 'TRUE' : 'FALSE',
+                'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
+                'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> empty($countOrderForCustomer['COUNT(id)']) ? "0" : $countOrderForCustomer['COUNT(id)'],
 
-        );
+            );
 
-        $allPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
-        foreach($allPayments as $key => $value){
-            $avPayments[$value['name']] = $value;
-        }
-
-        // only do Request if EasyCredit is active
-        if(array_key_exists('hgw_hpr',$avPayments))
-        {
-            $basketData = $this->getBasketId();
-            // prepare data and do request
-            $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
-            $responseHpr 	= $this->doRequest($requestData);
-
-            //preparing OptIn-text to show
-            $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
-
-            $optinText = str_replace('{', '', $optinText);
-            $optinText = str_replace('"optin": "', '', $optinText);
-            $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
-            $optinText = str_replace('"', '', $optinText);
-            $optinText = str_replace('}', '', $optinText);
-
-            //expand template
-            $view->configOptInText = $optinText;
-
-            if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-                $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
-            }else{
-                $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+            $allPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
+            foreach($allPayments as $key => $value){
+                $avPayments[$value['name']] = $value;
             }
-            $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
-
-            if (
-            ($args->getSubject()->Request()->getControllerName() == 'checkout')
-            )
+            // only do Request if EasyCredit is active
+            if(array_key_exists('hgw_hpr',$avPayments))
             {
-                if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
-                    Shopware()->Session()->HPdidRequest = 'TRUE';
-                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                $basketData = $this->getBasketId();
+                // prepare data and do request
+                $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
+                $responseHpr 	= $this->doRequest($requestData);
+
+                //preparing OptIn-text to show
+                $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
+
+                $optinText = str_replace('{', '', $optinText);
+                $optinText = str_replace('"optin": "', '', $optinText);
+                $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
+                $optinText = str_replace('"', '', $optinText);
+                $optinText = str_replace('}', '', $optinText);
+
+                //expand template
+                $view->configOptInText = $optinText;
+
+                if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
+                    $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
+                }else{
+                    $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+                }
+                $view->extendsTemplate('register/hp_payment_hpr.tpl');
+
+
+                if (
+                ($args->getSubject()->Request()->getControllerName() == 'checkout')
+                )
+                {
+                    if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
+                        Shopware()->Session()->HPdidRequest = 'TRUE';
+                        return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                    }
                 }
             }
         }
@@ -2910,7 +2934,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function prepareBasketData($basket = NULL, $user = NULL){
 		try{
-			$basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
+            $basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
 			$user == NULL	?	$user = Shopware()->Modules()->Admin()->sGetUserData()	: $user;
 
             $shippingCostVariable = Shopware()->Session()->sOrderVariables;

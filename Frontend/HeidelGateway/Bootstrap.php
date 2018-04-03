@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.04.03';
+		return '18.04.09';
 	}
 
 	/**
@@ -832,13 +832,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.04.03':
+            case '18.04.09':
                 // added Checkbox for Payolution
-                // refactoring request for EasyCredit in Emotion-Template
+                // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
                 // some JS-changes for validation of checkboxes and paymentmethods for all Sw-versions and templates
+                // change of addSnippets() to install DE and EN textsnippets
 
                 try{
-                    $msg .= '* update 18.04.03 <br />';
+                    $msg .= '* update 18.04.09 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -3464,6 +3465,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$this->Logging('addSnippets | '.$e->getMessage());
 			return;
 		}
+
 		foreach($langs as $key => $lang){
 			if(is_int(strpos($lang['locale'],'de_'))){
 				$snipLang = 'de';
@@ -3472,9 +3474,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 			$snippets = $this->snippets();
+
 			foreach($snippets as $key => $snippet){
 				// check if all array elements are set and lang matches
-				if((count(array_filter($snippet)) == '4') && ($snipLang == $snippet['1'])){
+
+                if($snippet[1] == "de")
+                { $lang['id'] = "1";}
+                else {$lang['id'] = "2";}
+
+				if((count(array_filter($snippet)) == '4') /*&& ($snipLang == $snippet['1'])*/){
 					$sql = 'SELECT `id` FROM `s_core_snippets` WHERE `namespace` = ? AND `shopID` = ? AND `localeID` = ? AND `name` = ?';
 					$data = Shopware()->Db()->fetchAll($sql, array($snippet['0'], '1', $lang['id'], $snippet['2']));
 

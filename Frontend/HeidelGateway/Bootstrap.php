@@ -811,34 +811,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '18.03.12':
-                // added Checkbox for Payolution
-                // refactoring EasyCredit max limit
-                // some minor JS-changes
-                try{
-                    $this->addSnippets();
-                    $msg .= '* update 18.03.12 <br />';
-                } catch (Exception $e) {
-                    $this->logError($msg, $e);
-                }
-
             case '18.03.23':
-                // added Checkbox for Payolution
-                // refactoring EasyCredit max limit
-                // some minor JS-changes
-                try{
-                    $this->addSnippets();
-                    $msg .= '* update 18.03.23 <br />';
-                } catch (Exception $e) {
-                    $this->logError($msg, $e);
-                }
-
             case '18.04.09':
                 // added Checkbox for Payolution
                 // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
+                // refactoring EasyCredit max limit
                 // some JS-changes for validation of checkboxes and paymentmethods for all Sw-versions and templates
                 // change of addSnippets() to install DE and EN textsnippets
 
                 try{
+                    $this->addSnippets();
                     $msg .= '* update 18.04.09 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);

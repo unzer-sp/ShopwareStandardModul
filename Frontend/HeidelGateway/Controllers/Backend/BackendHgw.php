@@ -488,22 +488,26 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                     $btns['rf']['trans'][] =
                                         $this->storeTrans($value,$payName, $payInfo);
                                 }
+
+                                if ($payInfo['payType'] == 'fi') {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['active'] = 'true';
+                                    $btns['fi']['active'] =	'false';
+//                                    $btns['rf']['active'] = 'true';
+//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+                                }
+
                                 if ($payInfo['payType'] == 'rc') {
                                     $btns['rv']['active'] =
                                     $btns['fi']['active'] = 'false';
-//                                    $btns['rf']['active'] = 'true';
+                                    $btns['rf']['active'] = 'true';
 
                                     if (!isset($maxRf)) {
                                         $maxRf = $value['PRESENTATION_AMOUNT'];
                                     }
                                     $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
                                 }
-                                if ($payInfo['payType'] == 'fi') {
-                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
-                                    $btns['rv']['active'] = $btns['fi']['active'] = 'false';
-//                                    $btns['rf']['active'] = 'true';
-//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
-                                }
+
                             }
                             else {
                                 $btns['rv']['active'] = $btns['fi']['active'] = 'false';

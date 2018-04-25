@@ -1,8 +1,6 @@
 {block name="hp_payment_san"}
 	<div class="{$grid} {$classname}" style='background-color: transparent; border-color: transparent;'>
-		<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">
-		<!--<img src="{$logoLink_San}" alt="Santander-Logo">-->
-		<!--<div class="newreg_{$pm}" style="width: 22rem;">-->
+		<img src="{$optin_San_logoUrl}" alt="Santander-Logo">
 		<div class="newreg_{$pm}" id="payType" style="width: 30rem;">
 			<div>
 				<label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
@@ -42,51 +40,30 @@
             {else}
 				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="">
             {/if}
-            {if isset($optin_San)}
-				<div>
-					<p>
-						<label for="hgw_adv_san">{s name='hp_sanAdvPermission' namespace='frontend/register/hp_payment'}{/s}:</label></br>
-                        {if $checkOptin_San == "TRUE"}
-							<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox" checked="checked">
-                        {else}
-							<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox">
-                        {/if}
-						<!--<strong>{* $optinText_San *}</strong>-->
-						<strong>Ja, ich bin damit einverstanden, dass meine Daten an die Santander Consumer Bank AG („Santander“)
-							weitergegeben werden. Die Santander darf diese Daten gerne dazu nutzen, um mich über Produkte der
-							Santander zu informieren. Natürlich kann ich meine Einwilligung jederzeit mit Wirkung für die Zukunft
-							widerrufen. Ausführliche Informationen zu dieser Einwilligung sowie die Möglichkeit zum Widerruf
-							finde ich <!--<a href="{$optinLink_San}" target="_blank">hier</a>.</strong>-->
-							<a href="https://www.santander.de/applications/rechnungskauf/werbewiderspruch/" target="_blank">hier</a>.
-						</strong>
-						</br>
-					</p>
-					<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label></br>
+			<div>
+				<p>
+					<label for="hgw_adv_san">{s name='hp_sanAdvPermission' namespace='frontend/register/hp_payment'}{/s}:</label></br>
+                    {if $checkOptin_San == "TRUE"}
+						<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox" checked="checked">
+					{else}
+						<input type="checkbox" id="hgw_adv_san" name="CUSTOMER.OPTIN" value="TRUE" class="checkbox">
+					{/if}
+					{$optin_San_adv}
+					</br>
+				</p>
+				<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label></br>
 
-					<p id="hgw_ParaPrivacyPolicy">
-                        {if $checkPrivacyPolicy_San == "TRUE" }
-							<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER_ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" checked="checked">
-                        {else}
-                            {*<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox">*}
-                            <input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER_ACCEPT_PRIVACY_POLICY" class="checkbox">
-                        {/if}
-
-						<!--<strong{* $privacy_policy_text_San *}></strong>-->
-						<strong>Ich willige in die Übermittlung meiner personenbezogenen Daten an die Santander Consumer Bank AG
-							gemäß den näheren Bestimmungen des beigefügten <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Einwilligungserklärungstextes</a> sowie an die darin
-							genannten Auskunfteien und in die Durchführung einer automatisierten Entscheidung ein.
-						</strong>
-						</br>
-						Nähere Informationen finden Sie in den
-						<a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Datenschutzhinweisen</a>
-						der Santander für den Rechnungs-/Ratenkauf.
-						<!--<a href="{$privacy_policy_link_San}" target="_blank">Weitere Informationen zum Datenschutz</a>-->
-						<br><br><a href="{$privacy_policy_link_San}" target="_blank">Weitere Informationen zum Datenschutz</a><!-- LÖSCHEN -->
-					</p>
-
-				</div>
-            {/if}
-			<input type="hidden" name="BRAND" id="handover_brand_san" value="SANTANDER">
+				<p id="hgw_ParaPrivacyPolicy">
+                	{if $checkPrivacyPolicy_San == "TRUE" }
+						<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER_ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox" checked="checked">
+					{else}
+                        {*<input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER.ACCEPT_PRIVACY_POLICY" value="TRUE" class="checkbox">*}
+                        <input type="checkbox" id="hgw_privacyPolicy" class="hgw_required" name="CUSTOMER_ACCEPT_PRIVACY_POLICY" class="checkbox">
+					{/if}
+					{$optin_San_privpol}
+				</p>
+			</div>
+            <input type="hidden" name="BRAND" id="handover_brand_san" value="SANTANDER">
 			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 		</div>
 	</div>

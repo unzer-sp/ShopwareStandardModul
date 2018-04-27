@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.04.25';
+		return '18.04.27';
 	}
 
 	/**
@@ -814,16 +814,18 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.03.23':
             case '18.04.09':
             case '18.04.25':
+            case '18.04.27':
                 // added Checkbox for Payolution
                 // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
                 // refactoring EasyCredit max limit
                 // some JS-changes for validation of checkboxes and paymentmethods for all Sw-versions and templates
                 // change of addSnippets() to install DE and EN textsnippets
                 // changes for Santander-variable CONFIG_OPTIN_TEXT from NGW
+                // added Css-File to adjust buttons and inputs to Shopware's
 
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.04.25 <br />';
+                    $msg .= '* update 18.04.27 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

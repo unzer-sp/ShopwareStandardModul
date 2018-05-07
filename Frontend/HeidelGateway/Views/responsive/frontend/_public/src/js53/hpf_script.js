@@ -116,6 +116,8 @@ document.asyncReady(function() {
         hasListener['dc'] = false;
         hasListener['cc'] = false;
 
+        hasListener['dd'] = false;
+
         checkedOpt = jQuery('.payment--method-list input:radio:checked');
         var checkedClass = checkedOpt.attr('class');
 

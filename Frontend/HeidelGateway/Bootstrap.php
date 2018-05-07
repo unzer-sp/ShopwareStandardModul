@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.04.27';
+		return '18.05.11';
 	}
 
 	/**
@@ -815,6 +815,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.04.09':
             case '18.04.25':
             case '18.04.27':
+            case '18.05.11':
                 // added Checkbox for Payolution
                 // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
                 // refactoring EasyCredit max limit
@@ -822,10 +823,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 // change of addSnippets() to install DE and EN textsnippets
                 // changes for Santander-variable CONFIG_OPTIN_TEXT from NGW
                 // added Css-File to adjust buttons and inputs to Shopware's
+                // fixed an issue with registration of direct debit registration for Shopware 5.4.x
 
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.04.27 <br />';
+                    $msg .= '* update 18.05.11 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -1829,7 +1831,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						if(($config->HGW_DC_BOOKING_MODE == '3') || ($config->HGW_DC_BOOKING_MODE == '4')){ $view->heidel_bm_dc = true; }
 						if(($config->HGW_DD_BOOKING_MODE == '3') || ($config->HGW_DD_BOOKING_MODE == '4')){ $view->heidel_bm_dd = true; }
 						if(($config->HGW_VA_BOOKING_MODE == '3') || ($config->HGW_VA_BOOKING_MODE == '4')){ $view->heidel_bm_va = true; }
-						
+
 						setlocale(LC_TIME, Shopware()->Locale()->getLanguage(), Shopware()->Shop()->getLocale()->getLocale());
 						
 						$view->heidel_iban	= $config->HGW_IBAN;
@@ -1859,6 +1861,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 									(($request->getControllerName() == 'account') && ($action == 'payment')) ||
 									(($request->getControllerName() == 'checkout') && (($action == 'confirm') || ($action == 'shippingPayment')))
 								){
+
 										$avPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
 
 										$user = Shopware()->Modules()->Admin()->sGetUserData();
@@ -1872,7 +1875,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 												if($pm == 'pay'){ $pm = va; }
 												$bookingMode = $config->{'HGW_'.strtoupper($pm).'_BOOKING_MODE'};
 												$data = $this->getRegData($user['additional']['user']['id'], $pm);
-
 												$last = mktime(23,59,00,$data['expMonth']+1,0,$data['expYear']);	//timestamp: last day of registration month
 												$shippingHash = $this->createShippingHash($user , $pm);
 
@@ -2851,7 +2853,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$ppd_user['ADDRESS.STREET'] 	.= $user['shippingaddress']['streetnumber'] != '' ? $user['shippingaddress']['streetnumber'] : $user['billingaddress']['streetnumber'];
 					$ppd_user['ADDRESS.ZIP'] 		= $user['shippingaddress']['zipcode'] != '' ? $user['shippingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
 					$ppd_user['ADDRESS.CITY'] 		= $user['shippingaddress']['city'] != '' ? $user['shippingaddress']['city'] : $user['billingaddress']['city'];
-          $ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
+					$ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
 
 				}else{
 					$countryInfo = Shopware()->Modules()->Admin()->sGetCountry($user['billingaddress']['countryID']);

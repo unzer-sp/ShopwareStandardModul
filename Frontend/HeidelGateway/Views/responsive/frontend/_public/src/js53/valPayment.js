@@ -14,6 +14,7 @@ document.asyncReady(function () {
 
             if (
                 (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1')
+                ||(window.location.pathname.toLowerCase().indexOf('zahlungsart-und-versand') == '-1')
                 ) {
                 // change checked option
                 jQuery('.register--payment').click(function () {
@@ -21,12 +22,17 @@ document.asyncReady(function () {
                     var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
                     changeUrl(checkedOpt, orgLink);
                 });
+                jQuery('.hgw_dd').click(function () {
+                    // change form action
+                    var checkedOpt = "hgw_dd";
+                    changeUrl(checkedOpt, orgLink);
+                });
+
             } else {
                 var clicked = '';
                 $(this).click(function (e) {
                     clicked = e.target.className;
                 });
-
                 jQuery('.payment--method-list').click(function () {
                     // change form action
                     var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
@@ -65,7 +71,7 @@ document.asyncReady(function () {
                         $(".hgw_required").removeAttr("required");
                     }
 
-                    if(jQuery('.newreg_dd').is(":visible")) {
+                    if(jQuery('.newreg_dd').is(":visible") && jQuery(".newreg_dd [name='Date_Day']").is(":visible")) {
                         var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
                         var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
                         var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();

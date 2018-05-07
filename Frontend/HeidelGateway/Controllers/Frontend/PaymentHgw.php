@@ -522,7 +522,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 
 			$this->View()->pluginPath = $pref .$basepath .$pluginPath;
-
 			if($response['POST_VALIDATION'] == "NOK"){
 				$this->hgw()->Logging(
 						$response['PROCESSING_RETURN'].
@@ -704,7 +703,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$this->View()->PaymentUrl = $response['FRONTEND_REDIRECT_URL'];
 				}
 			}
-
 		}catch(Exception $e){
 
 			$this->hgw()->Logging('gatewayAction | '.$e->getMessage());
@@ -1070,7 +1068,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->hgw()->Logging('responseRegAction saving response failed | '.$e->getMessage());
 				return;
 			}
-
 
 			if ($resp['PROCESSING_RESULT'] == 'ACK') {
 				// save registration to DB
@@ -3066,6 +3063,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			if($fromBootstrap){
 				$ppd_crit['CRITERION.SECRET'] = self::createSecretHash($tempID);
+
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
 				$errorMsg = self::getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}else{
@@ -3256,7 +3254,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$params['FRONTEND.ENABLED'] 	= "true";
 					break;
 			}
-
 //			$params['CRITERION.TEMPORDER'] = $this->getSession()->offsetGet('sessionId');
 			$params['CRITERION.TEMPORDER'] = Shopware()->Session()->offsetGet('sessionId');
 

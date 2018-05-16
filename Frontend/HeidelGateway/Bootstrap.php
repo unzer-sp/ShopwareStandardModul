@@ -98,26 +98,48 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return bool
 	 */
 	public function install(){
+        /**
+         * @todo  Zuweisung ENTFERNEN!!!!
+         */
+        Shopware()->Config()->version = "5.5.0";
+
 		$msg = 'Installationsfehler: <br />';
-		if(!$this->assertVersionGreaterThen("4.0.0")){
-			throw new Enlight_Exception("This Plugin needs min shopware 4.0.0");
+		if(!$this->assertMinimumVersion("4.3.7")){
+			throw new Enlight_Exception("This Plugin needs min shopware 4.3.7");
 		}
 
-		/* Major check Version */
-		if ($this->assertVersionGreaterThen('5.1.6')) {
-			$swVersion = Shopware()->Config()->version;
+        /* *************** Neuer Code ********************* */
+        $swVersion = Shopware()->Config()->version;
 
-		} else {
-			$swVersion = Shopware()->Config()->version;
-			if(!$this->assertRequiredPluginsPresent(array('Payment'))){
-				$msg .= "This plugin requires the plugin payment<br />";
-				$this->uninstall();
-				throw new Enlight_Exception("This plugin requires the plugin payment");
-			}
-		}
+mail("sascha.pflueger@heidelpay.de","install() Sw-Version",print_r(Shopware::VERSION,1));
+
+        /* Major check Version */
+        if(
+            (version_compare($swVersion,"4.3.7",">"))
+            && (version_compare($swVersion,"5.2.0","<"))
+        ){
+            if(!$this->assertRequiredPluginsPresent(array('Payment'))){
+                $msg .= "This plugin requires the plugin payment<br />";
+                $this->uninstall();
+                throw new Enlight_Exception("This plugin requires the shopware plugin payment");
+            }
+        };
+        /* *************** Ende neuer Code ********************* */
+        /* Major check Version */
+//		if ($this->assertVersionGreaterThen('5.1.6')) {
+//			$swVersion = Shopware()->Config()->version;
+//
+//		} else {
+//			$swVersion = Shopware()->Config()->version;
+//			if(!$this->assertRequiredPluginsPresent(array('Payment'))){
+//				$msg .= "This plugin requires the plugin payment<br />";
+//				$this->uninstall();
+//				throw new Enlight_Exception("This plugin requires the shopware plugin payment");
+//			}
+//		}
 
 		if($this->assertRequiredPluginsPresent(array('HeidelActions'))){
-			throw new Enlight_Exception("Please uninstall Heidelpay Backend Plugin (HeidelActions)");
+			throw new Enlight_Exception("Please delete Heidelpay Backend Plugin (HeidelActions) from your Server");
 		}
 
 		try{
@@ -1074,9 +1096,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	protected function createPayments(){
 		try{
-			$dbErrors = '';
+		    $dbErrors = '';
 			$inst = $this->paymentMethod();
-
+            $swVersion = Shopware()->Config()->version;
 			/* get Shops and check if locale is en_GB */
 			$sql = '
 				SELECT `s_core_shops`.`id`, `s_core_locales`.`locale` FROM `s_core_shops`, `s_core_locales`
@@ -1105,7 +1127,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			foreach ($inst as $key => $val){
 				// search for old hgw-paymethods
-				if ($this->assertVersionGreaterThen('5.2')) {
+//				if ($this->assertVersionGreaterThen('5.2')) {
+				if (version_compare($swVersion,"5.2.0",">=")) {
 
 					$sql = 'SELECT * FROM `s_core_paymentmeans` WHERE `name`="hgw_'.$val['name'].'";';
 					try {
@@ -1156,7 +1179,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$where		= array("id = ".(int)$getOldPayments['id']);
 
 
-					if ($this->assertVersionGreaterThen('5.2')) {
+//					if ($this->assertVersionGreaterThen('5.2')) {
+					if (version_compare($swVersion,"5.2.0",">=")) {
 						try {
 							$affRows = Shopware()->Db()->update('s_core_paymentmeans', $newData, $where);
 							$dbErrors .= Shopware()->Db()->getErrorMessage();
@@ -1184,7 +1208,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						}
 					}
 				} else {
-					if ($this->assertVersionGreaterThen('5.2')) {
+//					if ($this->assertVersionGreaterThen('5.2')) {
+					if (version_compare($swVersion,"5.2.0",">=")) {
 
 						$bind = array(
 								':name' 		=> "hgw_".$val['name'],
@@ -1585,7 +1610,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setParent($repository->findOneBy(array('name' => 'Payment')));
 
 			$this->addPluginTranslation();
-			$form->save();
+//			$form->save();
 		}catch(Exception $e){
 			$this->Logging('createForm | '.$e->getMessage());
 			return;
@@ -1600,9 +1625,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$newData	= array("active" => 0);
 			$where		= array("pluginID = ".(int)$this->getId());
-
+            $swVersion  = Shopware()->Config()->version;
 			// deactivate Plugin itself
-			if ($this->assertVersionGreaterThen('5.1.8')) {
+//			if ($this->assertVersionGreaterThen('5.1.8')) {
+			if (version_compare($swVersion,"5.2.0",">=")) {
 				try {
 					$where		= array("id = ".(int)$this->getId());
 
@@ -1623,7 +1649,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 			// set all Heidelpay paymentmethods to inactive
-			if ($this->assertVersionGreaterThen('5.1.8')) {
+//			if ($this->assertVersionGreaterThen('5.1.8')) {
+            if (version_compare($swVersion,"5.2.0",">=")) {
 				try {
 					$where		= array("name LIKE 'hgw_%'");
 
@@ -2211,7 +2238,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				}
 
 				// fix for missing csrf-token in SW 5.2 and greater
-				if ($this->assertVersionGreaterThen('5.1.6')) {
+                $swVersion = Shopware()->Config()->version;
+
+//				if ($this->assertVersionGreaterThen('5.1.6')) {
+				if (version_compare($swVersion,"5.2.0",">=")) {
 					if ($request->getPost('__csrf_token')!= false ) {
 						$view->token = $request->getPost('__csrf_token');
 					}

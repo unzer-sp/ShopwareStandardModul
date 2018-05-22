@@ -111,8 +111,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         /* *************** Neuer Code ********************* */
         $swVersion = Shopware()->Config()->version;
 
-mail("sascha.pflueger@heidelpay.de","install() Sw-Version",print_r(Shopware::VERSION,1));
-
         /* Major check Version */
         if(
             (version_compare($swVersion,"4.3.7",">"))
@@ -858,7 +856,7 @@ mail("sascha.pflueger@heidelpay.de","install() Sw-Version",print_r(Shopware::VER
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
 
-        $form->save();
+//        $form->save();
         $this->Logging($msg);
         return array(
             'success' => true,

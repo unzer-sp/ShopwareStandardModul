@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.05.11';
+		return '18.05.23';
 	}
 
 	/**
@@ -815,7 +815,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.04.09':
             case '18.04.25':
             case '18.04.27':
-            case '18.05.11':
+            case '18.05.23':
                 // added Checkbox for Payolution
                 // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
                 // refactoring EasyCredit max limit
@@ -827,7 +827,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.05.11 <br />';
+                    $msg .= '* update 18.05.23 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

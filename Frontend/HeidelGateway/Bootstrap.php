@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.05.11';
+		return '18.05.20';
 	}
 
 	/**
@@ -848,6 +848,25 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 try{
                     $this->addSnippets();
                     $msg .= '* update 18.05.11 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '18.05.20':
+                // added paymentmethod "Santander Ratenkauf"
+
+                try{
+                    $this->addSnippets();
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_HPS_CHANNEL',
+                        array(
+                            'label'=>'Ratenkauf von Santander Channel',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
+
+                    $msg .= '* update 18.05.20 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -2322,16 +2341,30 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         // Function to show EasyCredit-text on choose-payment-site
         if (
             ($request->getControllerName() == 'checkout') &&
-            (strtolower($user['additional']['payment']['name']) == 'hgw_hpr') &&
+            ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') || (strtolower($user['additional']['payment']['name']) == 'hgw_hps'))
+                &&
             ((Shopware()->Session()->HPdidRequest == 'FALSE') || (empty(Shopware()->Session()->HPdidRequest)) )
         )
         {
             // collect paymentdata for HP.IN
             $basket	= Shopware()->Modules()->Basket()->sGetBasket();
             $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
+            switch ($user['additional']['payment']['name']){
+                case 'hgw_hpr':
+                    $paymentMethod = 'hpr';
+                    $brand = "EASYCREDIT";
+                    break;
+                case 'hgw_hps';
+                    $paymentMethod = 'hps';
+                    $brand = "SANTANDER";
+                    break;
+                default:
+                    $paymentMethod = '';
+                    break;
+            }
 
-            $configData = $this->ppd_config('5', 'HPR');
-            $userData 	= $this->ppd_user($user,'hpr');
+            $configData = $this->ppd_config('5', $paymentMethod);
+            $userData 	= $this->ppd_user($user,strtolower($paymentMethod));
             $basketData = $this->getBasketId();
             $konfiguration = self::Config();
             $secret = $konfiguration['HGW_SECRET'];
@@ -2350,13 +2383,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ?  'FALSE':'TRUE',
                 'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
                 'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> $countOrderForCustomer['COUNT(id)'],
-
             );
 
             // prepare data and do request
-            $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
+            $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
             $responseHpr 	= $this->doRequest($requestData);
-
+mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($responseHpr,1));
             //preparing OptIn-text to show
             $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
 
@@ -2487,7 +2519,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         );
 
                         // prepare data and do request
-                        $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
+                        $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional,"",$brand);
                         $responseHpr 	= $this->doRequest($requestData);
 
                         //preparing OptIn-text to show
@@ -2898,7 +2930,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
                     $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
 
-					if($pm == 'san' || $pm == 'ivpd')
+					if($pm == 'san' || $pm == 'ivpd' || $pm == 'hps')
 					{
                         //fetching count of orders of customer
                         $countOrderForCustomer = '';
@@ -3067,9 +3099,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
      * @param array $basketData
      * @param array $criterion
      * @param array $additional
+     * @param array $brand
      * @return array
      */
-    public function prepareHprIniData($config = array(), $frontend = array(), $userData = array(), $basketData = array(), $criterion = array(), $additional = array())
+    public function prepareHprIniData($config = array(), $frontend = array(), $userData = array(), $basketData = array(), $criterion = array(), $additional = array(), $brand = "")
     {
         try {
             $params = array();
@@ -3088,6 +3121,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $params['PAYMENT.CODE'] 		= "HP.".$type;
             $params['ACCOUNT.BRAND'] 		= "EASYCREDIT";
             $params['FRONTEND.ENABLED'] 	= "true";
+
+            switch ($brand){
+                case "SANTANDER":
+                    $params['ACCOUNT.BRAND'] 		= "SANTANDER_HP";
+                    $params['FRONTEND.ENABLED'] 	= "false";
+                break;
+                case "EASYCREDIT";
+                    $params['ACCOUNT.BRAND'] 		= "EASYCREDIT";
+                break;
+            }
 
             //adding additionaldata
             $params = array_merge($params,$additional);
@@ -3112,7 +3155,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'controller' 	=> 'PaymentHgw',
                 'action' 		=> 'responseHpr'
             ));
-
             return $params;
         } catch (Exception $e) {
             $this->Logging('prepareHprIniData | '.$e->getMessage());
@@ -3179,7 +3221,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			if(array_key_exists('raw', $params)){
 				$res = json_decode($response->getBody(), true);
 				if($response->isError()){
-					self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
+					self::Logging('doRequest '.$params["PAYMENT.CODE"].' '.'Brand:'.$params["ACCOUNT.BRAND"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
 				}
 				return $res;
 				exit;
@@ -3191,7 +3233,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			parse_str($res, $result);
 
 			if(($result['PROCESSING_RESULT'] == 'NOK') && ($result['PROCESSING_STATUS'] == 'REJECTED_VALIDATION')){
-				self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$result['PROCESSING_RETURN']);
+				self::Logging('doRequest '.$params["PAYMENT.CODE"].' '.'Brand:'.$params["ACCOUNT.BRAND"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$result['PROCESSING_RETURN']);
 			}
 
 			if($this->Config()->HGW_DEBUG > 0 && Shopware()->Front()->Request()->getActionName() == 'gateway'){
@@ -3460,6 +3502,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (200 - 3.000 EUR). </p>
 								</div>',
                 'template' 		=> 'hp_payment_hpr.tpl',
+
+            );
+            $inst[] = array(
+                'name'			=> 'hps',
+                'description'	=> 'Ratenkauf von Santander',
+                'trans_desc' 	=> 'Hire Purchace by Santander',
+                'additionalDescription' => '
+								<div class="SanPermission">
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (XXX - XXXX EUR). </p>
+								</div>',
+                'template' 		=> 'hp_payment_hps.tpl',
 
             );
 			$inst[] = array(

@@ -47,7 +47,9 @@
     {elseif $payment_mean.name == "hgw_pay" && $heidel_bm_va && ($formUrl.$pm != '')}
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va'}
     {elseif $payment_mean.name == "hgw_hpr"}
-        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
+		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
+	{elseif $payment_mean.name == "hgw_hps"}
+		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hps.tpl" pm='hps'}
     {elseif $payment_mean.name == "hgw_ivpd"}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_ivpd.tpl" pm='ivpd'}
     {else}

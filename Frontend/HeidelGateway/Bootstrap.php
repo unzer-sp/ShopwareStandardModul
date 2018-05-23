@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.05.20';
+		return '18.05.23';
 	}
 
 	/**
@@ -835,7 +835,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.04.09':
             case '18.04.25':
             case '18.04.27':
-            case '18.05.11':
+            case '18.05.23':
                 // added Checkbox for Payolution
                 // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
                 // refactoring EasyCredit max limit
@@ -847,7 +847,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.05.11 <br />';
+                    $msg .= '* update 18.05.23 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -1497,6 +1497,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setElement('text', 'HGW_PF_CHANNEL', array('label'=>'PostFinance Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_MPA_CHANNEL', array('label'=>'MasterPass Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_HPR_CHANNEL', array('label'=>'EasyCredit Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+            $form->setElement('text', 'HGW_HPS_CHANNEL', array('label'=>'Santander Ratenkauf Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array('label' => 'Gesicherte Lastschrift', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use direct debit with guarantee.'));
 
             $bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
@@ -2400,6 +2401,8 @@ mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($r
 
             //expand template
             $view->configOptInText = $optinText;
+            $view->assign('sanGenderVal',['MR', 'MRS']);
+            $view->assign('sanGenderOut',['Herr', 'Frau']);
 
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                 $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');

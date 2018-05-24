@@ -395,36 +395,39 @@ $(document).ready(function(){
     // Event before swiching payment method
     $.ajaxSetup({
         beforeSend: function(event, xhr, settings){
-            // check chosen payment method
-            var chosenPaymentMethod = $('input:radio:checked').attr('class');
-            var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
-            chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+            if(window.location.pathname.indexOf('shippingPayment') >= 0) {
+                // check chosen payment method
+                var chosenPaymentMethod = $('input:radio:checked').attr('class');
+                var cut = parseInt(chosenPaymentMethod.indexOf("hgw_")) + 4;
+                chosenPaymentMethod = chosenPaymentMethod.substr(cut, 4);
 
-            //setting Payolution-checkbox to required if payolution is chosen
-            if(chosenPaymentMethod == 'ivpd'){
-                $('#hgw_privpol_ivpd').attr("required","required");
-                $('#hgw_privpol_ivpd').prop("required","required");
-            } else {
-                $('#hgw_privpol_ivpd').prop("required",null);
-                $('#hgw_privpol_ivpd').removeAttr("required");
+                //setting Payolution-checkbox to required if payolution is chosen
+                if (chosenPaymentMethod == 'ivpd') {
+                    $('#hgw_privpol_ivpd').attr("required", "required");
+                    $('#hgw_privpol_ivpd').prop("required", "required");
+                } else {
+                    $('#hgw_privpol_ivpd').prop("required", null);
+                    $('#hgw_privpol_ivpd').removeAttr("required");
+                }
+                jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
             }
-            jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
-
         },
         complete: function(event, xhr, settings){
-            var chosenPaymentMethod = $('input:radio:checked').attr('class');
-            var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
-            chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+            if(window.location.pathname.indexOf('shippingPayment') >= 0) {
+                var chosenPaymentMethod = $('input:radio:checked').attr('class');
+                var cut = parseInt(chosenPaymentMethod.indexOf("hgw_")) + 4;
+                chosenPaymentMethod = chosenPaymentMethod.substr(cut, 4);
 
-            //setting Payolution-checkbox to required if payolution is chosen
-            if(chosenPaymentMethod == 'ivpd'){
-                $('#hgw_privpol_ivpd').attr("required","required");
-                $('#hgw_privpol_ivpd').prop("required","required");
-            } else {
-                $('#hgw_privpol_ivpd').prop("required",null);
-                $('#hgw_privpol_ivpd').removeAttr("required");
+                //setting Payolution-checkbox to required if payolution is chosen
+                if (chosenPaymentMethod == 'ivpd') {
+                    $('#hgw_privpol_ivpd').attr("required", "required");
+                    $('#hgw_privpol_ivpd').prop("required", "required");
+                } else {
+                    $('#hgw_privpol_ivpd').prop("required", null);
+                    $('#hgw_privpol_ivpd').removeAttr("required");
+                }
+                jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
             }
-            jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
         },
     });
 });

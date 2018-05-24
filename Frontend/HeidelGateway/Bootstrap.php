@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.05.23';
+		return '18.05.24';
 	}
 
 	/**
@@ -832,6 +832,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
+            case '18.05.24':
+                // fixed bug in valPayment.js which could cause an error while clicking on AGB-link
+                try{
+                    $msg .= '* update 18.05.24 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
@@ -1675,7 +1682,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$document = $args->getSubject();
 			$view = $document->_view;
-
+//            $document->_template->addTemplateDir(dirname(__FILE__) . '/Views/');
 			if($document->_order->payment['name'] == 'hgw_bs'){
 				$orderData = $view->getTemplateVars('Order');
 				$containers = $view->getTemplateVars('Containers');

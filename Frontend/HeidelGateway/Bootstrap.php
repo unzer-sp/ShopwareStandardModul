@@ -2338,7 +2338,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $view->activeEasy = "FALSE";
             $view->easyAmount = $basketAmount+$shippingAmount;
         }
-mail("sascha.pflueger@heidelpay.de","Session",print_r(Shopware()->Session()->HPdidRequest,1));
         // Function to show EasyCredit-text on choose-payment-site
         if (
             ($request->getControllerName() == 'checkout') &&
@@ -2386,35 +2385,38 @@ mail("sascha.pflueger@heidelpay.de","Session",print_r(Shopware()->Session()->HPd
                 'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> $countOrderForCustomer['COUNT(id)'],
             );
 
-            // prepare data and do request
-            $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
-            $responseHpr 	= $this->doRequest($requestData);
-mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($responseHpr,1));
-//mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate User",print_r($user,1));
-            //preparing OptIn-text to show
-            $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
+            // prepare data and do request for easyCredit
+            if(strtolower($user['additional']['payment']['name']) == 'hgw_hpr'){
+                $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
+                $responseHpr 	= $this->doRequest($requestData);
 
-            $optinText = str_replace('{', '', $optinText);
-            $optinText = str_replace('"optin": "', '', $optinText);
-            $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
-            $optinText = str_replace('"', '', $optinText);
-            $optinText = str_replace('}', '', $optinText);
+                //preparing OptIn-text to show
+                $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
 
-            //expand template
-            //easyCredit
-            $view->configOptInText = $optinText;
+                $optinText = str_replace('{', '', $optinText);
+                $optinText = str_replace('"optin": "', '', $optinText);
+                $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
+                $optinText = str_replace('"', '', $optinText);
+                $optinText = str_replace('}', '', $optinText);
+
+                //expand template
+                //easyCredit
+                $view->configOptInText = $optinText;
+            }
+
             //santander
             $view->assign('sanGenderVal',['MR', 'MRS']);
             $view->assign('sanGenderOut',['Herr', 'Frau']);
             $view->assign('genderShop_HpSan',$user['additional']['user']['salutation'] == 'mrs'? 'MRS' : 'MR');
             $view->assign('accountHolder_HpSan',$user['additional']['user']['firstname'].' '.$user['additional']['user']['lastname']);
-            Shopware()->Session()->wantSanHP = true;
+            $view->assign('birthdate_hps',$user['additional']['user']['birthday'] ? $user['additional']['user']['birthday']: "0000-00-00");
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                 $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
             }else{
                 $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
             }
             $view->extendsTemplate('register/hp_payment_hpr.tpl');
+            $view->extendsTemplate('register/hp_payment_hps.tpl');
         }
 
         if (
@@ -2442,9 +2444,59 @@ mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($r
             )
         )
         {
+            // do request for Santander hire purchase and redirect to santander / Gilladorn
+            if((strtolower($user['additional']['payment']['name']) == 'hgw_hps')){
+//mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Con: checkout Act:saveShippingPayment",print_r($_POST,1));
+//mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Con: checkout Act:saveShippingPayment",print_r($request->getPost('Date_Year'),1));
+
+                $paymentMethod = 'hps';
+                $brand = "SANTANDER";
+
+                $configData = $this->ppd_config('5', $paymentMethod);
+                $userData 	= $this->ppd_user($user,strtolower($paymentMethod));
+                $basketData = $this->getBasketId();
+                $konfiguration = self::Config();
+                $secret = $konfiguration['HGW_SECRET'];
+
+                //fetching count of orders of customer
+                $countOrderForCustomer = '';
+                $sql = 'SELECT COUNT(id) FROM `s_order` WHERE userID ="'.$user['additional']['user']['userID'].'" AND ordernumber != "0"';
+                $countOrderForCustomer = Shopware()->Db()->fetchRow($sql);
+
+                $additional = array(
+                    'NAME.BIRTHDATE'        => $request->getPost('Date_Year').'-'.$request->getPost('Date_Month').'-'.$request->getPost('Date_Day'),
+                    'PRESENTATION.AMOUNT' 	=> $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
+                    'PRESENTATION.CURRENCY' => Shopware()->Currency()->getShortName(),
+                    'IDENTIFICATION.TRANSACTIONID' => Shopware()->SessionID(),
+                    'CRITERION.SECRET' 		=> hash('sha512', Shopware()->SessionID().$secret),
+                    'CRITERION.SESS'		=> Shopware()->Session()->sessionId,
+                    'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ?  'FALSE':'TRUE',
+                    'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
+                    'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> $countOrderForCustomer['COUNT(id)'],
+                );
+
+                $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
+                $responseHps 	= $this->doRequest($requestData);
+mail("sascha.pflueger@heidelpay.de","Achtion: saveShippingPayment Santan Resp",print_r($responseHps,1));
+                // redirect to santander Gillardorn
+                if($responseHps['PROCESSING_REDIRECT_URL']){
+                    mail("sascha.pflueger@heidelpay.de","DRIN",print_r("",1));
+                    return $responseHpr['PROCESSING_REDIRECT_URL'];
+                } else {
+                    return $args->getSubject()->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'checkout',
+//                        'action' => 'shippingPayment',
+                        'action' => 'ShippingPayment',
+                        'sTarget' => 'checkout'
+                    ));
+                }
+
+            }
+
             // redirect to EasyCredit
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-                if (Shopware()->Session()->wantEasy || Shopware()->Session()->wantSanHP) {
+                if (Shopware()->Session()->wantEasy) {
                     return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                 } else {
                     Shopware()->Session()->wantEasy = true;
@@ -2458,8 +2510,8 @@ mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($r
                 exit();
             }else{
 
-                if (Shopware()->Session()->wantEasy || Shopware()->Session()->wantSanHP) {
-                    if ($responseHpr['FRONTEND_REDIRECT_URL'] || $responseHpr['PROCESSING_REDIRECT_URL']) {
+                if (Shopware()->Session()->wantEasy) {
+                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                         exit();

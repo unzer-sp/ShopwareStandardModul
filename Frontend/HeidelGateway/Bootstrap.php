@@ -2338,7 +2338,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $view->activeEasy = "FALSE";
             $view->easyAmount = $basketAmount+$shippingAmount;
         }
-
+mail("sascha.pflueger@heidelpay.de","Session",print_r(Shopware()->Session()->HPdidRequest,1));
         // Function to show EasyCredit-text on choose-payment-site
         if (
             ($request->getControllerName() == 'checkout') &&
@@ -2390,6 +2390,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
             $responseHpr 	= $this->doRequest($requestData);
 mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($responseHpr,1));
+//mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate User",print_r($user,1));
             //preparing OptIn-text to show
             $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
 
@@ -2400,10 +2401,14 @@ mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($r
             $optinText = str_replace('}', '', $optinText);
 
             //expand template
+            //easyCredit
             $view->configOptInText = $optinText;
+            //santander
             $view->assign('sanGenderVal',['MR', 'MRS']);
             $view->assign('sanGenderOut',['Herr', 'Frau']);
-
+            $view->assign('genderShop_HpSan',$user['additional']['user']['salutation'] == 'mrs'? 'MRS' : 'MR');
+            $view->assign('accountHolder_HpSan',$user['additional']['user']['firstname'].' '.$user['additional']['user']['lastname']);
+            Shopware()->Session()->wantSanHP = true;
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                 $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
             }else{
@@ -2425,8 +2430,8 @@ mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($r
             (
                 ($request->getActionName() == 'saveShippingPayment') &&
                 ($request->getControllerName() == 'checkout') &&
-                (strtolower($user['additional']['payment']['name']) == 'hgw_hpr') &&
-                ((Shopware()->Session()->HPdidRequest == 'FALSE') || empty(Shopware()->Session()->HPdidRequest))
+                ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') || (strtolower($user['additional']['payment']['name']) == 'hgw_hps'))
+                //&& ((Shopware()->Session()->HPdidRequest == 'FALSE') || empty(Shopware()->Session()->HPdidRequest))
             ) ||
             //case for Emotion template
             (
@@ -2439,7 +2444,7 @@ mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($r
         {
             // redirect to EasyCredit
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-                if (Shopware()->Session()->wantEasy) {
+                if (Shopware()->Session()->wantEasy || Shopware()->Session()->wantSanHP) {
                     return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                 } else {
                     Shopware()->Session()->wantEasy = true;
@@ -2453,14 +2458,13 @@ mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Response",print_r($r
                 exit();
             }else{
 
-                if (Shopware()->Session()->wantEasy) {
-                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
+                if (Shopware()->Session()->wantEasy || Shopware()->Session()->wantSanHP) {
+                    if ($responseHpr['FRONTEND_REDIRECT_URL'] || $responseHpr['PROCESSING_REDIRECT_URL']) {
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                         exit();
                     }
                 } else {
-                    Shopware()->Session()->wantEasy = true;
                     return $args->getSubject()->redirect(array(
                         'forceSecure' => 1,
                         'controller' => 'checkout',

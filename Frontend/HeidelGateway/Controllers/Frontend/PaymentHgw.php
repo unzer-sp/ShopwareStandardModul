@@ -1223,6 +1223,7 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
             $resp['PROCESSING_REASON']			= $this->Request()->getPost('PROCESSING_REASON') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_REASON'), $flag, $enc) : '';
             $resp['PROCESSING_TIMESTAMP']		= $this->Request()->getPost('PROCESSING_TIMESTAMP') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_TIMESTAMP'), $flag, $enc) : '';
             $resp['PROCESSING_STATUS']			= $this->Request()->getPost('PROCESSING_STATUS') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_STATUS'), $flag, $enc) : '';
+            $resp['PROCESSING_RECOVERABLE']		= $this->Request()->getPost('PROCESSING_RECOVERABLE') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_RECOVERABLE'), $flag, $enc) : '';
 
             // special criterions for HPR
             $resp['CRITERION_EASYCREDIT_FIRSTRATEDUEDATE']	= $this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE'), $flag, $enc) : '';
@@ -1285,10 +1286,13 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
             $resp['NAME_BIRTHDATE']				= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
             $resp['NAME_FAMILY']				= $this->Request()->getPost('NAME_FAMILY') == true ? htmlspecialchars($this->Request()->getPost('NAME_FAMILY'), $flag, $enc) : '';
             $resp['NAME_GIVEN']					= $this->Request()->getPost('NAME_GIVEN') == true ? htmlspecialchars($this->Request()->getPost('NAME_GIVEN'), $flag, $enc) : '';
+            $resp['NAME_BIRTHDATE']				= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
             $resp['ADDRESS_STREET']				= $this->Request()->getPost('ADDRESS_STREET') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_STREET'), $flag, $enc) : '';
             $resp['ADDRESS_CITY']				= $this->Request()->getPost('ADDRESS_CITY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_CITY'), $flag, $enc) : '';
             $resp['ADDRESS_ZIP']				= $this->Request()->getPost('ADDRESS_ZIP') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_ZIP'), $flag, $enc) : '';
             $resp['ADDRESS_COUNTRY']			= $this->Request()->getPost('ADDRESS_COUNTRY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_COUNTRY'), $flag, $enc) : '';
+            $resp['CUSTOMER_OPTIN']			    = $this->Request()->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN'), $flag, $enc) : '';
+            $resp['CUSTOMER_OPTIN2']			= $this->Request()->getPost('CUSTOMER_OPTIN_2') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN_2'), $flag, $enc) : '';
 
             $resp['CONTACT_EMAIL']				= $this->Request()->getPost('CONTACT_EMAIL') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_EMAIL'), $flag, $enc) : '';
             $resp['CONTACT_PHONE']				= $this->Request()->getPost('CONTACT_PHONE') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_PHONE'), $flag, $enc) : '';
@@ -1296,6 +1300,7 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
 
             $resp['TRANSACTION_CHANNEL']		= $this->Request()->getPost('TRANSACTION_CHANNEL') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_CHANNEL'), $flag, $enc) : '';
             $resp['TRANSACTION_MODE']			= $this->Request()->getPost('TRANSACTION_MODE') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_MODE'), $flag, $enc) : '';
+            $resp['TRANSACTION_SOURCE']			= $this->Request()->getPost('TRANSACTION_SOURCE') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_SOURCE'), $flag, $enc) : '';
 
             $resp['var_Register']				= ($this->Request()->getPost('register') == true && gettype($this->Request()->getPost('register')) == 'array') ? $this->Request()->getPost('register') : '';
             if(empty($resp['var_Register'])){

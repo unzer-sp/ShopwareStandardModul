@@ -2439,16 +2439,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             (
                 ($request->getActionName() == 'confirm') &&
                 ( $request->getControllerName() == 'checkout')
-                && (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
+                && ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') || (strtolower($user['additional']['payment']['name']) == 'hgw_hps'))
                 && ((Shopware()->Session()->HPdidRequest == 'FALSE') || empty(Shopware()->Session()->HPdidRequest))
             )
         )
         {
             // do request for Santander hire purchase and redirect to santander / Gilladorn
             if((strtolower($user['additional']['payment']['name']) == 'hgw_hps')){
-//mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Con: checkout Act:saveShippingPayment",print_r($_POST,1));
-//mail("sascha.pflueger@heidelpay.de","onPostDispatchTemplate Con: checkout Act:saveShippingPayment",print_r($request->getPost('Date_Year'),1));
-
                 $paymentMethod = 'hps';
                 $brand = "SANTANDER";
 
@@ -2477,23 +2474,20 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                 $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                 $responseHps 	= $this->doRequest($requestData);
-mail("sascha.pflueger@heidelpay.de","Achtion: saveShippingPayment Santan Resp",print_r($responseHps,1));
-                // redirect to santander Gillardorn
+
+                // redirect to santander / Gillardorn
                 if($responseHps['PROCESSING_REDIRECT_URL']){
-                    mail("sascha.pflueger@heidelpay.de","DRIN",print_r("",1));
-                    return $responseHpr['PROCESSING_REDIRECT_URL'];
+                    return $args->getSubject()->redirect($responseHps['PROCESSING_REDIRECT_URL']);
                 } else {
                     return $args->getSubject()->redirect(array(
                         'forceSecure' => 1,
                         'controller' => 'checkout',
-//                        'action' => 'shippingPayment',
                         'action' => 'ShippingPayment',
                         'sTarget' => 'checkout'
                     ));
                 }
 
             }
-
             // redirect to EasyCredit
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                 if (Shopware()->Session()->wantEasy) {

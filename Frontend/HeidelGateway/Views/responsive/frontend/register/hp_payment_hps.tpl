@@ -1,6 +1,9 @@
 {block name="hp_payment_hps"}
-{debug}
-	<div class="newreg_hps" style="margin-top: 10px">
+{*{debug}*}
+	<  div class="newreg_hps" style="margin-top: 10px">
+		<div id="hps_logo">
+			<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">
+		</div>
 		<div id="hps_genderData">
 			<div>
 				<label for="sanGenders">{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label></br>

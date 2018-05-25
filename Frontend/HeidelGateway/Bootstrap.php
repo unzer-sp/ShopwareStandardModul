@@ -1633,7 +1633,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			if ($this->assertVersionGreaterThen('5.1.8')) {
 				try {
 					$where		= array("name LIKE 'hgw_%'");
-
 					$affRows = Shopware()->Db()->update('s_core_paymentmeans', $newData, $where);
 					$dbErrors = Shopware()->Db()->getErrorMessage();
 				} catch (Exception $e) {

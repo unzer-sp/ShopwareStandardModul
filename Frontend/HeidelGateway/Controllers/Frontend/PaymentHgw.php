@@ -1244,6 +1244,9 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
             $resp['CRITERION_EASYCREDIT_DEVICEIDENTTOKEN']	= $this->Request()->getPost('CRITERION_EASYCREDIT_DEVICEIDENTTOKEN') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_DEVICEIDENTTOKEN'), $flag, $enc) : '';
             $resp['CRITERION_EASYCREDIT_UUID']				= $this->Request()->getPost('CRITERION_EASYCREDIT_UUID') 				== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_UUID'), $flag, $enc) : '';
 
+            // special Criterions for Santander HP
+            $resp['CRITERION_SANTANDER_HP_PDF_URL']				= $this->Request()->getPost('CRITERION_SANTANDER_HP_PDF_URL') 				== true ? htmlspecialchars($this->Request()->getPost('CRITERION_SANTANDER_HP_PDF_URL'), $flag, $enc) : '';
+
             $resp['RISKINFORMATION.CUSTOMERGUESTCHECKOUT']	= $this->Request()->getPost('RISKINFORMATION.CUSTOMERGUESTCHECKOUT') 	== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERGUESTCHECKOUT'), $flag, $enc) : '';
             $resp['RISKINFORMATION.CUSTOMERSINCE']			= $this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE') 			== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE'), $flag, $enc) : '';
             $resp['RISKINFORMATION.CUSTOMERORDERCOUNT']		= $this->Request()->getPost('RISKINFORMATION.CUSTOMERORDERCOUNT') 		== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERORDERCOUNT'), $flag, $enc) : '';
@@ -3701,6 +3704,7 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
      */
     public function afterEasyAction()
     {
+        mail("sascha.pflueger@heidelpay.de","afterEasyAction",print_r("",1));
         Shopware()->Session()->HPdidRequest = 'TRUE';
         $this->redirect(
             array(

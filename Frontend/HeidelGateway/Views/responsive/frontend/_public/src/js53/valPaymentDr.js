@@ -353,6 +353,21 @@ $(document).ready(function(){
                 jQuery('#birthdate_papg').val(birthYear+'-'+birthMonth+'-'+birthDay);
             }
 
+            jQuery('.newreg_hps').change(function (e) {
+                var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+                jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            });
+
+            if (jQuery('.newreg_hps')) {
+                var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            }
+
             $( document ).ajaxComplete(function() {
                 jQuery('.newreg_dd').click(function(e){
                     var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();

@@ -1,6 +1,6 @@
 {block name="hp_payment_hps"}
 {*{debug}*}
-	<  div class="newreg_hps" style="margin-top: 10px">
+	<div class="newreg_hps" style="margin-top: 10px">
 		<div id="hps_logo">
 			<img src="https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif" alt="Santander-Logo">
 		</div>
@@ -23,7 +23,7 @@
 				{else}
 					{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben"}
 				{/if}
-				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_san" value="{$birthdate_hps}">
+				<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_sanHps" value="{$birthdate_hps}">
 			</div>
 
 		</div>

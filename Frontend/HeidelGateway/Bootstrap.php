@@ -2157,7 +2157,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     }
                 }
 
-                // Case for Santander
+                // Case for Santander invoice
                 if (
                     ($request->getPost("BRAND") == "SANTANDER") &&
                     ($user['additional']['payment']['name'] == "hgw_san")
@@ -2427,8 +2427,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         {
         }
 
-//mail("sascha.pflueger@heidelpay.de","Action",print_r($request->getActionName(),1));
-//mail("sascha.pflueger@heidelpay.de","Controller",print_r($request->getControllerName(),1));
         //after chosen HPR redirect to EasyCredit
         if (
             (
@@ -2442,8 +2440,20 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 )
             )
                 ||
+
             (
-                Shopware()->Shop()->getTemplate()->getVersion() <= 3 &&
+                Shopware()->Shop()->getTemplate()->getVersion() >= 3 &&
+                //case for Responsive template
+                (
+                    ($request->getActionName() == 'confirm') &&
+                    ($request->getControllerName() == 'checkout') &&
+                    (strtolower($user['additional']['payment']['name']) == 'hgw_hps')
+                    && (empty(Shopware()->Session()->HPdidRequest))
+                )
+            )
+                ||
+            (
+                Shopware()->Shop()->getTemplate()->getVersion() < 3 &&
                 //case for Emotion template
                 (
                     ($request->getActionName() == 'confirm') &&
@@ -2455,7 +2465,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         )
         {
 
-            // do request for Santander hire purchase and redirect to santander / Gilladorn
+            // do request HP.IN for Santander hire purchase and redirect to santander / Gilladorn
             if((strtolower($user['additional']['payment']['name']) == 'hgw_hps')){
                 $paymentMethod = 'hps';
                 $brand = "SANTANDER";
@@ -2486,7 +2496,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 if($additional['NAME.BIRTHDATE'] != "--"){
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
-
+                    Shopware()->Session()->HPdidRequest = 'TRUE';
                     // redirect to santander / Gillardorn
                     if($responseHps['PROCESSING_REDIRECT_URL']){
                         return $args->getSubject()->redirect($responseHps['PROCESSING_REDIRECT_URL']);
@@ -2508,6 +2518,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     ));
                 }
             }
+
             // redirect to EasyCredit
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                 if (Shopware()->Session()->wantEasy) {
@@ -2537,6 +2548,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 //                        'action' => 'shippingPayment',
 //                        'sTarget' => 'checkout'
 //                    ));
+                    return $args->getSubject()->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'checkout',
+                        'action' => 'confirm',
+                    ));
                 }
             }
         }
@@ -2654,6 +2670,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                     }
 
+                    //Showing pre-contract-infos to customer
                     if((strtolower($user['additional']['payment']['name']) == 'hgw_hps')){
                         $parameters = json_decode($transaction['jsonresponse']);
 
@@ -2752,7 +2769,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $view = $args->getSubject()->View();
 
         $user = Shopware()->Modules()->Admin()->sGetUserData();
-mail("sascha.pflueger@heidelpay.de","Bootstrap 2755",print_r("",1));
         if($user['additional']['payment']['name'] == "hgw_hpr"){
             $basket	= Shopware()->Modules()->Basket()->sGetBasket();
             $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();

@@ -15,9 +15,7 @@
 		</div>
 		<div id="hps_customerBirthdate" style="margin-top: 10px">
 			<div>
-				<h3>Übermitteltes GebDat: {$birthdate_hps}</h3>
 				<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-
 				{if isset($birthdate_hps) && $birthdate_hps != '0000-00-00'}
 					{html_select_date|utf8_encode time=$birthdate_hps start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 				{else}

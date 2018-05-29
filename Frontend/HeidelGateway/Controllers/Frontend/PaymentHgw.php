@@ -335,7 +335,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         ($activePayment != 'mpa')&&
                         ($activePayment != 'san')&&
                         ($activePayment != 'ivpd')&&
-                        ($activePayment != 'hpr')
+                        ($activePayment != 'hpr') &&
+                        ($activePayment != 'hps')
 						){
 
 							//adding a basketId for papg payment
@@ -401,7 +402,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
-
+                    //Masterpass
 					if($activePayment == 'mpa'){
 						if(empty($regData)){
 							$basketId = self::getBasketId();
@@ -420,7 +421,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							$ppd_crit['FRONTEND.ENABLED'] = 'true';
 						}
 					}
-
+                    // Santander Invoice
                     if($activePayment == 'san') {
                         $basketId = self::getBasketId();
 
@@ -452,7 +453,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             return $this->forward('missinginput');
                         }
                     }
-
+                    // Payolution Direct Invoice
                     if($activePayment == 'ivpd') {
                         $basketId = self::getBasketId();
 
@@ -489,7 +490,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         }
 
                     }
-
+                    // easyCredit Hire Purchace
                     if ($activePayment == 'hpr') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
@@ -502,21 +503,35 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         unset($this->View()->configOptInText);
                     }
 
+                    // Santander Hire Purchace
+                    if ($activePayment == 'hps') {
+                        // fetch INI Transaction to set the ReferenceId
+                        $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+                        //setting
+                        $ppd_bskt['PRESENTATION.AMOUNT'] 	= $this->hgw()->formatNumber($basket['amount']);
+                        $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
+
+                        $ppd_config['PAYMENT.CODE'] = "HP.PA";
+
+                        $ppd_crit['IDENTIFICATION.REFERENCEID'] = $transaction['uniqueid'];
+                        unset($this->View()->linkPrecontactInfos);
+
+                    }
+
+                    if($activePayment == 'bs'){
+                        if(!$this->mergeAddress()){
+                            $locId = (Shopware()->Locale()->getLanguage() == 'de') ? 1 : 2;
+                            Shopware()->Session()->HPError = '';
+                            return $this->forward('fail');
+                        }else{
+                            $params['CRITERION.GATEWAY'] = '1';
+                            $this->saveBillSafeRequest2DB($tempID, $params);
+                        }
+                    }elseif($activePayment == 'mk'){
+                        $params['CRITERION.GATEWAY'] = '1';
+                    }
+
 					$params = $this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit);
-
-					if($activePayment == 'bs'){
-						if(!$this->mergeAddress()){
-							$locId = (Shopware()->Locale()->getLanguage() == 'de') ? 1 : 2;
-							Shopware()->Session()->HPError = '';
-							return $this->forward('fail');
-						}else{
-							$params['CRITERION.GATEWAY'] = '1';
-							$this->saveBillSafeRequest2DB($tempID, $params);
-						}
-					}elseif($activePayment == 'mk'){
-						$params['CRITERION.GATEWAY'] = '1';
-					}
-
 					$response = $this->hgw()->doRequest($params);
 				}
 			}
@@ -1204,7 +1219,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             $flag = ENT_COMPAT;
             $enc = 'UTF-8';
             if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
-mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
             $flag = ENT_COMPAT;
             $enc = 'UTF-8';
             if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
@@ -3131,7 +3145,7 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
 			$params['FRONTEND.MODE'] 		= "WHITELABEL";
 
 			// set payment method
-			switch($config['PAYMENT.METHOD']){
+			switch(strtolower($config['PAYMENT.METHOD'])){
 				/* prezlewy24 */
 				case 'p24':
 					$type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
@@ -3232,11 +3246,18 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
 					$params['FRONTEND.ENABLED']		= "true";
 
 					break;
-                    /* EasyCredit */
+                    /* EasyCredit HP*/
                 case 'hpr':
                     $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
                     $params['PAYMENT.CODE'] 		= "HP.".$type;
                     $params['TRANSACTION.RESPONSE']	= "SYNC";
+                    break;
+                /* Santander HP */
+                case 'hps':
+                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+                    $params['PAYMENT.CODE'] 		= "HP.".$type;
+                    $params['TRANSACTION.RESPONSE']	= "SYNC";
+                    $params['FRONTEND.ENABLED']     = "false";
                     break;
 					/* credit- & debitcard */
 				case 'cc':
@@ -3704,7 +3725,6 @@ mail("sascha.pflueger@heidelpay.de","responseHpr Post",print_r($_POST,1));
      */
     public function afterEasyAction()
     {
-        mail("sascha.pflueger@heidelpay.de","afterEasyAction",print_r("",1));
         Shopware()->Session()->HPdidRequest = 'TRUE';
         $this->redirect(
             array(

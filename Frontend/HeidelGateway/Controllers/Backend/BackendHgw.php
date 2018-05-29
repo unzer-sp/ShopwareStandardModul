@@ -126,6 +126,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					$payName = 'wt';
 					break;
                 case 'hpr':
+                case 'hps':
                     $payName = 'hp';
                     break;
 				default:
@@ -227,10 +228,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$data[$newKey] = $value;
 				unset($data[$key]);
 			}
-
 			$resp = $this->callDoRequest($data);
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
-				
 			// switch, to update right table, depending on used frontend module
 			if(($trans->payName == 'bs') && ($meth == 'fi')){
 				if(strtolower($modul) == 'heidelpay'){
@@ -568,6 +567,15 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                             $maxFi = $value['PRESENTATION_AMOUNT'];
                             if($payInfo['payType'] == 'pa'){
                                 $btns['fi']['active'] = 'true';
+                            }
+                            break;
+                        case 'hps':
+                            $maxFi = $value['PRESENTATION_AMOUNT'];
+                            if($payInfo['payType'] == 'pa'){
+                                $btns['fi']['active'] = 'true';
+                            }
+                            if($payInfo['payType'] == 'fi'){
+                                $btns['fi']['active'] = 'false';
                             }
                             break;
 						default:

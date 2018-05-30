@@ -25,12 +25,10 @@ document.asyncReady(function () {
                     // change form action
                     var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
                     changeUrl(checkedOpt, orgLink);
-
                 });
-console.log("30");
+
 // add validation for form
 jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
-console.log("!!!!! 32 ");
 
                 // set original form action (before AJAX is sent)
                 $.ajaxSetup({
@@ -94,7 +92,6 @@ console.log("!!!!! 32 ");
                         });
 // add validation for form
 jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
-console.log("!!!!!");
                         // just call changeUrl() after all animations are done
                         $(document).promise().done(function () {
                             document.asyncReady(function () {
@@ -635,7 +632,6 @@ function changeUrl(checkedOpt, orgLink) {
 
 // VALIDATE FORM
 function valForm() {
-console.log("valForm");
     if (jQuery('.register--payment input:radio:checked').length != 0) {
         var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
         if (checkedOpt != undefined) {
@@ -740,7 +736,6 @@ console.log("valForm");
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm() {
-console.log("valGatewayForm");
     checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('_') + 1);
 
@@ -807,7 +802,6 @@ console.log("valGatewayForm");
 
 // VALIDATE FORM ON SHIPPINGPAYMENT
 function valShippingPaymentForm() {
-console.log('ValShippingPaymentForm');
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
     // remove check vor cc and dc
@@ -848,10 +842,7 @@ console.log('ValShippingPaymentForm');
                     break;
 
                 case "hps":
-                    console.log("Santanderdreck");
                     var errors = valSantanderHP();
-                    console.log("Fehler:");
-                    console.log(errors);
                     if(errors.length >0){return false;}
             }
             // if (pm == 'dd') {
@@ -1178,7 +1169,6 @@ function valInvoiceSec() {
  * Function to validate Santander Hire purchace
  */
 function valSantanderHP() {
-    console.log("valSantanderHP()");
     var errors = new Array();
     var i = 0;
 

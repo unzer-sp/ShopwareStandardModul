@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.05.23';
+		return '18.05.30';
 	}
 
 	/**
@@ -853,6 +853,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '18.05.20':
+            case '18.05.30':
                 // added paymentmethod "Santander Ratenkauf"
 
                 try{
@@ -866,7 +867,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         )
                     );
 
-                    $msg .= '* update 18.05.20 <br />';
+                    $msg .= '* update 18.05.30 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

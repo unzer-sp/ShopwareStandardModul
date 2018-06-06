@@ -5,9 +5,9 @@
 * @category Shopware
 * @package Shopware_Plugins
 * @subpackage Plugin
-* @link http://www.heidelpay.de
-* @copyright Copyright (c) 2016, Heidelberger Payment GmbH
-* @author Jens Richter / Andreas Nemet
+* @link http://www.heidelpay.com
+* @copyright Copyright (c) 2016, heidelpay GmbH
+* @author Jens Richter / Sascha Pflueger
 */
 
 class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backend_ExtJs implements Enlight_Hook{
@@ -142,7 +142,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 
             $data = $transactions[0];
             $formerPaTransaction = $data;
-
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
 			$data['USER_LOGIN'] = trim($this->FrontendConfigHGW()->HGW_USER_LOGIN);
 			$data['USER_PWD'] = trim($this->FrontendConfigHGW()->HGW_USER_PW);
@@ -161,15 +160,12 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url;
 			}
 
-            /**
-             * @ToDo Eventuell für IV.RF zuvor aus der IV.PA den Brand laden, da dieser in IV.RC nicht mitgeschickt wird vom Payment
-             * nur dann kann unten stehende Abfrage funktionieren
-             */
-
             // setting Basket-Id for Payolution
             if(
                 ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
              || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
+             || ($data['CRITERION_IVBRAND'] == 'PAYOLUTION')
+             || ($data['CRITERION_IVBRAND'] == 'SANTANDER')
             )
             {
 
@@ -178,7 +174,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 {
                     case 'IV.FI':
                     case 'IV.RV':
-                    case 'IV.RF': // kann nicht reinlaufen weil bei RC bei Payolution und Santander kein ACCOUNT.BRAND mit geschickt wird
+                    case 'IV.RF':
                             // fetch all articles for Basket-Api-Call from order
                             $orderDetails = $this->fetchOrderDetailsByUniqueId($data['IDENTIFICATION_UNIQUEID']);
 
@@ -283,10 +279,11 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
             {
                 case 'rf':
                     $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ? '
-                        .'AND (`payment_type` = "PA" '
-                        .'OR `payment_type` = "DB" '
+                        .'AND (`payment_type` = "DB" '
                         .'OR `payment_type` = "CP" '
-                        .'OR `payment_type` = "RB") ';
+                        .'OR `payment_type` = "RB" '
+                        .'OR `payment_type` = "RC" '
+                        .') ';
                    /* if(($uid != NULL) && ($uid != '')){
                         $sql .= 'AND `uniqueid` = ? ';
                         $params[] = $uid;
@@ -457,7 +454,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                 }
                                 if($payInfo['payType'] == 'rc'){
                                     $btns['rv']['active'] = $btns['fi']['active'] = 'false';
-//                                    $btns['rf']['active'] = 'true';
+                                    $btns['rf']['active'] = 'true';
 
                                     if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
                                     $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
@@ -491,22 +488,26 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                     $btns['rf']['trans'][] =
                                         $this->storeTrans($value,$payName, $payInfo);
                                 }
+
+                                if ($payInfo['payType'] == 'fi') {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['active'] = 'true';
+                                    $btns['fi']['active'] =	'false';
+//                                    $btns['rf']['active'] = 'true';
+//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+                                }
+
                                 if ($payInfo['payType'] == 'rc') {
                                     $btns['rv']['active'] =
                                     $btns['fi']['active'] = 'false';
-//                                    $btns['rf']['active'] = 'true';
+                                    $btns['rf']['active'] = 'true';
 
                                     if (!isset($maxRf)) {
                                         $maxRf = $value['PRESENTATION_AMOUNT'];
                                     }
                                     $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
                                 }
-                                if ($payInfo['payType'] == 'fi') {
-                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
-                                    $btns['rv']['active'] = $btns['fi']['active'] = 'false';
-//                                    $btns['rf']['active'] = 'true';
-//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
-                                }
+
                             }
                             else {
                                 $btns['rv']['active'] = $btns['fi']['active'] = 'false';
@@ -927,29 +928,34 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
      */
     protected function prepareBackendBasketData($orderDetails)
     {
-
         // prepare Basicdata for Basket-Api-Call
         $shoppingCart['authentication'] = array(
             'sender' 		=> trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER),
             'login'			=> trim($this->FrontendConfigHGW()->HGW_USER_LOGIN),
             'password'		=> trim($this->FrontendConfigHGW()->HGW_USER_PW),
         );
+
         // prepare hole basket data
-        $amountNet 		= !empty($orderDetails[0]["invoice_amount_net"])  ? str_replace(',','.',$orderDetails[0]["invoice_amount_net"]*100): "";
-        $amountGross 	= !empty($orderDetails[0]["invoice_amount"])      ? str_replace(',','.',$orderDetails[0]["invoice_amount"]*100): "";
-        $amountVat 		= $amountGross - $amountNet;
+        // remove dot as seperator for thousands and formate value into cent with no decimals
+        $amountNet      = number_format($orderDetails[0]["invoice_amount_net"], 4,".","");
+        $amountNet      = bcmul($amountNet, 100, 0);
+
+        $amountGross    = number_format($orderDetails[0]["invoice_amount"], 4,".","");
+        $amountGross    = bcmul($amountGross, 100, 0);
+
+        $amountVat 		= number_format(bcsub($amountGross,$amountNet),0,".","");
 
         $shoppingCart['basket'] = [
             'amountTotalNet' => $amountNet,
             'amountTotalVat' => $amountVat,
-            'currencyCode'   => !empty($orderDetails[0]["currency"])  ? str_replace(',','.',$orderDetails[0]["currency"]): "",
-
+            'currencyCode'   => !empty($orderDetails[0]["currency"])  ? $orderDetails[0]["currency"]: "",
         ];
 
         //prepare item basket data
         $count = 1;
         foreach ($orderDetails as $singleArticle)
         {
+
             $shoppingCart['basket']['basketItems'][] = array(
                 'position'				=> $count,
                 'basketItemReferenceId' => $count,
@@ -957,10 +963,10 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 'unit'					=> $singleArticle['unit'],
                 'quantity'				=> $singleArticle['quantity'],
                 'vat'					=> $singleArticle['tax_rate'],
-                'amountGross'			=> floor(bcmul($singleArticle['price'], 100, 10)),
-                'amountNet'				=> floor(bcmul((($singleArticle['price']/ (100+$singleArticle['tax_rate']))*100) , 100, 10)),
-                'amountVat'				=> round(bcmul($singleArticle['price'] - (($singleArticle['price']/ (100+$singleArticle['tax_rate']))*100),100,10)),
-                'amountPerUnit'			=> floor(bcmul(($singleArticle['price']), 100, 10)),
+                'amountGross'			=> bcmul($singleArticle['price'], 100, 0),
+                'amountNet'				=> bcmul(bcmul((bcdiv($singleArticle['price'],(bcadd(100,$singleArticle['tax_rate'],6)),6)),100,6), 100, 0),
+                'amountVat'				=> bcmul(bcsub($singleArticle['price'],bcmul(bcdiv($singleArticle['price'],(bcadd($singleArticle['tax_rate'],100,6)),6),100,6),6),100,0),
+                'amountPerUnit'			=> bcmul(($singleArticle['price']), 100, 0),
                 'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
                 'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
 
@@ -983,10 +989,10 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 'unit'					=> "stk",
                 'quantity'				=> "1",
                 'vat'					=> $orderDetails[0]['tax_rate'],
-                'amountGross'			=> floor(bcmul($orderDetails[0]['invoice_shipping'], 100, 10)),
-                'amountNet'				=> floor(bcmul($orderDetails[0]['invoice_shipping_net'] , 100, 10)),
-                'amountVat'				=> round(bcmul( $orderDetails[0]['invoice_shipping']- $orderDetails[0]['invoice_shipping_net'],100,10)),
-                'amountPerUnit'			=> floor(bcmul(($orderDetails[0]['invoice_shipping']), 100, 10)),
+                'amountGross'			=> bcmul($orderDetails[0]['invoice_shipping'], 100, 0),
+                'amountNet'				=> bcmul($orderDetails[0]['invoice_shipping_net'] , 100, 0),
+                'amountVat'				=> bcmul(bcsub($singleArticle['invoice_shipping'],$singleArticle['invoice_shipping_net'],6),100,0),
+                'amountPerUnit'			=> bcmul(($orderDetails[0]['invoice_shipping']), 100, 0),
                 'type'					=> "shipment",
                 'title'					=> "Shipping Costs"
 

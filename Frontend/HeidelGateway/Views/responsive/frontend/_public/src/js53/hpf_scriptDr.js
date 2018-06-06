@@ -105,12 +105,12 @@ $(document).ready(function(){
 		// SHIPPINGPAYMENT
 		var errorDiv = '.content-main--inner .content .alert .alert--content';
 
-		$(document).ajaxComplete(function(event, xhr, settings){
+		// $(document).ajaxComplete(function(event, xhr, settings){
 			// reset the flags for the frame listener, because event bindings are deleted due to ajax
 			// 'msg' flag don't need a reset because the listener is on the window
 			hasListener['dc'] = false;
 			hasListener['cc'] = false;
-			
+
 			checkedOpt = jQuery('.payment--method-list input:radio:checked');
 			var checkedClass = checkedOpt.attr('class');
 
@@ -146,7 +146,7 @@ $(document).ready(function(){
 					}
 				}else{ pm = ''; }
 			}
-		});
+		// });
 	}
 
 	// add an event listener that will execute the sendMessage() function when the send button is clicked.

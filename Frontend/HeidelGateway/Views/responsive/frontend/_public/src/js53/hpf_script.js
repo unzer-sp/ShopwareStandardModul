@@ -19,6 +19,7 @@ document.asyncReady(function() {
 
     // PATH SWITCH
     if(window.location.pathname.indexOf('account/payment') >= '0'){
+
         // ACCOUNT/PAYMENT
         var errorDiv = '#center .alert .alert--content';
 
@@ -103,7 +104,10 @@ document.asyncReady(function() {
                 }
             }else{ pm = ''; }
         }
-    }else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
+    }else if(
+        (window.location.pathname.indexOf('shippingPayment') >= '0')
+        || (window.location.pathname.indexOf('zahlungsart-und-versand') >= '0')
+    ){
         // SHIPPINGPAYMENT
         var errorDiv = '.content-main--inner .content .alert .alert--content';
 
@@ -111,6 +115,8 @@ document.asyncReady(function() {
         // if CC / DC was chosen before
         hasListener['dc'] = false;
         hasListener['cc'] = false;
+
+        hasListener['dd'] = false;
 
         checkedOpt = jQuery('.payment--method-list input:radio:checked');
         var checkedClass = checkedOpt.attr('class');

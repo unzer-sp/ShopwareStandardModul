@@ -5,9 +5,9 @@
 * @category Shopware
 * @package Shopware_Plugins
 * @subpackage Plugin
-* @link http://www.heidelpay.de
-* @copyright Copyright (c) 2016, Heidelberger Payment GmbH
-* @author Jens Richter / Andreas Nemet / Sasscha Pflüger
+* @link http://www.heidelpay.com
+* @copyright Copyright (c) 2018, heidelpay GmbH
+* @author Jens Richter / Sascha Pflueger
 */
 use Shopware\Components\CSRFWhitelistAware;
 
@@ -132,7 +132,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 
 			if($activePayment == 'pay'){ $activePayment = va; }
-
 			// BookingMode: CC, DC, DD, VA
 			if(in_array($activePayment, $bookingMode)){
 				$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
@@ -305,6 +304,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						$frame[$activePayment] = false;
 
 					}
+					
+					if ($activePayment == 'va') {
+					    $this->redirect($getFormUrl['FRONTEND_REDIRECT_URL']);
+                    }
 
 					$cssVar = 'HGW_HPF_'.strtoupper($config['PAYMENT.METHOD']).'_CSS';
 					$params['FRONTEND.CSS_PATH']	=	$this->Config()->$cssVar;
@@ -396,9 +399,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 				}else{
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
-
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
-
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
 
 					if($activePayment == 'mpa'){
@@ -420,8 +421,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						}
 					}
 
-					$request = $this->Request()->getPost();
-
                     if($activePayment == 'san') {
                         $basketId = self::getBasketId();
 
@@ -437,18 +436,21 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
                         $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
                         $ppd_crit["CUSTOMER.OPTIN"] = strtoupper($regDataParameters->CUSTOMER_OPTIN);
-                        $ppd_crit["CUSTOMER.OPTIN_2"] = strtoupper($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY);
-                        $ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"] = strtoupper($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY);
+                        $ppd_crit["CUSTOMER.OPTIN_2"] =
+                            strtoupper(($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "ON") || ($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "TRUE") ? "TRUE" : "FALSE");
+                        $ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"] =
+                            strtoupper(($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "ON") || ($regDataParameters->CUSTOMER_ACCEPT_PRIVACY_POLICY == "TRUE") ? "TRUE" : "FALSE");
+                        $ppd_crit["CRITERION.IVBRAND"] = "SANTANDER";
 
                         //to prevent sending request to paymentgateway if browser-back-button was pushed
-//                        if(
-//                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
-//                            empty($ppd_crit["NAME.SALUTATION"]) ||
-//                            empty($ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"])
-//                        )
-//                        {
-//                            $this->forward('fail');
-//                        }
+                        if(
+                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
+                            empty($ppd_crit["NAME.SALUTATION"]) ||
+                            empty($ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"])
+                        )
+                        {
+                            return $this->forward('missinginput');
+                        }
                     }
 
                     if($activePayment == 'ivpd') {
@@ -460,7 +462,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             $basketId = $basketId['basketId'];
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
-
                         $regDataParameters = json_decode($regData["payment_data"]);
 
                         $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
@@ -476,16 +477,16 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit['RISKINFORMATION.CUSTOMERSINCE'] 		    = $user['additional']['user']['firstlogin'];
                         $ppd_crit['RISKINFORMATION.CUSTOMERORDERCOUNT'] 	= $countOrderForCustomer['COUNT(id)'];
                         $ppd_crit['CRITERION.USER_ID'] 	= $user['additional']['user']['id'];
+                        $ppd_crit["CRITERION.IVBRAND"] = "PAYOLUTION";
 
                         //to prevent sending request to paymentgateway if browser-back-button was pushed
-//                        if(
-//                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
-//                            empty($ppd_crit["NAME.SALUTATION"]) ||
-//                            empty($ppd_crit["CUSTOMER.ACCEPT_PRIVACY_POLICY"])
-//                        )
-//                        {
-//                            $this->forward('fail');
-//                        }
+                        if(
+                            empty($ppd_crit["NAME.BIRTHDATE"]) ||
+                            empty($ppd_crit["NAME.SALUTATION"])
+                        )
+                        {
+                            return $this->forward('missinginput');
+                        }
 
                     }
 
@@ -521,7 +522,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 
 			$this->View()->pluginPath = $pref .$basepath .$pluginPath;
-
 			if($response['POST_VALIDATION'] == "NOK"){
 				$this->hgw()->Logging(
 						$response['PROCESSING_RETURN'].
@@ -531,6 +531,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}elseif($response['PROCESSING_RESULT'] == "NOK"){
                 $this->hgw()->saveRes($response);
 				Shopware()->Session()->HPError = $response['PROCESSING_RETURN_CODE'];
+
 				return $this->forward('fail');
 			}
 
@@ -702,7 +703,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$this->View()->PaymentUrl = $response['FRONTEND_REDIRECT_URL'];
 				}
 			}
-
 		}catch(Exception $e){
 
 			$this->hgw()->Logging('gatewayAction | '.$e->getMessage());
@@ -711,6 +711,43 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		}
 	}
 
+    /**
+     * Function redirects to payment method choice in case of missing birthdate fpr Santander oder Payolution
+     */
+    public function missinginputAction()
+    {
+        try{
+            switch (Shopware()->Shop()->getTemplate()->getVersion()){
+                // Emotion Template
+                case "2":
+                    return $this->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'account',
+                        'action' => 'payment'
+                    ));
+                    break;
+                // Responsive Template
+                case "3":
+                    return $this->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'checkout',
+                        'action' => 'shippingPayment'
+                    ));
+                    break;
+                // other Templates
+                default:
+                    return $this->redirect(array(
+                        'forceSecure' => 1,
+                        'controller' => 'checkout',
+                        'action' => 'shippingPayment'
+                    ));
+                    break;
+            }
+        } catch (Exception $e) {
+            $this->hgw()->Logging('missinginputAction | '.$e->getMessage());
+        }
+
+	}
 	/**
 	 * response action method for the reponse call of a debitfrom heidelpay
 	 */
@@ -802,8 +839,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['ADDRESS_ZIP']				= $this->Request()->getPost('ADDRESS_ZIP') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_ZIP'), $flag, $enc) : '';
 				$resp['ADDRESS_COUNTRY']			= $this->Request()->getPost('ADDRESS_COUNTRY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_COUNTRY'), $flag, $enc) : '';
 
-                $resp['CUSTOMER_OPTIN']			    = $this->Request()->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN'), $flag, $enc) : '';
-                $resp['CUSTOMER_OPTIN_2']			= $this->Request()->getPost('CUSTOMER_OPTIN_2') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN_2'), $flag, $enc) : '';
+                $resp['CUSTOMER_OPTIN']			    = $this->Request()->getPost('CUSTOMER_OPTIN') == true ? strtoupper(htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN'), $flag, $enc)) : '';
+                $resp['CUSTOMER_OPTIN_2']			= $this->Request()->getPost('CUSTOMER_OPTIN_2') == true ? strtoupper(htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN_2'), $flag, $enc)) : '';
 
                 $resp['CONTACT_EMAIL']				= $this->Request()->getPost('CONTACT_EMAIL') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_EMAIL'), $flag, $enc) : '';
 				$resp['CONTACT_PHONE']				= $this->Request()->getPost('CONTACT_PHONE') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_PHONE'), $flag, $enc) : '';
@@ -887,7 +924,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 * response action method for the reponse call of a registration from heidelpay
 	 */
 	public function responseRegAction() {
-
 		// setting csrf-Token is required
 		if($this->Request()->getPost('__csrf_token')){
 			$token = 'X-CSRF-Token';
@@ -1032,7 +1068,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$this->hgw()->Logging('responseRegAction saving response failed | '.$e->getMessage());
 				return;
 			}
-
 
 			if ($resp['PROCESSING_RESULT'] == 'ACK') {
 				// save registration to DB
@@ -2220,7 +2255,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			->getRepository('Shopware\Models\Order\Order')
 			->findOneBy(array('transactionId' => $transactionID));
 
-			if($status == '12'){ $orderModel->setClearedDate(date('d.m.Y H:i:s')); }
+            if($status == '12' && $orderModel != NULL )
+            {
+                $orderModel->setClearedDate(date('d.m.Y H:i:s'));
+            }
 			// if internalComment is set, read old commment and add time stamp
 			$alterWert = $orderModel->getInternalComment();
 			if(!empty($params['internalcomment'])){
@@ -2362,6 +2400,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$xml->Transaction->Account->Brand == true ? $xmlData['ACCOUNT_BRAND'] = (string)$xml->Transaction->Account->Brand : '';
 			$xml->Transaction->Analysis->SESS == true ? $xmlData['CRITERION_SESS'] = (string)$xml->Transaction->Analysis->SESS : '';
 			$xml->Transaction->Analysis->SHOP_ID == true ? $xmlData['CRITERION_SHOP_ID'] = (string)$xml->Transaction->Analysis->SHOP_ID : '';
+			$xml->Transaction->Analysis->TEMPORDER == true ? $xmlData['CRITERION_TEMPORDER'] = (string)$xml->Transaction->Analysis->TEMPORDER : '';
+			$xml->Transaction->Analysis->IVBRAND == true ? $xmlData['CRITERION_IVBRAND'] = (string)$xml->Transaction->Analysis->IVBRAND : '';
 			$xml->Transaction->Analysis->SECRET == true ? $xmlData['SECRET'] = (string)$xml->Transaction->Analysis->SECRET : '';
 			$xmlData['TRANSACTION_SOURCE'] = 'PUSH';
 
@@ -2377,7 +2417,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 $orgHash = $this->createSecretHash($xmlData['IDENTIFICATION_TRANSACTIONID']);
             }
 			$crit_Secret = $xmlData['SECRET'];
-
 			if($crit_Secret != $orgHash){
 				Shopware()->Session()->HPError = '';
 				$this->hgw()->Logging(
@@ -2603,8 +2642,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						$paymentStatus = 12 ; // default payment status is 12 - 'Komplett bezahlt'
 						if($transType == 'PA'){ $paymentStatus = 18; } // 'Reserviert'
 						if($data['PROCESSING_STATUS_CODE'] == "80"){ $paymentStatus = 21; } // 'Überprüfung notwendig'
-
-						$return = $this->saveOrder($transactionID, $uniqueID, $paymentStatus);
+						try{
+                            $return = $this->saveOrder($transactionID, $uniqueID, $paymentStatus);
+                        } catch (Exception $e){
+                            $this->convertOrder($data);
+//                            $this->convertOrder($data['CRITERION_SESS']);
+                        }
 
 						if($data['PROCESSING_STATUS_CODE'] != "80"){ $setComment = true; }
 					}
@@ -2676,6 +2719,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 						case 'RV':
 							$params['internalcomment'] = 'Reversal '.$comment;
+							$params['cleared'] = $this->hgw()->Config()->HGW_CHB_STATUS;
 							break;
 
 						case 'CB':
@@ -3019,6 +3063,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			if($fromBootstrap){
 				$ppd_crit['CRITERION.SECRET'] = self::createSecretHash($tempID);
+
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
 				$errorMsg = self::getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}else{
@@ -3197,6 +3242,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					// path to CSS
 					$cssVar = 'HGW_HPF_'.strtoupper($config['PAYMENT.METHOD']).'_CSS';
 					$konfiguration = self::Config();
+					if(empty($konfiguration->$cssVar)){
+                        $konfiguration->$cssVar = $params['FRONTEND.PAYMENT_FRAME_ORIGIN'].Shopware()->Shop()->getBaseUrl()."/engine/Shopware/Plugins/Community/Frontend/HeidelGateway/Views/hpf_cc.css";
+                    }
 					$params['FRONTEND.CSS_PATH']	=	$konfiguration->$cssVar;
 					break;
 					/* default */
@@ -3206,6 +3254,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$params['FRONTEND.ENABLED'] 	= "true";
 					break;
 			}
+//			$params['CRITERION.TEMPORDER'] = $this->getSession()->offsetGet('sessionId');
+			$params['CRITERION.TEMPORDER'] = Shopware()->Session()->offsetGet('sessionId');
 
 			// debit on registration
 			if(array_key_exists('ACCOUNT.REGISTRATION',$config)){
@@ -3653,6 +3703,196 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 'action' => 'confirm',
             )
         );
+    }
+
+    public function convertOrder($transactionData)
+    {
+        try {
+            if (empty($transactionData)) {
+                self::hgw()->Logging('convertOrder failed');
+            } else {
+                // Get user, shipping and billing
+                $builder = Shopware()->Models()->createQueryBuilder();
+                $builder->select(['orders', 'customer', 'billing', 'payment', 'shipping'])
+                    ->from(\Shopware\Models\Order\Order::class, 'orders')
+                    ->leftJoin('orders.customer', 'customer')
+                    ->leftJoin('orders.payment', 'payment')
+                    ->leftJoin('customer.defaultBillingAddress', 'billing')
+                    ->leftJoin('customer.defaultShippingAddress', 'shipping')
+                    ->where('orders.temporaryId = ?1')
+                    ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
+                $result = $builder->getQuery()->getArrayResult();
+                $customerDbResult = $result;
+
+                // Check required fields
+                if (empty($customerDbResult) || $customerDbResult[0]['customer'] === null || $customerDbResult[0]['customer']['defaultBillingAddress'] === null) {
+                    self::hgw()->Logging('convertOrder failed | no customer / order data found');
+                    return;
+                }
+
+                // create Order-Object from abborded order in db
+                $builder = Shopware()->Models()->createQueryBuilder();
+                $builder->select('orders.id')
+                    ->from(\Shopware\Models\Order\Order::class, 'orders')
+                    ->where('orders.temporaryId = ?1')
+                    ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
+                $result = $builder->getQuery()->getArrayResult();
+                $orderObject = Shopware()->Models()->find(\Shopware\Models\Order\Order::class,['id' => $result[0]['id']]);
+
+                // create instance of ordernumber-model to create new ordernumber for order
+                $numberRepository = Shopware()->Models()->getRepository(\Shopware\Models\Order\Number::class);
+                $numberModel = $numberRepository->findOneBy(['name' => 'invoice']);
+                if ($numberModel === null) {
+                    self::hgw()->Logging('convertOrder failed | no ordernumber could be created');
+                    return;
+                }
+                // fetch last ordernumber and add 1
+                $newOrderNumber = $numberModel->getNumber() + 1;
+                // Set new ordernumber
+                $numberModel->setNumber($newOrderNumber);
+
+                // setting ordernumber to orderobject
+                $orderObject->setNumber($newOrderNumber);
+;
+                foreach ($orderObject->getDetails() as $detailModel) {
+                    $detailModel->setNumber($newOrderNumber);
+                }
+
+                // If there is no shipping address, set billing address to be the shipping address
+                if ($customerDbResult[0]['customer']['defaultShippingAddress'] === null) {
+                    $customerDbResult[0]['customer']['defaultShippingAddress'] = $customerDbResult[0]['customer']['defaultBillingAddress'];
+                }
+
+                // get Customer-Model for Customer-Information
+                $builder->select('kunde')
+                    ->from(\Shopware\Models\Customer\Customer::class, 'kunde')
+                    ->where('kunde.id = ?1')
+                    ->setParameter(1, $customerDbResult[0]['customerId']);
+                $customerData = $builder->getQuery()->getArrayResult();
+
+                $customerObject = new Shopware\Models\Customer\Customer();
+                $customerObject->setNumber($customerData[0]['number']);
+                $customerObject->setPaymentId($customerData[0]['paymentId']);
+                $customerObject->setGroup($customerData[0]['groupKey']);
+                $customerObject->setPriceGroup($customerData[0]['priceGroupId']);
+                $customerObject->setEncoderName($customerData[0]['encoderName']);
+                $customerObject->setPassword($customerData[0]['hashPassword']);
+                $customerObject->setActive($customerData[0]['active']);
+                $customerObject->setEmail($customerData[0]['email']);
+                $customerObject->setFirstLogin($customerData[0]['firstLogin']);
+                $customerObject->setLastLogin($customerData[0]['lastLogin']);
+                $customerObject->setAccountMode($customerData[0]['accountMode']);
+                $customerObject->setConfirmationKey($customerData[0]['confirmationKey']);
+                $customerObject->setSessionId($customerData[0]['sessionId']);
+                $customerObject->setNewsletter($customerData[0]['newsletter']);
+                $customerObject->setValidation($customerData[0]['validation']);
+                $customerObject->setAffiliate($customerData[0]['affiliate']);
+                $customerObject->setPaymentPreset($customerData[0]['paymentPreset']);
+                $customerObject->setReferer($customerData[0]['referer']);
+                $customerObject->setInternalComment($customerData[0]['internalComment']);
+                $customerObject->setFailedLogins($customerData[0]['failedLogins']);
+                $customerObject->setLockedUntil($customerData[0]['lockedUntil']);
+                $customerObject->setSalutation($customerData[0]['salutation']);
+                $customerObject->setTitle($customerData[0]['title']);
+                $customerObject->setFirstname($customerData[0]['firstname']);
+                $customerObject->setLastname($customerData[0]['lastname']);
+                $customerObject->setBirthday($customerData[0]['birthday']);
+                Shopware()->Models()->persist($customerObject);
+
+                // copy customer number into billing address from customer
+                // Casting null values to empty strings to fulfill the restrictions of the s_order_billingaddress table
+
+                $billingAddress = [
+                    'id'                        => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['id'])          ? $customerDbResult[0]['customer']['defaultBillingAddress']['id'] : ' ',
+                    'company'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['company'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['company'] : ' ',
+                    'department'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['department'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['department'] : ' ',
+                    'title'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['title'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['title'] : ' ',
+                    'salutation'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['salutation'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['salutation']: ' ',
+                    'firstname'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['firstname'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['firstname']: ' ',
+                    'lastname'                  => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['lastname'])    ? $customerDbResult[0]['customer']['defaultBillingAddress']['lastName']: ' ',
+                    'street'                    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['street'])      ? $customerDbResult[0]['customer']['defaultBillingAddress']['street']: ' ',
+                    'zipcode'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['zipCode'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['zipCode']: ' ',
+                    'city'                      => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['city'])        ? $customerDbResult[0]['customer']['defaultBillingAddress']['city']: ' ',
+                    'phone'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['phone'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['phone']: ' ',
+                    'vatId'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['vatId'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['vatId']: ' ',
+                    'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']: ' ',
+                    'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']: ' ',
+                    'countryId'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['countryId'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']: ' ',
+                    'stateId'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['stateId'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['stateId']: ' ',
+                    'number'                    => !empty($customerDbResult[0]['customer']['number']) ? $customerDbResult[0]['customer']['number'] : ' ',
+                ];
+                
+                // make an instance of Billingmodel
+                $billingModel = new Shopware\Models\Order\Billing();
+                $billingModel->fromArray($billingAddress);
+
+                $builder->select('country')
+                    ->from(\Shopware\Models\Country\Country::class,'country')
+                    ->where('country.id = ?1')
+                    ->setParameter(1, $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']);
+                $country = $builder->getQuery()->getArrayResult();
+                $countryModel = new \Shopware\Models\Country\Country();
+                $countryModel = $countryModel->fromArray($country[0]);
+                Shopware()->Models()->persist($countryModel);
+                // setting some Values for Billingmodel
+                $billingModel->setCountry($countryModel);
+                $billingModel->setCustomer($customerObject);
+                $billingModel->setLastName($customerDbResult[0]['customer']['lastname']);
+                $billingModel->setZipCode($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode']);
+                $billingModel->setOrder($orderObject);
+                Shopware()->Models()->persist($billingModel);
+                
+                // Casting null values to empty strings to fulfill the restrictions of the s_order_shippingaddress table
+                $shippingAddress = array_map(function ($value) {
+                    return (string)$value;
+                }, $result[0]['customer']['defaultShippingAddress']);
+                $shippingAddress = [
+                    'id'                        => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['id'])          ? $customerDbResult[0]['customer']['defaultBillingAddress']['id'] : ' ',
+                    'company'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['company'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['company'] : ' ',
+                    'department'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['department'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['department'] : ' ',
+                    'title'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['title'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['title'] : ' ',
+                    'salutation'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['salutation'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['salutation']: ' ',
+                    'firstname'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['firstname'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['firstname']: ' ',
+                    'lastname'                  => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['lastname'])    ? $customerDbResult[0]['customer']['defaultBillingAddress']['lastname']: ' ',
+                    'street'                    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['street'])      ? $customerDbResult[0]['customer']['defaultBillingAddress']['street']: ' ',
+                    'zipcode'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['zipcode'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['zipCode']: ' ',
+                    'city'                      => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['city'])        ? $customerDbResult[0]['customer']['defaultBillingAddress']['city']: ' ',
+                    'phone'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['phone'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['phone']: ' ',
+                    'vatId'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['vatId'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['vatId']: ' ',
+                    'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']: ' ',
+                    'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']: ' ',
+                    'countryId'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['countryId'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']: ' ',
+                    'stateId'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['stateId'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['stateId']: ' ',
+                    'number'                    => !empty($customerDbResult[0]['customer']['number']) ? $customerDbResult[0]['customer']['number'] : '',
+                ];
+
+                // make a new instance of Shippingmodel
+                // Create new entry in s_order_shippingaddress
+                $shippingModel = new Shopware\Models\Order\Shipping();
+                $shippingModel->fromArray($shippingAddress);
+                $shippingModel->setCountry($countryModel);
+                $shippingModel->setCustomer($customerObject);
+                $shippingModel->setOrder($orderObject);
+                $shippingModel->setZipCode($customerDbResult[0]['customer']['defaultBillingAddress']['zipcode']);
+                Shopware()->Models()->persist($shippingModel);
+
+                
+                $statusModel = Shopware()->Models()->find(\Shopware\Models\Order\Status::class, '0');
+                
+                // Finally set the order to be a regular order
+                $orderObject->setOrderStatus($statusModel);
+                $orderObject->setTemporaryId($transactionData['IDENTIFICATION_UNIQUEID']);
+                $orderObject->setTransactionId($transactionData['IDENTIFICATION_TRANSACTIONID']);
+                $orderObject->setInternalComment($transactionData['PROCESSING_TIMESTAMP'].'\n Short-Id: '.$transactionData['IDENTIFICATION_SHORTID']);
+                $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
+
+                Shopware()->Models()->flush();
+                $this->View()->assign(['success' => true]);
+            }
+
+        } catch (Exception $e){
+            self::hgw()->Logging('convertOrder failed | Message:'.$e->getMessage());
+        }
     }
 
 	/**

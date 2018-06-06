@@ -5,17 +5,24 @@
 	</a>
 	<input type="hidden" name='ACTIVATEEASY' value='{$activeEasy}' />
 	<div id="easyText">
-			<div>
-				<p>Datenübermittlung Ratenkauf by easyCredit</p>
-			</div>
-	
+		{if $activeEasy == "TRUE"}
 			{if !empty($configOptInText)}
 				<div>
-					<div class="easyDiv">	
-						<input type="checkbox" id="hgw_cb_hpr" name="CONFIG.OPTIN.TEXT" value="TRUE" class="checkbox" >*
-						<span>{$configOptInText}</span> 
+					<p>Datenübermittlung Ratenkauf by easyCredit</p>
+				</div>
+				<div>
+					<div>
+						<input type="checkbox" id="hgw_cb_hpr" name="CONFIG.OPTIN.TEXT" value="TRUE" class="checkbox" required="required">*
+						<span>{$configOptInText}</span>
+
 					</div>
 				</div>
 			{/if}
+
+		{else}
+			<div class="EasyPermission">
+				<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ({$HGW_EASYMINAMOUNT} - {$HGW_EASYMAXAMOUNT} EUR). </p>
+			</div>
+		{/if}
 	</div>
 {/block}

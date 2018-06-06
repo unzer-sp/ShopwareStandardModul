@@ -22,7 +22,7 @@
 		
 		{else}
 			<div class="EasyPermission">
-				<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (200 - 5.000 EUR). </p>
+				<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ({$HGW_EASYMINAMOUNT} - {$HGW_EASYMAXAMOUNT} EUR). </p>
 			</div>
 		{/if}	
 	</div>

@@ -173,7 +173,7 @@ $(document).ready(function(){
 		}
 		
 		var recMsg = JSON.parse(e.data);
-		if(recMsg["POST.VALIDATION"] == 'NOK'){
+		if(recMsg["PROCESSING.RESULT"] == 'NOK'){
 			// enable all input fields
 			jQuery('.payment_method input').removeAttr('disabled');
 			jQuery('.payment_method select').removeAttr('disabled');

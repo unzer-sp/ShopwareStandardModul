@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.06.06';
+		return '18.06.15';
 	}
 
 	/**
@@ -875,9 +875,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-
-                // overwrite $msg if update was successful
-                $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
+            case '18.06.15':
+                // fixes for Emotion template for Santander invoice and Payolution invoice
+                // fixes a bug in direct debit with registration
+                try{
+                    $msg .= '* update 18.06.15 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            // overwrite $msg if update was successful
+            $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
 
 //        $form->save();
@@ -2645,7 +2652,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $view = $args->getSubject()->View();
 
         $user = Shopware()->Modules()->Admin()->sGetUserData();
-
         if($user['additional']['payment']['name'] == "hgw_hpr"){
             $basket	= Shopware()->Modules()->Basket()->sGetBasket();
             $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();

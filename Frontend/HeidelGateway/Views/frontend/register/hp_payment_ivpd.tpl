@@ -1,6 +1,6 @@
 {block name="hp_payment_ivpd"}
     <div class="{$grid} {$classname}" style='background-color: transparent;'>
-        <div class="newreg_{$pm}" id="payType" style="width: 30rem;">
+        <div class="newreg_{$pm}" id="payType" style="width: 44rem;">
             <div>
                 <label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
                 {if isset($salutation_ivpd)}
@@ -31,7 +31,7 @@
                 {assign var=payment_data value=$birthdate_ivpd}
                 {html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {else}
-                {html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
+                {html_select_date|utf8_encode time=$payment_data start_year='-1' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben"}
             {/if}
 
             {if isset($birthdate)}

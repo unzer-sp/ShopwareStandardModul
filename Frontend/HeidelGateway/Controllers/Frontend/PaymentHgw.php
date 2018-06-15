@@ -3242,7 +3242,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					// path to CSS
 					$cssVar = 'HGW_HPF_'.strtoupper($config['PAYMENT.METHOD']).'_CSS';
 					$konfiguration = self::Config();
-					if(empty($konfiguration->$cssVar)){
+					if( (empty($konfiguration->$cssVar)) && ((Shopware()->Shop()->getTemplate()->getVersion() >= 3))){
                         $konfiguration->$cssVar = $params['FRONTEND.PAYMENT_FRAME_ORIGIN'].Shopware()->Shop()->getBaseUrl()."/engine/Shopware/Plugins/Community/Frontend/HeidelGateway/Views/hpf_cc.css";
                     }
 					$params['FRONTEND.CSS_PATH']	=	$konfiguration->$cssVar;

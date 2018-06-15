@@ -95,6 +95,7 @@
 			<div>
 				<label>{s name='hp_iban' namespace='frontend/register/hp_payment'}{/s}*:</label>
 				<input type="text" class="text " value="" id="iban" name="ACCOUNT.IBAN"><br />
+				<input type="hidden"  value="DE" id="accCountry" name="ACCOUNT.COUNTRY"><br />
 			</div>
 			{/if}
 			

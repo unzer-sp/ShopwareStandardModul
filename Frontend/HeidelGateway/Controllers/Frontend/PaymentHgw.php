@@ -387,7 +387,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 								if((isset($dobPapg)) && ($dobPapg['NAME_BIRTHDATE'] != '')){
 									$ppd_crit['NAME.BIRTHDATE'] = $dobPapg['NAME_BIRTHDATE'];
 									$this->View()->salutation	= $dobPapg['NAME_SALUTATION'];
-									$this->View()->birthdate	= $dobPapg['NAME_BIRTHDATE'];
+									$this->View()->birthdate_papg	= $dobPapg['NAME_BIRTHDATE'];
 								}
 
 								$this->View()->accountHolder = $getFormUrl['ACCOUNT_HOLDER'];

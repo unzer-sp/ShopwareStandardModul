@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.06.15';
+		return '18.06.16';
 	}
 
 	/**
@@ -875,11 +875,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-            case '18.06.15':
+            case '18.06.16':
                 // fixes for Emotion template for Santander invoice and Payolution invoice
                 // fixes a bug in direct debit with registration
+                // changed query for birthdates for all payment methods so that there are no preallocated values
+                // fixed an issue for saving regdata for Santander and Payolution
                 try{
-                    $msg .= '* update 18.06.15 <br />';
+                    $this->addSnippets();
+                    $msg .= '* update 18.06.16 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -2142,7 +2145,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					  kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
 
                     $params = array(
-                        'userID' 	=> $user['additional']['user']['userID'],
+                        'userID' 	=> !empty($user['additional']['user']['userID']) && $user['additional']['user']['userID'] != "" ? $user['additional']['user']['userID'] : $user['additional']['user']['id'],
                         'payType' 	=> "ivpd",
                         'uid' 		=> "0",
                         'cardnr' 	=> "0",
@@ -2224,7 +2227,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					        kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
 
                     $params = array(
-                        'userID' 	=> $user['additional']['user']['userID'],
+                        'userID' 	=> !empty($user['additional']['user']['userID']) && $user['additional']['user']['userID'] != "" ? $user['additional']['user']['userID'] : $user['additional']['user']['id'],
                         'payType' 	=> "san",
                         'uid' 		=> "0",
                         'cardnr' 	=> "0",
@@ -3814,6 +3817,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accInfo','Account information');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_accSalutation','Anrede');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accSalutation','Salutation');
+
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueDay','Tag');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueDay','day');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueMonth','Monat');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueMonth','month');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueYear','Jahr');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueYear','Year');
         //added for Santander
         $snippets[] = array('frontend/register/hp_payment','de','hp_accSal_gender','bitte wählen');
         $snippets[] = array('frontend/register/hp_payment','en','hp_accSal_gender','please choose');

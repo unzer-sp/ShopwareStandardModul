@@ -616,7 +616,6 @@ function valGatewayForm() {
             jQuery(this).removeClass('has--error');
         }
     });
-
     if (pm == 'dd') {
         var errors = new Array();
         // direct debit
@@ -625,7 +624,6 @@ function valGatewayForm() {
         // direct debit secured
         if(jQuery('#salutation').is(':visible')){
             // getting Values from input fields
-            var salutation = jQuery('#salutation').val();
             var birthDay = jQuery('select[name=Date_Day]').val();
             var birthMonth = jQuery('select[name=Date_Month]').val();
             var birthYear = jQuery('select[name=Date_Year]').val();
@@ -636,9 +634,7 @@ function valGatewayForm() {
         }
     } else if (pm == 'gir') {
         var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
-    }
-
-    if(pm == "papg"){
+    } else if (pm == "papg"){
         var errorsPapg = valInvoiceSec();
 
         if((jQuery('.newreg_papg .has--error'))){
@@ -969,10 +965,10 @@ function valDirectDebitSecured(errors) {
     var salutation = $('.newreg_dd #salutation').val();
     if(salutation == undefined || salutation == "UNKNOWN")
     {
-        $('.newreg_papg #salutation').parent('.js--fancy-select').addClass("has--error");
+        $('.newreg_dd #salutation').parent('.js--fancy-select').addClass("has--error");
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_papg #salutation').parent('.js--fancy-select').removeClass('has--error');
+        $('.newreg_dd #salutation').parent('.js--fancy-select').removeClass('has--error');
     }
 
     //validation of birthdate

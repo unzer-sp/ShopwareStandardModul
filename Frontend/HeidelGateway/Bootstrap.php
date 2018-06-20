@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.06.16';
+		return '18.06.20';
 	}
 
 	/**
@@ -875,14 +875,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-            case '18.06.16':
-                // fixes for Emotion template for Santander invoice and Payolution invoice
+            case '18.06.20':
+                // fixes for Emotion template for Santander invoice and Payolution invoice and direct debit
                 // fixes a bug in direct debit with registration
                 // changed query for birthdates for all payment methods so that there are no preallocated values
                 // fixed an issue for saving regdata for Santander and Payolution
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.06.16 <br />';
+                    $msg .= '* update 18.06.20 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -3717,8 +3717,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.152','Sorry, your address could not be found');
 
         $snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
-
-        $snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','en','PaymentProcess','Payment process');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentCancel','Der Bezahlvorgang wurde von Ihnen abgebrochen.');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','en','PaymentCancel','The payment process was canceled by you.');
@@ -3727,24 +3725,27 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 		$snippets[] = array('frontend/payment_heidelpay/success','de','PaymentSuccess','Ihr Bezahlvorgang war erfolgreich!');
 		$snippets[] = array('frontend/payment_heidelpay/success','en','PaymentSuccess','Your transaction was successfull!');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','PaymentProcess','Bezahlvorgang');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','PaymentProcess','Payment process');
+
+		// prepayment
 		$snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} Konto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} Bankleitzahl: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{IDENTIFICATION_SHORTID}</strong>');
-        // added for Santander
+        $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
+        // invoice and invoice secured
+        $snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: \nLand: {CONNECTOR_ACCOUNT_COUNTRY} \nKontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} \nKonto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} \nBankleitzahl: {CONNECTOR_ACCOUNT_BANK} \nIBAN: {CONNECTOR_ACCOUNT_IBAN} \nBIC: {CONNECTOR_ACCOUNT_BIC} \n\nGeben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: \n<strong>{IDENTIFICATION_SHORTID}</strong>');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
+        // direct debit
+        $snippets[] = array('frontend/payment_heidelpay/success','de','DirectdebitText','Der Betrag in Höhe von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:\n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nDie Abbuchung enth&auml;lt die Mandatsreferenz-ID:{ACCOUNT_IDENT}\n und die Gl&auml;ubiger ID: {IDENT_CREDITOR_ID}\n\nBitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto.\n\n\nVielen Dank\nMit freundlichen Gr&uuml;&szlig;en\n\n{config name=shopName}\n{config name=address}');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','DirectdebitText','The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from the following account: \n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nThe debit contains the Reference-Id: {ACCOUNT_IDENT}\n and the creditor-id: {IDENT_CREDITOR_ID}\n\n Please ensure that your amount is enough.\n\n\nThanks for Your purchase\nSincere regards,\n\n{config name=shopName}\n{config name=address}');
+        // common
+        $snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceHeader','Rechnungsinformation');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceHeader','Invoiceinformation');
+        // Santander
         $snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentSanText','Bitte &uuml;berweisen Sie den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} Konto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} Bankleitzahl: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
         $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentSanText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account with term of payment within 30 days: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
-        // added for Payolution
+        // Payolution
         $snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentIvpdText','Bitte &uuml;berweisen Sie den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
         $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentIvpdText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account with term of payment within 30 days: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
 
-        $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
 
-		$snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: \nLand: {CONNECTOR_ACCOUNT_COUNTRY} \nKontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} \nKonto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} \nBankleitzahl: {CONNECTOR_ACCOUNT_BANK} \nIBAN: {CONNECTOR_ACCOUNT_IBAN} \nBIC: {CONNECTOR_ACCOUNT_BIC} \n\nGeben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: \n<strong>{IDENTIFICATION_SHORTID}</strong>');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','DirectdebitText','Der Betrag in Höhe von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:\n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nDie Abbuchung enth&auml;lt die Mandatsreferenz-ID:{ACCOUNT_IDENT}\n und die Gl&auml;ubiger ID: {IDENT_CREDITOR_ID}\n\nBitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto.\n\n\nVielen Dank\nMit freundlichen Gr&uuml;&szlig;en\n\n{config name=shopName}\n{config name=address}');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','DirectdebitText','The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from the following account: \n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nThe debit contains the Reference-Id: {ACCOUNT_IDENT}\n and the creditor-id: {IDENT_CREDITOR_ID}\n\n Please ensure that your amount is enough.\n\n\nThanks for Your purchase\nSincere regards,\n\n{config name=shopName}\n{config name=address}');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceHeader','Rechnungsinformation');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceHeader','Invoiceinformation');
 		
 		$snippets[] = array('frontend/payment_heidelpay/success','de','BarpayText','<center><a href=\"{CRITERION_BARPAY_PAYCODE_URL}\" target=\"_blank\" class=\"button-right large\">Klicken Sie hier um Ihren Barcode runterzuladen</a></center> {BARPAY_PAYCODE_URL} \<br /><br />'
 				.'Drucken Sie den Barcode aus oder speichern Sie diesen auf Ihrem mobilen Endger&auml;t. '

@@ -349,7 +349,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 								}
 								$ppd_crit['BASKET.ID'] = $basketId;
 							}
-
 							$getFormUrl = $this->getFormUrl($activePayment, NULL, $user['additional']['user']['id'], $tempID, NULL, $basket, $ppd_crit);
 							if(isset($getFormUrl['FRONTEND_REDIRECT_URL'])){
 								$redirectUrl = $getFormUrl['FRONTEND_REDIRECT_URL'];

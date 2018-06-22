@@ -160,8 +160,7 @@ $(document).ready(function(){
 			var birthYear = null;
 			var pm = null;
 			pm = jQuery("#payType").attr("class");
-			pm = pm.substr(7);					
-			
+			pm = pm.substr(7);
 			if(jQuery(".newreg_"+pm) > 0) {
 				birthDay = jQuery(".newreg_"+pm+" [name='Date_Day']").val();
 				birthMonth = jQuery(".newreg_"+pm+" [name = 'Date_Month']").val();
@@ -179,7 +178,7 @@ $(document).ready(function(){
 
 		}
 
-        // // disable all other input fields
+		// disable all other input fields
         jQuery('.payment_method input').attr('disabled', 'disabled');
         jQuery('.payment_method select').attr('disabled', 'disabled');
         jQuery('.payment_method input:radio:checked').parents('.grid_15').find('input').removeAttr('disabled');
@@ -189,6 +188,10 @@ $(document).ready(function(){
         {
             jQuery('#payType').find('input').removeAttr('disabled');
             jQuery('#payType').find('select').removeAttr('disabled');
+
+            jQuery('.payment_method.debit').find('input').removeAttr('disabled');
+            jQuery('.payment_method.debit').find('select').removeAttr('disabled');
+
         }
 	});
 	

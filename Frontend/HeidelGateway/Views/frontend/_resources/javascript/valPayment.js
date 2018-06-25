@@ -147,11 +147,6 @@ $(document).ready(function(){
                 $(".button-right.large").append('<input type="hidden" name="NAME.BIRTHDATE" value="'+birthdate+'">');
                 $(".button-right.large").append('<input type="hidden" name="NAME.SALUTATION" value="'+salutation+'">');
             }
-
-            if(pm.indexOf("newreg_dd") > 0){
-                jQuery('#iban').val(jQuery('#iban').val());
-            }
-
         }
 
 		if(jQuery("input[type='submit'], .right").val() == "Weiter") {
@@ -200,7 +195,7 @@ $(document).ready(function(){
 		var birthmonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
 		var birthyear = jQuery(".newreg_dd [name = 'Date_Year']").val();
 		jQuery('#birthdate').val(birthyear+'-'+birthmonth+'-'+birthday);
-		jQuery('#iban').val(jQuery('#iban').val());
+		// jQuery('.newreg_dd #iban').val(jQuery('.newreg_dd #iban').val());
 	});
 	
 	jQuery('.newreg_papg').click(function(e){
@@ -360,7 +355,7 @@ function valForm(){
 						});
 						if(pm == 'dd'){
 							// if(jQuery('.newreg_'+pm+' #sepa_switch').find(":selected").val() == 'iban'){
-                            jQuery('#iban').val(jQuery('.newreg_'+pm+' #iban').val());
+                            // jQuery('.hgw_dd #iban').val(jQuery('.newreg_'+pm+' #iban').val());
 
                             var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
 
@@ -372,6 +367,7 @@ function valForm(){
                                 jQuery('#birthdate_dd').val = birthYear+'-'+birthMonth+'-'+birthDay;
 
                                 errors = valDirectDebitSecured(errors);
+
                             }
 
 						}
@@ -438,7 +434,7 @@ function valGatewayForm(){
 	});
 
 	if(pm == 'dd'){
-        jQuery('#iban').val(jQuery('.newreg_'+pm+' #iban').val());
+        // jQuery('.newreg_'+pm+' #iban').val(jQuery('.newreg_'+pm+' #iban').val());
 
         var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
 
@@ -473,9 +469,6 @@ function valGatewayForm(){
         }
     }
 
-    if(pm == "dd"){
-        jQuery('#iban').val(jQuery('.newreg_'+pm+' #iban').val());
-    }
 	if((jQuery('.'+checkedOpt+' .instyle_error').length > 0)){
 		jQuery('.error ul li').remove();
 		jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
@@ -742,13 +735,14 @@ function valDirectDebitSecured(errors) {
     var salutation = $('.newreg_dd #salutation').val();
     if(salutation == undefined || salutation == "UNKNOWN")
     {
-        $('.newreg_dd #salutation').parent('.js--fancy-select').addClass("has--error");
+        $('.newreg_dd #salutation').parent('.js--fancy-select').addClass("instyle_error");
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_dd #salutation').parent('.js--fancy-select').removeClass('has--error');
+        $('.newreg_dd #salutation').parent('.js--fancy-select').removeClass('instyle_error');
     }
 
     //validation of birthdate
+    $('#birthdate_dd').val(jQuery('.newreg_dd select[name="Date_Year"]').val()+'-'+jQuery('.newreg_dd select[name="Date_Month"]').val()+"-"+jQuery('.newreg_dd select[name="Date_Day"]').val());
     var birthdate = $('#birthdate_dd').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {
@@ -757,30 +751,32 @@ function valDirectDebitSecured(errors) {
         var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
         if(age < 18){
 
-            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Year"]').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').addClass('has--error');
-
+            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Year"]').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').addClass('instyle_error');
+            jQuery('#birthdate_dd').addClass('instyle_error');
             errors[i++] = '.msg_dob';
         }else{
-            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Year"]').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').removeClass('has--error');
+            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Year"]').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').removeClass('instyle_error');
+            jQuery('#birthdate_dd').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Year"]').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Month"]').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Day"]').addClass('has--error');
+        jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Year"]').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Month"]').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Day"]').addClass('instyle_error');
+        jQuery('#birthdate_dd').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
     return errors;

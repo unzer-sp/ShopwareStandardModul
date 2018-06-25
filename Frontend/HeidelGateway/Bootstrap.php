@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.06.20';
+		return '18.06.25';
 	}
 
 	/**
@@ -875,8 +875,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-            case '18.06.20':
-                // fixes for Emotion template for Santander invoice and Payolution invoice and direct debit
+            case '18.06.25':
+                // fixes for Emotion template for Santander invoice, Payolution invoice and direct debit
                 // fixes a bug in direct debit with registration
                 // changed query for birthdates for all payment methods so that there are no preallocated values
                 // fixed an issue for saving regdata for Santander and Payolution

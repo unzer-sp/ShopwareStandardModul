@@ -375,7 +375,7 @@ function valForm(){
 							var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val()-1, jQuery('.hgw_papg select[name="Date_Day"]').val());
 							var today = new Date();
 							var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
-							var errors = valBirthdate(age);
+							var errors = valInvoiceSec();
 						}
                         if(pm == 'ivpd'){
                             var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val()-1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
@@ -452,7 +452,7 @@ function valGatewayForm(){
     if(pm == "papg"){
         var errors = valInvoiceSec();
 
-        if((jQuery('.newreg_papg .has--error'))){
+        if((jQuery('.newreg_papg .has--error').length > 0)){
             if(jQuery.isEmptyObject(errors) == false){
                 jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
                 jQuery.each(errors, function(key, value){
@@ -468,8 +468,11 @@ function valGatewayForm(){
             jQuery('#payment .alert .is--error .is--rounded div').remove();
         }
     }
-
-	if((jQuery('.'+checkedOpt+' .instyle_error').length > 0)){
+console.log(checkedOpt);
+console.log(jQuery('.'+checkedOpt+' .instyle_error').length);
+	if((jQuery('.'+checkedOpt+' .instyle_error').length >= 1)){
+	    return false;
+	    console.log("FUCK");
 		jQuery('.error ul li').remove();
 		jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
 
@@ -582,18 +585,21 @@ function valSantander() {
             jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('#birthdate_san').addClass('instyle_error');
 
             errors[i++] = '.msg_dob';
         }else{
             jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('#birthdate_san').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
         jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('#birthdate_san').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
     // validation of privacy policy
@@ -638,18 +644,21 @@ function valPayolutionDirect() {
             jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('#birthdate_ivpd').addClass('instyle_error');
 
             errors[i++] = '.msg_dob';
         }else{
             jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('#birthdate_ivpd').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
         jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('#birthdate_ivpd').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
 
@@ -692,7 +701,7 @@ function valInvoiceSec() {
     } else {
         $('.newreg_papg #salutation').parent('.outer-select').removeClass('instyle_error');
     }
-
+    $('#birthdate_papg').val(jQuery('.newreg_papg select[name="Date_Year"]').val()+"-"+jQuery('.newreg_papg select[name="Date_Month"]').val()+"-"+jQuery('.newreg_papg select[name="Date_Day"]').val());
     // validation of birthdate
     var birthdate = $('#birthdate_papg').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
@@ -706,17 +715,20 @@ function valInvoiceSec() {
             jQuery('.newreg_papg select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('#birthdate_papg').addClass('instyle_error');
             errors[i++] = '.msg_dob';
         }else{
             jQuery('.newreg_papg select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('#birthdate_papg').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
         jQuery('.newreg_papg select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.newreg_papg select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.newreg_papg select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('#birthdate_papg').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
 

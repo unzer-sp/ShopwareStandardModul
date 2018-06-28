@@ -468,8 +468,7 @@ function valGatewayForm(){
             jQuery('#payment .alert .is--error .is--rounded div').remove();
         }
     }
-console.log(checkedOpt);
-console.log(jQuery('.'+checkedOpt+' .instyle_error').length);
+
 	if((jQuery('.'+checkedOpt+' .instyle_error').length >= 1)){
 	    return false;
 	    console.log("FUCK");

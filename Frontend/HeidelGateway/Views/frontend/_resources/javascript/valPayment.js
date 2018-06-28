@@ -471,7 +471,6 @@ function valGatewayForm(){
 
 	if((jQuery('.'+checkedOpt+' .instyle_error').length >= 1)){
 	    return false;
-	    console.log("FUCK");
 		jQuery('.error ul li').remove();
 		jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
 

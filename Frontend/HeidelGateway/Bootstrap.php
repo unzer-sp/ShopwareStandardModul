@@ -2497,6 +2497,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 if($additional['NAME.BIRTHDATE'] != "--"){
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
+mail("sascha.pflueger@heidelpay.de","HP.IN Response onPostDispatchTemplate",print_r($responseHps,1));
                     Shopware()->Session()->HPdidRequest = 'TRUE';
                     // redirect to santander / Gillardorn
                     if($responseHps['PROCESSING_REDIRECT_URL']){
@@ -2687,7 +2688,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         {
                             $view->linkPrecontactInfos 	= $parameters->CRITERION_SANTANDER_HP_PDF_URL;
                             $view->heidelHpBrand        = "SANTANDER_HP";
-
+mail("sascha.pflueger@heidelpay.de","Data DB onPostDispatchTemplate",print_r($transaction,1));
                             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                                 $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
                                 $view->extendsTemplate('payment_hgw/checkout.tpl');

@@ -507,6 +507,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     if ($activePayment == 'hps') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+mail("sascha.pflueger@heidelpay.de","GatewayAction UserDaten",print_r($this->getUser(),1));
                         //setting
                         $ppd_bskt['PRESENTATION.AMOUNT'] 	= $this->hgw()->formatNumber($basket['amount']);
                         $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
@@ -533,6 +534,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 					$params = $this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit);
 					$response = $this->hgw()->doRequest($params);
+if($activePayment == "hps"){
+    mail("sascha.pflueger@heidelpay.de","HP.PA Param GatewayAction",print_r($params,1));
+}
 				}
 			}
 

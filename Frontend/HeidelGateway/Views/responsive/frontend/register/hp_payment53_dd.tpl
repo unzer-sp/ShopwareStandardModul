@@ -25,7 +25,7 @@
 			{if ($ddWithGuarantee) == 'true'}
 			<div>
 				<label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-				{if $salutation == 'MS' || $salutation == 'MRS'}
+				{if $salutation_dd == 'MS' || $salutation_dd == 'MRS'}
 					<select id="salutation" name="hpdd_salutation">
 						<option value="MR">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
 						<option value="MRS" selected>{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
@@ -45,12 +45,16 @@
 			{if ($ddWithGuarantee) == 'true'}
 			<div>
 				<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
+				{assign var=birthdateDD value=$birthdate_dd}
 				{if isset($regData)}
-					<!--{assign var=payment_data value=$regData|json_decode:1}-->
-					{assign var=birthdate value=$regData}
-					{html_select_date|utf8_encode time=$birthdate.birthdate.formatted start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
+
+					{html_select_date|utf8_encode time=$birthdateDD.birthdate.formatted start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
 				{else}
-					{html_select_date|utf8_encode start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
+					{html_select_date|utf8_encode time=$birthdateDD start_year='-10' end_year='-100' reverse_years='true'
+					day_value_format='%02d' field_order='DMY'
+					day_empty="{s name='hp_valueDay' namespace='frontend/register/hp_payment'}{/s}"
+					month_empty="{s name='hp_valueMonth' namespace='frontend/register/hp_payment'}{/s}"
+					year_empty="{s name='hp_valueYear' namespace='frontend/register/hp_payment'}{/s}"}
 				{/if}
 				<input type="hidden" id="birthdate_dd" value="" name="NAME.BIRTHDATE">
 			</div>

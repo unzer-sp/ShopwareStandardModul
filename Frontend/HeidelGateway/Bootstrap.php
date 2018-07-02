@@ -2031,6 +2031,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                     $view->accountHolder    = $getFormUrl['ACCOUNT_HOLDER'];
                                                 }
 
+                                                if($pm == "dd" && $config->HGW_DD_GUARANTEE_MODE == 1){
+                                                    $regDataDD          = $this->getRegData($user['additional']['user']['id'], $pm);
+                                                    $registratedDataDD  = json_decode($regDataDD['payment_data'],true);
+
+                                                    if((isset($registratedDataDD)) && ($registratedDataDD != '')){
+                                                        $view->salutation_dd	= $registratedDataDD['NAME_SALUTATION'];
+                                                        $view->birthdate_dd	    = $registratedDataDD['NAME_BIRTHDATE'];
+                                                    }
+
+                                                }
+
                                                 if(((isset($bookingMode)) && (($bookingMode == '3') || ($bookingMode == '4'))) && Shopware()->Modules()->Admin()->sCheckUser()){
 
 													$getFormUrl = Shopware_Controllers_Frontend_PaymentHgw::getFormUrl($pm, $bookingMode, $user['additional']['user']['id'], $tempID, $regData[$pm]['uid'], NULL, NULL, true);
@@ -2055,7 +2066,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                 if((!empty($data)) && (($data['expMonth'] != '0') && ($data['expYear'] != '0') && ($last < time())) || (($data['shippingHash'] != $shippingHash) && $config->HGW_SHIPPINGHASH == 0) || (($bookingMode == 1) || ($bookingMode == 2))){
 													unset($regData[$pm]);
 												}
-
 											}
 										}
 

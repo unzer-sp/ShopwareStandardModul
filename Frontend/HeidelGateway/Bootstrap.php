@@ -2040,6 +2040,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                         $view->birthdate_dd	    = $registratedDataDD['NAME_BIRTHDATE'];
                                                     }
 
+                                                    if((isset($regDataDD['kto'])) && ($regDataDD['kto'] != '')){
+                                                        $view->iban_heidel_dd	= $regDataDD['kto'];
+                                                    }
+
+
                                                 }
 
                                                 if(((isset($bookingMode)) && (($bookingMode == '3') || ($bookingMode == '4'))) && Shopware()->Modules()->Admin()->sCheckUser()){

@@ -60,12 +60,15 @@
 			</div>
 			{/if}
 			
-			{if ($heidel_iban == '0') || ($heidel_iban == '1') || ($heidel_iban == '2')}
 			<div id="ibanLabelField">
 				<label>{s name='hp_iban' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-				<input type="text" class="text " value="" id="iban" name="ACCOUNT.IBAN"><br />
+
+                {if !empty($iban_heidel_dd)}
+				    <input type="text" class="text " value="{$iban_heidel_dd}" id="iban" name="ACCOUNT.IBAN"><br />
+                {else}
+				    <input type="text" class="text " value="" id="iban" name="ACCOUNT.IBAN"><br />
+                {/if}
 			</div>
-			{/if}
 			
 			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 		</div>

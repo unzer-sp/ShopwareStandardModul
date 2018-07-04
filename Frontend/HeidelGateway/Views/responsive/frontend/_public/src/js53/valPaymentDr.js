@@ -202,6 +202,40 @@ $(document).ready(function(){
                         $("#birthdate_ivpd").attr('disabled', 'disabled');
                         $(".hgw_val_ivpd #salutation").attr('disabled', 'disabled');
                     }
+
+                    if(pm.indexOf("hgw_dd") != -1){
+                        var errorsDD = new Array();
+                        //validation of Iban
+                        var errorsDD = valInputDdIban(jQuery('.newreg_dd #iban').val(), pm);
+
+                        // direct debit secured
+                        if(jQuery('.newreg_dd #salutation').is(':visible')){
+                            // getting Values from input fields
+                            // var salutation = jQuery('.newreg_' + pm + ' #salutation').val();
+                            var birthDay = jQuery('.newreg_dd select[name=Date_Day]').val();
+                            var birthMonth = jQuery('.newreg_dd select[name=Date_Month]').val();
+                            var birthYear = jQuery('.newreg_dd select[name=Date_Year]').val();
+
+                            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                            // validation of birthdate and salutation
+                            errorsDD = valDirectDebitSecured(errorsDD);
+                        }
+
+                        if((jQuery('.'+"hgw_dd"+'  .has--error').length > 0)){
+                            jQuery('#payment .alert .alert--content ul li').remove();
+
+                            jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+                            jQuery.each(errorsDD, function(key, value){
+                                jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+                            });
+
+                            jQuery('.alert').removeClass("is--hidden");
+                            jQuery('html, body').animate({scrollTop: 0}, 0);
+
+                            return false;
+                        }
+                    }
+
                 } else {
                     // case for other payment methods than heidelpay's on account/payment
                     $('#hgw_privpol_ivpd').removeAttr("required");

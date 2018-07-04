@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.06.25';
+		return '18.07.03';
 	}
 
 	/**
@@ -883,6 +883,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 try{
                     $this->addSnippets();
                     $msg .= '* update 18.06.20 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '18.07.03':
+                // changes for Validation of EasyCredit from php to js
+                try{
+                    $msg .= '* update 18.07.03 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -2469,35 +2476,34 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         {
             // redirect to EasyCredit
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-                if (Shopware()->Session()->wantEasy) {
-                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
-                } else {
-                    Shopware()->Session()->wantEasy = true;
-                    return $args->getSubject()->redirect(array(
-                        'forceSecure' => 1,
-                        'controller' => 'account',
-                        'action' => 'payment',
-                        'sTarget' => 'checkout'
-                    ));
-                }
-                exit();
-            }else{
-
-                if (Shopware()->Session()->wantEasy) {
-                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
-                        Shopware()->Session()->HPdidRequest = 'TRUE';
-                        return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
-                        exit();
-                    }
-                } else {
-                    Shopware()->Session()->wantEasy = true;
-                    return $args->getSubject()->redirect(array(
-                        'forceSecure' => 1,
-                        'controller' => 'checkout',
-                        'action' => 'shippingPayment',
-                        'sTarget' => 'checkout'
-                    ));
-                }
+//                if (Shopware()->Session()->wantEasy) {
+//                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+//                } else {
+//                    return $args->getSubject()->redirect(array(
+//                        'forceSecure' => 1,
+//                        'controller' => 'account',
+//                        'action' => 'payment',
+//                        'sTarget' => 'checkout'
+//                    ));
+//                }
+//                exit();
+//            }else{
+//
+//                if (Shopware()->Session()->wantEasy) {
+//                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
+//                        Shopware()->Session()->HPdidRequest = 'TRUE';
+//                        return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+//                        exit();
+//                    }
+//                } else {
+//                    Shopware()->Session()->wantEasy = true;
+//                    return $args->getSubject()->redirect(array(
+//                        'forceSecure' => 1,
+//                        'controller' => 'checkout',
+//                        'action' => 'shippingPayment',
+//                        'sTarget' => 'checkout'
+//                    ));
+//                }
             }
         }
 
@@ -2567,7 +2573,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         //expand template
                         $view->configOptInText = $optinText;
 
-                        Shopware()->Session()->wantEasy = TRUE;
+//                        Shopware()->Session()->wantEasy = TRUE;
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         $view->activeEasy = "TRUE";
                         $view->easyAmount = $basketAmount+$shippingAmount;

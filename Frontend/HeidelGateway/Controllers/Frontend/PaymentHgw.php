@@ -1672,7 +1672,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 
             unset(Shopware()->Session()->HPdidRequest);
-//            unset(Shopware()->Session()->wantEasy);
+            unset(Shopware()->Session()->wantEasy);
 
 			Shopware()->Template()->addTemplateDir(dirname(__FILE__).'/Views/');
 			$this->View()->back2basket = 1;
@@ -2017,7 +2017,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                             case 'hp':
                                 unset(Shopware()->Session()->HPdidRequest);
-//                                unset(Shopware()->Session()->wantEasy);
+                                unset(Shopware()->Session()->wantEasy);
                                 unset($this->View()->configOptInText);
                                 unset($this->View()->amortisationText);
 
@@ -2105,7 +2105,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         break;
                     case 'hp':
                         unset(Shopware()->Session()->HPdidRequest);
-//                        unset(Shopware()->Session()->wantEasy);
+                        unset(Shopware()->Session()->wantEasy);
                         break;
                 }
 

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.07.04';
+		return '18.07.11';
 	}
 
 	/**
@@ -875,24 +875,18 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-            case '18.04.07':
+            case '18.07.11':
                 // fixes for Emotion template for Santander invoice, Payolution invoice and direct debit
                 // fixes a bug in direct debit with registration
                 // changed query for birthdates for all payment methods so that there are no preallocated values
                 // fixed an issue for saving regdata for Santander and Payolution
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.06.20 <br />';
+                    $msg .= '* update 18.07.11 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
-//            case '18.07.03':
-//                // changes for Validation of EasyCredit from php to js
-//                try{
-//                    $msg .= '* update 18.07.03 <br />';
-//                } catch (Exception $e) {
-//                    $this->logError($msg, $e);
-//                }
+
             // overwrite $msg if update was successful
             $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }

@@ -19,6 +19,7 @@ document.asyncReady(function() {
 
     // PATH SWITCH
     if(window.location.pathname.indexOf('account/payment') >= '0'){
+
         // ACCOUNT/PAYMENT
         var errorDiv = '#center .alert .alert--content';
 
@@ -103,7 +104,10 @@ document.asyncReady(function() {
                 }
             }else{ pm = ''; }
         }
-    }else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
+    }else if(
+        (window.location.pathname.indexOf('shippingPayment') >= '0')
+        || (window.location.pathname.indexOf('zahlungsart-und-versand') >= '0')
+    ){
         // SHIPPINGPAYMENT
         var errorDiv = '.content-main--inner .content .alert .alert--content';
 
@@ -111,6 +115,8 @@ document.asyncReady(function() {
         // if CC / DC was chosen before
         hasListener['dc'] = false;
         hasListener['cc'] = false;
+
+        hasListener['dd'] = false;
 
         checkedOpt = jQuery('.payment--method-list input:radio:checked');
         var checkedClass = checkedOpt.attr('class');
@@ -254,10 +260,10 @@ document.asyncReady(function() {
                         // disable all other input fields
                         jQuery('.payment--method input').attr('disabled', 'disabled');
                         jQuery('.payment--method select').attr('disabled', 'disabled');
-                        // jQuery(checkedOpt).parents('.payment--method').find('input').removeAttr('disabled');
                         jQuery(".hgw_"+activePm).parents('.payment--method').find('input').removeAttr('disabled');
-                        // jQuery(checkedOpt).parents('.payment--method').find('select').removeAttr('disabled');
                         jQuery(".hgw_"+activePm).parents('.payment--method').find('select').removeAttr('disabled');
+                        jQuery(checkedOpt).parents('.payment--method').find('select').removeAttr('disabled');
+                        jQuery(checkedOpt).parents('.payment--method').find('input').removeAttr('disabled');
                         // save the form data in an object
                         // var data = {};
                         var data = new Object();
@@ -292,7 +298,7 @@ document.asyncReady(function() {
 
         var recMsg = JSON.parse(e.data);
 
-        if(recMsg["POST.VALIDATION"] == 'NOK'){
+        if(recMsg["PROCESSING.RESULT"] == 'NOK'){
             // enable all input fields
             jQuery('.payment--method input').removeAttr('disabled');
             jQuery('.payment--method select').removeAttr('disabled');

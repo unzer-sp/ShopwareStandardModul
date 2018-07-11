@@ -39,11 +39,13 @@
 		{if !isset($regData.$pm)} {block name="hp_toggle"}{/block}	{else} {block name="hp_untoggle"}{/block} {/if}
 			{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va' classname='debit hgw_va'}
 		</div>
+
 	{elseif $payment_mean.name == "hgw_san"}
 		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_san.tpl" pm='san'}
+	{elseif $payment_mean.name == "hgw_ivpd"}
+		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_ivpd.tpl" pm='ivpd'}
 	{elseif $payment_mean.name == "hgw_hpr"}
 		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
-
 	{else}
 		{$smarty.block.parent}
 	{/if}
@@ -154,6 +156,7 @@
 			<div class='msg_dob'>{s name='ErrorDob' namespace='frontend/register/hp_payment'}{/s}</div>
 			<div class='msg_salut'>{s name='ErrorSalut' namespace='frontend/register/hp_payment'}{/s}</div>
 			<div class='msg_cb'>{s name='ErrorCb' namespace='frontend/register/hp_payment'}{/s}</div>
+			<div class='msg_phone'>{s name='ErrorPhone' namespace='frontend/register/hp_payment'}{/s}</div>
 		</div>
 	{/block}
 	

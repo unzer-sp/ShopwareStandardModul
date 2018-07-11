@@ -4,21 +4,54 @@
 	<script type='text/javascript'>
         // define formUrl to make it useable in external JS
         var formUrl = {$formUrl|@json_encode};
-        //		$(document).ready(function(){
-        document.asyncReady(function() {
-            if(jQuery('#center .panel.has--border .alert--content').length < 1){
-                jQuery('#center .panel.has--border').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div>');
-            }
-        });
+
+        {if $theme.asyncJavascriptLoading}
+            document.asyncReady(function() {
+                if(jQuery('#center .panel.has--border .alert--content').length < 1){
+                    jQuery('#center .panel.has--border').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div>');
+                }
+            });
+        {else}
+            $(document).ready(function(){
+                if(jQuery('#center .panel.has--border .alert--content').length < 1){
+                    jQuery('#center .panel.has--border').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div>');
+                }
+            });
+        {/if}
 
         {if isset($token)}
-        var token = "{$token}";
+            var token = "{$token}";
         {/if}
 	</script>
 
 	<script type='text/javascript'>
+        {if $theme.asyncJavascriptLoading}
+            document.asyncReady(function() {
+                function iban(){
+                    if(jQuery('.newreg_dd #iban').is(':hidden')){
+                        jQuery('.newreg_dd #account').parent().hide();
+                        jQuery('.newreg_dd #bankcode').parent().hide();
+                        jQuery('.newreg_dd #cardBrand').parent().hide();
+                        jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
+                        jQuery('.newreg_dd #iban').parent().show();
+                    }
+                }
+            });
+        {else}
+            $(document).ready(function(){
+                function iban(){
+                    if(jQuery('.newreg_dd #iban').is(':hidden')){
+                        jQuery('.newreg_dd #account').parent().hide();
+                        jQuery('.newreg_dd #bankcode').parent().hide();
+                        jQuery('.newreg_dd #cardBrand').parent().hide();
+                        jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
+                        jQuery('.newreg_dd #iban').parent().show();
+                    }
+                }
+            });
+        {/if}
         //		$(document).ready(function(){
-        document.asyncReady(function() {
+//        document.asyncReady(function() {
 //			$(document).ibanCheck();
 //			jQuery(document).ibanCheck();
 
@@ -52,29 +85,34 @@
 //				}
 //			}
 //		};
-
-
-
-            function iban(){
-                if(jQuery('.newreg_dd #iban').is(':hidden')){
-                    jQuery('.newreg_dd #account').parent().hide();
-                    jQuery('.newreg_dd #bankcode').parent().hide();
-                    jQuery('.newreg_dd #cardBrand').parent().hide();
-                    jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
-                    jQuery('.newreg_dd #iban').parent().show();
-                }
-            }
-
-
-
-        });
+//
+//
+//
+//            function iban(){
+//                if(jQuery('.newreg_dd #iban').is(':hidden')){
+//                    jQuery('.newreg_dd #account').parent().hide();
+//                    jQuery('.newreg_dd #bankcode').parent().hide();
+//                    jQuery('.newreg_dd #cardBrand').parent().hide();
+//                    jQuery('.newreg_dd #cardBrand').parent().prevAll('label:first').hide();
+//                    jQuery('.newreg_dd #iban').parent().show();
+//                }
+//            }
+//
+//
+//
+//        });
 
 	</script>
     {if $action != 'cart' && $action != 'orders'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
         {if $swVersion >= "5.3"}
-            <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
-            <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+            {if $theme.asyncJavascriptLoading}
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+            {else}
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPaymentDr.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_scriptDr.js' defer='defer'></script>
+            {/if}
         {else}
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
@@ -88,7 +126,6 @@
     {assign var='pm' value=$payment_mean.name|substr:($bar_at+1)}
     {if $pm == 'pay'}{assign var='pm' value='va'}{/if}
     {if $payment_mean.name == "hgw_cc" && $heidel_bm_cc && ($formUrl.$pm != '')}
-
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment53_cc.tpl"}
     {elseif $payment_mean.name == "hgw_dc" && $heidel_bm_dc && ($formUrl.$pm != '')}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment53_dc.tpl"}
@@ -100,6 +137,8 @@
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
     {elseif $payment_mean.name == "hgw_san"}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_san.tpl" pm='san'}
+    {elseif $payment_mean.name == "hgw_ivpd"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_ivpd.tpl" pm='ivpd'}
     {else}
         {$smarty.block.parent}
     {/if}
@@ -143,13 +182,13 @@
 		<div class='msg_crdnr'>{s name='ErrorCrdNr' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_cvv'>{s name='ErrorCvv' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_iban'>{s name='ErrorIban' namespace='frontend/register/hp_payment'}{/s}</div>
-		<!-- <div class='msg_bic'>{s name='ErrorBic' namespace='frontend/register/hp_payment'}{/s}</div> -->
 		<div class='msg_account'>{s name='ErrorAccount' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_bank'>{s name='ErrorBank' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_exp'>{s name='ErrorExp' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_dob'>{s name='ErrorDob' namespace='frontend/register/hp_payment'}{/s}</div>
         <div class='msg_salut'>{s name='ErrorSalut' namespace='frontend/register/hp_payment'}{/s}</div>
         <div class='msg_cb'>{s name='ErrorCb' namespace='frontend/register/hp_payment'}{/s}</div>
+        <div class='msg_phone'>{s name='ErrorPhone' namespace='frontend/register/hp_payment'}{/s}</div>
 	</div>
 {/block}
 

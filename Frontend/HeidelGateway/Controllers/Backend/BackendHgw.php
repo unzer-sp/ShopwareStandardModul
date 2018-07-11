@@ -5,9 +5,9 @@
 * @category Shopware
 * @package Shopware_Plugins
 * @subpackage Plugin
-* @link http://www.heidelpay.de
-* @copyright Copyright (c) 2016, Heidelberger Payment GmbH
-* @author Jens Richter / Andreas Nemet
+* @link http://www.heidelpay.com
+* @copyright Copyright (c) 2016, heidelpay GmbH
+* @author Jens Richter / Sascha Pflueger
 */
 
 class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backend_ExtJs implements Enlight_Hook{
@@ -109,7 +109,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 $payName = str_replace('hgw_', '', $payName);
             }
 
-// 			switch($trans->payName){
             switch($payName){
 				case 'pay':
 					$payName = 'va';
@@ -119,6 +118,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					$payName = 'ot';
 					break;
 				case 'bs':
+                case 'san':
+                case 'ivpd':
 					$payName = 'iv';
 					break;
 				case 'mpa':
@@ -132,46 +133,101 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					break;
 			}
 
-            if (isset($trans->uid) && (!empty($trans->uid))) {
-                $transaction = $this->getTransactions($transID, $trans->uid);
+            if (isset($trans->uid) && (!empty($trans->uid)))
+            {
+                $transactions = $this->getTransactions($transID, $trans->uid, $meth);
             } else {
-                $transaction = $this->getTransactions($transID);
+                $transactions = $this->getTransactions($transID,NULL, $meth);
             }
 
-			$data = $transaction[0];
-
+            $data = $transactions[0];
+            $formerPaTransaction = $data;
 			$data['SECURITY_SENDER'] = trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER);
 			$data['USER_LOGIN'] = trim($this->FrontendConfigHGW()->HGW_USER_LOGIN);
 			$data['USER_PWD'] = trim($this->FrontendConfigHGW()->HGW_USER_PW);
 			$data['PAYMENT_CODE'] = strtoupper($payName).'.'.strtoupper($meth);
 			$data['PRESENTATION_AMOUNT'] = $amount;
 			$data['FRONTEND_ENABLED'] = 'false';
-			$data['FRONTEND_MODE'] = 'DEFAULT';
-//			$data['IDENTIFICATION_REFERENCEID'] = $trans->uid;
+//			$data['FRONTEND_MODE'] = 'DEFAULT';
+			$data['FRONTEND_MODE'] = 'WHITELABEL';
             $data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
 
-			unset($data['FRONTEND_RESPONSE_URL']);
-			unset($data['FRONTEND_CSS_PATH']);
-			unset($data['ACCOUNT_NUMBER']);
-				
-			$sw = Shopware()->Plugins()->Frontend()->HeidelGateway();
+            // switching request-url
+			$hgwBootstrapVariables = Shopware()->Plugins()->Frontend()->HeidelGateway();
 			if(strtoupper($data['TRANSACTION_MODE']) == 'LIVE'){
-				$sw::$requestUrl = $sw::$live_url;
+                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$live_url;
 			}else{
-				$sw::$requestUrl = $sw::$test_url;
+                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url;
 			}
 
+            // setting Basket-Id for Payolution
+            if(
+                ($data['ACCOUNT_BRAND'] == 'PAYOLUTION_DIRECT')
+             || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
+             || ($data['CRITERION_IVBRAND'] == 'PAYOLUTION')
+             || ($data['CRITERION_IVBRAND'] == 'SANTANDER')
+            )
+            {
+
+                // call Heidelpay-Basket-Api
+                switch ($data['PAYMENT_CODE'])
+                {
+                    case 'IV.FI':
+                    case 'IV.RV':
+                    case 'IV.RF':
+                            // fetch all articles for Basket-Api-Call from order
+                            $orderDetails = $this->fetchOrderDetailsByUniqueId($data['IDENTIFICATION_UNIQUEID']);
+
+                            // prepare data for heidelpay-basket-api call
+                            $dataForBasketApi = self::prepareBackendBasketData($orderDetails);
+
+                            // send heidelpay-basket-api call to receive a BASKET.ID
+                            $ta_mode = $this->FrontendConfigHGW()->HGW_TRANSACTION_MODE;
+                            $origRequestUrl = $hgwBootstrapVariables::$requestUrl;
+
+                            if(is_numeric($ta_mode) && (($ta_mode == 0) || ($ta_mode == 3))){
+                                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$live_url_basket;
+                            }else{
+                                $hgwBootstrapVariables::$requestUrl = $hgwBootstrapVariables::$test_url_basket;
+                            }
+                            // do Basket-Api-Request
+                            $params['raw']= $dataForBasketApi;
+                            $response = $this->callDoRequest($params);
+
+                            // switch back to post url, after basket request is sent
+                            $hgwBootstrapVariables::$requestUrl = $origRequestUrl;
+
+                            if(!empty($response['basketId']))
+                            {
+                                $data['BASKET_ID'] = $response['basketId'];
+                            }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            // deleting unneccessary Data
+            unset($data['IDENTIFICATION_UNIQUEID']);
+            unset($data['FRONTEND_RESPONSE_URL']);  unset($data['FRONTEND_CSS_PATH']);          unset($data['ACCOUNT_NUMBER']);
+            unset($data['CRITERION_DBONRG']);       unset($data['CRITERION_SHIPPAY']);          unset($data['CRITERION_GATEWAY']);
+            unset($data['CRITERION_WALLET']);       unset($data['CRITERION_WALLET_PAYNAME']);   unset($data['CUSTOMER_OPTIN']);
+            unset($data['CUSTOMER_OPTIN_2']);       unset($data['CONFIG_OPTIN_TEXT']);          unset($data['var.Register']);
+            unset($data['var.sTarget']);            unset($data['var.sepa']);                   unset($data['._csrf_token']);
+
+            // prepare parameters for sending and replace all "_" with "."
 			foreach($data as $key => $value){
 				if(is_int(strpos($key, 'CLEARING_'))){ unset($data[$key]); continue; }
 				if(is_int(strpos($key, 'ACCOUNT_'))){ unset($data[$key]); continue; }
 				if(is_int(strpos($key, 'AUTHENTICATION_'))){ unset($data[$key]); continue; }
+				if(is_int(strpos($key, 'PROCESSING_'))){ unset($data[$key]); continue; }
 				$pos = strpos($key, '_');
 				$newKey = str_replace('_','.',substr($key, 0, $pos+1));
 				$newKey .= substr($key, $pos+1);
 				$data[$newKey] = $value;
 				unset($data[$key]);
 			}
-				
+
 			$resp = $this->callDoRequest($data);
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
 				
@@ -185,7 +241,10 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$sql .= 'SET `Request` = ? WHERE `temporaryID` = ?';
 				Shopware()->Db()->query($sql, array(serialize($resp), $resp['IDENTIFICATION_TRANSACTIONID']));
 			}
-				
+
+            /**
+             * @todo ggf Einbau Aenderung Bezahlstatus an Bestellung
+             */
 			$transactions = $this->getTransactions($transID);
 			$transTable = $this->getTransTable($transactions, $beLocaleId, true);
 			$retArr['transTable'] = $transTable;
@@ -199,78 +258,106 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 		}
 	}
 
-	/*
+    /*
 	 * Method to get all transaction with the same IDENTIFICATION_TRANSACTIONID
 	 * if second pram is set, the method returns just the selected transaction
 	 * @param string $transID
 	 * @param string $uiD
 	 * @return array $transactions
 	 */
-	public function getTransactions($transID, $uid = NULL){
-		try{
-			$table = $this->FrontendConfigHGW()->HGW_SECURITY_SENDER;
+    public function getTransactions($transID, $uid = NULL, $method = NULL){
+        try{
+            $table = $this->FrontendConfigHGW()->HGW_SECURITY_SENDER;
 
-			// check new DB-Table for transactions
-			$sql = '
-				SELECT `jsonresponse` FROM `s_plugin_hgw_transactions`
-				WHERE `transactionid` = ?
-			';
-			$params[] = $transID;
-				
-			if(($uid != NULL) && ($uid != '')){
-				$sql .= 'AND `uniqueid` = ?';
-				$params[] = $uid;
-			}
-			$sql .= 'ORDER BY `datetime` DESC';
-				
-			try{
-				$data = Shopware()->Db()->fetchAll($sql, $params);
-				// check old DB-Table for transactions
-				unset($params);
+            // check new DB-Table for transactions
 
-				$sql = 'SHOW TABLES LIKE "'.$table.'"';
-				$check = Shopware()->Db()->fetchAll($sql);
-				if(!empty($check)){
-					$sql = '
+            $sql = '';
+            $params[] = $transID;
+
+            /* ********************* neuer Code ********************* */
+            switch ($method)
+            {
+                case 'rf':
+                    $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ? '
+                        .'AND (`payment_type` = "DB" '
+                        .'OR `payment_type` = "CP" '
+                        .'OR `payment_type` = "RB" '
+                        .'OR `payment_type` = "RC" '
+                        .') ';
+                   /* if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `uniqueid` = ? ';
+                        $params[] = $uid;
+                    }*/
+                    $sql .= 'ORDER BY `datetime` DESC';
+                    break;
+                case 'rv':
+                    $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ?'
+                        .'AND `payment_type` = "PA" ';
+                    if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `uniqueid` = ?';
+                        $params[] = $uid;
+                    }
+                    $sql .= 'ORDER BY `datetime` DESC';
+                    break;
+                default:
+                    $sql = 'SELECT `jsonresponse` FROM `s_plugin_hgw_transactions` WHERE `transactionid` = ?';
+                    if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `uniqueid` = ?';
+                        $params[] = $uid;
+                    }
+                    $sql .= 'ORDER BY `datetime` DESC';
+                    break;
+            }
+            /* ********************* Ende neuer Code ********************* */
+
+            try{
+                $data = Shopware()->Db()->fetchAll($sql, $params);
+                // check old DB-Table for transactions
+                unset($params);
+
+                $sql = 'SHOW TABLES LIKE "'.$table.'"';
+                $check = Shopware()->Db()->fetchAll($sql);
+                if(!empty($check)){
+                    $sql = '
 						SELECT `SERIAL` FROM '.$table.'
 						WHERE `IDENTIFICATION_TRANSACTIONID` = ?
 					';
-					$params[] = $transID;
-					if(($uid != NULL) && ($uid != '')){
-						$sql .= 'AND `IDENTIFICATION_UNIQUEID` = ?';
-						$params[] = $uid;
-					}
-					$sql .= 'ORDER BY `created` DESC';
-					$data = array_merge($data, Shopware()->Db()->fetchAll($sql, $params));
-				}
-			}catch(Exception $e){
-				if(count($data) == '0'){
-					Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
-					return $transactions;
-				}
-			}
-				
-			foreach($data as $key => $value){
-				if(isset($value['jsonresponse'])){
-					$transactions[] = json_decode($value['jsonresponse'], true);
-				}elseif(isset($value['SERIAL'])){
-					$transactions[] = unserialize($value['SERIAL']);
-				}
-			}
+                    $params[] = $transID;
+                    if(($uid != NULL) && ($uid != '')){
+                        $sql .= 'AND `IDENTIFICATION_UNIQUEID` = ?';
+                        $params[] = $uid;
+                    }
+                    $sql .= 'ORDER BY `created` DESC';
+                    $data = array_merge($data, Shopware()->Db()->fetchAll($sql, $params));
+                }
+            }catch(Exception $e){
+                if(count($data) == '0'){
+                    Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
+//                    return $transactions;
+                    return $data;
+                }
+            }
 
-			foreach($transactions as $tKey => $transaction){
-				foreach($transaction as $transKey => $transVal){
-					$transaction[$transKey] = urldecode($transVal);
-				}
-				$transactions[$tKey] = $transaction;
-			}
+            foreach($data as $key => $value){
+                if(isset($value['jsonresponse'])){
+                    $transactions[] = json_decode($value['jsonresponse'], true);
+                }elseif(isset($value['SERIAL'])){
+                    $transactions[] = unserialize($value['SERIAL']);
+                }
+            }
 
-			return $transactions;
-		}catch(Exception $e){
-			Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
-			return;
-		}
-	}
+            foreach($transactions as $tKey => $transaction){
+                foreach($transaction as $transKey => $transVal){
+                    $transaction[$transKey] = urldecode($transVal);
+                }
+                $transactions[$tKey] = $transaction;
+            }
+            return $transactions;
+        }catch(Exception $e){
+            Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
+            return;
+        }
+    }
 
 	/*
 	 * Method to generate the html code for the transaction buttons
@@ -312,6 +399,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					$payInfo = $this->getPayInfo($value['PAYMENT_CODE'], $beLocaleId);
 					if($payName == 'papg'){ $payName = 'iv'; $papg = true; }
 					if($payName == 'san'){ $payName = 'iv'; $san = true; }
+					if($payName == 'ivpd'){ $payName = 'iv'; $ivpd = true; }
 					switch($payName){
 						case 'cc':
 						case 'dc':
@@ -356,24 +444,110 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 							break;
 						case 'bs':
 						case 'iv':
-							if($payInfo['payType'] == 'pa'){
-								$btns['rv']['active'] = $btns['fi']['active'] = 'true';
+                            if($ivpd || $san)
+						    {
+                                if($payInfo['payType'] == 'pa'){
+                                    $btns['rv']['active'] = $btns['fi']['active'] = 'true';
 
-								$maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
-								$btns['rv']['trans'][] = $btns['fi']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
-							}
-							if($payInfo['payType'] == 'rc'){
-								$btns['rv']['active'] = $btns['fi']['active'] = 'false';
-								$btns['rf']['active'] = 'true';
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['trans'][] = $btns['fi']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+                                if($payInfo['payType'] == 'rc'){
+                                    $btns['rv']['active'] = $btns['fi']['active'] = 'false';
+                                    $btns['rf']['active'] = 'true';
 
-								if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
-								$btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
-							}
-							if($payInfo['payType'] == 'fi'){
-								//$btns['rv']['active'] = $btns['fi']['active'] = 'false';
+                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+                                    $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+                                if($payInfo['payType'] == 'fi') {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+
+                                    if ($ivpd || $san) {
+                                        $btns['fi']['active'] = $btns['rv']['active'] = 'false';
+//                                        $btns['rf']['active'] = 'true';
+
+                                        if (!isset($maxRf)) {
+                                            $maxRf = $value['PRESENTATION_AMOUNT'];
+                                        }
+                                        $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                    } else {
+
+                                        $btns['fi']['active'] = 'false';
+                                        $btns['rv']['active'] = 'true';
+                                    }
+                                }
+                            } elseif ($papg) {
+                                if ($payInfo['payType'] == 'pa') {
+//                                    $btns['rf']['active'] =
+                                    $btns['rv']['active'] =
+                                    $btns['fi']['active'] = 'true';
+
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['trans'][] =
+                                    $btns['fi']['trans'][] =
+                                    $btns['rf']['trans'][] =
+                                        $this->storeTrans($value,$payName, $payInfo);
+                                }
+
+                                if ($payInfo['payType'] == 'fi') {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['active'] = 'true';
+                                    $btns['fi']['active'] =	'false';
+//                                    $btns['rf']['active'] = 'true';
+//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+                                }
+
+                                if ($payInfo['payType'] == 'rc') {
+                                    $btns['rv']['active'] =
+                                    $btns['fi']['active'] = 'false';
+                                    $btns['rf']['active'] = 'true';
+
+                                    if (!isset($maxRf)) {
+                                        $maxRf = $value['PRESENTATION_AMOUNT'];
+                                    }
+                                    $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+
+                            }
+                            else {
+                                $btns['rv']['active'] = $btns['fi']['active'] = 'false';
 								$btns['fi']['active'] = 'false';
 								$btns['rv']['active'] = 'true';
-							}
+                            }
+
+//                            if($payInfo['payType'] == 'pa'){
+//								$btns['rv']['active'] = $btns['fi']['active'] = 'true';
+//
+//								$maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+//								$btns['rv']['trans'][] = $btns['fi']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+//							}
+//							if($payInfo['payType'] == 'rc'){
+//								$btns['rv']['active'] = $btns['fi']['active'] = 'false';
+//								$btns['rf']['active'] = 'true';
+//
+//								if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+//								$btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+//							}
+//							if($payInfo['payType'] == 'fi'){
+//                                $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+//
+//							    if(
+//							        $ivpd
+////                                || $san
+//                                ){
+//                                    $btns['fi']['active'] =  $btns['rv']['active'] ='false';
+//                                    $btns['rf']['active'] = 'true';
+//
+//                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+//                                    $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+//                                } else {
+//                                    $btns['fi']['active'] = 'false';
+//                                    $btns['rv']['active'] = 'true';
+//                                }
+								//$btns['rv']['active'] = $btns['fi']['active'] = 'false';
+//								$btns['fi']['active'] = 'false';
+//								$btns['rv']['active'] = 'true';
+//							}
 							break;
 						case 'pp':
 							if($payInfo['payType'] == 'pa'){
@@ -413,8 +587,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 						if($maxRv <= 0){ $btns['rv']['active'] = 'false'; }
 						if($maxFi <= 0){ $btns['fi']['active'] = 'false'; }
 					}
-					if($papg){ $payName = 'papg'; $papg = false; }
-					if($payName == 'san'){ $payName = 'iv'; unset($san); }
+					if($papg)   { $payName = 'papg'; $papg = false; }
+					if($san)    { $payName = 'san'; $san = false; }
+					if($ivpd)   { $payName = 'ivpd'; $ivpd = false; }
 				}
 
 				$btns['rf']['trans'][0]['maxRf'] = number_format($maxRf, 2,'.','');
@@ -446,7 +621,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$buttonTable .= '</tr></table>';
 			$buttonRet['ref'] = $reference;
 			$buttonRet['table'] = $buttonTable;
-				
 			return $buttonRet;
 		}catch(Exception $e){
 			Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getButtons (BE) | '.$e->getMessage());
@@ -727,4 +901,107 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 	public function FrontendConfigHGW(){
 		return Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
 	}
+
+    /** fetchOrderByUniqueId()
+     * fetches the id from datatable s_order for a specific temporaryId / UniqueId
+     * @param $identificationUniqueId
+     * @return array
+     */
+	protected function fetchOrderDetailsByUniqueId($identificationUniqueId)
+    {
+        $sql = 'SELECT * FROM `s_order` 
+                INNER JOIN `s_order_details` 
+                ON `s_order`.`ordernumber` = `s_order_details`.`ordernumber`
+                WHERE `s_order`.`temporaryID` = ?
+                ;';
+
+        $uniqueId = [$identificationUniqueId];
+        $orderdetails = Shopware()->Db()->fetchAll($sql,$uniqueId);
+
+        return $orderdetails;
+    }
+
+    /**
+     * prepareBackendBasketData prepares basket data for basket-api-call from a given array
+     * @param $orderDetails
+     * @return array
+     */
+    protected function prepareBackendBasketData($orderDetails)
+    {
+        // prepare Basicdata for Basket-Api-Call
+        $shoppingCart['authentication'] = array(
+            'sender' 		=> trim($this->FrontendConfigHGW()->HGW_SECURITY_SENDER),
+            'login'			=> trim($this->FrontendConfigHGW()->HGW_USER_LOGIN),
+            'password'		=> trim($this->FrontendConfigHGW()->HGW_USER_PW),
+        );
+
+        // prepare hole basket data
+        // remove dot as seperator for thousands and formate value into cent with no decimals
+        $amountNet      = number_format($orderDetails[0]["invoice_amount_net"], 4,".","");
+        $amountNet      = bcmul($amountNet, 100, 0);
+
+        $amountGross    = number_format($orderDetails[0]["invoice_amount"], 4,".","");
+        $amountGross    = bcmul($amountGross, 100, 0);
+
+        $amountVat 		= number_format(bcsub($amountGross,$amountNet),0,".","");
+
+        $shoppingCart['basket'] = [
+            'amountTotalNet' => $amountNet,
+            'amountTotalVat' => $amountVat,
+            'currencyCode'   => !empty($orderDetails[0]["currency"])  ? $orderDetails[0]["currency"]: "",
+        ];
+
+        //prepare item basket data
+        $count = 1;
+        foreach ($orderDetails as $singleArticle)
+        {
+
+            $shoppingCart['basket']['basketItems'][] = array(
+                'position'				=> $count,
+                'basketItemReferenceId' => $count,
+                'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['articleordernumber'],
+                'unit'					=> $singleArticle['unit'],
+                'quantity'				=> $singleArticle['quantity'],
+                'vat'					=> $singleArticle['tax_rate'],
+                'amountGross'			=> bcmul($singleArticle['price'], 100, 0),
+                'amountNet'				=> bcmul(bcmul((bcdiv($singleArticle['price'],(bcadd(100,$singleArticle['tax_rate'],6)),6)),100,6), 100, 0),
+                'amountVat'				=> bcmul(bcsub($singleArticle['price'],bcmul(bcdiv($singleArticle['price'],(bcadd($singleArticle['tax_rate'],100,6)),6),100,6),6),100,0),
+                'amountPerUnit'			=> bcmul(($singleArticle['price']), 100, 0),
+                'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
+
+            );
+
+            if($shoppingCart['basket']['basketItems'][$count]['type'] == "voucher") {
+                $shoppingCart['basket']['basketItems'][$count]['articleId'] = "voucher";
+            }
+
+            $count ++;
+
+        }
+
+        if(array_key_exists("0",$orderDetails))
+        {
+            $shoppingCart['basket']['basketItems'][] = array(
+                'position'				=> $count,
+                'basketItemReferenceId' => $count,
+                'articleId'				=> "SwShipping",
+                'unit'					=> "stk",
+                'quantity'				=> "1",
+                'vat'					=> $orderDetails[0]['tax_rate'],
+                'amountGross'			=> bcmul($orderDetails[0]['invoice_shipping'], 100, 0),
+                'amountNet'				=> bcmul($orderDetails[0]['invoice_shipping_net'] , 100, 0),
+                'amountVat'				=> bcmul(bcsub($singleArticle['invoice_shipping'],$singleArticle['invoice_shipping_net'],6),100,0),
+                'amountPerUnit'			=> bcmul(($orderDetails[0]['invoice_shipping']), 100, 0),
+                'type'					=> "shipment",
+                'title'					=> "Shipping Costs"
+
+            );
+        }
+        $shoppingCart['basket']['itemCount'] = $count;
+        $basketReturn = $shoppingCart;
+        return $basketReturn;
+    }
+
+
 }

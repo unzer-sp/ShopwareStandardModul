@@ -16,16 +16,16 @@ $(document).ready(function(){
 		origEvent = e;
 		sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt);
 	}
-	
-	// PATH SWITCH
-	if((window.location.pathname.indexOf('account/payment') >= '0') || (window.location.pathname.indexOf('account/savePayment') >= '0')){
-		// ACCOUNT/PAYMENT
-		var errorDiv = '#center .error';
 
+	// PATH SWITCH
+	if(window.location.pathname.indexOf('account/payment') >= '0'){
+		// ACCOUNT/PAYMENT
+		var errorDiv = '#center .alert .alert--content';
+		
 		// check if payment selection is changed
-		$('.payment_method').click(function(){
+		$('.register--payment').click(function(){
 			// change form action
-			checkedOpt = $('.payment_method input:radio:checked');
+			checkedOpt = $('.register--payment input:radio:checked');
 			var checkedClass = checkedOpt.attr('class');
 			if(typeof checkedClass != 'undefined'){
 				var prefix = 'hgw_';
@@ -55,23 +55,24 @@ $(document).ready(function(){
 							setMessageListener();
 							hasListener['msg'] = true;
 						}
-					}
+					}				
 				}else{ pm = ''; }
 			}
 		});
 		// trigger 'click' on document.ready() to get functionality if paymet method is preselected
-//		$('.payment_method').trigger('click');
-		$('.payment_method input:radio:checked').trigger('click');
+		$('.register--payment').trigger('click');
 		
 	}else if(window.location.pathname.indexOf('gateway') >= '0'){
 		// GATEWAY
-		var errorDiv = '#payment .error';
+		var errorDiv = '#payment .alert .alert--content';
+
 		checkedOpt = $('#payment .payment_method');
 		var checkedClass = checkedOpt.attr('class');
-		
+
 		if(typeof checkedClass != 'undefined'){
 			var prefix = 'hgw_';
 			var checkedClassPos = checkedClass.indexOf(prefix);
+
 			if(checkedClassPos >= 0){
 				pm = checkedClass.substr(checkedClassPos+prefix.length);
 				if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
@@ -100,8 +101,54 @@ $(document).ready(function(){
 				}
 			}else{ pm = ''; }
 		}
-	}	
-	
+	}else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
+		// SHIPPINGPAYMENT
+		var errorDiv = '.content-main--inner .content .alert .alert--content';
+
+		// $(document).ajaxComplete(function(event, xhr, settings){
+			// reset the flags for the frame listener, because event bindings are deleted due to ajax
+			// 'msg' flag don't need a reset because the listener is on the window
+			hasListener['dc'] = false;
+			hasListener['cc'] = false;
+
+			checkedOpt = jQuery('.payment--method-list input:radio:checked');
+			var checkedClass = checkedOpt.attr('class');
+
+			if(typeof checkedClass != 'undefined'){
+				var prefix = 'hgw_';
+				var checkedClassPos = checkedClass.indexOf(prefix);
+
+				if(checkedClassPos >= 0){
+					pm = checkedClass.substr(checkedClassPos+prefix.length);					
+					if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
+						// get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
+						targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
+						paymentFrameForm = document.getElementsByName('shippingPaymentForm');
+						paymentFrameIframe = document.getElementById('hp_frame_'+pm);
+						// get right element from nodelist
+						for(var i = 0; i < paymentFrameForm.length; i++){
+							var item = paymentFrameForm[i];							
+							if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
+								paymentFrameForm = paymentFrameForm[i];
+								break;
+							}
+						}
+
+						if(!hasListener[pm]){
+							setSubmitListener();
+							hasListener[pm] = true;
+						}
+						
+						if(!hasListener['msg']){
+							setMessageListener();
+							hasListener['msg'] = true;
+						}
+					}
+				}else{ pm = ''; }
+			}
+		// });
+	}
+
 	// add an event listener that will execute the sendMessage() function when the send button is clicked.
 	function setSubmitListener(){
 		if(paymentFrameForm.addEventListener){ // W3C DOM
@@ -125,8 +172,8 @@ $(document).ready(function(){
 		if((pm == 'cc') || (pm == 'dc')){
 			// just use eventListener on new registration or debit
 			if(jQuery('.newreg_'+pm).is(':visible')){
-				$($.loadingIndicator.config.overlay).fadeTo($.loadingIndicator.config.animationSpeed, $.loadingIndicator.config.overlayOpacity);
-				$.loadingIndicator.open();
+				$.overlay.open();
+				$.loadingIndicator.open({ animationSpeed: 50 });
 				$(paymentFrameForm).find('input[type="submit"]').attr('disabled', 'disabled');
 				var checkedClass = checkedOpt.attr('class');
 				
@@ -144,10 +191,10 @@ $(document).ready(function(){
 
 					if(activePm == pm){
 						// disable all other input fields
-						jQuery('.payment_method input').attr('disabled', 'disabled');
-						jQuery('.payment_method select').attr('disabled', 'disabled');
-						jQuery('.payment_method input:radio:checked').parents('.grid_15').find('input').removeAttr('disabled');
-						jQuery('.payment_method input:radio:checked').parents('.grid_15').find('select').removeAttr('disabled');
+						jQuery('.payment--method input').attr('disabled', 'disabled');
+						jQuery('.payment--method select').attr('disabled', 'disabled');
+						jQuery(checkedOpt).parents('.payment--method').find('input').removeAttr('disabled');
+						jQuery(checkedOpt).parents('.payment--method').find('select').removeAttr('disabled');
 						// save the form data in an object
 						var data = {};
 						for(var i = 0, len = paymentFrameForm.length; i < len; ++i){
@@ -156,7 +203,11 @@ $(document).ready(function(){
 								data[input.name] = input.value;
 							}
 						}
-						// send a json message with the form data to the iFrame receiver window.
+						
+						if (swVersion.substring(0,3) >= '5.2') {
+							data["__csrf_token"] = jQuery('input[name="__csrf_token"]').val();
+						}
+						
 						paymentFrameIframe.contentWindow.postMessage(JSON.stringify(data), targetOrigin);
 					}
 				}
@@ -173,15 +224,16 @@ $(document).ready(function(){
 		}
 		
 		var recMsg = JSON.parse(e.data);
+		
 		if(recMsg["PROCESSING.RESULT"] == 'NOK'){
 			// enable all input fields
-			jQuery('.payment_method input').removeAttr('disabled');
-			jQuery('.payment_method select').removeAttr('disabled');
-						
+			jQuery('.payment--method input').removeAttr('disabled');
+			jQuery('.payment--method select').removeAttr('disabled');
+			
 			var errors = {};
 			var errorExp = false;
 			setTimeout(function(){
-				$($.loadingIndicator.config.overlay).fadeOut($.loadingIndicator.config.animationSpeed);
+				$.overlay.close();
 				$.loadingIndicator.close();
 			}, 250);
 
@@ -227,31 +279,31 @@ $(document).ready(function(){
 
 		if(i > 0){
 			if(jQuery(errorDiv+' ul').length == 0){
-				jQuery(errorDiv).html('<ul></ul>');
+				jQuery(errorDiv).html('<ul class="alert--list"></ul>');
 			}
 			
 			jQuery(errorDiv+' ul li').remove();
-			jQuery(errorDiv+' ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
+			jQuery(errorDiv+' ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
 			
 			jQuery.each(errors, function(key, value){
 				if(key == 'text'){
-					jQuery(errorDiv+' ul').append('<li>'+value+'</li>');
+					jQuery(errorDiv+' ul').append('<li class="list--entry">'+value+'</li>');
 				}else{			
-					jQuery(errorDiv+' ul').append('<li>'+jQuery(value).html()+'</li>');
+					jQuery(errorDiv+' ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
 				}
 			});
-
-			jQuery(errorDiv).removeClass('is--hidden');
-			jQuery(errorDiv).show();
+			
+			jQuery(errorDiv).parent().removeClass('is--hidden');
+			jQuery(errorDiv).parent().show();
 			jQuery('html, body').animate({scrollTop: 0}, 0);
 			return false;
 		}else{
 			// disable all other input fields
-			jQuery(errorDiv).fadeOut();
-			jQuery('.payment_method input').attr('disabled', 'disabled');
-			jQuery('.payment_method select').attr('disabled', 'disabled');
-			jQuery('.payment_method input:radio:checked').parents('.grid_15').find('input').removeAttr('disabled');
-			jQuery('.payment_method input:radio:checked').parents('.grid_15').find('select').removeAttr('disabled');
+			jQuery(errorDiv).parent().fadeOut();
+			jQuery('.payment--method input').attr('disabled', 'disabled');
+			jQuery('.payment--method select').attr('disabled', 'disabled');
+			jQuery(checkedOpt).parents('.payment--method').find('input').removeAttr('disabled');
+			jQuery(checkedOpt).parents('.payment--method').find('select').removeAttr('disabled');
 		}
 	}
 

@@ -34,7 +34,10 @@
 
 
 /* SW5 - responsive tpl */
-#paymentFrameForm{}
+#paymentFrameForm{
+    height: 270px;
+    width: 300px;
+}
 
 #paymentFrameForm div{
 	margin-bottom: 3px;

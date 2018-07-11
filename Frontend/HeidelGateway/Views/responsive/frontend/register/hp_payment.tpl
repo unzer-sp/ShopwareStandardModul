@@ -17,8 +17,13 @@
     {if $action != 'cart' && $action != 'orders'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
 		{if $swVersion >= "5.3"}
-			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
-			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+            {if $theme.asyncJavascriptLoading}
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+            {else}
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPaymentDr.js' defer='defer'></script>
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_scriptDr.js' defer='defer'></script>
+            {/if}
 		{else}
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
@@ -43,7 +48,9 @@
 		{include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_va.tpl" heidel_bm_va=$heidel_bm_va pm='va'}
     {elseif $payment_mean.name == "hgw_hpr"}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
-	{else}
+    {elseif $payment_mean.name == "hgw_ivpd"}
+        {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment_ivpd.tpl" pm='ivpd'}
+    {else}
 		{$smarty.block.parent}
 	{/if}
 
@@ -74,6 +81,7 @@
 		<div class='msg_dob'>{s name='ErrorDob' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_salut'>{s name='ErrorSalut' namespace='frontend/register/hp_payment'}{/s}</div>
 		<div class='msg_cb'>{s name='ErrorCb' namespace='frontend/register/hp_payment'}{/s}</div>
+		<div class='msg_phone'>{s name='ErrorPhone' namespace='frontend/register/hp_payment'}{/s}</div>
 	</div>
 {/block}
 

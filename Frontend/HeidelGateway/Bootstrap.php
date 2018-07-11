@@ -5,8 +5,8 @@
 * @category Shopware
 * @package Shopware_Plugins
 * @subpackage Plugin
-* @link http://www.heidelpay.de
-* @copyright Copyright (c) 2016, Heidelberger Payment GmbH
+* @link http://www.heidelpay.com
+* @copyright Copyright (c) 2018, heidelpay GmbH
 * @author Jens Richter / Sascha Pflueger
 */
 require_once __DIR__ . '/Components/CSRFWhitelistAware.php';
@@ -22,10 +22,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 	/**
 	 * Method to return Versionnumber
-	 * @return string version numberf
+	 * @return string version number
 	 */
 	public function getVersion(){
-		return '17.11.06';
+		return '18.07.11';
 	}
 
 	/**
@@ -55,20 +55,41 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function getInfo(){
 		$prefix 	= substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'));
-		$hp_logo 	= base64_encode(file_get_contents(dirname(__FILE__) . '/img/heidelpay.png'));
+//		$hp_logo 	= base64_encode(file_get_contents(dirname(__FILE__) . '/img/heidelpay.png'));
+		$hp_logo 	= dirname(__FILE__) . '/img/heidelpay.png';
 		return array(
 				'version' => $this->getVersion(),
-				'autor' => 'Heidelberger Payment GmbH (AN)',
+				'autor' => 'heidelpay GmbH (SP)',
 				'label' => $this->getLabel(),
 				'source' => "Default",
-				'description' => '<p><img src="data:image/png;base64,' .$hp_logo. '" /></p>
-			<p style="font-size:12px; font-weight: bold;">Heidelberger Payment GmbH - Ihr Full Service Payment Provider - alles aus einer Hand</p>
-			<p style="font-size:12px">Die Heidelberger Payment GmbH kurz: Heidelpay bietet als BaFin-zertifizierter Payment Service Provider alles was zum Online-Payment geh&ouml;rt.<br><br><a href="http://testshops.heidelpay.de/contactform/?campaign=shopware4.0&shop=shopware4.0" target="_blank" style="font-size: 12px; color: #000; font-weight: bold;">&gt;&gt;&gt; Informationen anfordern &lt;&lt;&lt;</a><br/></p><br /><p style="font-size:12px">Das Leistungsspektrum des PCI DSS zertifizierten Unternehmens reicht von weltweiten e-Payment L&ouml;sungen, inklusive eines vollst&auml;ndigen Debitorenmanagement-, Risk- und Fraud- Systems bis hin zu einem breiten Angebot alternativer Bezahlverfahren - schnell, sicher, einfach und umfassend - alles aus einer Hand.</p><br/><a href="http://www.heidelpay.de" style="font-size: 12px; color: #000; font-weight: bold;">www.heidelpay.de</a><br/><br/><p style="font-size: 12px; color: #f00; font-weight: bold;">Hinweis:</p><p style="font-size:12px">Um unser "Heidelpay Backend" Plug-in nutzen zu k&ouml;nnen, beantragen Sie bitte die Aufschaltung von Push-Benachrichtigungen bei unserem Technischen Support. Wenden Sie sich hierf&uuml;r bitte per E-Mail an support@heidelpay.de oder Telefon +49 (0) 6221 65170-10 an uns. Bitte notieren Sie sich Sie sich vorher die URL ihres e-Shops plus dem Webpfad zur Heidelpay Action und teilen Sie uns diese dann mit, als Beispiel:<br/><br/><b>https://www.meinshop.de/PaymentHgw/rawnotify</b><br/><br/><br />
-			Testdaten entnehmen Sie bitte unserer <a href="https://dev.heidelpay.de/testumgebung/" style="color: #000; font-weight: bold;" target="_blank">Dokumentation</a>.</p>',
+				'description' =>
+                    '<p style="font-size:12px">
+                        <img src="' .$hp_logo. '"/><br/> 
+                        Die heidelpay GmbH kurz: heidelpay bietet als BaFin-zertifizierter Payment Service Provider 
+                        alles was zum Online-Payment geh&ouml;rt.<br><br>
+                        <a href="http://testshops.heidelpay.de/contactform/?campaign=shopware4.0&shop=shopware" target="_blank" style="font-size: 12px; color: #000; font-weight: bold;">&gt;&gt;&gt; Informationen anfordern &lt;&lt;&lt;</a><br/>
+                    </p>
+                    <br />
+                    <p style="font-size:12px">
+                        Das Leistungsspektrum des PCI DSS zertifizierten Unternehmens reicht von weltweiten e-Payment L&ouml;sungen, 
+                        inklusive eines vollst&auml;ndigen Debitorenmanagement-, Risk- und Fraud- Systems bis hin zu einem breiten 
+                        Angebot alternativer Bezahlverfahren - schnell, sicher, einfach und umfassend - alles aus einer Hand.
+                     </p>
+                     <br/>
+                     <a href="http://www.heidelpay.com" style="font-size: 12px; color: #000; font-weight: bold;">www.heidelpay.com</a><br/><br/>
+                     <p style="font-size: 12px; color: #f00; font-weight: bold;">
+                        Für Fragen zu der Funktion des Plugins oder der Zahlungsabwicklung wenden Sie sich bitte an<br/> 
+                        E-Mail: <a href="mailto:support@heidelpay.com">support@heidelpay.com</a><br/>Telefon: <a href="tel:+4962216471100">+49 (0) 6221 64 71 100</a>.<br/> 
+                        Bitte notieren Sie sich Sie sich vorher die URL Ihres e-Shops sowie die Version Ihres Shopware-Systems und teilen Sie uns diese dann mit, 
+                        als Beispiel:<br/>
+                        <b>https://www.meinshop.de/</b><br/>
+                        <b>Shopware 5.3.5</b><br/>
+                        Testdaten entnehmen Sie bitte unserer <a href="https://dev.heidelpay.de/testumgebung/" style="color: #000; font-weight: bold;" target="_blank">Dokumentation</a>.
+                     </p>',
 				'license' => 'commercial',
-				'copyright' => 'Copyright © '.date("Y").', Heidelberger Payment GmbH',
-				'support' => 'support@heidelpay.de',
-				'link' => 'http://www.heidelpay.de/'
+				'copyright' => 'Copyright © '.date("Y").', heidelpay GmbH',
+				'support' => 'support@heidelpay.com',
+				'link' => 'http://www.heidelpay.com/'
 		);
 	}
 
@@ -77,26 +98,41 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return bool
 	 */
 	public function install(){
-		$msg = 'Installationsfehler: <br />';
-		if(!$this->assertVersionGreaterThen("4.0.0")){
-			throw new Enlight_Exception("This Plugin needs min shopware 4.0.0");
+        $msg = 'Installationsfehler: <br />';
+		if(!$this->assertMinimumVersion("4.3.7")){
+			throw new Enlight_Exception("This Plugin needs min shopware 4.3.7");
 		}
 
-		/* Major check Version */
-		if ($this->assertVersionGreaterThen('5.1.6')) {
-			$swVersion = Shopware()->Config()->version;
+        /* *************** Neuer Code ********************* */
+        $swVersion = Shopware()->Config()->version;
 
-		} else {
-			$swVersion = Shopware()->Config()->version;
-			if(!$this->assertRequiredPluginsPresent(array('Payment'))){
-				$msg .= "This plugin requires the plugin payment<br />";
-				$this->uninstall();
-				throw new Enlight_Exception("This plugin requires the plugin payment");
-			}
-		}
+        /* Major check Version */
+        if(
+            (version_compare($swVersion,"4.3.7",">"))
+            && (version_compare($swVersion,"5.2.0","<"))
+        ){
+            if(!$this->assertRequiredPluginsPresent(array('Payment'))){
+                $msg .= "This plugin requires the plugin payment<br />";
+                $this->uninstall();
+                throw new Enlight_Exception("This plugin requires the shopware plugin payment");
+            }
+        };
+        /* *************** Ende neuer Code ********************* */
+        /* Major check Version */
+//		if ($this->assertVersionGreaterThen('5.1.6')) {
+//			$swVersion = Shopware()->Config()->version;
+//
+//		} else {
+//			$swVersion = Shopware()->Config()->version;
+//			if(!$this->assertRequiredPluginsPresent(array('Payment'))){
+//				$msg .= "This plugin requires the plugin payment<br />";
+//				$this->uninstall();
+//				throw new Enlight_Exception("This plugin requires the shopware plugin payment");
+//			}
+//		}
 
 		if($this->assertRequiredPluginsPresent(array('HeidelActions'))){
-			throw new Enlight_Exception("Please uninstall Heidelpay Backend Plugin (HeidelActions)");
+			throw new Enlight_Exception("Please delete Heidelpay Backend Plugin (HeidelActions) from your Server");
 		}
 
 		try{
@@ -120,7 +156,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$this->createRGTable();
 			$this->alterRGTable();
-			$msg .= '* create reg table<br />';
+			$this->alterRGTable171012();
+			$msg .= '* create / alter reg table<br />';
 		}catch(Exception $e){
 			$this->logError($msg, $e);
 		}
@@ -143,6 +180,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$this->installDirectDebitMail();
 			// Santander Invoice Mail
             $this->installInvoiceSanMail();
+            // Payolution Invoice Mail
+            $this->installInvoiceIvpdMail();
 			$msg .= '* install mail templates<br />';
 		}catch(Exception $e){
 			$this->logError($msg, $e);
@@ -159,12 +198,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		}catch(Exception $e){
 			$this->logError($msg, $e);
 		}
-		try {
-			$this->alterRGTable161027();
-			$msg .= '* alter registration table<br />';
-		}catch (Exception $e){
-			$this->logError($msg, $e);
-		}
 
 		// overwrite $msg if install was successful
 		$msg = 'Installation erfolgreich: '.$this->getVersion();
@@ -173,493 +206,493 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		return array('success' => true, 'invalidateCache' => array('frontend'));
 	}
 
-	/**
-	 * Plugin update method
-	 * @param string $oldVersion - old module version
-	 * @return bool
-	 */
-	public function update($oldVersion){
+    /**
+     * Plugin update method
+     * @param string $oldVersion - old module version
+     * @return bool
+     */
+    public function update($oldVersion){
 
-		$msg = 'Update Fehler. Alte Modulversion: '.$oldVersion.'<br />';
-		$form = $this->Form();
-		switch($oldVersion){
-			case '14.05.08':
-			case '14.05.15':
-			case '14.05.22':
-			case '14.06.03':
-				try{
-					$msg .= '* update 14.06.03<br />';
-					$form->setElement('select', 'HGW_MOBILE_CSS', array(
-							'label' => 'activate mobile CSS',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.06.10':
-			case '14.06.18':
-				try{
-					$msg .= '* update 14.06.18<br />';
-					$this->createEvents();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.06.27':
-			case '14.07.07':
-			case '14.07.08':
-			case '14.07.09':
-				try{
-					$msg .= '* update 14.07.09<br />';
-					$this->installDirectDebitMail();
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.11':
-				try{
-					$msg .= '* update 14.08.11<br />';
-					$this->installPrepaymentMail();
-					$this->installBarPayMail();
-					$this->installDirectDebitMail();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.13':
-				try{
-					$msg .= '* update 14.08.13<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_PF_CHANNEL', array(
-							'label'=>'PostFinance Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.15':
-				try{
-					$msg .= '* update 14.08.15<br />';
-					$this->getInfo();
-					$this->createLoggingUser();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.22':
-				try{
-					$msg .= '* update 14.08.22<br />';
-					$form->setElement('select', 'HGW_PP_MAIL', array(
-							'label' => 'Send pay data via mail',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Send payment information in additional email. Available for BarPay, Prepayment and Direct Debit.'
-					));
-					$form->setElement('select', 'HGW_IBAN', array(
-							'label' => 'Show IBAN?',
-							'value' => 2,
-							'store' => array(array(0, 'No'), array(1, 'Yes'), array(2, 'Both')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Show IBAN or Account / Bank no.? Valid for Direct Debit and Sofort Banking.'
-					));
-					$form->setElement('select', 'HGW_TRANSACTION_MODE', array(
-							'label' => 'Sandbox mode',
-							'value' => 1,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'If enabled, all transaction will be send to Heidelpay Sandbox. Otherwise all transactions are real transactions and each transaction is charged.'
-					));
-					$form->setElement('select', 'HGW_VA_BOOKING_MODE', array(
-							'label' => 'PayPal booking mode',
-							'value' => 1,
-							'store' => array(array(1, 'debit'), array(2, 'reservation'), array(3, 'registration with debit'), array(4, 'registration with reservation')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => '<b>Please note: PayPal Account needs to be configured for recurring transactions, if you want use the registration feature.<b>'
-					));
-					$this->installPrepaymentMail();
-					$this->installBarPayMail();
-					$this->installDirectDebitMail();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.08.25':
-				// moved getFormUrl and preparePostData to controller
-			case '14.09.02':
-			case '14.09.17':
-			case '14.10.15':
-				try{
-					$msg .= '* update 14.10.15<br />';
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '14.11.19':
-			case '14.12.10':
-			case '14.12.22':
-				try{
-					$msg .= '* update 14.12.22<br />';
-					$this->createEvents();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.01.30':
-				try{
-					$msg .= '* update 15.01.30<br />';
-					if($this->assertRequiredPluginsPresent(array('HeidelActions'))){
-						throw new Enlight_Exception("Please uninstall Heidelpay Backend Plugin (HeidelActions)");
-					}
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.02.12':
-			case '15.02.23':
-			case '15.03.04':
-			case '15.03.06':
-			case '15.03.12':
-				try{
-					$msg .= '* update 15.03.12<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_GIR_CHANNEL', array(
-							'label'=>'Giropay Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.03.17':
-				try{
-					$msg .= '* update 15.03.17<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_IDE_CHANNEL', array(
-							'label'=>'Ideal Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.03.19':
-			case '15.04.09':
-				try{
-					$msg .= '* update 15.04.09<br />';
-					$this->createTransactionsTable();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.04.20':
-			case '15.04.22':
-				try{
-					$msg .= '* update 15.04.22<br />';
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.04.28':
-			case '15.05.04':
-			case '15.05.11':
-			case '15.05.13':
-			case '15.05.18':
-				try{
-					$msg .= '* update 15.05.18<br />';
-					$this->createPayments();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.05.27':
-			case '15.05.29':
-			case '15.06.03':
-			case '15.06.10':
-			case '15.06.17':
-			case '15.06.30':
-			case '15.07.07':
-			case '15.08.28':
-			case '15.09.02':
-				try{
-					$msg .= '* update 15.09.02<br />';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_MPA_CHANNEL', array(
-							'label'=>'MasterPass Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-					$form->setElement('select', 'HGW_MPA_BOOKING_MODE', array(
-							'label' => 'MasterPass booking mode',
-							'value' => 1,
-							'store' => array(array(1, 'debit'), array(2, 'reservation')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
-					$this->alterRGTable();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.09.07':
-			case '15.09.08':
-			case '15.09.10':
-				try{
-					$msg .= '* update 15.09.10<br />';
-					$this->addPluginTranslation();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.09.14':
-			case '15.09.15':
-				try{
-					$msg .= '* update 15.09.15<br />';
-					$this->createPayments();
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.09.18':
-			case '15.09.21':
-			case '15.09.22':
-			case '15.09.25':
-			case '15.10.07':
-			case '15.10.08':
-			case '15.10.14':
-			case '15.10.16':
-			case '15.10.19':
-				try{
-					$msg .= '* update 15.10.19<br />';
-					$form->setElement('select', 'HGW_CHB_STATUS', array(
-							'label' => 'Chargeback State',
-							'value' => 35,
-							'store' => 'base.PaymentStatus',
-							'displayField' => 'description',
-							'valueField' => 'id',
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'This state is set if a direct debit is bounced or at a credit card chargeback'
-					));
-					$this->addPluginTranslation();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.10.27':
-			case '15.11.02':
-			case '15.11.17':
-				try{
-					$msg .= '* update 15.11.17<br />';
-					$this->createTable();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '15.11.30':
-			case '15.12.02':
-			case '16.02.22':
-			case '16.03.10':
-			case '16.03.22':
-				try{
-					$msg .= '* update 16.03.22<br />';
-					$this->createEvents();
-					$this->addSnippets();
-					$this->alterRGTable();
-					$this->deactivateYapital();
-					$form->setElement('text', 'HGW_HPF_CC_CSS', array(
-							'label'=>'Path to hPF CSS for creditcard',
-							'value'=> '',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our creditcard form.'
-					));
-					$form->setElement('text', 'HGW_HPF_DC_CSS', array(
-							'label'=>'Path to hPF CSS for debitcard',
-							'value'=> '',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our debitcard form.'
-					));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.04.08':
-				try{
-					$msg .= '* update 16.04.08<br />';
-					$this->addSnippets();
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.04.25':
-				try{
-					$msg .= '* update 16.04.25<br />';
-					$this->addSnippets();
-					$this->createPayments();
-					$this->addPluginTranslation();
-					$this->alterRGTable();
-					$form->setElement('text', 'HGW_PAPG_CHANNEL', array(
-							'label'=>'Gesicherter Rechnungskauf',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
-					));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.06.06':
-			case '16.06.16':
-				try {
-					$msg .= '* Update 16.06.16';
-					$this->createPayments();
-					$form->setElement('text', 'HGW_P24_CHANNEL', array(
-							'label'=>'Przelewy24 Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
+        $msg = 'Update Fehler. Alte Modulversion: '.$oldVersion.'<br />';
+        $form = $this->Form();
+        switch($oldVersion){
+            case '14.05.08':
+            case '14.05.15':
+            case '14.05.22':
+            case '14.06.03':
+                try{
+                    $msg .= '* update 14.06.03<br />';
+                    $form->setElement('select', 'HGW_MOBILE_CSS', array(
+                        'label' => 'activate mobile CSS',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.06.10':
+            case '14.06.18':
+                try{
+                    $msg .= '* update 14.06.18<br />';
+                    $this->createEvents();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.06.27':
+            case '14.07.07':
+            case '14.07.08':
+            case '14.07.09':
+                try{
+                    $msg .= '* update 14.07.09<br />';
+                    $this->installDirectDebitMail();
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.11':
+                try{
+                    $msg .= '* update 14.08.11<br />';
+                    $this->installPrepaymentMail();
+                    $this->installBarPayMail();
+                    $this->installDirectDebitMail();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.13':
+                try{
+                    $msg .= '* update 14.08.13<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_PF_CHANNEL', array(
+                        'label'=>'PostFinance Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.15':
+                try{
+                    $msg .= '* update 14.08.15<br />';
+                    $this->getInfo();
+                    $this->createLoggingUser();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.22':
+                try{
+                    $msg .= '* update 14.08.22<br />';
+                    $form->setElement('select', 'HGW_PP_MAIL', array(
+                        'label' => 'Send pay data via mail',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Send payment information in additional email. Available for BarPay, Prepayment and Direct Debit.'
+                    ));
+                    $form->setElement('select', 'HGW_IBAN', array(
+                        'label' => 'Show IBAN?',
+                        'value' => 2,
+                        'store' => array(array(0, 'No'), array(1, 'Yes'), array(2, 'Both')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Show IBAN or Account / Bank no.? Valid for Direct Debit and Sofort Banking.'
+                    ));
+                    $form->setElement('select', 'HGW_TRANSACTION_MODE', array(
+                        'label' => 'Sandbox mode',
+                        'value' => 1,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'If enabled, all transaction will be send to Heidelpay Sandbox. Otherwise all transactions are real transactions and each transaction is charged.'
+                    ));
+                    $form->setElement('select', 'HGW_VA_BOOKING_MODE', array(
+                        'label' => 'PayPal booking mode',
+                        'value' => 1,
+                        'store' => array(array(1, 'debit'), array(2, 'reservation'), array(3, 'registration with debit'), array(4, 'registration with reservation')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => '<b>Please note: PayPal Account needs to be configured for recurring transactions, if you want use the registration feature.<b>'
+                    ));
+                    $this->installPrepaymentMail();
+                    $this->installBarPayMail();
+                    $this->installDirectDebitMail();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.08.25':
+                // moved getFormUrl and preparePostData to controller
+            case '14.09.02':
+            case '14.09.17':
+            case '14.10.15':
+                try{
+                    $msg .= '* update 14.10.15<br />';
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '14.11.19':
+            case '14.12.10':
+            case '14.12.22':
+                try{
+                    $msg .= '* update 14.12.22<br />';
+                    $this->createEvents();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.01.30':
+                try{
+                    $msg .= '* update 15.01.30<br />';
+                    if($this->assertRequiredPluginsPresent(array('HeidelActions'))){
+                        throw new Enlight_Exception("Please uninstall Heidelpay Backend Plugin (HeidelActions)");
+                    }
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.02.12':
+            case '15.02.23':
+            case '15.03.04':
+            case '15.03.06':
+            case '15.03.12':
+                try{
+                    $msg .= '* update 15.03.12<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_GIR_CHANNEL', array(
+                        'label'=>'Giropay Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.03.17':
+                try{
+                    $msg .= '* update 15.03.17<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_IDE_CHANNEL', array(
+                        'label'=>'Ideal Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.03.19':
+            case '15.04.09':
+                try{
+                    $msg .= '* update 15.04.09<br />';
+                    $this->createTransactionsTable();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.04.20':
+            case '15.04.22':
+                try{
+                    $msg .= '* update 15.04.22<br />';
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.04.28':
+            case '15.05.04':
+            case '15.05.11':
+            case '15.05.13':
+            case '15.05.18':
+                try{
+                    $msg .= '* update 15.05.18<br />';
+                    $this->createPayments();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.05.27':
+            case '15.05.29':
+            case '15.06.03':
+            case '15.06.10':
+            case '15.06.17':
+            case '15.06.30':
+            case '15.07.07':
+            case '15.08.28':
+            case '15.09.02':
+                try{
+                    $msg .= '* update 15.09.02<br />';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_MPA_CHANNEL', array(
+                        'label'=>'MasterPass Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                    $form->setElement('select', 'HGW_MPA_BOOKING_MODE', array(
+                        'label' => 'MasterPass booking mode',
+                        'value' => 1,
+                        'store' => array(array(1, 'debit'), array(2, 'reservation')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP));
+                    $this->alterRGTable();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.09.07':
+            case '15.09.08':
+            case '15.09.10':
+                try{
+                    $msg .= '* update 15.09.10<br />';
+                    $this->addPluginTranslation();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.09.14':
+            case '15.09.15':
+                try{
+                    $msg .= '* update 15.09.15<br />';
+                    $this->createPayments();
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.09.18':
+            case '15.09.21':
+            case '15.09.22':
+            case '15.09.25':
+            case '15.10.07':
+            case '15.10.08':
+            case '15.10.14':
+            case '15.10.16':
+            case '15.10.19':
+                try{
+                    $msg .= '* update 15.10.19<br />';
+                    $form->setElement('select', 'HGW_CHB_STATUS', array(
+                        'label' => 'Chargeback State',
+                        'value' => 35,
+                        'store' => 'base.PaymentStatus',
+                        'displayField' => 'description',
+                        'valueField' => 'id',
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'This state is set if a direct debit is bounced or at a credit card chargeback'
+                    ));
+                    $this->addPluginTranslation();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.10.27':
+            case '15.11.02':
+            case '15.11.17':
+                try{
+                    $msg .= '* update 15.11.17<br />';
+                    $this->createTable();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '15.11.30':
+            case '15.12.02':
+            case '16.02.22':
+            case '16.03.10':
+            case '16.03.22':
+                try{
+                    $msg .= '* update 16.03.22<br />';
+                    $this->createEvents();
+                    $this->addSnippets();
+                    $this->alterRGTable();
+                    $this->deactivateYapital();
+                    $form->setElement('text', 'HGW_HPF_CC_CSS', array(
+                        'label'=>'Path to hPF CSS for creditcard',
+                        'value'=> '',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our creditcard form.'
+                    ));
+                    $form->setElement('text', 'HGW_HPF_DC_CSS', array(
+                        'label'=>'Path to hPF CSS for debitcard',
+                        'value'=> '',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our debitcard form.'
+                    ));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.04.08':
+                try{
+                    $msg .= '* update 16.04.08<br />';
+                    $this->addSnippets();
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.04.25':
+                try{
+                    $msg .= '* update 16.04.25<br />';
+                    $this->addSnippets();
+                    $this->createPayments();
+                    $this->addPluginTranslation();
+                    $this->alterRGTable();
+                    $form->setElement('text', 'HGW_PAPG_CHANNEL', array(
+                        'label'=>'Gesicherter Rechnungskauf',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                    ));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.06.06':
+            case '16.06.16':
+                try {
+                    $msg .= '* Update 16.06.16';
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_P24_CHANNEL', array(
+                        'label'=>'Przelewy24 Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
-			case '16.07.01':
-				try {
-					$msg .= '* Update 16.07.01';
-					$this->createPayments();
-					$form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array(
-							'label' => 'Direct Debit guarantee mode',
-							'value' => 2,
-							'store' => array( array(1, 'Yes'), array(2, 'No')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Please consider, that a special contract is needed'
-					));
+            case '16.07.01':
+                try {
+                    $msg .= '* Update 16.07.01';
+                    $this->createPayments();
+                    $form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array(
+                        'label' => 'Direct Debit guarantee mode',
+                        'value' => 2,
+                        'store' => array( array(1, 'Yes'), array(2, 'No')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Please consider, that a special contract is needed'
+                    ));
 
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
-			case '16.07.15':
-				try {
-					$this->createPayments();
-					$msg .= '* Update 16.07.15';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.08.01':
-			case '16.08.06':
-			case '16.08.08':
-				try {
-					$msg .= '* Update 16.08.08';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.08.30':
-			case '16.09.14':
-			case '16.09.21':
-				try {
-					$msg .= '* Update 16.09.14';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.09.30':
-			case '16.10.01':
-				try{
-					$msg .= '* update 16.10.01<br />';
-					$this->createPayments();
-					$this->addSnippets();
-					$form->setElement('text', 'HGW_EPS_CHANNEL', array(
-							'label'=>'EPS Channel',
-							'value'=>'',
-							'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.10.11':
-				try{
-					$msg .= '* update 16.10.11<br />';
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-			case '16.10.31':
-				try{
-					$msg .= '* update 16.10.31 <br />';
-					$form = $this->update161028($form);
+            case '16.07.15':
+                try {
+                    $this->createPayments();
+                    $msg .= '* Update 16.07.15';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.08.01':
+            case '16.08.06':
+            case '16.08.08':
+                try {
+                    $msg .= '* Update 16.08.08';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.08.30':
+            case '16.09.14':
+            case '16.09.21':
+                try {
+                    $msg .= '* Update 16.09.14';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.09.30':
+            case '16.10.01':
+                try{
+                    $msg .= '* update 16.10.01<br />';
+                    $this->createPayments();
+                    $this->addSnippets();
+                    $form->setElement('text', 'HGW_EPS_CHANNEL', array(
+                        'label'=>'EPS Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.10.11':
+                try{
+                    $msg .= '* update 16.10.11<br />';
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            case '16.10.31':
+                try{
+                    $msg .= '* update 16.10.31 <br />';
+                    $form = $this->update161028($form);
 
-				}catch(Exception $e){
-					$this->logError($msg, $e);
-				}
-				// new method responseRegAction added and changed precedure after sending transaction to payment
-			case '16.11.18':
-				try {
-					$msg .= '* update 16.11.18 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.11.29':
-				try {
-					$msg .= '* update 16.11.18 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '16.12.04':
-				// Fix for reregistration in Emotiontemplate
-				try {
-					$msg .= '* update 16.12.04 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '17.01.09':
-				// only version number changed
-				try {
-					$msg .= '* update 17.01.09 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '17.01.20':
-			case '17.01.25':
-			case '17.01.31':
-			case '17.02.21':
-			case '17.02.23':
-				// issues in Emotion-template with redirection after registration
-				// recreated checkoutflow for both templates
-				// added Basket-API for Santander-Payment
-				try {
-					$msg .= '* update 17.02.21 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-				
-			case '17.03.13':
-			case '17.03.15':
-			case '17.03.16':
-			case '17.04.01':
-			case '17.04.10':
-				// changes for invoice payment - set payment-status after ACK-transaction to "review necessary"
-				// changes for prepayment - to show accountinfo to customers and merchant
-				// changes for prepayment - removed view of Short ID uppon the prepayment text in view "Orders" for customers
-				// changes in heidelpays Basket-Api use
-				// Fix for AboCommerce users
-				// IV-payments will not longer marked as paid by push RESs, only RC will mark an order to paid
-				// set HP-Basket-Api-calls for santander, invoice with gurantee (papg) and direct debit with insurance
-				// did some code refactoring from if/elseif to switch/case
-				// changed some responseparameter names
-				// added 3 new switches for sending prepayment-, invoice- and directDebit-Emails or not
-				// changed font-size of Invoice-PDF-Template 
-				try {
-					$form->setElement('select', 'HGW_IV_MAIL', array(
-							'label' => 'Zahlungsinformationen für Rechnung per Mail senden',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Zahlungsinformationen für Rechnung, gesicherte Rechnung und Santander in einer zusätzlicher Mail versenden.'
-					));
-					$form->setElement('select', 'HGW_DD_MAIL', array(
-							'label' => 'Zahlungsinformationen für Lastschrift per Mail senden',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Zahlungsinformationen für Lastschrift in einer zusätzlicher Mail versenden.'
-					));
-					$form->setElement('select', 'HGW_PP_MAIL', array(
-							'label' => 'Zahlungsinformationen für Vorkasse per Mail senden',
-							'value' => 0,
-							'store' => array(array(0, 'No'), array(1, 'Yes')),
-							'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
-							'description' => 'Zahlungsinformationen für Vorkasse in einer zusätzlicher Mail versenden.'
-					));
-					$this->updateInvoiceTemplates();
-					$msg .= '* update 17.04.10 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
-			case '17.04.19':
-			case '17.07.26':
-				// fix for missing articleId for shippment-article for secured invoice-payment
-				// fix for missing articleId for voucher for secured invoive-payment
-				// fix in JS for parsing error while setting CSRF-Token in JS of hp_payment.tpl
-				try {
-					$msg .= '* update 17.07.26 <br />';
-				} catch (Exception $e) {
-					$this->logError($msg, $e);
-				}
+                }catch(Exception $e){
+                    $this->logError($msg, $e);
+                }
+            // new method responseRegAction added and changed precedure after sending transaction to payment
+            case '16.11.18':
+                try {
+                    $msg .= '* update 16.11.18 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.11.29':
+                try {
+                    $msg .= '* update 16.11.18 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '16.12.04':
+                // Fix for reregistration in Emotiontemplate
+                try {
+                    $msg .= '* update 16.12.04 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '17.01.09':
+                // only version number changed
+                try {
+                    $msg .= '* update 17.01.09 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '17.01.20':
+            case '17.01.25':
+            case '17.01.31':
+            case '17.02.21':
+            case '17.02.23':
+                // issues in Emotion-template with redirection after registration
+                // recreated checkoutflow for both templates
+                // added Basket-API for Santander-Payment
+                try {
+                    $msg .= '* update 17.02.21 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '17.03.13':
+            case '17.03.15':
+            case '17.03.16':
+            case '17.04.01':
+            case '17.04.10':
+                // changes for invoice payment - set payment-status after ACK-transaction to "review necessary"
+                // changes for prepayment - to show accountinfo to customers and merchant
+                // changes for prepayment - removed view of Short ID uppon the prepayment text in view "Orders" for customers
+                // changes in heidelpays Basket-Api use
+                // Fix for AboCommerce users
+                // IV-payments will not longer marked as paid by push RESs, only RC will mark an order to paid
+                // set HP-Basket-Api-calls for santander, invoice with gurantee (papg) and direct debit with insurance
+                // did some code refactoring from if/elseif to switch/case
+                // changed some responseparameter names
+                // added 3 new switches for sending prepayment-, invoice- and directDebit-Emails or not
+                // changed font-size of Invoice-PDF-Template
+                try {
+                    $form->setElement('select', 'HGW_IV_MAIL', array(
+                        'label' => 'Zahlungsinformationen für Rechnung per Mail senden',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Zahlungsinformationen für Rechnung, gesicherte Rechnung und Santander in einer zusätzlicher Mail versenden.'
+                    ));
+                    $form->setElement('select', 'HGW_DD_MAIL', array(
+                        'label' => 'Zahlungsinformationen für Lastschrift per Mail senden',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Zahlungsinformationen für Lastschrift in einer zusätzlicher Mail versenden.'
+                    ));
+                    $form->setElement('select', 'HGW_PP_MAIL', array(
+                        'label' => 'Zahlungsinformationen für Vorkasse per Mail senden',
+                        'value' => 0,
+                        'store' => array(array(0, 'No'), array(1, 'Yes')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Zahlungsinformationen für Vorkasse in einer zusätzlicher Mail versenden.'
+                    ));
+                    $this->updateInvoiceTemplates();
+                    $msg .= '* update 17.04.10 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '17.04.19':
+            case '17.07.26':
+                // fix for missing articleId for shippment-article for secured invoice-payment
+                // fix for missing articleId for voucher for secured invoive-payment
+                // fix in JS for parsing error while setting CSRF-Token in JS of hp_payment.tpl
+                try {
+                    $msg .= '* update 17.07.26 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
             case '17.08.20':
                 //Compatibility for Shopware 5.3
@@ -696,7 +729,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 // Compatibility for Shopware 4.3.6 - 5.3.3
                 // Some changes in Js
                 try {
-                    $msg .= '* update 17.09.25 <br />';
+                    $msg .= '* update 17.09.19 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
@@ -728,29 +761,205 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
+            case '17.10.12':
             case '17.10.26':
-            case '17.11.06':
-                // Resolves a problem while generating PFD-invoice for Santander
-                // Compatibility with SW 5.3.4
-                try {
-                    $msg .= '* update 17.10.26 <br />';
+            case '17.11.07':
+            case '17.11.08':
+            case '17.11.28':
+            case '17.12.12':
+            case '17.12.15':
+                // resolves a problem while generating Santander-PDF-invoice
+                // Introducing Paymentmethod "Payolution direct"
+                // fixes Errors with SW 5.3.4 jQueryAsync-Functionality
+                // adding phonenumber to each payment request if available
+                try{
+                    $this->addSnippets();
+                    $this->createPayments();
+                    $this->update171012();
+                    $this->installInvoiceIvpdMail();
+                    $this->installInvoiceSanMail();
+                    $form->setElement('text', 'HGW_IVPD_CHANNEL',
+                        array(
+                            'label'=>'Payolution Direct Channel',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
+
+                    $msg .= '* update 17.12.15 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
 
-    		// overwrite $msg if update was successful
-			$msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
-		}
+            case '17.12.19':
+                // Hotfix for switching to other PaymentMethods
+                // Fix in BackendHgw for fin-transactions by payolution and santander and IVPG
+                try{
+                    $msg .= '* update 17.12.15 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '18.01.10':
+                // Hotfix for switching to other PaymentMethods on Account-Site
+                try{
+                    $msg .= '* update 18.01.10 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
-		$form->save();
-		$this->Logging($msg);
-		return array(
-				'success' => true,
-				'message' => $msg,
-				'invalidateCache' => array('frontend'),
+            case '18.02.12':
+            case '18.02.15':
+            case '18.03.01':
+            case '18.03.06':
+                // Changes for sending Basket-Api-Request for Santander and Payolution in BackendHgw
+                // function convertOrder() converts a abborded order into a regular order from a pushmessage
+                // Paypal direct redirect without entering e-mail-address in shop
+                // prevents a payment request for Santander and Payolution in case of no birthdate is stored
+                // fixes for payment method santander for Emotion templates
+                // changes in Santander templates for both templatefiles
+                // rebranding of heidelpay Company
+                try{
+                    $this->addSnippets();
+                    $msg .= '* update 18.03.06 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
 
-		);
-	}
+            case '18.03.12':
+            case '18.03.23':
+            case '18.04.09':
+            case '18.04.25':
+            case '18.04.27':
+            case '18.05.11':
+            // added Checkbox for Payolution
+            // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
+            // refactoring EasyCredit max limit
+            // some JS-changes for validation of checkboxes and paymentmethods for all Sw-versions and templates
+            // change of addSnippets() to install DE and EN textsnippets
+            // changes for Santander-variable CONFIG_OPTIN_TEXT from NGW
+            // added Css-File to adjust buttons and inputs to Shopware's
+            // fixed an issue with registration of direct debit registration for Shopware 5.4.x
+
+            try{
+                $this->addSnippets();
+                $msg .= '* update 18.05.23 <br />';
+            } catch (Exception $e) {
+                $this->logError($msg, $e);
+            }
+
+            case '18.05.24':
+                // fixed bug in valPayment.js which could cause an error while clicking on AGB-link
+                try{
+                    $msg .= '* update 18.05.24 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            case '18.06.05':
+                // set minimum / maximum amount for easyCredit
+                try{
+                    $form->setElement('text', 'HGW_EASYMINAMOUNT', array(
+                        'label' => 'Minimum amount for easyCredit',
+                        'value' => 200,
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'change minimum amount for easyCredit only after consultation with heidelpay'
+                    ));
+                    $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
+                        'label' => 'Maximum amount for easyCredit',
+                        'value' => 3000,
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
+                    ));
+                    $this->addSnippets();
+                    $msg .= '* update 18.06.05 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '18.07.11':
+                // fixes for Emotion template for Santander invoice, Payolution invoice and direct debit
+                // fixes a bug in direct debit with registration
+                // changed query for birthdates for all payment methods so that there are no preallocated values
+                // fixed an issue for saving regdata for Santander and Payolution
+                try{
+                    $this->addSnippets();
+                    $msg .= '* update 18.07.11 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
+            // overwrite $msg if update was successful
+            $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
+        }
+
+//        $form->save();
+        $this->Logging($msg);
+        return array(
+            'success' => true,
+            'message' => $msg,
+            'invalidateCache' => array('frontend'),
+        );
+    }
+
+	protected function renamePayments()
+    {
+        // getting paymentmeanname for Frontend
+        $sql = "SELECT * FROM `s_core_paymentmeans` WHERE `name` = 'hgw_sue';";
+        $hgwSufuData = Shopware()->Db()->fetchRow($sql);
+
+        if($hgwSufuData['description'] == "Heidelpay CD-Edition Sofort&uuml;berweisung")
+        {
+            // changing name of Sofü to "Sofort"
+            $sql = "UPDATE s_core_paymentmeans 
+              SET description = 'Heidelpay CD-Edition Sofort' 
+              WHERE description = 'Heidelpay CD-Edition Sofort&uuml;berweisung'";
+            try{
+                Shopware()->Db()->query($sql);
+            } catch (Exception $e)
+            {
+                $this->logError('renamePayments Failure SoFu | Message:', $e);
+            }
+        }
+    }
+
+	protected function update171012()
+    {
+        try {
+            // checks weather the regdata-table can receive Santander transactions
+            $alterRegTable = false;
+            $sql = 'DESCRIBE `s_plugin_hgw_regdata`';
+            $data = Shopware()->Db()->fetchAll($sql);
+
+            foreach ($data as $spalte => $eigenschaften) {
+                foreach ($eigenschaften as $NameEigenschaft => $wert) {
+                    if(strpos($wert,'ivpd')) {
+
+                    } else {
+                        $alterRegTable = true;
+                    }
+                }
+            }
+
+            if ($alterRegTable) {
+                $this->alterRGTable171012();
+            }
+            $alterRegTable = false;
+
+            // inserting IVPD - Mail
+            $sql = "
+				INSERT INTO `s_core_documents_box` (`documentID`, `name`, `style`, `value`)
+					SELECT '1', 'Hgw_IVPD_Content_Info', ?, ?
+					FROM `s_core_documents_box`
+					WHERE NOT EXISTS (SELECT `name` FROM `s_core_documents_box` WHERE name='Hgw_IVPD_Content_Info')
+					LIMIT 1;
+			";
+            Shopware()->Db()->query($sql, array(
+                '.payment_instruction, .payment_instruction td, .payment_instruction tr{ margin: 0; padding: 0; border: 0; font-size:10px; font: inherit; vertical-align: baseline; } .payment_note{ font-size: 10px; color: #333; } .payment_account{ margin: 5px 0 5px 5px; padding: 0; } .payment_account tr, .payment_account td{ margin: 0; padding: 0; border: 0; font-size:10px; font: inherit; vertical-align: baseline; } .payment_account td{ padding: 0 5px 0 0; }',
+                '<br/><div>Bitte &uuml;berweisen Sie den Rechnungsbetrag mit Zahlungsziel innerhalb von 7 Tagen auf folgendes Konto:<table class="payment_account"><tr><td>Kontoinhaber:</td><td>{$instruction.holder}</td></tr><tr><td>IBAN:</td><td>{$instruction.iban}</td></tr><tr><td>BIC:</td><td>{$instruction.bic}</td></tr></table>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{$instruction.connectorAccountUsage}</strong></div>'
+            ));
+        } catch (Exception $e) {
+            $this->logError('update171012() fehlgeschlagen bei Update 171014|', $e);
+        }
+    }
 
 	/** Method to check which functions are necessary for this update
 	 * and do uptdate
@@ -897,6 +1106,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'Theme_Compiler_Collect_Plugin_Less',
 					'addLessFiles'
 					);
+
             // Register your custom JS files, so that they are processed into JS and included in the module template (SW5)
 //            $this->subscribeEvent(
 //                'Theme_Compiler_Collect_Plugin_Javascript',
@@ -919,9 +1129,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	protected function createPayments(){
 		try{
-			$dbErrors = '';
+		    $dbErrors = '';
 			$inst = $this->paymentMethod();
-
+            $swVersion = Shopware()->Config()->version;
 			/* get Shops and check if locale is en_GB */
 			$sql = '
 				SELECT `s_core_shops`.`id`, `s_core_locales`.`locale` FROM `s_core_shops`, `s_core_locales`
@@ -950,7 +1160,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			foreach ($inst as $key => $val){
 				// search for old hgw-paymethods
-				if ($this->assertVersionGreaterThen('5.2')) {
+				if (version_compare($swVersion,"5.2.0",">=")) {
 
 					$sql = 'SELECT * FROM `s_core_paymentmeans` WHERE `name`="hgw_'.$val['name'].'";';
 					try {
@@ -1001,7 +1211,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$where		= array("id = ".(int)$getOldPayments['id']);
 
 
-					if ($this->assertVersionGreaterThen('5.2')) {
+//					if ($this->assertVersionGreaterThen('5.2')) {
+					if (version_compare($swVersion,"5.2.0",">=")) {
 						try {
 							$affRows = Shopware()->Db()->update('s_core_paymentmeans', $newData, $where);
 							$dbErrors .= Shopware()->Db()->getErrorMessage();
@@ -1029,7 +1240,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						}
 					}
 				} else {
-					if ($this->assertVersionGreaterThen('5.2')) {
+					if (version_compare($swVersion,"5.2.0",">=")) {
 
 						$bind = array(
 								':name' 		=> "hgw_".$val['name'],
@@ -1067,9 +1278,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 								'additionaldescription' => $val['additionaldescription']
 						))->save();
 					}
-
-
-
 				}
 			}
 
@@ -1153,6 +1361,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 '<br/><div>Bitte &uuml;berweisen Sie den Rechnungsbetrag mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto:<table class="payment_account"><tr><td>Kontoinhaber:</td><td>{$instruction.holder}</td></tr><tr><td>IBAN:</td><td>{$instruction.iban}</td></tr><tr><td>BIC:</td><td>{$instruction.bic}</td></tr></table>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{$instruction.connectorAccountUsage}</strong></div>'
             ));
 
+            // create db entry for additional Santander invoice text, if not already set
+            $sql = "
+				INSERT INTO `s_core_documents_box` (`documentID`, `name`, `style`, `value`)
+					SELECT '1', 'Hgw_IVPD_Content_Info', ?, ?
+					FROM `s_core_documents_box`
+					WHERE NOT EXISTS (SELECT `name` FROM `s_core_documents_box` WHERE name='Hgw_IVPD_Content_Info')
+					LIMIT 1;
+			";
+            Shopware()->Db()->query($sql, array(
+                '.payment_instruction, .payment_instruction td, .payment_instruction tr{ margin: 0; padding: 0; border: 0; font-size:10px; font: inherit; vertical-align: baseline; } .payment_note{ font-size: 10px; color: #333; } .payment_account{ margin: 5px 0 5px 5px; padding: 0; } .payment_account tr, .payment_account td{ margin: 0; padding: 0; border: 0; font-size:10px; font: inherit; vertical-align: baseline; } .payment_account td{ padding: 0 5px 0 0; }',
+                '<br/><div>Bitte &uuml;berweisen Sie den Rechnungsbetrag mit Zahlungsziel innerhalb von 7 Tagen auf folgendes Konto:<table class="payment_account"><tr><td>Kontoinhaber:</td><td>{$instruction.holder}</td></tr><tr><td>IBAN:</td><td>{$instruction.iban}</td></tr><tr><td>BIC:</td><td>{$instruction.bic}</td></tr></table>Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{$instruction.connectorAccountUsage}</strong></div>'
+            ));
+
         }catch(Exception $e){
 			$this->Logging('createTable | '.$e->getMessage());
 			return;
@@ -1167,7 +1388,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$sql = "CREATE TABLE IF NOT EXISTS `s_plugin_hgw_regdata` (
 				`id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 				`userID` bigint(20) UNSIGNED NOT NULL,
-				`payType` enum('cc','dc','dd','va','mpa','papg','san') NOT NULL,
+				`payType` enum('cc','dc','dd','va','mpa','papg','san','ivpd') NOT NULL,
 				`uid` varchar(32) NOT NULL,
 				`cardnr` varchar(25) NOT NULL,
 				`expMonth` tinyint(2) UNSIGNED NOT NULL,
@@ -1237,6 +1458,25 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		}
 	}
 
+	/** Method to change registrationtable hgw_regdata
+	 * 	adds in field "payType" an enum-entry "ivpd"
+	 *
+	 * @return
+	 */
+	protected function alterRGTable171012() {
+		$sql = "
+				ALTER TABLE `s_plugin_hgw_regdata`
+				CHANGE `payType`
+				`payType` ENUM( 'cc', 'dc', 'dd', 'va', 'mpa', 'papg', 'san', 'ivpd' )
+				CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL
+			";
+		try{
+			Shopware()->Db()->query($sql);
+		}catch(Exception $e){
+			$this->Logging('alterRGTable171012() | '.$e->getMessage());
+		}
+	}
+
 	/**
 	 * Method to create payment plugin config form (backend)
 	 */
@@ -1256,7 +1496,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setElement('text', 'HGW_IV_CHANNEL', array('label'=>'Invoice Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_PAPG_CHANNEL', array('label'=>'Invoice with guarantee Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_SAN_CHANNEL', array('label'=>'Santander Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
-			$form->setElement('text', 'HGW_P24_CHANNEL', array('label'=>'Przelewy24 Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+            $form->setElement('text', 'HGW_IVPD_CHANNEL', array('label'=>'Payolution branded Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+            $form->setElement('text', 'HGW_P24_CHANNEL', array('label'=>'Przelewy24 Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_SUE_CHANNEL', array('label'=>'Sofort Banking Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_GIR_CHANNEL', array('label'=>'Giropay Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_VA_CHANNEL', array('label'=>'PayPal Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
@@ -1269,7 +1510,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $form->setElement('text', 'HGW_HPR_CHANNEL', array('label'=>'EasyCredit Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array('label' => 'Gesicherte Lastschrift', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use direct debit with guarantee.'));
 
-			$bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
+            $bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
 			$form->setElement('select', 'HGW_CC_BOOKING_MODE', array(
 					'label' => 'Credit Card booking mode',
 					'value' => 1,
@@ -1336,7 +1577,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			));
 			$secret= strtoupper(sha1(mt_rand(10000, mt_getrandmax())));
 			$form->setElement('text', 'HGW_SECRET', array('label'=>'Secret', 'value'=>''.$secret.'', 'required' => true, 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Secret to verify the server response. Change only if necessary'));
-			$form->setElement('text', 'HGW_ERRORMAIL', array('label'=>'Error E-Mail address', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+//			$form->setElement('text', 'HGW_ERRORMAIL', array('label'=>'Error E-Mail address', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('select', 'HGW_DD_MAIL', array(
 					'label' => 'Send pay data for direct debit via mail',
 					'value' => 0,
@@ -1379,6 +1620,18 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
 					'description' => 'Is the recognition disabled, the registered payment data will be discarded, if the customer changes the delivery address after the registration.'
 			));
+            $form->setElement('text', 'HGW_EASYMINAMOUNT', array(
+                'label' => 'Minimum amount for easyCredit',
+                'value' => 200,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
+            ));
+            $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
+                'label' => 'Maximum amount for easyCredit',
+                'value' => 3000,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
+            ));
 			$form->setElement('text', 'HGW_HPF_CC_CSS', array(
 					'label'=>'Path to hPF CSS for creditcard',
 					'value'=> '',
@@ -1397,7 +1650,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setParent($repository->findOneBy(array('name' => 'Payment')));
 
 			$this->addPluginTranslation();
-			$form->save();
 		}catch(Exception $e){
 			$this->Logging('createForm | '.$e->getMessage());
 			return;
@@ -1412,9 +1664,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$newData	= array("active" => 0);
 			$where		= array("pluginID = ".(int)$this->getId());
-
+            $swVersion  = Shopware()->Config()->version;
 			// deactivate Plugin itself
-			if ($this->assertVersionGreaterThen('5.1.8')) {
+			if (version_compare($swVersion,"5.2.0",">=")) {
 				try {
 					$where		= array("id = ".(int)$this->getId());
 
@@ -1435,7 +1687,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 			// set all Heidelpay paymentmethods to inactive
-			if ($this->assertVersionGreaterThen('5.1.8')) {
+            if (version_compare($swVersion,"5.2.0",">=")) {
 				try {
 					$where		= array("name LIKE 'hgw_%'");
 
@@ -1455,9 +1707,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				Shopware()->Payments()->update($newData, $where);
 			}
 
-
-
-			$sql = 'DELETE FROM `s_core_documents_box` WHERE `name` LIKE ?';
+            $sql = 'DELETE FROM `s_core_documents_box` WHERE `name` LIKE ?';
 			Shopware()->Db()->query($sql, array('Hgw_%'));
 			$this->Logging('Deinstallation erfolgreich');
 
@@ -1521,56 +1771,62 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
 				$view->assign('Containers', $containerData);
 			}elseif(
-					($document->_order->payment['name'] == 'hgw_iv') || ($document->_order->payment['name'] == 'hgw_papg')
-					|| ($document->_order->payment['name'] == 'hgw_san')
-					){
-						$orderData = $view->getTemplateVars('Order');
-						$containers = $view->getTemplateVars('Containers');
+			    ($document->_order->payment['name'] == 'hgw_iv') ||
+                ($document->_order->payment['name'] == 'hgw_papg') ||
+                ($document->_order->payment['name'] == 'hgw_san') ||
+                ($document->_order->payment['name'] == 'hgw_ivpd')
 
-                        if($document->_order->payment['name'] == 'hgw_san')
-                        {
-                            $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'SAN');
-                            $containers['Hgw_SAN_Content_Info']['value'] = $rawFooter['value'];
-                        } else {
-                            $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'IV');
-                            $containers['Hgw_IV_Content_Info']['value'] = $rawFooter['value'];
-                        }
-						// is necessary to get the data into the invoice template
-						$view->assign('Containers', $containers);
+				){
+				    $orderData = $view->getTemplateVars('Order');
+					$containers = $view->getTemplateVars('Containers');
 
-						$trans = $this->getTransactionByTransType($document->_order->order['transactionID'], 'PA');
-						$transData = json_decode($trans['jsonresponse'], true);
+                    if($document->_order->payment['name'] == 'hgw_san')
+                    {
+                        $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'SAN');
+                        $containers['Hgw_SAN_Content_Info']['value'] = $rawFooter['value'];
+                    } elseif ($document->_order->payment['name'] == 'hgw_ivpd'){
+                        $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'IVPD');
+                        $containers['Hgw_IVPD_Content_Info']['value'] = $rawFooter['value'];
+                    } else {
+                        $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'IV');
+                        $containers['Hgw_IV_Content_Info']['value'] = $rawFooter['value'];
+                    }
+					// is necessary to get the data into the invoice template
+					$view->assign('Containers', $containers);
 
-						$paymentInstruction['amount'] 			= htmlentities($transData['CLEARING_AMOUNT'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['currency'] 		= htmlentities($transData['CLEARING_CURRENCY'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['country'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_COUNTRY'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['holder'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_HOLDER'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['accountNumber']	= htmlentities($transData['CONNECTOR_ACCOUNT_NUMBER'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['bankCode'] 		= htmlentities($transData['CONNECTOR_ACCOUNT_BANK'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['iban'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_IBAN'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['bic'] 				= htmlentities($transData['CONNECTOR_ACCOUNT_BIC'], ENT_QUOTES, 'UTF-8');
-						$paymentInstruction['shortId'] 			= htmlentities($transData['IDENTIFICATION_SHORTID'], ENT_QUOTES, 'UTF-8');
-                        $paymentInstruction['connectorAccountUsage'] = htmlentities($transData['CONNECTOR_ACCOUNT_USAGE'], ENT_QUOTES, 'UTF-8');
+					$trans = $this->getTransactionByTransType($document->_order->order['transactionID'], 'PA');
+					$transData = json_decode($trans['jsonresponse'], true);
 
-						$document->_template->addTemplateDir(dirname(__FILE__) . '/Views/');
-						$document->_template->assign('instruction', (array) $paymentInstruction);
+					$paymentInstruction['amount'] 			= htmlentities($transData['CLEARING_AMOUNT'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['currency'] 		= htmlentities($transData['CLEARING_CURRENCY'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['country'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_COUNTRY'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['holder'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_HOLDER'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['accountNumber']	= htmlentities($transData['CONNECTOR_ACCOUNT_NUMBER'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['bankCode'] 		= htmlentities($transData['CONNECTOR_ACCOUNT_BANK'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['iban'] 			= htmlentities($transData['CONNECTOR_ACCOUNT_IBAN'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['bic'] 				= htmlentities($transData['CONNECTOR_ACCOUNT_BIC'], ENT_QUOTES, 'UTF-8');
+					$paymentInstruction['shortId'] 			= htmlentities($transData['IDENTIFICATION_SHORTID'], ENT_QUOTES, 'UTF-8');
+                    $paymentInstruction['connectorAccountUsage'] = htmlentities($transData['CONNECTOR_ACCOUNT_USAGE'], ENT_QUOTES, 'UTF-8');
 
-						$containerData = $view->getTemplateVars('Containers');
+					$document->_template->addTemplateDir(dirname(__FILE__) . '/Views/');
+					$document->_template->assign('instruction', (array) $paymentInstruction);
 
-                        if($document->_order->payment['name'] == 'hgw_san')
-                        {
-                            $containerData['Content_Info'] = $containerData['Hgw_SAN_Content_Info'];
-                            $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
-                            $view->assign('Containers', $containerData);
-                        } else {
-                            $containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
-                            $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
-                            $view->assign('Containers', $containerData);
-                        }
+					$containerData = $view->getTemplateVars('Containers');
 
-//						$containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
-//						$containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
-//						$view->assign('Containers', $containerData);
+                    if($document->_order->payment['name'] == 'hgw_san')
+                    {
+                        $containerData['Content_Info'] = $containerData['Hgw_SAN_Content_Info'];
+                        $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
+                        $view->assign('Containers', $containerData);
+                    } elseif($document->_order->payment['name'] == 'hgw_ivpd') {
+                        $containerData['Content_Info'] = $containerData['Hgw_IVPD_Content_Info'];
+                        $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
+                        $view->assign('Containers', $containerData);
+                    } else {
+                        $containerData['Content_Info'] = $containerData['Hgw_IV_Content_Info'];
+                        $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
+                        $view->assign('Containers', $containerData);
+                    }
 			}
 		}catch(Exception $e){
 			$this->Logging('onBeforeRenderDocument | '.$e->getMessage());
@@ -1583,7 +1839,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function onPostDispatch(Enlight_Event_EventArgs $args){
 
-		$request = $args->getSubject()->Request();
+        $request = $args->getSubject()->Request();
 		$response = $args->getSubject()->Response();
 		$config = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
 		$view = $args->getSubject()->View();
@@ -1593,8 +1849,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		// SSL Problem?! http://forum.shopware.com/allgemein-f25/nach-update-auf-4-3-1-resource-shop-not-found-klarna-t22933.html
 
 		if($request->getModuleName() == 'frontend'){
-
-			$realpath 		= realpath(dirname(__FILE__));
+            $realpath 		= realpath(dirname(__FILE__));
 			$pluginPath 	= substr($realpath,strpos($realpath, '/engine'));
 			$basepath		= Shopware()->System()->sCONFIG['sBASEPATH'];
 			$shopPath		= substr($basepath,strpos($basepath, '/'));
@@ -1614,12 +1869,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
                 $shippingAmount = $shipping['value'];
 
-                if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 3000) {
+                if (
+                    $basketAmount+$shippingAmount >= $config->HGW_EASYMINAMOUNT &&
+                    $basketAmount+$shippingAmount <= $config->HGW_EASYMAXAMOUNT
+                ) {
                     $view->activeEasy = "TRUE";
                     $view->easyAmount = $basketAmount+$shippingAmount;
+                    $view->HGW_EASYMINAMOUNT = $config->HGW_EASYMINAMOUNT;
+                    $view->HGW_EASYMAXAMOUNT = $config->HGW_EASYMAXAMOUNT;
                 } else {
                     $view->activeEasy = "FALSE";
                     $view->easyAmount = $basketAmount+$shippingAmount;
+                    $view->HGW_EASYMINAMOUNT = $config->HGW_EASYMINAMOUNT;
+                    $view->HGW_EASYMAXAMOUNT = $config->HGW_EASYMAXAMOUNT;
                 }
             }
 
@@ -1641,7 +1903,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						if(($config->HGW_DC_BOOKING_MODE == '3') || ($config->HGW_DC_BOOKING_MODE == '4')){ $view->heidel_bm_dc = true; }
 						if(($config->HGW_DD_BOOKING_MODE == '3') || ($config->HGW_DD_BOOKING_MODE == '4')){ $view->heidel_bm_dd = true; }
 						if(($config->HGW_VA_BOOKING_MODE == '3') || ($config->HGW_VA_BOOKING_MODE == '4')){ $view->heidel_bm_va = true; }
-						
+
 						setlocale(LC_TIME, Shopware()->Locale()->getLanguage(), Shopware()->Shop()->getLocale()->getLocale());
 						
 						$view->heidel_iban	= $config->HGW_IBAN;
@@ -1655,9 +1917,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             $view->extendsTemplate('register/hp_payment.tpl');
                         }
 
-
-						$file = realpath(dirname(__FILE__)).'/Controllers/Frontend/PaymentHgw.php';
-
+                        $file = realpath(dirname(__FILE__)).'/Controllers/Frontend/PaymentHgw.php';
 						if(file_exists($file)){
 							require_once($file);
 							$basket	= Shopware()->Modules()->Basket()->sGetBasket();
@@ -1673,6 +1933,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 									(($request->getControllerName() == 'account') && ($action == 'payment')) ||
 									(($request->getControllerName() == 'checkout') && (($action == 'confirm') || ($action == 'shippingPayment')))
 								){
+
 										$avPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
 
 										$user = Shopware()->Modules()->Admin()->sGetUserData();
@@ -1686,7 +1947,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 												if($pm == 'pay'){ $pm = va; }
 												$bookingMode = $config->{'HGW_'.strtoupper($pm).'_BOOKING_MODE'};
 												$data = $this->getRegData($user['additional']['user']['id'], $pm);
-
 												$last = mktime(23,59,00,$data['expMonth']+1,0,$data['expYear']);	//timestamp: last day of registration month
 												$shippingHash = $this->createShippingHash($user , $pm);
 
@@ -1713,27 +1973,79 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                                                     if((isset($dobSan)) && ($dobSan['NAME_BIRTHDATE'] != '')){
                                                         $ppd_crit['NAME.BIRTHDATE'] = $dobSan['NAME_BIRTHDATE'];
-                                                        $view->salutation	= $dobSan['NAME_SALUTATION'];
-                                                        $view->birthdate	= $dobSan['NAME_BIRTHDATE'];
+                                                        $view->salutation_san	= $dobSan['NAME_SALUTATION'];
+                                                        $view->birthdate_san	= $dobSan['NAME_BIRTHDATE'];
                                                     }
 
+                                                    $recoveryLogoUrl ='https://www.santander.de/media/bilder/logos/logos_privatkunden/logo.gif';
+                                                    $recoveryTextOptin = '<strong>Ja, ich bin damit einverstanden, dass meine Daten an die Santander Consumer Bank AG („Santander“)
+                                                                                weitergegeben werden. Die Santander darf diese Daten gerne dazu nutzen, um mich über Produkte der
+                                                                                Santander zu informieren. Natürlich kann ich meine Einwilligung jederzeit mit Wirkung für die Zukunft
+                                                                                widerrufen. Ausführliche Informationen zu dieser Einwilligung sowie die Möglichkeit zum Widerruf
+                                                                                finde ich </strong><a href="https://www.santander.de/applications/rechnungskauf/werbewiderspruch/" target="_blank">hier</a>.
+                                                                            </strong>';
+                                                    $recoveryTextPrivacyPolicy = '<strong>Ich willige in die Übermittlung meiner personenbezogenen Daten an die Santander Consumer Bank AG
+                                                                                    gemäß den näheren Bestimmungen des beigefügten <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Einwilligungserklärungstextes</a> sowie an die darin
+                                                                                    genannten Auskunfteien und in die Durchführung einer automatisierten Entscheidung ein.</strong>
+                                                                                    </br>
+                                                                                    Nähere Informationen finden Sie in den <a href="https://www.santander.de/applications/rechnungskauf/datenschutzbestimmungen" target="_blank">Datenschutzhinweisen</a>
+                                                                                ';
+
                                                     $sanJson 			= json_decode($getFormUrl['CONFIG_OPTIN_TEXT'],true);
-                                                    $optin 				= $sanJson['optin'];
-//                                                    $privacy_policy 	= $sanJson['privacy_policy'];
 
-                                                    $view->optin 			    = $optin;
-                                                    $view->optinText 		    = isset($sanJson['santander_iv_de_werbewiderspruch_optin_text']) ? $sanJson['santander_iv_de_werbewiderspruch_optin_text'] : $sanJson['santander_iv_de_adv_text'];
-                                                    $view->optinLink 		    = isset($sanJson['santander_iv_de_werbewiderspruch_link']) ? $sanJson['santander_iv_de_werbewiderspruch_link'] : $sanJson['santander_iv_de_adv_link'];
+                                                    $view->optin_San_logoUrl 		= empty($sanJson['logolink'])       ? $recoveryLogoUrl          : $sanJson['logolink'];
+                                                    $view->optin_San_adv		    = empty($sanJson['optin'])          ? $recoveryTextOptin        : $sanJson['optin'];
+                                                    $view->optin_San_privpol		= empty($sanJson['privacy_policy']) ? $recoveryTextPrivacyPolicy: $sanJson['privacy_policy'];
 
-                                                    $view->accountHolder	    = $getFormUrl['ACCOUNT_HOLDER'];
-                                                    $view->checkOptin           = $dobSan['CUSTOMER_OPTIN'];
-                                                    $view->checkPrivacyPolicy   = $dobSan['CUSTOMER_ACCEPT_PRIVACY_POLICY'];
+                                                    $view->accountHolder_San	    = $getFormUrl['ACCOUNT_HOLDER'];
+                                                    $view->checkOptin_San           = strtoupper($dobSan['CUSTOMER_OPTIN']);
+                                                    $view->checkPrivacyPolicy_San   = strtoupper($dobSan['CUSTOMER_ACCEPT_PRIVACY_POLICY']);
 
-//                                                    $view->privacy_policy 	= $privacy_policy;
-                                                    $view->privacy_policy_text 	= isset($sanJson['santander_iv_de_datenschutzbestimmungen_optin_text']) ? $sanJson['santander_iv_de_datenschutzbestimmungen_optin_text'] : $sanJson['santander_iv_de_privpol_text'];
-                                                    $view->privacy_policy_link 	= isset($sanJson['santander_iv_de_datenschutzbestimmungen_link']) ? $sanJson['santander_iv_de_datenschutzbestimmungen_link'] : $sanJson['santander_iv_de_privpol_link'];
+                                                    $view->logoLink_San             = isset($sanJson['santander_iv_logo_link']) ? $sanJson['santander_iv_logo_link'] : $sanJson['santander_iv_img_link'];
 
-                                                    $view->logoLink             = isset($sanJson['santander_iv_logo_link']) ? $sanJson['santander_iv_logo_link'] : $sanJson['santander_iv_img_link'];
+                                                }
+
+
+                                                if($pm == 'ivpd')
+                                                {   // do initial request to get infotext
+                                                    $regData = $this->getRegData($user['additional']['user']['id'], $pm);
+                                                    $getFormUrl = Shopware_Controllers_Frontend_PaymentHgw::getFormUrl($pm, $bookingMode, $user['additional']['user']['id'], $tempID, Null, NULL, NULL, true);
+                                                    // get registrated data from database
+                                                    $registratedData = json_decode($regData['payment_data'],true);
+
+                                                    if((isset($registratedData)) && ($registratedData != '')){
+                                                        $view->salutation_ivpd	= $registratedData['NAME_SALUTATION'];
+                                                        $view->birthdate_ivpd	= $registratedData['NAME_BIRTHDATE'];
+                                                        $view->phonenumber_ivpd	= $registratedData['CONTACT_PHONE'];
+                                                    }
+                                                    // show telephone-entry if customer is from NL
+                                                    if($user['additional']['countryShipping']['countryiso'] == "NL")
+                                                    {
+                                                        $view->showPhoneEntry = "TRUE";
+                                                    }
+                                                    $payolutionText = $getFormUrl['CONFIG_OPTIN_TEXT'];
+
+                                                    $replaceText = '<p id="payolutiontext"><input type="checkbox" id="hgw_privpol_ivpd" name="cbIvpd" class="checkbox">  ';
+                                                    $searchText = '<p id="payolutiontext">';
+                                                    $textToShow = str_ireplace($searchText,$replaceText,$payolutionText);
+
+                                                    $view->optinText        = $textToShow;
+                                                    $view->accountHolder    = $getFormUrl['ACCOUNT_HOLDER'];
+                                                }
+
+                                                if($pm == "dd" && $config->HGW_DD_GUARANTEE_MODE == 1){
+                                                    $regDataDD          = $this->getRegData($user['additional']['user']['id'], $pm);
+                                                    $registratedDataDD  = json_decode($regDataDD['payment_data'],true);
+
+                                                    if((isset($registratedDataDD)) && ($registratedDataDD != '')){
+                                                        $view->salutation_dd	= $registratedDataDD['NAME_SALUTATION'];
+                                                        $view->birthdate_dd	    = $registratedDataDD['NAME_BIRTHDATE'];
+                                                    }
+
+                                                    if((isset($regDataDD['kto'])) && ($regDataDD['kto'] != '')){
+                                                        $view->iban_heidel_dd	= $regDataDD['kto'];
+                                                    }
+
 
                                                 }
 
@@ -1753,17 +2065,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 														}
 													}
 													if(!empty($getFormUrl) && $getFormUrl['PROCESSING_RESULT'] == 'NOK'){
-
-														$_SESSION['Shopware']['HPError'] = Shopware_Controllers_Frontend_PaymentHgw::getHPErrorMsg($getFormUrl['PROCESSING_RETURN_CODE'], true);
+                                                        $_SESSION['Shopware']['HPError'] = Shopware_Controllers_Frontend_PaymentHgw::getHPErrorMsg($getFormUrl['PROCESSING_RETURN_CODE'], true);
 														$this->Logging($pm.' | '.$getFormUrl['PROCESSING_RETURN_CODE'].' | '.$getFormUrl['PROCESSING_RETURN']);
 													}
 												}
 
-
-												if((!empty($data)) && (($data['expMonth'] != '0') && ($data['expYear'] != '0') && ($last < time())) || (($data['shippingHash'] != $shippingHash) && $config->HGW_SHIPPINGHASH == 0) || (($bookingMode == 1) || ($bookingMode == 2))){
+                                                if((!empty($data)) && (($data['expMonth'] != '0') && ($data['expYear'] != '0') && ($last < time())) || (($data['shippingHash'] != $shippingHash) && $config->HGW_SHIPPINGHASH == 0) || (($bookingMode == 1) || ($bookingMode == 2))){
 													unset($regData[$pm]);
 												}
-
 											}
 										}
 
@@ -1777,19 +2086,18 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 										if ($config->HGW_DD_GUARANTEE_MODE == 1 ) {
 											$view->ddWithGuarantee 		= true;
-
-										} else {
+                                        } else {
 											$view->ddWithGuarantee 		= false;
 										}
 
 										if($config->HGW_MOBILE_CSS){
 											if(
-													(strtolower(Shopware()->Shop()->getTemplate()->getAuthor()) == 'shopware ag') ||
-													(is_int(strpos(strtolower(Shopware()->Shop()->getTemplate()->getName()),'emotion'))) ||
-													(is_int(strpos(strtolower(Shopware()->Shop()->getTemplate()->getTemplate()),'responsive'))) ||
-													(is_int(strpos(strtolower(Shopware()->Shop()->getTemplate()->getTemplate()),'bare')))
-													){
-														$view->isMobile = false;
+											    (strtolower(Shopware()->Shop()->getTemplate()->getAuthor()) == 'shopware ag') ||
+												(is_int(strpos(strtolower(Shopware()->Shop()->getTemplate()->getName()),'emotion'))) ||
+												(is_int(strpos(strtolower(Shopware()->Shop()->getTemplate()->getTemplate()),'responsive'))) ||
+												(is_int(strpos(strtolower(Shopware()->Shop()->getTemplate()->getTemplate()),'bare')))
+                                            ){
+												$view->isMobile = false;
 											}else{
 												$view->isMobile = $this->isMobile();
 											}
@@ -1814,31 +2122,117 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             // Case for Santander to save Values to DB to use them in Request on gatewayAction()
             if(
                 ($request->getControllerName() == 'checkout' &&  $action == 'saveShippingPayment') ||
+                ($request->getControllerName() == 'checkout' &&  $action == 'payment') ||
                 ($request->getControllerName() == 'account' &&  $action == 'savePayment')
+
             )
             {
-                if ($request->getPost("CUSTOMER_ACCEPT_PRIVACY_POLICY") == "TRUE")
+                //load Userdata to check payment method
+                $user = Shopware()->Modules()->Admin()->sGetUserData();
+
+                // check if IVPD is active
+                if(
+                    ($request->getPost("BRAND") == "PAYOLUTION_DIRECT") &&
+                    ($user['additional']['payment']['name'] == "hgw_ivpd")
+                )
+                {
+                    //save Birthdate to DB
+                    $flag = ENT_COMPAT;
+                    $enc = 'UTF-8';
+                    $salutation         = $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : '';
+                    $nameBirthdate      = $request->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($request->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
+                    $contactPhone       = $request->getPost('CONTACT_PHONE') == true ? htmlspecialchars($request->getPost('CONTACT_PHONE'), $flag, $enc) : '';
+                    //daten in DB Speichern
+                    // Benoetigte User-Indexe bei SW.516 anders vergeben
+                    $user = self::formatUserInfos($user);
+
+                    $payment_data = [
+                        "NAME_BIRTHDATE"  => $nameBirthdate,
+                        "NAME_SALUTATION" => $salutation,
+                        "CONTACT_PHONE"   => $contactPhone
+                    ];
+
+                    $sql = '
+			          INSERT INTO `s_plugin_hgw_regdata`(`userID`, `payType`, `uid`, `cardnr`, `expMonth`, `expYear`, `brand`, `owner`,
+					  `kto`, `blz`, `chan`, `shippingHash`, `email`, `payment_data`)
+				      VALUES (:userID, :payType , :uid, :cardnr, :expMonth, :expYear, :brand, :owner,
+					  :kto, :blz, :chan, :shippingHash, :email, :payment_data)
+			          ON DUPLICATE KEY UPDATE
+					  uid = :uidNew, cardnr = :cardnrNew, expMonth = :expMonthNew, expYear = :expYearNew, brand = :brandNew, owner = :ownerNew,
+					  kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
+
+                    $params = array(
+                        'userID' 	=> !empty($user['additional']['user']['userID']) && $user['additional']['user']['userID'] != "" ? $user['additional']['user']['userID'] : $user['additional']['user']['id'],
+                        'payType' 	=> "ivpd",
+                        'uid' 		=> "0",
+                        'cardnr' 	=> "0",
+                        'expMonth' 	=> "0",
+                        'expYear' 	=> "0",
+                        'brand' 	=> "PAYOLUTION_DIRECT",
+                        'owner' 	=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
+                        'kto' 		=> "0",
+                        'blz' 		=> "0",
+                        'chan' 		=> $config->HGW_IVPD_CHANNEL,
+                        'shippingHash' => "0",
+                        'email' 	=> $user['additional']['user']['email'],
+                        'payment_data' => json_encode($payment_data),
+
+                        'uidNew' 		=> "0",
+                        'cardnrNew' 	=> "0",
+                        'expMonthNew' 	=> "0",
+                        'expYearNew' 	=> "0",
+                        'brandNew'		=> "PAYOLUTION_DIRECT",
+                        'ownerNew'		=> $user['additional']['user']['lastname'].' '.$user['additional']['user']['firstname'],
+                        'ktoNew' 		=> "0",
+                        'blzNew' 		=> "0",
+                        'chanNew' 		=> $config->HGW_IVPD_CHANNEL,
+                        'shippingHashNew'=> "0",
+                        'emailNew' 		=> $user['additional']['user']['email'],
+                        'payment_dataNew' => json_encode($payment_data)
+                    );
+
+                    try {
+                        Shopware()->Db()->query($sql, $params);
+                    }
+                    catch (Exception $e) {
+                        $this->logError("IVPD saving to DB | ". $e->getMessage());
+                    }
+                }
+
+                // Case for Santander
+                if (
+                    ($request->getPost("BRAND") == "SANTANDER") &&
+                    ($user['additional']['payment']['name'] == "hgw_san")
+                )
                 {
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
-                    $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year')) : '';
-                    $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
-                    $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
-
+                    $birthdate = $request->getPost("NAME_BIRTHDATE");
+                    if(!empty($birthdate)){
+                        $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
+                    } else {
+                        $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'), $flag, $enc) : '';
+                        $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
+                        $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
+                        $nameBirthdate = $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay;
+                    }
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
 
                     // Benoetigte User-Indexe bei SW.516 anders vergeben
                     $user = self::formatUserInfos($user);
 
+                    $customerOptIn  = $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')), $flag, $enc) : 'FALSE';
+                    $customerOptIn2 = $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY')), $flag, $enc) : null;
+                    if(empty($customerOptIn2) || $customerOptIn2 == null)
+                    {
+                        $customerOptIn2 = $request->getPost('CUSTOMER_OPTIN_2') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN_2')), $flag, $enc) : 'FALSE';
+                    }
                     $payment_data = [
-                        "NAME_BIRTHDATE"                    => $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay,
-                        "CUSTOMER_OPTIN"                    =>
-                            $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars($request->getPost('CUSTOMER_OPTIN'), $flag, $enc) : 'FALSE',
-                        "CUSTOMER_ACCEPT_PRIVACY_POLICY"    =>
-                            $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY'), $flag, $enc) : 'FALSE',
-                        "NAME_SALUTATION"                   =>
-                            $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
+                        "NAME_BIRTHDATE"                    => $nameBirthdate,
+                        "CUSTOMER_OPTIN"                    => $customerOptIn,
+                        "CUSTOMER_ACCEPT_PRIVACY_POLICY"    => $customerOptIn2,
+                        "NAME_SALUTATION"                   => $request->getPost('NAME_SALUTATION') == true ? htmlspecialchars($request->getPost('NAME_SALUTATION'), $flag, $enc) : 'MR',
                     ];
 
                     $sql = '
@@ -1851,7 +2245,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					        kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
 
                     $params = array(
-                        'userID' 	=> $user['additional']['user']['userID'],
+                        'userID' 	=> !empty($user['additional']['user']['userID']) && $user['additional']['user']['userID'] != "" ? $user['additional']['user']['userID'] : $user['additional']['user']['id'],
                         'payType' 	=> "san",
                         'uid' 		=> "0",
                         'cardnr' 	=> "0",
@@ -1905,7 +2299,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				}
 
 				// fix for missing csrf-token in SW 5.2 and greater
-				if ($this->assertVersionGreaterThen('5.1.6')) {
+                $swVersion = Shopware()->Config()->version;
+
+				if (version_compare($swVersion,"5.2.0",">=")) {
 					if ($request->getPost('__csrf_token')!= false ) {
 						$view->token = $request->getPost('__csrf_token');
 					}
@@ -1976,23 +2372,28 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
         $shippingAmount = $shipping['value'];
 
-        if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 3000)
-        {
+        if (
+            $basketAmount+$shippingAmount >= Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT &&
+            $basketAmount+$shippingAmount <= Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT
+        ){
             $view->activeEasy = "TRUE";
             $view->easyAmount = $basketAmount+$shippingAmount;
+            $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+            $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
         } else {
             $view->activeEasy = "FALSE";
             $view->easyAmount = $basketAmount+$shippingAmount;
+            $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+            $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
         }
 
-        // Function to show EasyCredit text on choose-payment-site
+        // Function to show EasyCredit-text on choose-payment-site
         if (
             ($request->getControllerName() == 'checkout') &&
             (strtolower($user['additional']['payment']['name']) == 'hgw_hpr') &&
             ((Shopware()->Session()->HPdidRequest == 'FALSE') || (empty(Shopware()->Session()->HPdidRequest)) )
         )
         {
-
             // collect paymentdata for HP.IN
             $basket	= Shopware()->Modules()->Basket()->sGetBasket();
             $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
@@ -2044,6 +2445,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $view->extendsTemplate('register/hp_payment_hpr.tpl');
         }
 
+        if (
+            ($request->getControllerName() == 'checkout') &&
+            ($request->getActionName() == 'shippingPayment') &&
+            (strtolower($user['additional']['payment']['name']) == 'hgw_ivpd')
+        )
+        {
+        }
         //after chosen HPR redirect to EasyCredit
         if (
             //case for Responsive template
@@ -2064,11 +2472,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         {
             // redirect to EasyCredit
             if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-
                 if (Shopware()->Session()->wantEasy) {
                     return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                 } else {
-                    Shopware()->Session()->wantEasy = true;
                     return $args->getSubject()->redirect(array(
                         'forceSecure' => 1,
                         'controller' => 'account',
@@ -2080,7 +2486,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             }else{
 
                 if (Shopware()->Session()->wantEasy) {
-//                    if (!empty(trim($responseHpr['FRONTEND_REDIRECT_URL']))) {
                     if ($responseHpr['FRONTEND_REDIRECT_URL']) {
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
@@ -2095,7 +2500,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'sTarget' => 'checkout'
                     ));
                 }
-
             }
         }
 
@@ -2111,9 +2515,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             ){
                 // fetching transaction of INI from Db
                 $transaction = self::getHgwTransactions(Shopware()->Session()->sessionId);
-
                 if ($transaction) {
-
                     $parameters = json_decode($transaction['jsonresponse']);
                     /* check if submitted address is same as deliveryaddress
                      * and if amount sent is same as amount in basket
@@ -2171,6 +2573,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         $view->activeEasy = "TRUE";
                         $view->easyAmount = $basketAmount+$shippingAmount;
+                        $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+                        $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
 
                         if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                             $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
@@ -2195,12 +2599,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                     if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                         $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
-
                         $view->extendsTemplate('payment_hgw/checkout.tpl');
                         $view->extendsTemplate('payment_hgw/checkout_confirm_footer.tpl');
                     }else{
                         $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
-
                         $view->extendsTemplate('payment_hgw/checkout.tpl');
                         $view->extendsTemplate('payment_hgw/checkout_footer.tpl');
                     }
@@ -2221,10 +2623,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             }else {
                 $args->getSubject()->forward('shippingPayment', 'checkout');
             }
-
         }
 
-        // Setting template for checkout finish to show interest and ammount with interest
+        // Setting template for checkout finish to show interest and ammount with interest for EasyCredit
         if (
             ($request->getControllerName() == 'checkout') &&
             ($request->getActionName() == 'finish') &&
@@ -2271,66 +2672,68 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $view = $args->getSubject()->View();
 
         $user = Shopware()->Modules()->Admin()->sGetUserData();
-        $basket	= Shopware()->Modules()->Basket()->sGetBasket();
-        $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
+        if($user['additional']['payment']['name'] == "hgw_hpr"){
+            $basket	= Shopware()->Modules()->Basket()->sGetBasket();
+            $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
+            $configData = $this->ppd_config('5', 'HPR');
+            $userData 	= $this->ppd_user($user,'hpr');
 
-        $configData = $this->ppd_config('5', 'HPR');
-        $userData 	= $this->ppd_user($user,'hpr');
-        $basketData = $this->getBasketId();
-        $konfiguration = self::Config();
-        $secret = $konfiguration['HGW_SECRET'];
+            $konfiguration = self::Config();
+            $secret = $konfiguration['HGW_SECRET'];
 
-        $additional = array(
-            'PRESENTATION.AMOUNT' 	=> $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
-            'PRESENTATION.CURRENCY' => Shopware()->Currency()->getShortName(),
-            'IDENTIFICATION.TRANSACTIONID' => Shopware()->SessionID(),
-            'CRITERION.SECRET' 		=> hash('sha512', Shopware()->SessionID().$secret),
-            'CRITERION.SESS'		=> Shopware()->Session()->sessionId,
-            'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ? 'TRUE' : 'FALSE',
-            'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
-            'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> empty($countOrderForCustomer['COUNT(id)']) ? "0" : $countOrderForCustomer['COUNT(id)'],
+            $additional = array(
+                'PRESENTATION.AMOUNT' 	=> $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
+                'PRESENTATION.CURRENCY' => Shopware()->Currency()->getShortName(),
+                'IDENTIFICATION.TRANSACTIONID' => Shopware()->SessionID(),
+                'CRITERION.SECRET' 		=> hash('sha512', Shopware()->SessionID().$secret),
+                'CRITERION.SESS'		=> Shopware()->Session()->sessionId,
+                'RISKINFORMATION.CUSTOMERGUESTCHECKOUT' => $user['additional']['user']['accountmode'] == '0' ? 'TRUE' : 'FALSE',
+                'RISKINFORMATION.CUSTOMERSINCE' 		=> $user['additional']['user']['firstlogin'],
+                'RISKINFORMATION.CUSTOMERORDERCOUNT' 	=> empty($countOrderForCustomer['COUNT(id)']) ? "0" : $countOrderForCustomer['COUNT(id)'],
 
-        );
+            );
 
-        $allPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
-        foreach($allPayments as $key => $value){
-            $avPayments[$value['name']] = $value;
-        }
-
-        // only do Request if EasyCredit is active
-        if(array_key_exists('hgw_hpr',$avPayments))
-        {
-            // prepare data and do request
-            $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
-            $responseHpr 	= $this->doRequest($requestData);
-
-            //preparing OptIn-text to show
-            $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
-
-            $optinText = str_replace('{', '', $optinText);
-            $optinText = str_replace('"optin": "', '', $optinText);
-            $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
-            $optinText = str_replace('"', '', $optinText);
-            $optinText = str_replace('}', '', $optinText);
-
-            //expand template
-            $view->configOptInText = $optinText;
-
-            if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-                $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
-            }else{
-                $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+            $allPayments = Shopware()->Modules()->Admin()->sGetPaymentMeans();
+            foreach($allPayments as $key => $value){
+                $avPayments[$value['name']] = $value;
             }
-            $view->extendsTemplate('register/hp_payment_hpr.tpl');
 
-
-            if (
-            ($args->getSubject()->Request()->getControllerName() == 'checkout')
-            )
+            // only do Request if EasyCredit is active
+            if(array_key_exists('hgw_hpr',$avPayments))
             {
-                if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
-                    Shopware()->Session()->HPdidRequest = 'TRUE';
-                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                $basketData = $this->getBasketId();
+                // prepare data and do request
+                $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,$additional);
+                $responseHpr 	= $this->doRequest($requestData);
+
+                //preparing OptIn-text to show
+                $optinText = $responseHpr['CONFIG_OPTIN_TEXT'];
+
+                $optinText = str_replace('{', '', $optinText);
+                $optinText = str_replace('"optin": "', '', $optinText);
+                $optinText = str_replace('%TESTSHOPVARIABLE%', 'dieser Onlineshop', $optinText);
+                $optinText = str_replace('"', '', $optinText);
+                $optinText = str_replace('}', '', $optinText);
+
+                //expand template
+                $view->configOptInText = $optinText;
+
+                if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
+                    $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
+                }else{
+                    $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+                }
+                $view->extendsTemplate('register/hp_payment_hpr.tpl');
+
+
+                if (
+                ($args->getSubject()->Request()->getControllerName() == 'checkout')
+                )
+                {
+                    if (!empty($responseHpr['FRONTEND_REDIRECT_URL'])) {
+                        Shopware()->Session()->HPdidRequest = 'TRUE';
+                        return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                    }
                 }
             }
         }
@@ -2531,7 +2934,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			// check if user is logged in, otherweise set dummy data
 			if(Shopware()->Modules()->Admin()->sCheckUser()){
 				if($user == NULL){ $user = Shopware()->Modules()->Admin()->sGetUserData(); }
-				// use shipping adress instead of billing adress, if set/possible
+                // getting Customer's userid to save regdata in regData-table
+                $ppd_user['CRITERION.USER_ID']	= !empty($user['additional']['user']['userID']) ? $user['additional']['user']['userID'] : $user['additional']['user']['customerId'];
+                // use shipping adress instead of billing adress, if set/possible
 				if($pm == 'va'  || $pm == 'mpa'){
 
 					$countryId = $user['shippingaddress']['countryID'] != '' ? $user['shippingaddress']['countryID'] : $user['billingaddress']['countryID'];
@@ -2544,11 +2949,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$ppd_user['ADDRESS.STREET'] 	.= $user['shippingaddress']['streetnumber'] != '' ? $user['shippingaddress']['streetnumber'] : $user['billingaddress']['streetnumber'];
 					$ppd_user['ADDRESS.ZIP'] 		= $user['shippingaddress']['zipcode'] != '' ? $user['shippingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
 					$ppd_user['ADDRESS.CITY'] 		= $user['shippingaddress']['city'] != '' ? $user['shippingaddress']['city'] : $user['billingaddress']['city'];
+					$ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
+
 				}else{
 					$countryInfo = Shopware()->Modules()->Admin()->sGetCountry($user['billingaddress']['countryID']);
 					if (strtoupper($user['billingaddress']['salutation']) == 'MS') {
 						$user['billingaddress']['salutation'] = 'MRS';
 					}
+
 					$ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
 					$ppd_user['NAME.SALUTATION']	= strtoupper($user['billingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['billingaddress']['salutation']);
 					$ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'];
@@ -2556,6 +2964,31 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
 					$ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
 					$ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
+                    $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
+
+					if($pm == 'san' || $pm == 'ivpd')
+					{
+                        //fetching count of orders of customer
+                        $countOrderForCustomer = '';
+                        $sql = 'SELECT COUNT(id) FROM `s_order` WHERE userID ="'.$user['additional']['user']['userID'].'" AND ordernumber != "0"';
+                        $countOrderForCustomer = Shopware()->Db()->fetchRow($sql);
+                        $countryId = $user['shippingaddress']['countryID'] != '' ? $user['shippingaddress']['countryID'] : $user['billingaddress']['countryID'];
+                        $countryInfo = Shopware()->Modules()->Admin()->sGetCountry($countryId);
+
+                        $ppd_user['CRITERION.USER_ID']	= $user['additional']['user']['userID'];
+                        $ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
+                        $ppd_user['NAME.GIVEN']			= $user['shippingaddress']['firstname'] != '' ? $user['shippingaddress']['firstname'] : $user['billingaddress']['firstname'];
+                        $ppd_user['NAME.FAMILY']		= $user['shippingaddress']['lastname'] != '' ? $user['shippingaddress']['lastname'] : $user['billingaddress']['lastname'];
+                        $ppd_user['ADDRESS.STREET'] 	= $user['shippingaddress']['street'] != '' ? $user['shippingaddress']['street'] : $user['billingaddress']['street'];
+                        $ppd_user['ADDRESS.STREET'] 	.= $user['shippingaddress']['streetnumber'] != '' ? $user['shippingaddress']['streetnumber'] : $user['billingaddress']['streetnumber'];
+                        $ppd_user['ADDRESS.ZIP'] 		= $user['shippingaddress']['zipcode'] != '' ? $user['shippingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
+                        $ppd_user['ADDRESS.CITY'] 		= $user['shippingaddress']['city'] != '' ? $user['shippingaddress']['city'] : $user['billingaddress']['city'];
+                        $ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
+
+                        $ppd_user['RISKINFORMATION.CUSTOMERGUESTCHECKOUT']  = $user['additional']['user']['accountmode'] == '0' ?  'FALSE':'TRUE';
+                        $ppd_user['RISKINFORMATION.CUSTOMERSINCE'] 		    = $user['additional']['user']['firstlogin'];
+                        $ppd_user['RISKINFORMATION.CUSTOMERORDERCOUNT'] 	= $countOrderForCustomer['COUNT(id)'];
+                    }
 				}
 
 				$kundenNummer = '';
@@ -2595,7 +3028,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function prepareBasketData($basket = NULL, $user = NULL){
 		try{
-			$basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
+            $basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
 			$user == NULL	?	$user = Shopware()->Modules()->Admin()->sGetUserData()	: $user;
 
             $shippingCostVariable = Shopware()->Session()->sOrderVariables;
@@ -2645,6 +3078,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 				$count++;
 			};
+
 			// adding shipping costs as an article
 			$shoppingCart['basket']['basketItems'][] = array(
 					'position'				=> $count,
@@ -2669,18 +3103,23 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			} else {
 				$amountTotalVat = $basket['sAmountTax'];
 			}
-	
+
 			// adding total amounts basket-Api-information
-			$basketTotalData['basket'] = array(
-			
-					'amountTotalNet'	=> str_replace('.','',$basket['AmountNetNumeric']*100),
-					'amountTotalVat'	=> str_replace(',','.',$amountTotalVat)* 100,
-					'currencyCode'		=> Shopware()->Currency()->getShortName(),
-					'itemCount'			=> count($shoppingCart['basket']['basketItems']),
-			);
+            $amountTotalNet      = number_format($basket['AmountNetNumeric'], 4,".","");
+            $amountTotalNet      = bcmul($amountTotalNet, 100, 0);
 
-			$shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
+            $amountTotalGross    = number_format($basket["AmountNumeric"], 4,".","");
+            $amountTotalGross    = bcmul($amountTotalGross, 100, 0);
 
+            $amountTotalVatCalc 		= number_format(bcsub($amountTotalGross,$amountTotalNet),0,".","");
+            $basketTotalData['basket'] = [
+                'amountTotalNet' => $amountTotalNet,
+                'amountTotalVat' => $amountTotalVatCalc,
+                'currencyCode'   => !empty($basket["sCurrencyName"])  ? $basket["sCurrencyName"]: "EUR",
+                'itemCount'		 => count($shoppingCart['basket']['basketItems']),
+            ];
+
+            $shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());
@@ -2808,7 +3247,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			if(array_key_exists('raw', $params)){
 				$res = json_decode($response->getBody(), true);
 				if($response->isError()){
-					self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
+					self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
 				}
 				return $res;
 				exit;
@@ -2820,7 +3259,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			parse_str($res, $result);
 
 			if(($result['PROCESSING_RESULT'] == 'NOK') && ($result['PROCESSING_STATUS'] == 'REJECTED_VALIDATION')){
-				self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$result['PROCESSING_RETURN']);
+				self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$result['PROCESSING_RETURN']);
 			}
 
 			if($this->Config()->HGW_DEBUG > 0 && Shopware()->Front()->Request()->getActionName() == 'gateway'){
@@ -2845,7 +3284,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			return $result;
 		}catch(Exception $e){
-			self::Logging('doRequest '.$params["PAYMENT.CODE"].'| '.$e->getMessage());
+			self::Logging('doRequest '.$params["PAYMENT.CODE"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$e->getMessage());
 			return;
 		}
 	}
@@ -3032,7 +3471,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			);
 			$inst[] = array(
 					'name'			=> 'sue',
-					'description'	=> 'Heidelpay CD-Edition Sofort&uuml;berweisung',
+					'description'	=> 'Heidelpay CD-Edition Sofort',
 					'trans_desc' 	=> 'Heidelpay CD-Edition Sofort Banking',
 			);
 			$inst[] = array(
@@ -3076,12 +3515,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'trans_desc' 	=> 'Heidelpay CD-Edition PostFinance',
 			);
             $inst[] = array(
+                'name'			=> 'ivpd',
+                'description'	=> 'Payolution Rechnungskauf',
+                'trans_desc' 	=> 'Payolution invoice payment',
+            );
+            $inst[] = array(
                 'name'			=> 'hpr',
                 'description'	=> 'Heidelpay CD-Edition ratenkauf by easyCredit',
                 'trans_desc' 	=> 'Heidelpay CD-Edition Hire purchase by easyCredit',
                 'additionalDescription' => '
 								<div class="EasyPermission">
-									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (200 - 3.000 EUR). </p>
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR). </p>
 								</div>',
                 'template' 		=> 'hp_payment_hpr.tpl',
 
@@ -3114,6 +3558,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$this->Logging('addSnippets | '.$e->getMessage());
 			return;
 		}
+
 		foreach($langs as $key => $lang){
 			if(is_int(strpos($lang['locale'],'de_'))){
 				$snipLang = 'de';
@@ -3122,9 +3567,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 			$snippets = $this->snippets();
+
 			foreach($snippets as $key => $snippet){
 				// check if all array elements are set and lang matches
-				if((count(array_filter($snippet)) == '4') && ($snipLang == $snippet['1'])){
+
+                if($snippet[1] == "de")
+                { $lang['id'] = "1";}
+                else {$lang['id'] = "2";}
+
+				if((count(array_filter($snippet)) == '4') /*&& ($snipLang == $snippet['1'])*/){
 					$sql = 'SELECT `id` FROM `s_core_snippets` WHERE `namespace` = ? AND `shopID` = ? AND `localeID` = ? AND `name` = ?';
 					$data = Shopware()->Db()->fetchAll($sql, array($snippet['0'], '1', $lang['id'], $snippet['2']));
 
@@ -3190,10 +3641,70 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-100.400.110','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-100.400.110','Please choose another payment method');
         // added for Santander
-        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.107','Es ist ein technischer Fehler aufgetreten. </br> Bitte w&auml;hlen Sie eine andere Zahlart');
-        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.107','A technical error has occured. </br> Please choose another payment method');
-        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.113','Es ist ein technischer Fehler aufgetreten. </br> Bitte w&auml;hlen Sie eine andere Zahlart');
-        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.113','A technical error has occured. </br> Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.100','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.100','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.101','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.101','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.102','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.102','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.103','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.103','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.104','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.104','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.105','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.105','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.106','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.106','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.107','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.107','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.108','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.108','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.109','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.109','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.110','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.110','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.111','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.111','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.112','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.112','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.113','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.113','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.114','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.114','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.115','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.115','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.116','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.116','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.117','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.117','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.118','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.118','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.119','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.119','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.120','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.120','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.121','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.121','This paymentmethod can´t be quoted to you. Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.122','Die von Ihnen gew&auml;hlte Zahlungsart kann Ihnen leider nicht angeboten werden. Bitte w&auml;hlen Sie eine andere Zahlungsart aus.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.122','This paymentmethod can´t be quoted to you.  Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.123','Finalisierungsbetrag muss mit offenem Betrag &uuml;bereinstimmen');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.123','finalize-amount must match open amount');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.124','Finalisierung bedarf Basked-Id');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.124','finalize needs basketId');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.125','Finalisierungsbetrag muss mit offenem Betrag &uuml;bereinstimmen');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.125','finalize-amount must match open amount');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-400.100.126','Refund wurde vom Versicherer zur&uuml;ckgewiesen');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-400.100.126','refund not accepted by insurance provider');
+
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.800','Versicherung wurde bereits aktiviert');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.800','Insurance is already activated');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.801','Versicherung wurde bereits beendet');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.801','Insurance has already been cancelled');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.802','Versicherungsaktivierungsdatum &uuml;berschritten');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.802','Activation deadline is in the past');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.804','Transaktion wurde zum Versicherer bereits &uuml;bermittelt');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.804','Transaction already submitted to insurance provider');
+        // Ende Santander Codes
 
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.151','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.151','Please choose another payment method');
@@ -3213,14 +3724,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.171','Please choose another payment method');
 		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.300.101','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.300.101','Please choose another payment method');
-        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge (200 - 3.000 EUR) ');
-        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of 200 and 3000 EUR');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR) ');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' and '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge (200 - 5000 EUR) ');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of 200 and 5000 EUR');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.153','Die verwendete Adresse wurde nicht gefunden');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.153','Sorry, your address could not be found');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.152','Die verwendete Adresse wurde nicht gefunden');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.152','Sorry, your address could not be found');
-
-        $snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
 
         $snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','en','PaymentProcess','Payment process');
@@ -3231,21 +3742,27 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 		$snippets[] = array('frontend/payment_heidelpay/success','de','PaymentSuccess','Ihr Bezahlvorgang war erfolgreich!');
 		$snippets[] = array('frontend/payment_heidelpay/success','en','PaymentSuccess','Your transaction was successfull!');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','PaymentProcess','Bezahlvorgang');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','PaymentProcess','Payment process');
+
+		// prepayment
 		$snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} Konto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} Bankleitzahl: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{IDENTIFICATION_SHORTID}</strong>');
-        // added for Santander
-        $snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentSanText','Bitte &uuml;berweisen Sie den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} Konto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} Bankleitzahl: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
-        $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentSanText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account with term of payment within 30 days: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
-
         $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
+        // invoice and invoice secured
+        $snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: \nLand: {CONNECTOR_ACCOUNT_COUNTRY} \nKontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} \nKonto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} \nBankleitzahl: {CONNECTOR_ACCOUNT_BANK} \nIBAN: {CONNECTOR_ACCOUNT_IBAN} \nBIC: {CONNECTOR_ACCOUNT_BIC} \n\nGeben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: \n<strong>{IDENTIFICATION_SHORTID}</strong>');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
+        // direct debit
+        $snippets[] = array('frontend/payment_heidelpay/success','de','DirectdebitText','Der Betrag in Höhe von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:\n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nDie Abbuchung enth&auml;lt die Mandatsreferenz-ID:{ACCOUNT_IDENT}\n und die Gl&auml;ubiger ID: {IDENT_CREDITOR_ID}\n\nBitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto.\n\n\nVielen Dank\nMit freundlichen Gr&uuml;&szlig;en\n\n{config name=shopName}\n{config name=address}');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','DirectdebitText','The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from the following account: \n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nThe debit contains the Reference-Id: {ACCOUNT_IDENT}\n and the creditor-id: {IDENT_CREDITOR_ID}\n\n Please ensure that your amount is enough.\n\n\nThanks for Your purchase\nSincere regards,\n\n{config name=shopName}\n{config name=address}');
+        // common
+        $snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceHeader','Rechnungsinformation');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceHeader','Invoiceinformation');
+        // Santander
+        $snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentSanText','Bitte &uuml;berweisen Sie den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} Konto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} Bankleitzahl: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentSanText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account with term of payment within 30 days: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
+        // Payolution
+        $snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentIvpdText','Bitte &uuml;berweisen Sie den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentIvpdText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account with term of payment within 30 days: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
 
-		$snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: \nLand: {CONNECTOR_ACCOUNT_COUNTRY} \nKontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} \nKonto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} \nBankleitzahl: {CONNECTOR_ACCOUNT_BANK} \nIBAN: {CONNECTOR_ACCOUNT_IBAN} \nBIC: {CONNECTOR_ACCOUNT_BIC} \n\nGeben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: \n<strong>{IDENTIFICATION_SHORTID}</strong>');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','DirectdebitText','Der Betrag in Höhe von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:\n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nDie Abbuchung enth&auml;lt die Mandatsreferenz-ID:{ACCOUNT_IDENT}\n und die Gl&auml;ubiger ID: {IDENT_CREDITOR_ID}\n\nBitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto.\n\n\nVielen Dank\nMit freundlichen Gr&uuml;&szlig;en\n\n{config name=shopName}\n{config name=address}');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','DirectdebitText','The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from the following account: \n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nThe debit contains the Reference-Id: {ACCOUNT_IDENT}\n and the creditor-id: {IDENT_CREDITOR_ID}\n\n Please ensure that your amount is enough.\n\n\nThanks for Your purchase\nSincere regards,\n\n{config name=shopName}\n{config name=address}');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceHeader','Rechnungsinformation');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceHeader','Invoiceinformation');
+
 		
 		$snippets[] = array('frontend/payment_heidelpay/success','de','BarpayText','<center><a href=\"{CRITERION_BARPAY_PAYCODE_URL}\" target=\"_blank\" class=\"button-right large\">Klicken Sie hier um Ihren Barcode runterzuladen</a></center> {BARPAY_PAYCODE_URL} \<br /><br />'
 				.'Drucken Sie den Barcode aus oder speichern Sie diesen auf Ihrem mobilen Endger&auml;t. '
@@ -3318,6 +3835,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accInfo','Account information');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_accSalutation','Anrede');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accSalutation','Salutation');
+
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueDay','Tag');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueDay','day');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueMonth','Monat');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueMonth','month');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueYear','Jahr');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueYear','Year');
         //added for Santander
         $snippets[] = array('frontend/register/hp_payment','de','hp_accSal_gender','bitte wählen');
         $snippets[] = array('frontend/register/hp_payment','en','hp_accSal_gender','please choose');
@@ -3325,12 +3849,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accSal_mr','Mr');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_accSal_ms','Frau');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accSal_ms','Ms');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_accSal_unknown','Bitte wählen');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_accSal_unknown','please choose');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_RegisterLabelBirthday','Geburtsdatum');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_RegisterLabelBirthday','Date of birth');
         $snippets[] = array('frontend/register/hp_payment','de','hp_sanAdvPermission','Werbezustimmung');
         $snippets[] = array('frontend/register/hp_payment','en','hp_sanAdvPermission','Permission for advertising');
         $snippets[] = array('frontend/register/hp_payment','de','hp_sanPrivacyPolicy','Datenschutzerklärung');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_sanPrivacyPolicy','privacy policy');
+
+		$snippets[] = array('frontend/register/hp_payment','de','hp_RegisterPhone','telefoonnummer');
+		$snippets[] = array('frontend/register/hp_payment','en','hp_RegisterPhone','phonenumber');
+		$snippets[] = array('frontend/register/hp_payment','nl','hp_RegisterPhone','telefoonnummer');
+
 		$snippets[] = array('frontend/register/hp_payment','de','hp_sepa_classic','Kontonr. &amp; Bankleitzahl');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_sepa_classic','Account no. &amp; Bank no.');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_sepa_iban','IBAN');
@@ -3366,13 +3897,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $snippets[] = array('frontend/register/hp_payment','en','ErrorSalut','You need to enter a salutation to use this payment type.');
         $snippets[] = array('frontend/register/hp_payment','de','ErrorCb','Sie müssen die Datenschutzbestimmungen akzeptieren um diese Zahlart nutzen zu können.');
         $snippets[] = array('frontend/register/hp_payment','en','ErrorCb','You have to accept the privacy policy to use this payment type.');
+        $snippets[] = array('frontend/register/hp_payment','de','ErrorPhone','Sie m&uuml;ssen Ihre Telefonnummer eingeben um diese Zahlart nutzen zu k&ouml;nnen.');
+        $snippets[] = array('frontend/register/hp_payment','en','ErrorPhone','You have to enter your phonenumber to use this payment type.');
         $snippets[] = array('frontend/register/hp_payment','de','hp_payNow','Jetzt bezahlen');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_payNow','Pay now');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_cancelPay','Abbrechen');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_cancelPay','Cancel');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_selectedPayData','Gew&auml;hlte Zahldaten');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_selectedPayData','Selected payment data');
-		$snippets[] = array('frontend/register/hp_payment','de','hp_paypalInfo','Wenn Sie Ihre E-Mail Adresse regestieren m&ouml;chten werden Sie zur Best&auml;tigung Ihrer Daten auf die Seite von PayPal umgeleitet.');
+		$snippets[] = array('frontend/register/hp_payment','de','hp_paypalInfo','Wenn Sie Ihre E-Mail Adresse registieren m&ouml;chten werden Sie zur Best&auml;tigung Ihrer Daten auf die Seite von PayPal umgeleitet.');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_paypalInfo',"You'll be redirectet to PayPal to confirm your data, if you want to register it.");
 		$snippets[] = array('frontend/register/hp_payment','de','hp_moreMpa','über MasterPass');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_moreMpa','about MasterPass');
@@ -3508,7 +4041,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$prms_subject 	= 'Zahldaten zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
 			$prms_content 	= 'Sehr geehrter Kunde,
 
-vielen Dank fuer Ihre Bestellung in userem Shop.
+vielen Dank fuer Ihre Bestellung in unserem Shop.
 
 Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.
 
@@ -3529,7 +4062,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
 			$prms_ishtml 		= 1;
 			$prms_attachment 	= '';
 			$prms_mailtype 		= 1;
@@ -3564,9 +4097,9 @@ Mit freundlichen Gruessen
 
 vielen Dank fuer Ihre Bestellung in userem Shop.
 
-Bitte nutzen Sie zum Bezahlen Ihrer Bestellung folgende Bezahldaten.
+Bezahlen Sie bequem nach Warenerhalt. Alle Zahlungsdetails können Sie später auch Ihrer Rechnung entnehmen. Ab Rechnungsdatum haben Sie 30 Tage Zeit, diese zu begleichen.
 
-Zahlungsziel: Innerhalb 30 Tage
+Zahlungsziel: 30 Tage nach Warenerhalt
 Betrag: {$AMOUNT} {$CURRENCY}
 Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}
 Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}
@@ -3584,7 +4117,59 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$IDENTIFICATION_SHORTID}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bezahlen Sie bequem nach Warenerhalt. Alle Zahlungsdetails können Sie später auch Ihrer Rechnung entnehmen. Ab Rechnungsdatum haben Sie 30 Tage Zeit, diese zu begleichen.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>Konto-Nr.: {$CONNECTOR_ACCOUNT_NUMBER}<br/>Bankleitzahl: {$CONNECTOR_ACCOUNT_BANK}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$CONNECTOR_ACCOUNT_USAGE}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+            $prms_ishtml 		= 1;
+            $prms_attachment 	= '';
+            $prms_mailtype 		= 1;
+            $prms_context 		= 'a:10:{s:6:"AMOUNT";s:5:"73.98";s:8:"CURRENCY";s:3:"EUR";s:25:"CONNECTOR_ACCOUNT_COUNTRY";s:3:"DE\n";s:24:"CONNECTOR_ACCOUNT_HOLDER";s:25:"heidelpay - TEST Inhaber\n";s:24:"CONNECTOR_ACCOUNT_NUMBER";s:11:"1234567890\n";s:22:"CONNECTOR_ACCOUNT_BANK";s:9:"10000000\n";s:22:"CONNECTOR_ACCOUNT_IBAN";s:23:"DE01000000001234567890\n";s:21:"CONNECTOR_ACCOUNT_BIC";s:12:"HEIDELPAYXY\n";s:22:"IDENTIFICATION_SHORTID";s:18:"\n\n2311.5548.6334\n\n";s:11:"ordernumber";s:5:"20028";}';
+
+            $params = array($prms_id, $prms_stateId, $prms_name, $prms_frommail, $prms_fromname, $prms_subject, $prms_content, $prms_contentHTML, $prms_ishtml, $prms_attachment, $prms_mailtype, $prms_context, $prms_frommail, $prms_fromname, $prms_subject, $prms_content, $prms_contentHTML, $prms_ishtml, $prms_attachment, $prms_mailtype, $prms_context);
+
+            return Shopware()->Db()->query($sql, $params);
+        }catch(Exception $e){
+            $this->Logging('installPrepaymentMail | '.$e->getMessage());
+            return;
+        }
+    }
+
+    /**
+     * Method to create the prepayment mail
+     */
+    private function installInvoiceIvpdMail(){
+        try{
+            $sql = '
+			INSERT INTO `s_core_config_mails` (`id`, `stateId`, `name`, `frommail`, `fromname`, `subject`, `content`, `contentHTML`, `ishtml`, `attachment`, `mailtype`, `context`)
+			VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
+			ON DUPLICATE KEY UPDATE frommail= ?, fromname= ?, subject= ?, content= ?, contentHTML= ?, ishtml= ?, attachment= ?, mailtype= ?, context= ?';
+
+            $prms_id 		= NULL;
+            $prms_stateId 	= NULL;
+            $prms_name 		= 'invoiceIvpdHeidelpay';
+            $prms_frommail 	= '{config name=mail}';
+            $prms_fromname 	= '{config name=shopName}';
+            $prms_subject 	= 'Zahldaten zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
+            $prms_content 	= 'Sehr geehrter Kunde,
+
+vielen Dank fuer Ihre Bestellung in unserem Shop.
+
+Bitte nutzen Sie zum Bezahlen Ihrer Bestellung folgende Bezahldaten.
+
+Betrag: {$AMOUNT} {$CURRENCY}
+Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}
+IBAN: {$CONNECTOR_ACCOUNT_IBAN}
+BIC: {$CONNECTOR_ACCOUNT_BIC}
+
+Um eine schnelle Bearbeitung gewaehrleisten zu koennen, geben Sie bitte als Verwendungszweck nur diese Nummer an.
+Verwendungszweck: {$CONNECTOR_ACCOUNT_USAGE}
+
+
+Vielen Dank
+
+Mit freundlichen Gruessen
+
+{config name=shopName}
+{config name=address}';
+            $prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgende Bezahldaten.<br/><br/>Betrag: {$AMOUNT} {$CURRENCY}<br/>Kontoinhaber: {$CONNECTOR_ACCOUNT_HOLDER}<br/>IBAN: {$CONNECTOR_ACCOUNT_IBAN}<br/>BIC: {$CONNECTOR_ACCOUNT_BIC}<br/><br/>Um eine schnelle Bearbeitung gew&auml;hrleisten zu k&ouml;nnen, geben Sie bitte als Verwendungszweck nur diese Nummer an.<br/>Verwendungszweck: {$CONNECTOR_ACCOUNT_USAGE}<br/><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
             $prms_ishtml 		= 1;
             $prms_attachment 	= '';
             $prms_mailtype 		= 1;
@@ -3617,7 +4202,7 @@ Mit freundlichen Gruessen
 			$prms_subject 			= 'Barcode Download zu Ihrer Bestellung {$ordernumber} bei {config name=shopName}';
 			$prms_content 			= 'Sehr geehrter Kunde,
 
-vielen Dank fuer Ihre Bestellung in userem Shop.
+vielen Dank fuer Ihre Bestellung in unserem Shop.
 
 Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgenden Barcode.
 
@@ -3638,7 +4223,7 @@ Mit freundlichen Gruessen
 
 {config name=shopName}
 {config name=address}';
-			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in userem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgenden Barcode.<br/><br/><a href"{$CRITERION_BARPAY_PAYCODE_URL}" target="_blank">{$CRITERION_BARPAY_PAYCODE_URL}</a><br/><br/><p>Drucken Sie den Barcode aus oder speichern Sie diesen auf Ihrem mobilen Endger&auml;t.</p><p>Gehen Sie nun zu einer Kasse der <b>18.000 Akzeptanzstellen in Deutschland</b> undbezahlen Sie ganz einfach in bar. </p><p>In dem Augenblick, wenn der Rechnungsbetrag beglichen wird, erh&auml;lt der Online-H&auml;ndler die Information &uuml;ber den Zahlungseingang. Die bestellte Ware oder Dienstleistung geht umgehend in den Versand.</p><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
+			$prms_contentHTML	= 'Sehr geehrter Kunde,<br/><br/>vielen Dank f&uuml;r Ihre Bestellung in unserem Shop.<br><br/>Bitte nutzen Sie zum Zahlen Ihrer Bestellung folgenden Barcode.<br/><br/><a href"{$CRITERION_BARPAY_PAYCODE_URL}" target="_blank">{$CRITERION_BARPAY_PAYCODE_URL}</a><br/><br/><p>Drucken Sie den Barcode aus oder speichern Sie diesen auf Ihrem mobilen Endger&auml;t.</p><p>Gehen Sie nun zu einer Kasse der <b>18.000 Akzeptanzstellen in Deutschland</b> undbezahlen Sie ganz einfach in bar. </p><p>In dem Augenblick, wenn der Rechnungsbetrag beglichen wird, erh&auml;lt der Online-H&auml;ndler die Information &uuml;ber den Zahlungseingang. Die bestellte Ware oder Dienstleistung geht umgehend in den Versand.</p><br/><br/>Vielen Dank<br/><br/>Mit freundlichen Gr&uuml;&szlig;en<br/><br/>{config name=shopName}<br/>{config name=address}';
 			$prms_ishtml 				= 1;
 			$prms_attachment 	= '';
 			$prms_mailtype 			= 1;
@@ -3820,9 +4405,10 @@ Mit freundlichen Gruessen
 							'HGW_DD_CHANNEL' 		=> array('label' => 'Lastschrift Channel'),
 							'HGW_PP_CHANNEL' 		=> array('label' => 'Vorkasse Channel'),
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Rechnung Channel'),
-							'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
+                            'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Rechnungskauf Channel'),
+                            'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
-							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofortüberweisung Channel'),
+							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Channel'),
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Kreditkarten Buchungsmodus',
@@ -3854,7 +4440,7 @@ Mit freundlichen Gruessen
 							),
 							'HGW_MOBILE_CSS' 		=> array('label' => 'CSS für Mobilgeräte aktivieren'),
 							'HGW_SECRET' 			=> array('description' => 'Secret, um die Serverantwort zu verifizieren. Nur wenn nötig ändern.'),
-							'HGW_ERRORMAIL' 		=> array('label' => 'Error E-Mail-Adresse'),
+//							'HGW_ERRORMAIL' 		=> array('label' => 'Error E-Mail-Adresse'),
 							'HGW_IV_MAIL' 			=> array(
 									'label' 			=> 'Zahlungsinformationen für Rechnung per Mail senden',
 									'description' 		=> 'Zahlungsinformationen für Rechnung, gesicherte Rechnung und Santander in einer zusätzlicher Mail versenden.',
@@ -3886,7 +4472,15 @@ Mit freundlichen Gruessen
 							'HGW_HPF_DC_CSS' 		=> array(
 									'label'				=>'Pfad zum hPF CSS für Debitkarte',
 									'description' 		=> 'Bitte tragen Sie hier, beginnend mit "http(s)://", den absoluten Pfad zum CSS ein. Dieses CSS wird für das Debitkartenformular verwendet.'
-							)
+							),
+                            'HGW_EASYMINAMOUNT' 		=> array(
+                                'label'				=>'Minimumbetrag für Ratenkauf by easyCredit',
+                                'description' 		=> 'Bitte tragen Sie hier den mit heidelpay / easyCredit vereinbarten Minimumbetrag für Ihre Transaktionen ein.'
+                            ),
+                            'HGW_EASYMAXAMOUNT' 		=> array(
+                                'label'				=>'Maximumbetrag für Ratenkauf by easyCredit',
+                                'description' 		=> 'Bitte tragen Sie hier den mit heidelpay / easyCredit vereinbarten Maximumbetrag für Ihre Transaktionen ein.'
+                            )
 					),
 					'en_GB' => array(
 							'HGW_USER_PW' 			=> array('label' => 'Password'),
@@ -3907,7 +4501,8 @@ Mit freundlichen Gruessen
 							'HGW_PP_CHANNEL' 		=> array('label' => 'Prepayment Channel'),
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Invoice Channel'),
 							'HGW_PAPG_CHANNEL', array('label'=> 'Invoice with guarantee Channel'),
-							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Banking Channel'),
+                            'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Invoice Payment Channel'),
+                            'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Banking Channel'),
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Credit Card booking mode',
@@ -3939,7 +4534,7 @@ Mit freundlichen Gruessen
 							),
 							'HGW_MOBILE_CSS' 		=> array('label' => 'activate mobile CSS'),
 							'HGW_SECRET' 			=> array('description' => 'Secret to verify the server response. Change only if necessary.'),
-							'HGW_ERRORMAIL' 		=> array('label' => 'Error E-Mail address'),
+//							'HGW_ERRORMAIL' 		=> array('label' => 'Error E-Mail address'),
 							'HGW_IV_MAIL' 			=> array(
 									'label' 			=> 'Send paymentinformation email for invoice',
 									'description' 		=> 'Paymentinformation are beeing send in an extra email for invoice payment.',
@@ -3971,7 +4566,15 @@ Mit freundlichen Gruessen
 							'HGW_HPF_DC_CSS' 		=> array(
 									'label'				=>'Path to hPF CSS for debitcard',
 									'description' 		=> 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our debitcard form.'
-							)
+							),
+                            'HGW_EASYMINAMOUNT' 		=> array(
+                                'label'				=>'Minimum amount for Ratenkauf by easyCredit',
+                                'description' 		=> 'Please enter here the appointed minimum amount for Ratenkauf by easyCredit.'
+                            ),
+                            'HGW_EASYMAXAMOUNT' 		=> array(
+                                'label'				=>'maximum amount for Ratenkauf by easyCredit',
+                                'description' 		=> 'Please enter here the appointed maximum amount for Ratenkauf by easyCredit.'
+                            )
 					),
 			);
 

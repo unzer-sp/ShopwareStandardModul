@@ -25,7 +25,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
+
 		return '18.07.11';
+
 	}
 
 	/**
@@ -831,6 +833,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.04.25':
             case '18.04.27':
             case '18.05.11':
+          case '18.05.23':
             // added Checkbox for Payolution
             // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
             // refactoring EasyCredit max limit
@@ -847,7 +850,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 $this->logError($msg, $e);
             }
 
-            case '18.05.24':
+          case '18.05.24':
                 // fixed bug in valPayment.js which could cause an error while clicking on AGB-link
                 try{
                     $msg .= '* update 18.05.24 <br />';
@@ -883,12 +886,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 try{
                     $this->addSnippets();
                     $msg .= '* update 18.07.11 <br />';
+
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
 
-            // overwrite $msg if update was successful
-            $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
+                // overwrite $msg if update was successful
+                $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
 
 //        $form->save();
@@ -1739,7 +1743,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$document = $args->getSubject();
 			$view = $document->_view;
-
+//            $document->_template->addTemplateDir(dirname(__FILE__) . '/Views/');
 			if($document->_order->payment['name'] == 'hgw_bs'){
 				$orderData = $view->getTemplateVars('Order');
 				$containers = $view->getTemplateVars('Containers');

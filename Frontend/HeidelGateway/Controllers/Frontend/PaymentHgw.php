@@ -3732,14 +3732,14 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 // create Order-Object from abborded order in db
                 $builder = Shopware()->Models()->createQueryBuilder();
                 $builder->select('orders.id')
-                    ->from(\Shopware\Models\Order\Order::class, 'orders')
+                    ->from("\Shopware\Models\Order\Order", 'orders')
                     ->where('orders.temporaryId = ?1')
                     ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
                 $result = $builder->getQuery()->getArrayResult();
-                $orderObject = Shopware()->Models()->find(\Shopware\Models\Order\Order::class,['id' => $result[0]['id']]);
+                $orderObject = Shopware()->Models()->find("\Shopware\Models\Order\Order",['id' => $result[0]['id']]);
 
                 // create instance of ordernumber-model to create new ordernumber for order
-                $numberRepository = Shopware()->Models()->getRepository(\Shopware\Models\Order\Number::class);
+                $numberRepository = Shopware()->Models()->getRepository("\Shopware\Models\Order\Number");
                 $numberModel = $numberRepository->findOneBy(['name' => 'invoice']);
                 if ($numberModel === null) {
                     self::hgw()->Logging('convertOrder failed | no ordernumber could be created');
@@ -3764,7 +3764,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                 // get Customer-Model for Customer-Information
                 $builder->select('kunde')
-                    ->from(\Shopware\Models\Customer\Customer::class, 'kunde')
+                    ->from("\Shopware\Models\Customer\Customer", 'kunde')
                     ->where('kunde.id = ?1')
                     ->setParameter(1, $customerDbResult[0]['customerId']);
                 $customerData = $builder->getQuery()->getArrayResult();
@@ -3826,7 +3826,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 $billingModel->fromArray($billingAddress);
 
                 $builder->select('country')
-                    ->from(\Shopware\Models\Country\Country::class,'country')
+                    ->from("\Shopware\Models\Country\Country",'country')
                     ->where('country.id = ?1')
                     ->setParameter(1, $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']);
                 $country = $builder->getQuery()->getArrayResult();
@@ -3876,7 +3876,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 Shopware()->Models()->persist($shippingModel);
 
                 
-                $statusModel = Shopware()->Models()->find(\Shopware\Models\Order\Status::class, '0');
+                $statusModel = Shopware()->Models()->find("\Shopware\Models\Order\Status", '0');
                 
                 // Finally set the order to be a regular order
                 $orderObject->setOrderStatus($statusModel);

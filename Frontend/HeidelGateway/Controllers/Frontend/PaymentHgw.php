@@ -3713,7 +3713,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 // Get user, shipping and billing
                 $builder = Shopware()->Models()->createQueryBuilder();
                 $builder->select(['orders', 'customer', 'billing', 'payment', 'shipping'])
-                    ->from(\Shopware\Models\Order\Order::class, 'orders')
+                    ->from("\Shopware\Models\Order\Order", 'orders')
                     ->leftJoin('orders.customer', 'customer')
                     ->leftJoin('orders.payment', 'payment')
                     ->leftJoin('customer.defaultBillingAddress', 'billing')

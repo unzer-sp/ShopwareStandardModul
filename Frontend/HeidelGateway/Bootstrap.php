@@ -1838,7 +1838,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * Event for custom code
 	 */
 	public function onPostDispatch(Enlight_Event_EventArgs $args){
-		$request = $args->getSubject()->Request();
+
+        $request = $args->getSubject()->Request();
 		$response = $args->getSubject()->Response();
 		$config = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
 		$view = $args->getSubject()->View();
@@ -2206,7 +2207,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 {
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
-                    if(!empty($request->getPost("NAME_BIRTHDATE"))){
+                    $birthdate = $request->getPost("NAME_BIRTHDATE");
+                    if(!empty($birthdate)){
                         $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
                     } else {
                         $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'), $flag, $enc) : '';

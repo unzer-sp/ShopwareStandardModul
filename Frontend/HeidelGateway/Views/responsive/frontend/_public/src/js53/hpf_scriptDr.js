@@ -225,7 +225,7 @@ $(document).ready(function(){
 		
 		var recMsg = JSON.parse(e.data);
 		
-		if(recMsg["POST.VALIDATION"] == 'NOK'){
+		if(recMsg["PROCESSING.RESULT"] == 'NOK'){
 			// enable all input fields
 			jQuery('.payment--method input').removeAttr('disabled');
 			jQuery('.payment--method select').removeAttr('disabled');

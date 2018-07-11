@@ -25,7 +25,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.05.24';
+
+		return '18.07.11';
+
 	}
 
 	/**
@@ -98,26 +100,41 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return bool
 	 */
 	public function install(){
-		$msg = 'Installationsfehler: <br />';
-		if(!$this->assertVersionGreaterThen("4.0.0")){
-			throw new Enlight_Exception("This Plugin needs min shopware 4.0.0");
+        $msg = 'Installationsfehler: <br />';
+		if(!$this->assertMinimumVersion("4.3.7")){
+			throw new Enlight_Exception("This Plugin needs min shopware 4.3.7");
 		}
 
-		/* Major check Version */
-		if ($this->assertVersionGreaterThen('5.1.6')) {
-			$swVersion = Shopware()->Config()->version;
+        /* *************** Neuer Code ********************* */
+        $swVersion = Shopware()->Config()->version;
 
-		} else {
-			$swVersion = Shopware()->Config()->version;
-			if(!$this->assertRequiredPluginsPresent(array('Payment'))){
-				$msg .= "This plugin requires the plugin payment<br />";
-				$this->uninstall();
-				throw new Enlight_Exception("This plugin requires the plugin payment");
-			}
-		}
+        /* Major check Version */
+        if(
+            (version_compare($swVersion,"4.3.7",">"))
+            && (version_compare($swVersion,"5.2.0","<"))
+        ){
+            if(!$this->assertRequiredPluginsPresent(array('Payment'))){
+                $msg .= "This plugin requires the plugin payment<br />";
+                $this->uninstall();
+                throw new Enlight_Exception("This plugin requires the shopware plugin payment");
+            }
+        };
+        /* *************** Ende neuer Code ********************* */
+        /* Major check Version */
+//		if ($this->assertVersionGreaterThen('5.1.6')) {
+//			$swVersion = Shopware()->Config()->version;
+//
+//		} else {
+//			$swVersion = Shopware()->Config()->version;
+//			if(!$this->assertRequiredPluginsPresent(array('Payment'))){
+//				$msg .= "This plugin requires the plugin payment<br />";
+//				$this->uninstall();
+//				throw new Enlight_Exception("This plugin requires the shopware plugin payment");
+//			}
+//		}
 
 		if($this->assertRequiredPluginsPresent(array('HeidelActions'))){
-			throw new Enlight_Exception("Please uninstall Heidelpay Backend Plugin (HeidelActions)");
+			throw new Enlight_Exception("Please delete Heidelpay Backend Plugin (HeidelActions) from your Server");
 		}
 
 		try{
@@ -815,35 +832,70 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.04.09':
             case '18.04.25':
             case '18.04.27':
-            case '18.05.23':
-                // added Checkbox for Payolution
-                // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
-                // refactoring EasyCredit max limit
-                // some JS-changes for validation of checkboxes and paymentmethods for all Sw-versions and templates
-                // change of addSnippets() to install DE and EN textsnippets
-                // changes for Santander-variable CONFIG_OPTIN_TEXT from NGW
-                // added Css-File to adjust buttons and inputs to Shopware's
-                // fixed an issue with registration of direct debit registration for Shopware 5.4.x
+            case '18.05.11':
+          case '18.05.23':
+            // added Checkbox for Payolution
+            // refactoring request for EasyCredit in Responsive-Template of SW 5.1.6
+            // refactoring EasyCredit max limit
+            // some JS-changes for validation of checkboxes and paymentmethods for all Sw-versions and templates
+            // change of addSnippets() to install DE and EN textsnippets
+            // changes for Santander-variable CONFIG_OPTIN_TEXT from NGW
+            // added Css-File to adjust buttons and inputs to Shopware's
+            // fixed an issue with registration of direct debit registration for Shopware 5.4.x
 
-                try{
-                    $this->addSnippets();
-                    $msg .= '* update 18.05.23 <br />';
-                } catch (Exception $e) {
-                    $this->logError($msg, $e);
-                }
+            try{
+                $this->addSnippets();
+                $msg .= '* update 18.05.23 <br />';
+            } catch (Exception $e) {
+                $this->logError($msg, $e);
+            }
 
-            case '18.05.24':
+          case '18.05.24':
                 // fixed bug in valPayment.js which could cause an error while clicking on AGB-link
                 try{
                     $msg .= '* update 18.05.24 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
+
+            case '18.06.05':
+                // set minimum / maximum amount for easyCredit
+                try{
+                    $form->setElement('text', 'HGW_EASYMINAMOUNT', array(
+                        'label' => 'Minimum amount for easyCredit',
+                        'value' => 200,
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'change minimum amount for easyCredit only after consultation with heidelpay'
+                    ));
+                    $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
+                        'label' => 'Maximum amount for easyCredit',
+                        'value' => 3000,
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
+                    ));
+                    $this->addSnippets();
+                    $msg .= '* update 18.06.05 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+            case '18.07.11':
+                // fixes for Emotion template for Santander invoice, Payolution invoice and direct debit
+                // fixes a bug in direct debit with registration
+                // changed query for birthdates for all payment methods so that there are no preallocated values
+                // fixed an issue for saving regdata for Santander and Payolution
+                try{
+                    $this->addSnippets();
+                    $msg .= '* update 18.07.11 <br />';
+
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
+
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
 
-        $form->save();
+//        $form->save();
         $this->Logging($msg);
         return array(
             'success' => true,
@@ -1081,9 +1133,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	protected function createPayments(){
 		try{
-			$dbErrors = '';
+		    $dbErrors = '';
 			$inst = $this->paymentMethod();
-
+            $swVersion = Shopware()->Config()->version;
 			/* get Shops and check if locale is en_GB */
 			$sql = '
 				SELECT `s_core_shops`.`id`, `s_core_locales`.`locale` FROM `s_core_shops`, `s_core_locales`
@@ -1112,7 +1164,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			foreach ($inst as $key => $val){
 				// search for old hgw-paymethods
-				if ($this->assertVersionGreaterThen('5.2')) {
+				if (version_compare($swVersion,"5.2.0",">=")) {
 
 					$sql = 'SELECT * FROM `s_core_paymentmeans` WHERE `name`="hgw_'.$val['name'].'";';
 					try {
@@ -1163,7 +1215,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					$where		= array("id = ".(int)$getOldPayments['id']);
 
 
-					if ($this->assertVersionGreaterThen('5.2')) {
+//					if ($this->assertVersionGreaterThen('5.2')) {
+					if (version_compare($swVersion,"5.2.0",">=")) {
 						try {
 							$affRows = Shopware()->Db()->update('s_core_paymentmeans', $newData, $where);
 							$dbErrors .= Shopware()->Db()->getErrorMessage();
@@ -1191,7 +1244,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						}
 					}
 				} else {
-					if ($this->assertVersionGreaterThen('5.2')) {
+					if (version_compare($swVersion,"5.2.0",">=")) {
 
 						$bind = array(
 								':name' 		=> "hgw_".$val['name'],
@@ -1229,9 +1282,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 								'additionaldescription' => $val['additionaldescription']
 						))->save();
 					}
-
-
-
 				}
 			}
 
@@ -1574,6 +1624,18 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
 					'description' => 'Is the recognition disabled, the registered payment data will be discarded, if the customer changes the delivery address after the registration.'
 			));
+            $form->setElement('text', 'HGW_EASYMINAMOUNT', array(
+                'label' => 'Minimum amount for easyCredit',
+                'value' => 200,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
+            ));
+            $form->setElement('text', 'HGW_EASYMAXAMOUNT', array(
+                'label' => 'Maximum amount for easyCredit',
+                'value' => 3000,
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'change maximum amount for easyCredit only after consultation with heidelpay'
+            ));
 			$form->setElement('text', 'HGW_HPF_CC_CSS', array(
 					'label'=>'Path to hPF CSS for creditcard',
 					'value'=> '',
@@ -1592,7 +1654,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setParent($repository->findOneBy(array('name' => 'Payment')));
 
 			$this->addPluginTranslation();
-			$form->save();
 		}catch(Exception $e){
 			$this->Logging('createForm | '.$e->getMessage());
 			return;
@@ -1607,9 +1668,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		try{
 			$newData	= array("active" => 0);
 			$where		= array("pluginID = ".(int)$this->getId());
-
+            $swVersion  = Shopware()->Config()->version;
 			// deactivate Plugin itself
-			if ($this->assertVersionGreaterThen('5.1.8')) {
+			if (version_compare($swVersion,"5.2.0",">=")) {
 				try {
 					$where		= array("id = ".(int)$this->getId());
 
@@ -1630,7 +1691,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 
 			// set all Heidelpay paymentmethods to inactive
-			if ($this->assertVersionGreaterThen('5.1.8')) {
+            if (version_compare($swVersion,"5.2.0",">=")) {
 				try {
 					$where		= array("name LIKE 'hgw_%'");
 
@@ -1781,7 +1842,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * Event for custom code
 	 */
 	public function onPostDispatch(Enlight_Event_EventArgs $args){
-		$request = $args->getSubject()->Request();
+
+        $request = $args->getSubject()->Request();
 		$response = $args->getSubject()->Response();
 		$config = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
 		$view = $args->getSubject()->View();
@@ -1811,12 +1873,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
                 $shippingAmount = $shipping['value'];
 
-                if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 5000) {
+                if (
+                    $basketAmount+$shippingAmount >= $config->HGW_EASYMINAMOUNT &&
+                    $basketAmount+$shippingAmount <= $config->HGW_EASYMAXAMOUNT
+                ) {
                     $view->activeEasy = "TRUE";
                     $view->easyAmount = $basketAmount+$shippingAmount;
+                    $view->HGW_EASYMINAMOUNT = $config->HGW_EASYMINAMOUNT;
+                    $view->HGW_EASYMAXAMOUNT = $config->HGW_EASYMAXAMOUNT;
                 } else {
                     $view->activeEasy = "FALSE";
                     $view->easyAmount = $basketAmount+$shippingAmount;
+                    $view->HGW_EASYMINAMOUNT = $config->HGW_EASYMINAMOUNT;
+                    $view->HGW_EASYMAXAMOUNT = $config->HGW_EASYMAXAMOUNT;
                 }
             }
 
@@ -1968,6 +2037,22 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                     $view->accountHolder    = $getFormUrl['ACCOUNT_HOLDER'];
                                                 }
 
+                                                if($pm == "dd" && $config->HGW_DD_GUARANTEE_MODE == 1){
+                                                    $regDataDD          = $this->getRegData($user['additional']['user']['id'], $pm);
+                                                    $registratedDataDD  = json_decode($regDataDD['payment_data'],true);
+
+                                                    if((isset($registratedDataDD)) && ($registratedDataDD != '')){
+                                                        $view->salutation_dd	= $registratedDataDD['NAME_SALUTATION'];
+                                                        $view->birthdate_dd	    = $registratedDataDD['NAME_BIRTHDATE'];
+                                                    }
+
+                                                    if((isset($regDataDD['kto'])) && ($regDataDD['kto'] != '')){
+                                                        $view->iban_heidel_dd	= $regDataDD['kto'];
+                                                    }
+
+
+                                                }
+
                                                 if(((isset($bookingMode)) && (($bookingMode == '3') || ($bookingMode == '4'))) && Shopware()->Modules()->Admin()->sCheckUser()){
 
 													$getFormUrl = Shopware_Controllers_Frontend_PaymentHgw::getFormUrl($pm, $bookingMode, $user['additional']['user']['id'], $tempID, $regData[$pm]['uid'], NULL, NULL, true);
@@ -1992,7 +2077,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                 if((!empty($data)) && (($data['expMonth'] != '0') && ($data['expYear'] != '0') && ($last < time())) || (($data['shippingHash'] != $shippingHash) && $config->HGW_SHIPPINGHASH == 0) || (($bookingMode == 1) || ($bookingMode == 2))){
 													unset($regData[$pm]);
 												}
-
 											}
 										}
 
@@ -2082,7 +2166,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					  kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
 
                     $params = array(
-                        'userID' 	=> $user['additional']['user']['userID'],
+                        'userID' 	=> !empty($user['additional']['user']['userID']) && $user['additional']['user']['userID'] != "" ? $user['additional']['user']['userID'] : $user['additional']['user']['id'],
                         'payType' 	=> "ivpd",
                         'uid' 		=> "0",
                         'cardnr' 	=> "0",
@@ -2127,7 +2211,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 {
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
-                    if(!empty($request->getPost("NAME_BIRTHDATE"))){
+                    $birthdate = $request->getPost("NAME_BIRTHDATE");
+                    if(!empty($birthdate)){
                         $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
                     } else {
                         $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'), $flag, $enc) : '';
@@ -2164,7 +2249,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					        kto = :ktoNew, blz = :blzNew, chan = :chanNew, shippingHash = :shippingHashNew, email = :emailNew, payment_data = :payment_dataNew';
 
                     $params = array(
-                        'userID' 	=> $user['additional']['user']['userID'],
+                        'userID' 	=> !empty($user['additional']['user']['userID']) && $user['additional']['user']['userID'] != "" ? $user['additional']['user']['userID'] : $user['additional']['user']['id'],
                         'payType' 	=> "san",
                         'uid' 		=> "0",
                         'cardnr' 	=> "0",
@@ -2218,7 +2303,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				}
 
 				// fix for missing csrf-token in SW 5.2 and greater
-				if ($this->assertVersionGreaterThen('5.1.6')) {
+                $swVersion = Shopware()->Config()->version;
+
+				if (version_compare($swVersion,"5.2.0",">=")) {
 					if ($request->getPost('__csrf_token')!= false ) {
 						$view->token = $request->getPost('__csrf_token');
 					}
@@ -2289,13 +2376,19 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
         $shippingAmount = $shipping['value'];
 
-        if ($basketAmount+$shippingAmount >= 200 && $basketAmount+$shippingAmount <= 5000)
-        {
+        if (
+            $basketAmount+$shippingAmount >= Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT &&
+            $basketAmount+$shippingAmount <= Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT
+        ){
             $view->activeEasy = "TRUE";
             $view->easyAmount = $basketAmount+$shippingAmount;
+            $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+            $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
         } else {
             $view->activeEasy = "FALSE";
             $view->easyAmount = $basketAmount+$shippingAmount;
+            $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+            $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
         }
 
         // Function to show EasyCredit-text on choose-payment-site
@@ -2386,7 +2479,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 if (Shopware()->Session()->wantEasy) {
                     return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
                 } else {
-                    Shopware()->Session()->wantEasy = true;
                     return $args->getSubject()->redirect(array(
                         'forceSecure' => 1,
                         'controller' => 'account',
@@ -2485,6 +2577,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         Shopware()->Session()->HPdidRequest = 'TRUE';
                         $view->activeEasy = "TRUE";
                         $view->easyAmount = $basketAmount+$shippingAmount;
+                        $view->HGW_EASYMINAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT;
+                        $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
 
                         if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
                             $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
@@ -2582,7 +2676,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $view = $args->getSubject()->View();
 
         $user = Shopware()->Modules()->Admin()->sGetUserData();
-
         if($user['additional']['payment']['name'] == "hgw_hpr"){
             $basket	= Shopware()->Modules()->Basket()->sGetBasket();
             $shipping	= Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
@@ -3436,7 +3529,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'trans_desc' 	=> 'Heidelpay CD-Edition Hire purchase by easyCredit',
                 'additionalDescription' => '
 								<div class="EasyPermission">
-									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (200 - 3.000 EUR). </p>
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR). </p>
 								</div>',
                 'template' 		=> 'hp_payment_hpr.tpl',
 
@@ -3635,14 +3728,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.171','Please choose another payment method');
 		$snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.300.101','Bitte w&auml;hlen Sie eine andere Zahlart');
 		$snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.300.101','Please choose another payment method');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR) ');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' and '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.174','Der Finanzierungsbetrag liegt au&szlig;erhalb der zulässigen Beträge (200 - 5000 EUR) ');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.100.174','The financing amount is outside the permitted amounts of 200 and 5000 EUR');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.153','Die verwendete Adresse wurde nicht gefunden');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.153','Sorry, your address could not be found');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.400.152','Die verwendete Adresse wurde nicht gefunden');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-800.400.152','Sorry, your address could not be found');
-
-        $snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
 
         $snippets[] = array('frontend/payment_heidelpay/cancel','de','PaymentProcess','Bezahlvorgang');
 		$snippets[] = array('frontend/payment_heidelpay/cancel','en','PaymentProcess','Payment process');
@@ -3653,24 +3746,27 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 		$snippets[] = array('frontend/payment_heidelpay/success','de','PaymentSuccess','Ihr Bezahlvorgang war erfolgreich!');
 		$snippets[] = array('frontend/payment_heidelpay/success','en','PaymentSuccess','Your transaction was successfull!');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','PaymentProcess','Bezahlvorgang');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','PaymentProcess','Payment process');
+
+		// prepayment
 		$snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} Konto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} Bankleitzahl: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{IDENTIFICATION_SHORTID}</strong>');
-        // added for Santander
+        $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
+        // invoice and invoice secured
+        $snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: \nLand: {CONNECTOR_ACCOUNT_COUNTRY} \nKontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} \nKonto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} \nBankleitzahl: {CONNECTOR_ACCOUNT_BANK} \nIBAN: {CONNECTOR_ACCOUNT_IBAN} \nBIC: {CONNECTOR_ACCOUNT_BIC} \n\nGeben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: \n<strong>{IDENTIFICATION_SHORTID}</strong>');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
+        // direct debit
+        $snippets[] = array('frontend/payment_heidelpay/success','de','DirectdebitText','Der Betrag in Höhe von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:\n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nDie Abbuchung enth&auml;lt die Mandatsreferenz-ID:{ACCOUNT_IDENT}\n und die Gl&auml;ubiger ID: {IDENT_CREDITOR_ID}\n\nBitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto.\n\n\nVielen Dank\nMit freundlichen Gr&uuml;&szlig;en\n\n{config name=shopName}\n{config name=address}');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','DirectdebitText','The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from the following account: \n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nThe debit contains the Reference-Id: {ACCOUNT_IDENT}\n and the creditor-id: {IDENT_CREDITOR_ID}\n\n Please ensure that your amount is enough.\n\n\nThanks for Your purchase\nSincere regards,\n\n{config name=shopName}\n{config name=address}');
+        // common
+        $snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceHeader','Rechnungsinformation');
+        $snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceHeader','Invoiceinformation');
+        // Santander
         $snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentSanText','Bitte &uuml;berweisen Sie den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} Konto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} Bankleitzahl: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
         $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentSanText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account with term of payment within 30 days: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
-        // added for Payolution
+        // Payolution
         $snippets[] = array('frontend/payment_heidelpay/success','de','PrepaymentIvpdText','Bitte &uuml;berweisen Sie den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> mit Zahlungsziel innerhalb von 30 Tagen auf folgendes Konto: Land: {CONNECTOR_ACCOUNT_COUNTRY} Kontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Geben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
         $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentIvpdText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account with term of payment within 30 days: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{CONNECTOR_ACCOUNT_USAGE}</strong>');
 
-        $snippets[] = array('frontend/payment_heidelpay/success','en','PrepaymentText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
 
-		$snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceText','Bitte &uuml;berweisen Sie uns den Betrag von <strong>{AMOUNT} {CURRENCY}</strong> auf folgendes Konto: \nLand: {CONNECTOR_ACCOUNT_COUNTRY} \nKontoinhaber: {CONNECTOR_ACCOUNT_HOLDER} \nKonto-Nr.: {CONNECTOR_ACCOUNT_NUMBER} \nBankleitzahl: {CONNECTOR_ACCOUNT_BANK} \nIBAN: {CONNECTOR_ACCOUNT_IBAN} \nBIC: {CONNECTOR_ACCOUNT_BIC} \n\nGeben Sie als Verwendungszweck bitte ausschlie&szlig;lich diese Identifikationsnummer an: \n<strong>{IDENTIFICATION_SHORTID}</strong>');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceText','Please transfer the amount of <strong>{AMOUNT} {CURRENCY}</strong> to the following account: Country: {CONNECTOR_ACCOUNT_COUNTRY} Account holder: {CONNECTOR_ACCOUNT_HOLDER} Account No: {CONNECTOR_ACCOUNT_NUMBER} Bank Code: {CONNECTOR_ACCOUNT_BANK} IBAN: {CONNECTOR_ACCOUNT_IBAN} BIC: {CONNECTOR_ACCOUNT_BIC} Please use the following identifcation number as payment reference: <strong>{IDENTIFICATION_SHORTID}</strong>');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','DirectdebitText','Der Betrag in Höhe von <strong>{AMOUNT} {CURRENCY}</strong> wird in den n&auml;chsten Tagen von folgendem Konto abgebucht:\n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nDie Abbuchung enth&auml;lt die Mandatsreferenz-ID:{ACCOUNT_IDENT}\n und die Gl&auml;ubiger ID: {IDENT_CREDITOR_ID}\n\nBitte sorgen Sie f&uuml;r ausreichende Deckung auf dem entsprechenden Konto.\n\n\nVielen Dank\nMit freundlichen Gr&uuml;&szlig;en\n\n{config name=shopName}\n{config name=address}');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','DirectdebitText','The amount of <strong>{AMOUNT} {CURRENCY}</strong> will be debited from the following account: \n\nIBAN: {ACCOUNT_IBAN}\nBIC: {ACCOUNT_BIC}\n\nThe debit contains the Reference-Id: {ACCOUNT_IDENT}\n and the creditor-id: {IDENT_CREDITOR_ID}\n\n Please ensure that your amount is enough.\n\n\nThanks for Your purchase\nSincere regards,\n\n{config name=shopName}\n{config name=address}');
-		$snippets[] = array('frontend/payment_heidelpay/success','de','InvoiceHeader','Rechnungsinformation');
-		$snippets[] = array('frontend/payment_heidelpay/success','en','InvoiceHeader','Invoiceinformation');
 		
 		$snippets[] = array('frontend/payment_heidelpay/success','de','BarpayText','<center><a href=\"{CRITERION_BARPAY_PAYCODE_URL}\" target=\"_blank\" class=\"button-right large\">Klicken Sie hier um Ihren Barcode runterzuladen</a></center> {BARPAY_PAYCODE_URL} \<br /><br />'
 				.'Drucken Sie den Barcode aus oder speichern Sie diesen auf Ihrem mobilen Endger&auml;t. '
@@ -3743,6 +3839,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accInfo','Account information');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_accSalutation','Anrede');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_accSalutation','Salutation');
+
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueDay','Tag');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueDay','day');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueMonth','Monat');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueMonth','month');
+        $snippets[] = array('frontend/register/hp_payment','de','hp_valueYear','Jahr');
+        $snippets[] = array('frontend/register/hp_payment','en','hp_valueYear','Year');
         //added for Santander
         $snippets[] = array('frontend/register/hp_payment','de','hp_accSal_gender','bitte wählen');
         $snippets[] = array('frontend/register/hp_payment','en','hp_accSal_gender','please choose');
@@ -4373,7 +4476,15 @@ Mit freundlichen Gruessen
 							'HGW_HPF_DC_CSS' 		=> array(
 									'label'				=>'Pfad zum hPF CSS für Debitkarte',
 									'description' 		=> 'Bitte tragen Sie hier, beginnend mit "http(s)://", den absoluten Pfad zum CSS ein. Dieses CSS wird für das Debitkartenformular verwendet.'
-							)
+							),
+                            'HGW_EASYMINAMOUNT' 		=> array(
+                                'label'				=>'Minimumbetrag für Ratenkauf by easyCredit',
+                                'description' 		=> 'Bitte tragen Sie hier den mit heidelpay / easyCredit vereinbarten Minimumbetrag für Ihre Transaktionen ein.'
+                            ),
+                            'HGW_EASYMAXAMOUNT' 		=> array(
+                                'label'				=>'Maximumbetrag für Ratenkauf by easyCredit',
+                                'description' 		=> 'Bitte tragen Sie hier den mit heidelpay / easyCredit vereinbarten Maximumbetrag für Ihre Transaktionen ein.'
+                            )
 					),
 					'en_GB' => array(
 							'HGW_USER_PW' 			=> array('label' => 'Password'),
@@ -4459,7 +4570,15 @@ Mit freundlichen Gruessen
 							'HGW_HPF_DC_CSS' 		=> array(
 									'label'				=>'Path to hPF CSS for debitcard',
 									'description' 		=> 'Please enter the absolute path to the CSS, starting with "http(s)://". This CSS applies to our debitcard form.'
-							)
+							),
+                            'HGW_EASYMINAMOUNT' 		=> array(
+                                'label'				=>'Minimum amount for Ratenkauf by easyCredit',
+                                'description' 		=> 'Please enter here the appointed minimum amount for Ratenkauf by easyCredit.'
+                            ),
+                            'HGW_EASYMAXAMOUNT' 		=> array(
+                                'label'				=>'maximum amount for Ratenkauf by easyCredit',
+                                'description' 		=> 'Please enter here the appointed maximum amount for Ratenkauf by easyCredit.'
+                            )
 					),
 			);
 

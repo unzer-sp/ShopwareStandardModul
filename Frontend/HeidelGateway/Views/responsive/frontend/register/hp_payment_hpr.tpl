@@ -12,17 +12,14 @@
 					<p>Datenübermittlung Ratenkauf by easyCredit</p>
 				</div>
 				<div>
-					<div>	
-						<input type="checkbox" id="hgw_cb_hpr" name="CONFIG.OPTIN.TEXT" value="TRUE" class="checkbox" required="required">*
-						<span>{$configOptInText}</span>
-						
-					</div>
+					<input type="checkbox" id="hgw_cb_hpr" name="CONFIG.OPTIN.TEXT" value="TRUE" class="checkbox" required="required">*
+					<span>{$configOptInText}</span>
 				</div>
 			{/if}
 		
 		{else}
 			<div class="EasyPermission">
-				<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (200 - 5.000 EUR). </p>
+				<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ({$HGW_EASYMINAMOUNT} - {$HGW_EASYMAXAMOUNT} EUR). </p>
 			</div>
 		{/if}	
 	</div>

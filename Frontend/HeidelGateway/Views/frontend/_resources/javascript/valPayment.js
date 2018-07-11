@@ -44,14 +44,15 @@ $(document).ready(function(){
 						var reuse = false;
 					}
 
-                    // if( (formUrl != null)&& (formUrl != undefined) ){
-                    //
-                    //     if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
-                    //         jQuery('form.payment').attr('action', orgLink);
-                    //     }else{
-                    //         jQuery('form.payment').attr('action', formUrl[pm]);
-                    //     }
-                    // }
+                    if( (typeof formUrl !== "undefined") && (formUrl != null)){
+                        if((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')){
+                            jQuery('form.payment').attr('action', orgLink);
+
+                        }else{
+                            jQuery('form.payment').attr('action', formUrl[pm]);
+                            jQuery('form.frmRegister').attr('action', formUrl[pm]);
+                        }
+                    }
 				}else{
 					jQuery('form.payment').attr('action', orgLink);
 					hideForm();
@@ -120,6 +121,7 @@ $(document).ready(function(){
             if(pm.indexOf("hgw_ivpd") > 0)
             {
                 var errorsPayolution = valPayolutionDirect();
+
                 if((jQuery('.'+"hgw_ivpd"+'  .instyle_error').length > 0)){
                     jQuery('.error ul li').remove();
                     jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
@@ -145,7 +147,6 @@ $(document).ready(function(){
                 $(".button-right.large").append('<input type="hidden" name="NAME.BIRTHDATE" value="'+birthdate+'">');
                 $(".button-right.large").append('<input type="hidden" name="NAME.SALUTATION" value="'+salutation+'">');
             }
-
         }
 
 		if(jQuery("input[type='submit'], .right").val() == "Weiter") {
@@ -154,15 +155,14 @@ $(document).ready(function(){
 			var birthYear = null;
 			var pm = null;
 			pm = jQuery("#payType").attr("class");
-			pm = pm.substr(7);					
-			
+			pm = pm.substr(7);
 			if(jQuery(".newreg_"+pm) > 0) {
 				birthDay = jQuery(".newreg_"+pm+" [name='Date_Day']").val();
 				birthMonth = jQuery(".newreg_"+pm+" [name = 'Date_Month']").val();
 				birthYear = jQuery(".newreg_"+pm+" [name = 'Date_Year']").val();
 				jQuery("#birthdate_"+pm).val( birthYear+'-'+birthMonth+'-'+birthDay);
-			} 
-			
+			}
+
 			if(birthYear == null) {
 					jQuery(".newreg_"+pm+" [name = 'Date_Year']").val(jQuery(".newreg_"+pm+" [name = 'Date_Year']").next("div.js--fancy-select-text").text()) ;	
 					var birthYear = jQuery(".newreg_"+pm+" [name = 'Date_Year']").next("div.js--fancy-select-text").text();
@@ -170,13 +170,24 @@ $(document).ready(function(){
 					var birthDay = jQuery(".newreg_"+pm+" [name = 'Date_Day']").next("div.js--fancy-select-text").text();
 					jQuery("#birthdate_"+pm).val(birthYear+'-'+birthMonth+'-'+birthDay);
 			}
+
 		}
 
-        // // disable all other input fields
+		// disable all other input fields
         jQuery('.payment_method input').attr('disabled', 'disabled');
         jQuery('.payment_method select').attr('disabled', 'disabled');
         jQuery('.payment_method input:radio:checked').parents('.grid_15').find('input').removeAttr('disabled');
         jQuery('.payment_method input:radio:checked').parents('.grid_15').find('select').removeAttr('disabled');
+
+        if(window.location.pathname.indexOf('gateway') >= '-1')
+        {
+            jQuery('#payType').find('input').removeAttr('disabled');
+            jQuery('#payType').find('select').removeAttr('disabled');
+
+            jQuery('.payment_method.debit').find('input').removeAttr('disabled');
+            jQuery('.payment_method.debit').find('select').removeAttr('disabled');
+
+        }
 	});
 	
 	jQuery('.newreg_dd').click(function(e){
@@ -184,10 +195,10 @@ $(document).ready(function(){
 		var birthmonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
 		var birthyear = jQuery(".newreg_dd [name = 'Date_Year']").val();
 		jQuery('#birthdate').val(birthyear+'-'+birthmonth+'-'+birthday);
+		// jQuery('.newreg_dd #iban').val(jQuery('.newreg_dd #iban').val());
 	});
 	
 	jQuery('.newreg_papg').click(function(e){
-
 		var birthday = jQuery(".newreg_papg [name='Date_Day']").val();
 		var birthmonth = jQuery(".newreg_papg [name = 'Date_Month']").val();
 		var birthyear = jQuery(".newreg_papg [name = 'Date_Year']").val();
@@ -344,16 +355,27 @@ function valForm(){
 						});
 						if(pm == 'dd'){
 							// if(jQuery('.newreg_'+pm+' #sepa_switch').find(":selected").val() == 'iban'){
-								var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
-							// }else{
-							// 	var errors = valInputDdAccount(jQuery('.newreg_'+pm+' #account').val(), jQuery('.newreg_'+pm+' #bankcode').val(), pm);
-							// }
+                            // jQuery('.hgw_dd #iban').val(jQuery('.newreg_'+pm+' #iban').val());
+
+                            var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
+
+                            if (jQuery('.newreg_dd #salutation').is(':visible')) {
+                                var birthDay = jQuery('.newreg_dd select[name=Date_Day]').val();
+                                var birthMonth = jQuery('.newreg_dd select[name=Date_Month]').val();
+                                var birthYear = jQuery('.newreg_dd select[name=Date_Year]').val();
+
+                                jQuery('#birthdate_dd').val = birthYear+'-'+birthMonth+'-'+birthDay;
+
+                                errors = valDirectDebitSecured(errors);
+
+                            }
+
 						}
 						if(pm == 'papg'){
 							var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val()-1, jQuery('.hgw_papg select[name="Date_Day"]').val());
 							var today = new Date();
 							var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
-							var errors = valBirthdate(age);
+							var errors = valInvoiceSec();
 						}
                         if(pm == 'ivpd'){
                             var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val()-1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
@@ -411,19 +433,26 @@ function valGatewayForm(){
 		}
 	});
 
-	if((pm == 'dd') || (pm == 'sue')){
-		// if(jQuery('.'+checkedOpt+' #sepa_switch').find(":selected").val() == 'iban'){
-			var errors = valInputDdIban(jQuery('.'+checkedOpt+' #iban').val(), pm);
-		// }else{
-		// 	var errors = valInputDdAccount(jQuery('.'+checkedOpt+' #account').val(), jQuery('.'+checkedOpt+' #bankcode').val(), pm);
-		// }
+	if(pm == 'dd'){
+        // jQuery('.newreg_'+pm+' #iban').val(jQuery('.newreg_'+pm+' #iban').val());
+
+        var errors = valInputDdIban(jQuery('.newreg_'+pm+' #iban').val(), pm);
+
+        if (jQuery('.newreg_dd #salutation').is(':visible')) {
+            var birthDay = jQuery('.newreg_dd select[name=Date_Day]').val();
+            var birthMonth = jQuery('.newreg_dd select[name=Date_Month]').val();
+            var birthYear = jQuery('.newreg_dd select[name=Date_Year]').val();
+
+            jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            errors = valDirectDebitSecured(errors);
+        }
 	}else if(pm == 'gir'){
 		var errors = valInputDdIban(jQuery('.'+checkedOpt+' #iban').val(), pm);
 	}
     if(pm == "papg"){
         var errors = valInvoiceSec();
 
-        if((jQuery('.newreg_papg .has--error'))){
+        if((jQuery('.newreg_papg .has--error').length > 0)){
             if(jQuery.isEmptyObject(errors) == false){
                 jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
                 jQuery.each(errors, function(key, value){
@@ -440,7 +469,8 @@ function valGatewayForm(){
         }
     }
 
-	if((jQuery('.'+checkedOpt+' .instyle_error').length > 0)){
+	if((jQuery('.'+checkedOpt+' .instyle_error').length >= 1)){
+	    return false;
 		jQuery('.error ul li').remove();
 		jQuery('.error ul').append('<li>'+jQuery('.msg_fill').html()+'</li>');
 
@@ -461,7 +491,7 @@ function valInputDdIban(iban, pm){
 	
 	iban = iban.trim();	
 	var regexIban	= new RegExp('^[A-Z]{2}[0-9]{2}[a-zA-Z0-9]{11,30}$');
-	
+    jQuery('#iban').val(iban);
 	if(iban.search(regexIban) == '-1'){
 		jQuery('.newreg_'+pm+' #iban').addClass('instyle_error');
 		errors[i++] = '.msg_iban';
@@ -532,13 +562,13 @@ function valSantander() {
     var i = 0;
 
     // validation of salutation
-    var salutation = $('.newreg_san select[name="NAME.SALUTATION"]').val();
+    var salutation = $('.hgw_san select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "-")
     {
-        $('.newreg_san #salutation').parent('.outer-select').addClass("instyle_error");
+        $('.hgw_san #salutation').parent('div').addClass('instyle_error');
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_san #salutation').parent('.outer-select').removeClass('instyle_error');
+        $('.hgw_san #salutation').parent('div').removeClass('instyle_error');
     }
 
     // validation of birthdate
@@ -553,27 +583,30 @@ function valSantander() {
             jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('#birthdate_san').addClass('instyle_error');
 
             errors[i++] = '.msg_dob';
         }else{
             jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('#birthdate_san').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
         jQuery('.hgw_san select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.hgw_san select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.hgw_san select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('#birthdate_san').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
-
     // validation of privacy policy
     if($("#hgw_privacyPolicy").is(':checked'))
     {
         $("#hgw_privacyPolicy").removeClass('instyle_error');
+        $("#hgw_privacyPolicy").parent().next('p').removeClass('instyle_error');
     } else {
-        $("#hgw_privacyPolicy").addClass('instyle_error');
+        $("#hgw_privacyPolicy").parent().next('p').addClass('instyle_error');
         $("#hgw_privacyPolicy").attr("required","required");
 
         errors[i++] = '.msg_cb';
@@ -588,13 +621,13 @@ function valPayolutionDirect() {
     var i = 0;
 
     // validation of salutation
-    var salutation = $('.hgw_val_ivpd select[name="NAME.SALUTATION"]').val();
+    var salutation = $('.hgw_val_ivpd').val();
     if(salutation == undefined || salutation == "UNKNOWN")
     {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').addClass("instyle_error");
+        $('.newreg_ivpd #salutation').parent('div').addClass("instyle_error");
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').removeClass('instyle_error');
+        $('.newreg_ivpd #salutation').parent('div').removeClass('instyle_error');
     }
 
     // validation of birthdate
@@ -606,28 +639,33 @@ function valPayolutionDirect() {
         var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
         if(age < 18){
 
-            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('instyle_error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('instyle_error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('#birthdate_ivpd').addClass('instyle_error');
 
             errors[i++] = '.msg_dob';
         }else{
-            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('instyle_error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('instyle_error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('#birthdate_ivpd').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('instyle_error');
-        jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('instyle_error');
-        jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('instyle_error');
+        jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('#birthdate_ivpd').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
 
     //validation of Checkbox
     if(document.getElementById("hgw_privpol_ivpd").checked){
         $('#hgw_privpol_ivpd').removeAttr("required");
+        $("#payolutiontext").removeClass('instyle_error');
     } else {
+        $("#payolutiontext").addClass('instyle_error');
         $('#hgw_privpol_ivpd').attr("required","required");
         errors[i++] = 'msg_cb';
     }
@@ -647,6 +685,7 @@ function valPayolutionDirect() {
     return errors;
 }
 
+// function to validate invoice secured form
 function valInvoiceSec() {
     //var errors = [];
     var errors = new Array();
@@ -660,7 +699,7 @@ function valInvoiceSec() {
     } else {
         $('.newreg_papg #salutation').parent('.outer-select').removeClass('instyle_error');
     }
-
+    $('#birthdate_papg').val(jQuery('.newreg_papg select[name="Date_Year"]').val()+"-"+jQuery('.newreg_papg select[name="Date_Month"]').val()+"-"+jQuery('.newreg_papg select[name="Date_Day"]').val());
     // validation of birthdate
     var birthdate = $('#birthdate_papg').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
@@ -674,17 +713,20 @@ function valInvoiceSec() {
             jQuery('.newreg_papg select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('#birthdate_papg').addClass('instyle_error');
             errors[i++] = '.msg_dob';
         }else{
             jQuery('.newreg_papg select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
             jQuery('.newreg_papg select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('#birthdate_papg').removeClass('instyle_error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
         jQuery('.newreg_papg select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.newreg_papg select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
         jQuery('.newreg_papg select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('#birthdate_papg').addClass('instyle_error');
         errors[i++] = '.msg_dob';
     }
 
@@ -694,6 +736,60 @@ function valInvoiceSec() {
     if(errors.length > 0){
         return errors;
     }
+}
+
+// function to validate direct debit form
+function valDirectDebitSecured(errors) {
+    var i = 1;
+    // validation of salutation
+    var salutation = $('.newreg_dd #salutation').val();
+    if(salutation == undefined || salutation == "UNKNOWN")
+    {
+        $('.newreg_dd #salutation').parent('.js--fancy-select').addClass("instyle_error");
+        errors[i++] = '.msg_salut';
+    } else {
+        $('.newreg_dd #salutation').parent('.js--fancy-select').removeClass('instyle_error');
+    }
+
+    //validation of birthdate
+    $('#birthdate_dd').val(jQuery('.newreg_dd select[name="Date_Year"]').val()+'-'+jQuery('.newreg_dd select[name="Date_Month"]').val()+"-"+jQuery('.newreg_dd select[name="Date_Day"]').val());
+    var birthdate = $('#birthdate_dd').val();
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+        var dob = new Date(jQuery('.newreg_dd select[name="Date_Year"]').val(), jQuery('.newreg_dd select[name="Date_Month"]').val()-1, jQuery('.newreg_dd select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+        if(age < 18){
+
+            jQuery('.newreg_dd select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Year"]').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').addClass('instyle_error');
+            jQuery('#birthdate_dd').addClass('instyle_error');
+            errors[i++] = '.msg_dob';
+        }else{
+            jQuery('.newreg_dd select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Year"]').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Month"]').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.newreg_dd select[name="Date_Day"]').removeClass('instyle_error');
+            jQuery('#birthdate_dd').removeClass('instyle_error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.newreg_dd select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Year"]').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Month"]').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.newreg_dd select[name="Date_Day"]').addClass('instyle_error');
+        jQuery('#birthdate_dd').addClass('instyle_error');
+        errors[i++] = '.msg_dob';
+    }
+    return errors;
 }
 
 // function to show iFrame form

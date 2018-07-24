@@ -2965,8 +2965,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 				}else{
 					$countryInfo = Shopware()->Modules()->Admin()->sGetCountry($user['billingaddress']['countryID']);
-					if (strtoupper($user['billingaddress']['salutation']) == 'MS') {
-						$user['billingaddress']['salutation'] = 'MRS';
+					if (strtoupper($user['shippingaddress']['salutation']) == 'MS') {
+						$user['shippingaddress']['salutation'] = 'MRS';
 					}
 
 //					$ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
@@ -3034,7 +3034,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				$ppd_user['ACCOUNT.HOLDER'] 			= ' - ';
 				$ppd_user['IDENTIFICATION.SHOPPERID']	= 'guest';
 			}
-
 			return $ppd_user;
 		}catch(Exception $e){
 			$this->Logging('ppd_user | '.$e->getMessage());

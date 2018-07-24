@@ -3049,7 +3049,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		try{
 
 			$ppd_config = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_config($bookingMode, $pm, $uid);
-			$ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user(NULL, $pm);
+//			$ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user(NULL, $pm);
+            if($fromBootstrap){
+                $ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user(self::getUser(), $pm);
+            } else {
+                $ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user($this->getUser(), $pm);
+            }
+
 			$ppd_bskt['PRESENTATION.AMOUNT'] 	= Shopware()->Plugins()->Frontend()->HeidelGateway()->formatNumber($basket['amount']);
 			$ppd_bskt['PRESENTATION.CURRENCY']	= $basket['currency'];
 			$ppd_crit['CRITERION.USER_ID']		= $userId;
@@ -3062,7 +3068,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			if($fromBootstrap){
 				$ppd_crit['CRITERION.SECRET'] = self::createSecretHash($tempID);
-
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
 				$errorMsg = self::getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}else{
@@ -3108,7 +3113,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function preparePostData($config = array(), $frontend = array(), $userData = array(), $basketData = array(), $criterion = array(),$isRecurring = false){
 		try{
-			$params = array();
+		    $params = array();
 			// configurtation part of this function
 			$params['SECURITY.SENDER']		= $config['SECURITY.SENDER'];
 			$params['USER.LOGIN'] 			= $config['USER.LOGIN'];
@@ -3345,7 +3350,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			if(!empty($config['IDENTIFICATION.REFERENCEID'])){
 				$params['IDENTIFICATION.REFERENCEID'] = $config['IDENTIFICATION.REFERENCEID'];
 			}
-
 			return $params;
 
 		}catch(Exception $e){

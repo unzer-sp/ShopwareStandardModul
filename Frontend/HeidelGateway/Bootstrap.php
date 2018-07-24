@@ -26,7 +26,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function getVersion(){
 
-		return '18.07.11';
+		return '18.07.24';
 
 	}
 
@@ -891,6 +891,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
+            case '18.07.24':
+                // fixed an issue for saving regdata for Santander and Payolution
+                try{
+                    $this->addSnippets();
+                    $msg .= '* update 18.07.11 <br />';
+                } catch (Exception $e) {
+                    $this->logError($msg, $e);
+                }
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
@@ -1779,7 +1787,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($document->_order->payment['name'] == 'hgw_papg') ||
                 ($document->_order->payment['name'] == 'hgw_san') ||
                 ($document->_order->payment['name'] == 'hgw_ivpd')
-
+                || ($document->_order->payment['name'] == 'hgw_pp')
 				){
 				    $orderData = $view->getTemplateVars('Order');
 					$containers = $view->getTemplateVars('Containers');
@@ -2961,14 +2969,23 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						$user['billingaddress']['salutation'] = 'MRS';
 					}
 
-					$ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
-					$ppd_user['NAME.SALUTATION']	= strtoupper($user['billingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['billingaddress']['salutation']);
-					$ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'];
-					$ppd_user['NAME.FAMILY']		= $user['billingaddress']['lastname'];
-					$ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
-					$ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
-					$ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
-                    $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
+//					$ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
+//					$ppd_user['NAME.SALUTATION']	= strtoupper($user['billingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['billingaddress']['salutation']);
+//					$ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'];
+//					$ppd_user['NAME.FAMILY']		= $user['billingaddress']['lastname'];
+//					$ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
+//					$ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
+//					$ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
+//                    $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
+
+                    $ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
+                    $ppd_user['NAME.SALUTATION']	= strtoupper($user['shippingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['shippingaddress']['salutation']);
+                    $ppd_user['NAME.GIVEN']			= $user['shippingaddress']['firstname'];
+                    $ppd_user['NAME.FAMILY']		= $user['shippingaddress']['lastname'];
+                    $ppd_user['ADDRESS.STREET']		= $user['shippingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
+                    $ppd_user['ADDRESS.ZIP']		= $user['shippingaddress']['zipcode'];
+                    $ppd_user['ADDRESS.CITY']		= $user['shippingaddress']['city'];
+                    $ppd_user['CONTACT.PHONE']		= $user['shippingaddress']['phone'];
 
 					if($pm == 'san' || $pm == 'ivpd')
 					{

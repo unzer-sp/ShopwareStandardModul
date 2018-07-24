@@ -955,11 +955,10 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
         $count = 1;
         foreach ($orderDetails as $singleArticle)
         {
-
             $shoppingCart['basket']['basketItems'][] = array(
                 'position'				=> $count,
                 'basketItemReferenceId' => $count,
-                'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['articleordernumber'],
+                'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['id'],
                 'unit'					=> $singleArticle['unit'],
                 'quantity'				=> $singleArticle['quantity'],
                 'vat'					=> $singleArticle['tax_rate'],

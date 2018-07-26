@@ -2969,23 +2969,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						$user['shippingaddress']['salutation'] = 'MRS';
 					}
 
-//					$ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
-//					$ppd_user['NAME.SALUTATION']	= strtoupper($user['billingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['billingaddress']['salutation']);
-//					$ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'];
-//					$ppd_user['NAME.FAMILY']		= $user['billingaddress']['lastname'];
-//					$ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
-//					$ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
-//					$ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
-//                    $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
-
                     $ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
-                    $ppd_user['NAME.SALUTATION']	= strtoupper($user['shippingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['shippingaddress']['salutation']);
-                    $ppd_user['NAME.GIVEN']			= $user['shippingaddress']['firstname'];
-                    $ppd_user['NAME.FAMILY']		= $user['shippingaddress']['lastname'];
-                    $ppd_user['ADDRESS.STREET']		= $user['shippingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
-                    $ppd_user['ADDRESS.ZIP']		= $user['shippingaddress']['zipcode'];
-                    $ppd_user['ADDRESS.CITY']		= $user['shippingaddress']['city'];
-                    $ppd_user['CONTACT.PHONE']		= $user['shippingaddress']['phone'];
+                    $ppd_user['NAME.SALUTATION']	= strtoupper($user['billingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['billingaddress']['salutation']);
+                    $ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'];
+                    $ppd_user['NAME.FAMILY']		= $user['billingaddress']['lastname'];
+                    $ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
+                    $ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
+                    $ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
+                    $ppd_user['CONTACT.PHONE']		= $user['billingaddress']['phone'];
 
 					if($pm == 'san' || $pm == 'ivpd')
 					{
@@ -2998,13 +2989,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                         $ppd_user['CRITERION.USER_ID']	= $user['additional']['user']['userID'];
                         $ppd_user['ADDRESS.COUNTRY']	= $countryInfo['countryiso'];
-                        $ppd_user['NAME.GIVEN']			= $user['shippingaddress']['firstname'] != '' ? $user['shippingaddress']['firstname'] : $user['billingaddress']['firstname'];
-                        $ppd_user['NAME.FAMILY']		= $user['shippingaddress']['lastname'] != '' ? $user['shippingaddress']['lastname'] : $user['billingaddress']['lastname'];
-                        $ppd_user['ADDRESS.STREET'] 	= $user['shippingaddress']['street'] != '' ? $user['shippingaddress']['street'] : $user['billingaddress']['street'];
-                        $ppd_user['ADDRESS.STREET'] 	.= $user['shippingaddress']['streetnumber'] != '' ? $user['shippingaddress']['streetnumber'] : $user['billingaddress']['streetnumber'];
-                        $ppd_user['ADDRESS.ZIP'] 		= $user['shippingaddress']['zipcode'] != '' ? $user['shippingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
-                        $ppd_user['ADDRESS.CITY'] 		= $user['shippingaddress']['city'] != '' ? $user['shippingaddress']['city'] : $user['billingaddress']['city'];
-                        $ppd_user['CONTACT.PHONE'] 		= $user['shippingaddress']['phone'] != '' ? $user['shippingaddress']['phone'] : $user['billingaddress']['phone'];
+                        $ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'] != '' ? $user['billingaddress']['firstname'] : $user['billingaddress']['firstname'];
+                        $ppd_user['NAME.FAMILY']		= $user['billingaddress']['lastname'] != '' ? $user['billingaddress']['lastname'] : $user['billingaddress']['lastname'];
+                        $ppd_user['ADDRESS.STREET'] 	= $user['billingaddress']['street'] != '' ? $user['billingaddress']['street'] : $user['billingaddress']['street'];
+                        $ppd_user['ADDRESS.STREET'] 	.= $user['billingaddress']['streetnumber'] != '' ? $user['billingaddress']['streetnumber'] : $user['billingaddress']['streetnumber'];
+                        $ppd_user['ADDRESS.ZIP'] 		= $user['billingaddress']['zipcode'] != '' ? $user['billingaddress']['zipcode'] : $user['billingaddress']['zipcode'];
+                        $ppd_user['ADDRESS.CITY'] 		= $user['billingaddress']['city'] != '' ? $user['billingaddress']['city'] : $user['billingaddress']['city'];
+                        $ppd_user['CONTACT.PHONE'] 		= $user['billingaddress']['phone'] != '' ? $user['billingaddress']['phone'] : $user['billingaddress']['phone'];
 
                         $ppd_user['RISKINFORMATION.CUSTOMERGUESTCHECKOUT']  = $user['additional']['user']['accountmode'] == '0' ?  'FALSE':'TRUE';
                         $ppd_user['RISKINFORMATION.CUSTOMERSINCE'] 		    = $user['additional']['user']['firstlogin'];

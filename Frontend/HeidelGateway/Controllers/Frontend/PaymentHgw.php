@@ -1769,6 +1769,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             (strtolower($payType) == 'ivpd') ||
                             (strtolower($payType) == 'pp')
                         ) {
+
                             $comment .= '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
                             $comment .= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
 
@@ -1982,7 +1983,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							break;
 
 							case 'pp':
+
 								Shopware()->Session()->sOrderVariables['prepaymentText'] = $comment;
+
 								// sendeing Prepayment Email
 								if($this->Config()->HGW_PP_MAIL > 0){
 									$repl = array(

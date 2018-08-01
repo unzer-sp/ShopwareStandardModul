@@ -2023,7 +2023,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                 unset(Shopware()->Session()->wantEasy);
                                 unset($this->View()->configOptInText);
                                 unset($this->View()->amortisationText);
-
                                 unset($comment);
                                 //delete chosen payment of user
                                 $user = Shopware()->Modules()->Admin()->sGetUserData();
@@ -2067,7 +2066,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						);
 
 						$this->addOrderInfos($parameters->IDENTIFICATION_TRANSACTIONID, $params, $paymentStatus);
-
+                        Shopware()->Session()->HPdidRequest == false;
+						unset(Shopware()->Session()->HPdidRequest);
 						print Shopware()->Front()->Router()->assemble(array(
 								'forceSecure' 	=> 1,
 								'controller' 	=> 'PaymentHgw',
@@ -2150,7 +2150,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 				}
             }
-
+            Shopware()->Session()->HPdidRequest == false;
+            unset(Shopware()->Session()->HPdidRequest);
 			return $this->redirect(array(
 					'controller' 	=> 'checkout',
 					'action' 		=> 'finish',

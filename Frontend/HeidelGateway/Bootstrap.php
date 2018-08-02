@@ -26,7 +26,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function getVersion(){
 
-		return '18.08.01';
+		return '18.08.03';
 
 	}
 
@@ -902,6 +902,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 }
 
             case '18.08.01':
+            case '18.08.03':
                 // integration of Santander HP
                 try{
                     $this->addSnippets();
@@ -2599,41 +2600,41 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     ));
                 }
             }
-
-            // redirect to EasyCredit
-            if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
-                if (Shopware()->Session()->HPdidRequest == true)
-                {
-                    return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
-                } else {
-                    return $args->getSubject()->redirect(array(
-                        'forceSecure' => 1,
-                        'controller' => 'account',
-                        'action' => 'payment',
-                        'sTarget' => 'checkout'
-                    ));
-                }
-                exit();
-            }else{
-                if (Shopware()->Session()->wantEasy) {
-                    if ($responseHpr['FRONTEND_REDIRECT_URL']) {
-                        Shopware()->Session()->HPdidRequest = 'TRUE';
+            if((strtolower($user['additional']['payment']['name']) == 'hgw_hpr')) {
+                // redirect to EasyCredit
+                if (Shopware()->Shop()->getTemplate()->getVersion() < 3) {
+                    if (Shopware()->Session()->HPdidRequest == true) {
                         return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
-                        exit();
+                    } else {
+                        return $args->getSubject()->redirect(array(
+                            'forceSecure' => 1,
+                            'controller' => 'account',
+                            'action' => 'payment',
+                            'sTarget' => 'checkout'
+                        ));
                     }
+                    exit();
                 } else {
-//                    Shopware()->Session()->wantEasy = true;
-//                    return $args->getSubject()->redirect(array(
-//                        'forceSecure' => 1,
-//                        'controller' => 'checkout',
-//                        'action' => 'shippingPayment',
-//                        'sTarget' => 'checkout'
-//                    ));
-                    return $args->getSubject()->redirect(array(
-                        'forceSecure' => 1,
-                        'controller' => 'checkout',
-                        'action' => 'confirm',
-                    ));
+                    if (Shopware()->Session()->wantEasy) {
+                        if ($responseHpr['FRONTEND_REDIRECT_URL']) {
+                            Shopware()->Session()->HPdidRequest = 'TRUE';
+                            return $args->getSubject()->redirect($responseHpr['FRONTEND_REDIRECT_URL']);
+                            exit();
+                        }
+                    } else {
+                        //                    Shopware()->Session()->wantEasy = true;
+                        //                    return $args->getSubject()->redirect(array(
+                        //                        'forceSecure' => 1,
+                        //                        'controller' => 'checkout',
+                        //                        'action' => 'shippingPayment',
+                        //                        'sTarget' => 'checkout'
+                        //                    ));
+                        return $args->getSubject()->redirect(array(
+                            'forceSecure' => 1,
+                            'controller' => 'checkout',
+                            'action' => 'confirm',
+                        ));
+                    }
                 }
             }
         }

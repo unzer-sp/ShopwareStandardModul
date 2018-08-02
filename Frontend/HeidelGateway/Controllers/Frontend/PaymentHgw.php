@@ -324,7 +324,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				}
 			}else{
 				$ppd_config = $this->hgw()->ppd_config(NULL, $activePayment, NULL, true);
-				$ppd_user = $this->hgw()->ppd_user();
+//				$ppd_user = $this->hgw()->ppd_user(Null, $activePayment);
+                $ppd_user = $this->hgw()->ppd_user($this->getUser(), $activePayment);
 				$ppd_bskt['PRESENTATION.AMOUNT'] = $this->hgw()->formatNumber($basket['amount']);
 				$ppd_bskt['PRESENTATION.CURRENCY'] = $basket['currency'];
 
@@ -398,6 +399,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							$this->View()->pluginPath 	= $pref .$basepath .$pluginPath;
 
 				}else{
+                    //payment methods: pp, iv, bs, mk, mpa, san, ivpd, hpr, hps
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
@@ -1251,6 +1253,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             $resp['PROCESSING_REASON']			= $this->Request()->getPost('PROCESSING_REASON') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_REASON'), $flag, $enc) : '';
             $resp['PROCESSING_TIMESTAMP']		= $this->Request()->getPost('PROCESSING_TIMESTAMP') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_TIMESTAMP'), $flag, $enc) : '';
             $resp['PROCESSING_STATUS']			= $this->Request()->getPost('PROCESSING_STATUS') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_STATUS'), $flag, $enc) : '';
+            $resp['PROCESSING_RECOVERABLE']		= $this->Request()->getPost('PROCESSING_RECOVERABLE') == true ? htmlspecialchars($this->Request()->getPost('PROCESSING_RECOVERABLE'), $flag, $enc) : '';
 
             // special criterions for HPR
             $resp['CRITERION_EASYCREDIT_FIRSTRATEDUEDATE']	= $this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_FIRSTRATEDUEDATE'), $flag, $enc) : '';
@@ -1270,6 +1273,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             $resp['CRITERION_EASYCREDIT_EFFECTIVEINTEREST']	= $this->Request()->getPost('CRITERION_EASYCREDIT_EFFECTIVEINTEREST') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_EFFECTIVEINTEREST'), $flag, $enc) : '';
             $resp['CRITERION_EASYCREDIT_DEVICEIDENTTOKEN']	= $this->Request()->getPost('CRITERION_EASYCREDIT_DEVICEIDENTTOKEN') 	== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_DEVICEIDENTTOKEN'), $flag, $enc) : '';
             $resp['CRITERION_EASYCREDIT_UUID']				= $this->Request()->getPost('CRITERION_EASYCREDIT_UUID') 				== true ? htmlspecialchars($this->Request()->getPost('CRITERION_EASYCREDIT_UUID'), $flag, $enc) : '';
+
+            // special Criterions for Santander HP
+            $resp['CRITERION_SANTANDER_HP_PDF_URL']				= $this->Request()->getPost('CRITERION_SANTANDER_HP_PDF_URL') 				== true ? htmlspecialchars($this->Request()->getPost('CRITERION_SANTANDER_HP_PDF_URL'), $flag, $enc) : '';
 
             $resp['RISKINFORMATION.CUSTOMERGUESTCHECKOUT']	= $this->Request()->getPost('RISKINFORMATION.CUSTOMERGUESTCHECKOUT') 	== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERGUESTCHECKOUT'), $flag, $enc) : '';
             $resp['RISKINFORMATION.CUSTOMERSINCE']			= $this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE') 			== true ? htmlspecialchars($this->Request()->getPost('RISKINFORMATION.CUSTOMERSINCE'), $flag, $enc) : '';
@@ -1313,10 +1319,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             $resp['NAME_BIRTHDATE']				= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
             $resp['NAME_FAMILY']				= $this->Request()->getPost('NAME_FAMILY') == true ? htmlspecialchars($this->Request()->getPost('NAME_FAMILY'), $flag, $enc) : '';
             $resp['NAME_GIVEN']					= $this->Request()->getPost('NAME_GIVEN') == true ? htmlspecialchars($this->Request()->getPost('NAME_GIVEN'), $flag, $enc) : '';
+            $resp['NAME_BIRTHDATE']				= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('NAME_BIRTHDATE'), $flag, $enc) : '';
             $resp['ADDRESS_STREET']				= $this->Request()->getPost('ADDRESS_STREET') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_STREET'), $flag, $enc) : '';
             $resp['ADDRESS_CITY']				= $this->Request()->getPost('ADDRESS_CITY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_CITY'), $flag, $enc) : '';
             $resp['ADDRESS_ZIP']				= $this->Request()->getPost('ADDRESS_ZIP') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_ZIP'), $flag, $enc) : '';
             $resp['ADDRESS_COUNTRY']			= $this->Request()->getPost('ADDRESS_COUNTRY') == true ? htmlspecialchars($this->Request()->getPost('ADDRESS_COUNTRY'), $flag, $enc) : '';
+            $resp['CUSTOMER_OPTIN']			    = $this->Request()->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN'), $flag, $enc) : '';
+            $resp['CUSTOMER_OPTIN2']			= $this->Request()->getPost('CUSTOMER_OPTIN_2') == true ? htmlspecialchars($this->Request()->getPost('CUSTOMER_OPTIN_2'), $flag, $enc) : '';
 
             $resp['CONTACT_EMAIL']				= $this->Request()->getPost('CONTACT_EMAIL') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_EMAIL'), $flag, $enc) : '';
             $resp['CONTACT_PHONE']				= $this->Request()->getPost('CONTACT_PHONE') == true ? htmlspecialchars($this->Request()->getPost('CONTACT_PHONE'), $flag, $enc) : '';
@@ -1324,6 +1333,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
             $resp['TRANSACTION_CHANNEL']		= $this->Request()->getPost('TRANSACTION_CHANNEL') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_CHANNEL'), $flag, $enc) : '';
             $resp['TRANSACTION_MODE']			= $this->Request()->getPost('TRANSACTION_MODE') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_MODE'), $flag, $enc) : '';
+            $resp['TRANSACTION_SOURCE']			= $this->Request()->getPost('TRANSACTION_SOURCE') == true ? htmlspecialchars($this->Request()->getPost('TRANSACTION_SOURCE'), $flag, $enc) : '';
 
             $resp['var_Register']				= ($this->Request()->getPost('register') == true && gettype($this->Request()->getPost('register')) == 'array') ? $this->Request()->getPost('register') : '';
             if(empty($resp['var_Register'])){
@@ -1670,6 +1680,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             )
             {
                 Shopware()->Session()->HPError = $this->getHPErrorMsg($parameters->PROCESSING_RETURN_CODE);
+
+                if(Shopware()->Session()->HpHpsErrorAdress){
+                    Shopware()->Session()->HPError = $this->getHPErrorMsg("700.400.XXX",false);
+                    Shopware()->Session()->HpHpsErrorAdress = false;
+                }
 
                 print Shopware()->Front()->Router()->assemble(array(
 						'forceSecure' => 1,
@@ -3160,7 +3175,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$params['FRONTEND.MODE'] 		= "WHITELABEL";
 
 			// set payment method
-			switch($config['PAYMENT.METHOD']){
+            switch(strtolower($config['PAYMENT.METHOD'])){
 				/* prezlewy24 */
 				case 'p24':
 					$type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
@@ -3266,6 +3281,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
                     $params['PAYMENT.CODE'] 		= "HP.".$type;
                     $params['TRANSACTION.RESPONSE']	= "SYNC";
+                    break;
+                /* Santander HP */
+                case 'hps':
+                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+                    $params['PAYMENT.CODE'] 		= "HP.".$type;
+                    $params['TRANSACTION.RESPONSE']	= "SYNC";
+                    $params['FRONTEND.ENABLED']     = "false";
                     break;
 					/* credit- & debitcard */
 				case 'cc':

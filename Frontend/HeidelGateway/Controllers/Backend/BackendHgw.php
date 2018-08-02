@@ -126,6 +126,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					$payName = 'wt';
 					break;
                 case 'hpr':
+                case 'hps':
                     $payName = 'hp';
                     break;
 				default:
@@ -568,6 +569,18 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                             $maxFi = $value['PRESENTATION_AMOUNT'];
                             if($payInfo['payType'] == 'pa'){
                                 $btns['fi']['active'] = 'true';
+                            }
+                            if($payInfo['payType'] == 'fi'){
+                                $btns['fi']['active'] = 'false';
+                            }
+                            break;
+                        case 'hps':
+                            $maxFi = $value['PRESENTATION_AMOUNT'];
+                            if($payInfo['payType'] == 'pa'){
+                                $btns['fi']['active'] = 'true';
+                            }
+                            if($payInfo['payType'] == 'fi'){
+                                $btns['fi']['active'] = 'false';
                             }
                             break;
 						default:

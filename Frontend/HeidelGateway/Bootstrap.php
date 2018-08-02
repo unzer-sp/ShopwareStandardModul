@@ -26,7 +26,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function getVersion(){
 
-		return '18.07.24';
+		return '18.08.02';
 
 	}
 
@@ -891,11 +891,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.07.24':
+            case '18.08.02':
                 // fixed an issue for saving regdata for Santander and Payolution
+                // refactored easyCredit events
+                // tested for SW 5.4.6
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.07.11 <br />';
+                    $msg .= '* update 18.08.02 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }

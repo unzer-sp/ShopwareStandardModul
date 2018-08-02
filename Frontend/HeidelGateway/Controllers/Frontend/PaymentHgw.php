@@ -324,7 +324,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				}
 			}else{
 				$ppd_config = $this->hgw()->ppd_config(NULL, $activePayment, NULL, true);
-				$ppd_user = $this->hgw()->ppd_user();
+//				$ppd_user = $this->hgw()->ppd_user(Null, $activePayment);
+				$ppd_user = $this->hgw()->ppd_user($this->getUser(), $activePayment);
+
 				$ppd_bskt['PRESENTATION.AMOUNT'] = $this->hgw()->formatNumber($basket['amount']);
 				$ppd_bskt['PRESENTATION.CURRENCY'] = $basket['currency'];
 
@@ -397,6 +399,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							$this->View()->pluginPath 	= $pref .$basepath .$pluginPath;
 
 				}else{
+				    //payment methods: pp, iv, bs, mk, mpa, san, ivpd, hpr, hps
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
@@ -486,7 +489,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         {
                             return $this->forward('missinginput');
                         }
-
                     }
 
                     if ($activePayment == 'hpr') {

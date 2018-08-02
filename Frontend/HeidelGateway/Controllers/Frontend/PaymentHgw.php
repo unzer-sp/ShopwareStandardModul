@@ -335,7 +335,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         ($activePayment != 'mpa')&&
                         ($activePayment != 'san')&&
                         ($activePayment != 'ivpd')&&
-                        ($activePayment != 'hpr')
+                        ($activePayment != 'hpr') &&
+                        ($activePayment != 'hps')
 						){
 
 							//adding a basketId for papg payment
@@ -400,7 +401,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
-
+                    // Masterpass
 					if($activePayment == 'mpa'){
 						if(empty($regData)){
 							$basketId = self::getBasketId();
@@ -419,7 +420,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							$ppd_crit['FRONTEND.ENABLED'] = 'true';
 						}
 					}
-
+                    // Santander Invoice
                     if($activePayment == 'san') {
                         $basketId = self::getBasketId();
 
@@ -451,7 +452,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             return $this->forward('missinginput');
                         }
                     }
-
+                    // Payolution direct Invoice
                     if($activePayment == 'ivpd') {
                         $basketId = self::getBasketId();
 
@@ -488,7 +489,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         }
 
                     }
-
+                    // easyCredit hire purchase
                     if ($activePayment == 'hpr') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
@@ -499,6 +500,34 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                         $ppd_crit['IDENTIFICATION.REFERENCEID'] = $transaction['uniqueid'];
                         unset($this->View()->configOptInText);
+                    }
+
+                    // Santander Hire Purchace
+                    if ($activePayment == 'hps') {
+                        // fetch INI Transaction to set the ReferenceId
+                        $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+                        $transactionParams = json_decode($transaction['jsonresponse'],1);
+
+                        if(
+                            ($transactionParams['ACCOUNT_HOLDER'] != $user['shippingaddress']['firstname'].' '.$user['shippingaddress']['lastname'])
+                            || ($transactionParams['ADDRESS_STREET'] != $user['shippingaddress']['street'])
+                            || ($transactionParams['ADDRESS_CITY'] != $user['shippingaddress']['city'])
+                            || ($transactionParams['ADDRESS_ZIP'] != $user['shippingaddress']['zipcode'])
+
+                        ){
+                            Shopware()->Session()->HPOrderID = $transaction['transactionid'];
+                            Shopware()->Session()->HpHpsErrorAdress = true;
+                            return $this->forward('fail');
+
+                        }
+                        //setting
+                        $ppd_bskt['PRESENTATION.AMOUNT'] 	= $this->hgw()->formatNumber($basket['amount']);
+                        $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
+
+                        $ppd_config['PAYMENT.CODE'] = "HP.PA";
+
+                        $ppd_crit['IDENTIFICATION.REFERENCEID'] = $transaction['uniqueid'];
+                        unset($this->View()->linkPrecontactInfos);
                     }
 
 					$params = $this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit);

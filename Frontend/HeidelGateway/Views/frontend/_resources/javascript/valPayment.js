@@ -309,19 +309,21 @@ $(document).ready(function(){
 
         },
         complete: function(event, xhr, settings){
-            var chosenPaymentMethod = $('input:radio:checked').attr('class');
-            // check chosen payment method
-            if(chosenPaymentMethod != undefined){
-                var cut = parseInt(chosenPaymentMethod.indexOf("hgw_"))+4;
-                chosenPaymentMethod = chosenPaymentMethod.substr(cut,4);
+            if(window.location.pathname.indexOf('shippingPayment') >= 0) {
+                var chosenPaymentMethod = $('input:radio:checked').attr('class');
+                // check chosen payment method
+                if (chosenPaymentMethod != undefined) {
+                    var cut = parseInt(chosenPaymentMethod.indexOf("hgw_")) + 4;
+                    chosenPaymentMethod = chosenPaymentMethod.substr(cut, 4);
 
-                //setting Payolution-checkbox to required if payolution is chosen
-                if(chosenPaymentMethod == 'ivpd'){
-                    $('#hgw_privpol_ivpd').attr("required","required");
-                    $('#hgw_privpol_ivpd').prop("required","required");
-                } else {
-                    $('#hgw_privpol_ivpd').prop("required",null);
-                    $('#hgw_privpol_ivpd').removeAttr("required");
+                    //setting Payolution-checkbox to required if payolution is chosen
+                    if (chosenPaymentMethod == 'ivpd') {
+                        $('#hgw_privpol_ivpd').attr("required", "required");
+                        $('#hgw_privpol_ivpd').prop("required", "required");
+                    } else {
+                        $('#hgw_privpol_ivpd').prop("required", null);
+                        $('#hgw_privpol_ivpd').removeAttr("required");
+                    }
                 }
             }
         },

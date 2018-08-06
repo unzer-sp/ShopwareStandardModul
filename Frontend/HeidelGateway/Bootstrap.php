@@ -2420,7 +2420,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $view->HGW_EASYMAXAMOUNT = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT;
         }
 
-        // Function to show EasyCredit-text on choose-payment-site
+        // Function to
+        // - show EasyCredit-text on choose-payment-site
+        // - assign variables for Santander HP ratepay
         if (
             ($request->getControllerName() == 'checkout') &&
             ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') || (strtolower($user['additional']['payment']['name']) == 'hgw_hps')) &&
@@ -2535,14 +2537,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             (
                 ($request->getActionName() == 'saveShippingPayment') &&
                 ($request->getControllerName() == 'checkout') &&
-                ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') && (strtolower($user['additional']['payment']['name']) == 'hgw_hps')) &&
+                ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') || (strtolower($user['additional']['payment']['name']) == 'hgw_hps')) &&
                 ((Shopware()->Session()->HPdidRequest == 'FALSE') || empty(Shopware()->Session()->HPdidRequest))
             ) ||
             //case for Emotion template
             (
                 ($request->getActionName() == 'confirm') &&
                 ( $request->getControllerName() == 'checkout') &&
-                ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') && (strtolower($user['additional']['payment']['name']) == 'hgw_hps')) &&
+                ((strtolower($user['additional']['payment']['name']) == 'hgw_hpr') || (strtolower($user['additional']['payment']['name']) == 'hgw_hps')) &&
                 ((Shopware()->Session()->HPdidRequest == 'FALSE') || empty(Shopware()->Session()->HPdidRequest))
             )
         )
@@ -2600,6 +2602,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     ));
                 }
             }
+
             if((strtolower($user['additional']['payment']['name']) == 'hgw_hpr')) {
                 // redirect to EasyCredit
                 if (Shopware()->Shop()->getTemplate()->getVersion() < 3) {

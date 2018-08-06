@@ -39,6 +39,9 @@ document.asyncReady(function () {
                     changeUrl(checkedOpt, orgLink);
 
                 });
+                // add validation for form
+                // add validation for form
+                jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
 
                 // set original form action (before AJAX is sent)
                 $.ajaxSetup({
@@ -392,6 +395,21 @@ document.asyncReady(function () {
             jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
 
+        jQuery('.newreg_hps').change(function (e) {
+            var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+            jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
+        });
+
+        if (jQuery('.newreg_hps')) {
+            var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+            var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+            var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+            jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
+        }
+
         $( document ).ajaxComplete(function() {
             jQuery('.newreg_dd').click(function (e) {
                 var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
@@ -719,51 +737,82 @@ function valShippingPaymentForm() {
                 }
             });
 
-            if (pm == 'dd') {
-                var errors = new Array();
-                // direct debit
-                errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+            // if (pm == 'dd') {
+            //     var errors = new Array();
+            //     // direct debit
+            //     errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+            //
+            //     // direct debit secured
+            //     if(jQuery('#salutation').is(':visible')){
+            //         // getting Values from input fields
+            //         var birthDay = jQuery('select[name=Date_Day]').val();
+            //         var birthMonth = jQuery('select[name=Date_Month]').val();
+            //         var birthYear = jQuery('select[name=Date_Year]').val();
+            //
+            //         jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            //
+            //         errors = valDirectDebitSecured(errors);
+            //     }
+            // }
+            //
+            // if (pm == 'papg') {
+            //     var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val() - 1, jQuery('.hgw_papg select[name="Date_Day"]').val());
+            //     var today = new Date();
+            //     var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+            //     var errors = valBirthdate(age);
+            // }
+            //
+            // if(pm == 'san'){
+            //     var errors = valSantander();
+            //
+            //     if(errors.length >0)
+            //     {
+            //         return false;
+            //     }
+            // }
+            //
+            // if(pm == 'ivpd'){
+            //     var errors = valPayolutionDirect();
+            //     if(errors.length >0)
+            //     {
+            //         return false;
+            //     }
+            // }
+            switch (pm.toLocaleLowerCase()) {
+                case "dd":
+                    var errors = valInputDdIban(jQuery('.newreg_' + pm + ' #iban').val(), pm);
+                    break;
 
-                // direct debit secured
-                if(jQuery('#salutation').is(':visible')){
-                    // getting Values from input fields
-                    var birthDay = jQuery('select[name=Date_Day]').val();
-                    var birthMonth = jQuery('select[name=Date_Month]').val();
-                    var birthYear = jQuery('select[name=Date_Year]').val();
+                case "papg":
+                    var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val() - 1, jQuery('.hgw_papg select[name="Date_Day"]').val());
+                    var today = new Date();
+                    var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+                    var errors = valBirthdate(age);
+                    break;
 
-                    jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                case "san":
+                    var errors = valSantander();
+                    if(errors.length >0){return false;}
+                    break;
 
-                    errors = valDirectDebitSecured(errors);
-                }
+                case "ivpd":
+                    var errors = valPayolutionDirect();
+                    if(errors.length >0){return false;}
+                    break;
+
+                case "hps":
+                    var errors = valSantanderHP();
+                // if(errors.length >0){return false;}
             }
 
-            if (pm == 'papg') {
-                var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val() - 1, jQuery('.hgw_papg select[name="Date_Day"]').val());
-                var today = new Date();
-                var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
-                var errors = valBirthdate(age);
-            }
-
-            if(pm == 'san'){
-                var errors = valSantander();
-
-                if(errors.length >0)
-                {
-                    return false;
-                }
-            }
-
-            if(pm == 'ivpd'){
-                var errors = valPayolutionDirect();
-                if(errors.length >0)
-                {
-                    return false;
-                }
-            }
 
         }
 
-        if ((jQuery('div.hgw_' + pm + ' .has--error').length > 0)) {
+        if (
+            (jQuery('div.hgw_' + pm + ' .has--error').length > 0)
+            || (jQuery('div.newreg_' + pm + ' .has--error').length > 0)
+
+        ) {
             if (jQuery('.content-main--inner .content .alert--content ul').length == 0) {
                 jQuery('.content-main--inner .content .alert--content').html('<ul class="alert--list"></ul>');
             }
@@ -1100,6 +1149,44 @@ function valInvoiceSec() {
     }
 }
 
+/**
+ * valSantanderHP
+ * Function to validate Santander Hire purchace
+ */
+function valSantanderHP() {
+    var errors = new Array();
+    var i = 0;
+
+    var birthdate = $('#birthdate_sanHps').val();
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+
+        var dob = new Date(jQuery('.newreg_hps select[name="Date_Year"]').val(), jQuery('.newreg_hps select[name="Date_Month"]').val()-1, jQuery('.newreg_hps select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+
+        if(age < 18){
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            errors[i++] = '.msg_dob';
+        }else{
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        errors[i++] = '.msg_dob';
+    }
+    if(errors.length > 0){
+        return errors;
+    }
+
+}
 
 /**
  * valPhoneNumber

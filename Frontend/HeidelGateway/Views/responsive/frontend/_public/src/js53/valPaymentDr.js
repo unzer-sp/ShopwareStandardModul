@@ -532,36 +532,36 @@ function hgwToggleReuse (pm)
 }
 
 // CHANGE FORM URL
-function changeUrl(checkedOpt, orgLink) {
-    if (checkedOpt != undefined) {
-        var prefix = 'hgw_';
-        var checkedOptPos = checkedOpt.indexOf(prefix);
-
-        if (checkedOptPos >= 0) {
-            var pm = checkedOpt.substr(checkedOptPos + prefix.length);
-
-            if (pm == 'pay') { pm = 'va';}
-
-            if ((jQuery('.reues_' + pm).length > 0) && !(jQuery('.reues_' + pm).is(':checked'))) {
-                var reuse = true;
-            } else {
-                var reuse = false;
-            }
-            if (formUrl != null) {
-                if ((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')) {
-                    jQuery('form.payment').attr('action', orgLink);
-                } else {
-                    jQuery('form.payment').attr('action', formUrl[pm]);
-                }
-            }
-        } else {
-            jQuery('form.payment').attr('action', orgLink);
-        }
-    } else {
-        jQuery('form.payment').attr('action', orgLink);
-    }
-
-}
+// function changeUrl(checkedOpt, orgLink) {
+//     if (checkedOpt != undefined) {
+//         var prefix = 'hgw_';
+//         var checkedOptPos = checkedOpt.indexOf(prefix);
+//
+//         if (checkedOptPos >= 0) {
+//             var pm = checkedOpt.substr(checkedOptPos + prefix.length);
+//
+//             if (pm == 'pay') { pm = 'va';}
+//
+//             if ((jQuery('.reues_' + pm).length > 0) && !(jQuery('.reues_' + pm).is(':checked'))) {
+//                 var reuse = true;
+//             } else {
+//                 var reuse = false;
+//             }
+//             if (formUrl != null) {
+//                 if ((formUrl[pm] == undefined) || (formUrl[pm] == '') || (reuse) || (pm == 'cc') || (pm == 'dc')) {
+//                     jQuery('form.payment').attr('action', orgLink);
+//                 } else {
+//                     jQuery('form.payment').attr('action', formUrl[pm]);
+//                 }
+//             }
+//         } else {
+//             jQuery('form.payment').attr('action', orgLink);
+//         }
+//     } else {
+//         jQuery('form.payment').attr('action', orgLink);
+//     }
+//
+// }
 
 // VALIDATE FORM
 function valForm() {
@@ -682,6 +682,26 @@ function valGatewayForm() {
             jQuery(this).removeClass('has--error');
         }
     });
+
+    // switch (pm.toLocaleLowerCase()) {
+    //     case "dd":
+    //         var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+    //
+    //         if (jQuery('#salutation').is(':visible')) {
+    //             // getting Values from input fields
+    //             var salutation = jQuery('#salutation').val();
+    //             var birthDay = jQuery('select[name=Date_Day]').val();
+    //             var birthMonth = jQuery('select[name=Date_Month]').val();
+    //             var birthYear = jQuery('select[name=Date_Year]').val();
+    //
+    //             jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //
+    //             errors = valDirectDebitSecured(errors);
+    //     break
+    //     case "gir":
+    // }
+
+
 
     if (pm == 'dd') {
         var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);

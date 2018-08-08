@@ -1661,6 +1661,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function failAction(){
 		try{
+		    mail("sascha.pflueger@heidelpay.de","FailAction Treffer ",print_r("",1));
             if (empty(Shopware()->Session()->HPOrderID)) {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
                 $parameters = json_decode($transaction['jsonresponse']);

@@ -324,7 +324,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				}
 			}else{
 				$ppd_config = $this->hgw()->ppd_config(NULL, $activePayment, NULL, true);
-				$ppd_user = $this->hgw()->ppd_user();
+//				$ppd_user = $this->hgw()->ppd_user(Null, $activePayment);
+				$ppd_user = $this->hgw()->ppd_user($this->getUser(), $activePayment);
+
 				$ppd_bskt['PRESENTATION.AMOUNT'] = $this->hgw()->formatNumber($basket['amount']);
 				$ppd_bskt['PRESENTATION.CURRENCY'] = $basket['currency'];
 
@@ -397,6 +399,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							$this->View()->pluginPath 	= $pref .$basepath .$pluginPath;
 
 				}else{
+				    //payment methods: pp, iv, bs, mk, mpa, san, ivpd, hpr, hps
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
@@ -486,7 +489,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         {
                             return $this->forward('missinginput');
                         }
-
                     }
 
                     if ($activePayment == 'hpr') {
@@ -1769,6 +1771,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             (strtolower($payType) == 'ivpd') ||
                             (strtolower($payType) == 'pp')
                         ) {
+
                             $comment .= '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
                             $comment .= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
 
@@ -1982,7 +1985,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							break;
 
 							case 'pp':
+
 								Shopware()->Session()->sOrderVariables['prepaymentText'] = $comment;
+
 								// sendeing Prepayment Email
 								if($this->Config()->HGW_PP_MAIL > 0){
 									$repl = array(
@@ -2020,7 +2025,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                 unset(Shopware()->Session()->wantEasy);
                                 unset($this->View()->configOptInText);
                                 unset($this->View()->amortisationText);
-
                                 unset($comment);
                                 //delete chosen payment of user
                                 $user = Shopware()->Modules()->Admin()->sGetUserData();
@@ -2064,7 +2068,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						);
 
 						$this->addOrderInfos($parameters->IDENTIFICATION_TRANSACTIONID, $params, $paymentStatus);
-
+                        Shopware()->Session()->HPdidRequest == false;
+						unset(Shopware()->Session()->HPdidRequest);
 						print Shopware()->Front()->Router()->assemble(array(
 								'forceSecure' 	=> 1,
 								'controller' 	=> 'PaymentHgw',
@@ -2147,7 +2152,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 				}
             }
-
+            Shopware()->Session()->HPdidRequest == false;
+            unset(Shopware()->Session()->HPdidRequest);
 			return $this->redirect(array(
 					'controller' 	=> 'checkout',
 					'action' 		=> 'finish',
@@ -3049,7 +3055,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		try{
 
 			$ppd_config = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_config($bookingMode, $pm, $uid);
-			$ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user(NULL, $pm);
+//			$ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user(NULL, $pm);
+            if($fromBootstrap){
+                $ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user(self::getUser(), $pm);
+            } else {
+                $ppd_user = Shopware()->Plugins()->Frontend()->HeidelGateway()->ppd_user($this->getUser(), $pm);
+            }
+
 			$ppd_bskt['PRESENTATION.AMOUNT'] 	= Shopware()->Plugins()->Frontend()->HeidelGateway()->formatNumber($basket['amount']);
 			$ppd_bskt['PRESENTATION.CURRENCY']	= $basket['currency'];
 			$ppd_crit['CRITERION.USER_ID']		= $userId;
@@ -3062,7 +3074,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			if($fromBootstrap){
 				$ppd_crit['CRITERION.SECRET'] = self::createSecretHash($tempID);
-
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
 				$errorMsg = self::getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}else{
@@ -3108,7 +3119,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function preparePostData($config = array(), $frontend = array(), $userData = array(), $basketData = array(), $criterion = array(),$isRecurring = false){
 		try{
-			$params = array();
+		    $params = array();
 			// configurtation part of this function
 			$params['SECURITY.SENDER']		= $config['SECURITY.SENDER'];
 			$params['USER.LOGIN'] 			= $config['USER.LOGIN'];
@@ -3345,7 +3356,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			if(!empty($config['IDENTIFICATION.REFERENCEID'])){
 				$params['IDENTIFICATION.REFERENCEID'] = $config['IDENTIFICATION.REFERENCEID'];
 			}
-
 			return $params;
 
 		}catch(Exception $e){

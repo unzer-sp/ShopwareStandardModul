@@ -878,7 +878,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '18.07.11':
                 // fixes for Emotion template for Santander invoice, Payolution invoice and direct debit
                 // fixes a bug in direct debit with registration
-                // changed query for birthdates for all payment methods so that there are no preallocated values
+                // changed query for birthdates for all payment-methods so that there are no preallocated values
                 // fixed an issue for saving regdata for Santander and Payolution
                 try{
                     $this->addSnippets();

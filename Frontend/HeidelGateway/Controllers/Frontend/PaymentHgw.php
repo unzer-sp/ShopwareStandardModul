@@ -495,16 +495,22 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     if ($activePayment == 'hpr') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
-
+//mail("sascha.pflueger@heidelpay.de","Gateway 498 Transaktion",print_r($transaction,1));
                         //setting
                         $ppd_bskt['PRESENTATION.AMOUNT'] 	= $this->hgw()->formatNumber($basket['amount']);
                         $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
-
                         $ppd_crit['IDENTIFICATION.REFERENCEID'] = $transaction['uniqueid'];
+                        $ppd_crit['IDENTIFICATION.TRANSACTIONID'] = $transaction['transactionid'];
+                        $ppd_crit['TRANSACTION.RESPONSE'] = "SYNC";
+//                        $ppd_crit['ACCOUNT.BRAND'] = "EASYCREDIT";
+                        $ppd_config['PAYMENT.CODE'] = "HP.PA";
+                        $ppd_config['PAYMENT.TYPE'] = "PA";
+                        $ppd_config['PAYMENT.METHOD'] = "hpr";
+
                         unset($this->View()->configOptInText);
                     }
 
-                    // Santander Hire Purchace
+                    // Santander hire Purchace
                     if ($activePayment == 'hps') {
                         // fetch INI Transaction to set the ReferenceId
                         $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
@@ -527,6 +533,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
 
                         $ppd_config['PAYMENT.CODE'] = "HP.PA";
+                        $ppd_config['ACCOUNT.BRAND'] = "SANTANDER_HP";
 
                         $ppd_crit['IDENTIFICATION.REFERENCEID'] = $transaction['uniqueid'];
                         unset($this->View()->linkPrecontactInfos);
@@ -548,6 +555,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 
 					$response = $this->hgw()->doRequest($params);
+mail("sascha.pflueger@heidelpay.de","553 Response",print_r($response,1));
+mail("sascha.pflueger@heidelpay.de","554 Request",print_r($params,1));
 				}
 			}
 
@@ -602,10 +611,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						}
 						$this->View()->Input = $input;
 					}
-				}
-
-				elseif(in_array($activePayment, array('pp', 'iv', 'papg', 'san', 'ivpd')) && empty($response['ACCOUNT.BRAND'])){
-
+				} elseif(in_array($activePayment, array('pp', 'iv', 'papg', 'san', 'ivpd')) && empty($response['ACCOUNT.BRAND'])){
                     if($activePayment == "san" || $activePayment == "ivpd")
                     {
                         return $this->redirect($response['FRONTEND_REDIRECT_URL']);
@@ -699,6 +705,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							'sUniqueID' => $transactionId,
 					));
 				}elseif(!empty($response['IDENTIFICATION_REFERENCEID'])){
+
 					$transactionId = $response['IDENTIFICATION_TRANSACTIONID'];
 					$paymentUniqueId = $response['IDENTIFICATION_UNIQUEID'];
 
@@ -715,13 +722,16 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							'o_attr2' => $response['IDENTIFICATION_UNIQUEID'],
 							'internalcomment' => "ShortID: ".$response['IDENTIFICATION_SHORTID']
 					);
+mail("sascha.pflueger@heidelpay.de","Gateway 718",print_r($transactionId,1));
 					$this->addOrderInfos($transactionId, $params, $paymentStatus);
 
                     // save Response for HP.PA
                     if ($response['PAYMENT_CODE'] == 'HP.PA') {
                         $this->hgw()->saveRes($response);
-                    }
+                        Shopware()->Session()->HPOrderID = $transactionId;
 
+                    }
+mail("sascha.pflueger@heidelpay.de","Gateway 726 Response",print_r($response,1));
 					return $this->redirect(array(
 							'forceSecure' => 1,
 							'action' => 'success',
@@ -1747,7 +1757,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
                 $parameters = json_decode($transaction['jsonresponse']);
             }
-
+mail("sascha.pflueger@heidelpay.de","success 1752 HPorderID",print_r(Shopware()->Session()->HPOrderID,1));
+mail("sascha.pflueger@heidelpay.de","success 1752 Session",print_r(Shopware()->Session()->sessionId,1));
+mail("sascha.pflueger@heidelpay.de","success 1752 Transaktion",print_r($parameters,1));
 			if ($parameters->PROCESSING_RESULT == 'NOK') {
 				Shopware()->Session()->HPError = $parameters->PROCESSING_RETURN_CODE;
 				print Shopware()->Front()->Router()->assemble(array(
@@ -2070,7 +2082,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                 unset($this->View()->amortisationText);
                                 unset($comment);
                                 //delete chosen payment of user
-                                $user = Shopware()->Modules()->Admin()->sGetUserData();
+//                                $user = Shopware()->Modules()->Admin()->sGetUserData();
                                 break;
 
 							default:
@@ -2302,6 +2314,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			->Models()
 			->getRepository('Shopware\Models\Order\Order')
 			->findOneBy(array('transactionId' => $transactionID));
+			// for easyCredit hire purchase
+			if(empty($orderModel) || $orderModel == null){
+                $orderModel = Shopware()
+                ->Models()
+                ->getRepository('Shopware\Models\Order\Order')
+                ->findOneBy(array('temporaryId' => $transactionID));
+            }
 
             if($status == '12' && $orderModel != NULL )
             {
@@ -2388,6 +2407,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			Shopware()->Models()->persist($orderModel);
 			// save to database
 			Shopware()->Models()->flush();
+$result = \Doctrine\Common\Util\Debug::dump($orderModel, 2, true, false);
+mail("sascha.pflueger@heidelpay.de","addOrderInfos 2405 OrderModel ",print_r($result,1));
 		}catch(Exception $e){
 			// 			$this->hgw()->Logging('addOrderInfos | '.$e->getMessage());
 			self::hgw()->Logging('addOrderInfos | '.$e->getMessage());
@@ -3281,7 +3302,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 case 'hpr':
                     $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
                     $params['PAYMENT.CODE'] 		= "HP.".$type;
-                    $params['TRANSACTION.RESPONSE']	= "SYNC";
+                    $params['TRANSACTION.RESPONSE']= "SYNC";
+                    $params['FRONTEND.ENABLED']	= "FALSE";
+                    $params['ACCOUNT.BRAND']		= "EASYCREDIT";
                     break;
                 /* Santander HP */
                 case 'hps':
@@ -3289,6 +3312,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     $params['PAYMENT.CODE'] 		= "HP.".$type;
                     $params['TRANSACTION.RESPONSE']	= "SYNC";
                     $params['FRONTEND.ENABLED']     = "false";
+                    $params['ACCOUNT.BRAND']     = "SANTANDER_HP";
                     break;
 					/* credit- & debitcard */
 				case 'cc':
@@ -3309,12 +3333,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					break;
 					/* default */
 				default:
+
 					$params['PAYMENT.CODE'] = strtoupper($config['PAYMENT.METHOD']).'.'.$config['PAYMENT.TYPE'];
 					$params['FRONTEND.RETURN_ACCOUNT'] = "true";
 					$params['FRONTEND.ENABLED'] 	= "true";
-					break;
+                    break;
 			}
-//			$params['CRITERION.TEMPORDER'] = $this->getSession()->offsetGet('sessionId');
 			$params['CRITERION.TEMPORDER'] = Shopware()->Session()->offsetGet('sessionId');
 
 			// debit on registration

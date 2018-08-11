@@ -788,6 +788,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$snipRf	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('rf', $beLocaleId, 'backend/heidelBackend');
 			$snipCb	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('cb', $beLocaleId, 'backend/heidelBackend');
 			$snipFi	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('fi', $beLocaleId, 'backend/heidelBackend');
+			$snipIn	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('in', $beLocaleId, 'backend/heidelBackend');
 
 			$payCode = explode('.', $payCode);
 			/*
@@ -825,6 +826,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					break;
 				case 'fi':
 					$retArr['typeName'] = $snipFi;
+					break;
+				case 'in':
+					$retArr['typeName'] = $snipIn;
 					break;
 				default:
 					$retArr['typeName'] = $retArr['payType'];

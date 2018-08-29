@@ -1486,7 +1486,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		    $swVersion = Shopware::VERSION;
 		    $tplVersion = Shopware()->Shop()->getTemplate()->getVersion();
 
-			$postparams = array();
             $postparams = array('payment' => $this->Request()->getParam('sRegister'));
 
 			$_SERVER['REQUEST_METHOD'] = 'GET';
@@ -1507,7 +1506,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			$this->Request()->setPost('sRegister', $postparams);
 
-			$target = false;
 			$target = $this->Request()->getParam('sTarget');
 			if(!empty($target)){
 				$this->Request()->setParam('sTarget', $target);
@@ -1765,6 +1763,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 								'{IDENTIFICATION_SHORTID}'		=> "\n".$parameters->IDENTIFICATION_SHORTID,
 						);
 
+			$comment = '';
                         if(
                             (strtolower($payType) == 'iv') ||
                             (strtolower($payType) == 'papg') ||
@@ -1962,7 +1961,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                                         );
                                     }
 
-									$orderNum = $this->getOrder($transactionId);
+									$orderNum = $this->getOrder($parameters->IDENTIFICATION_TRANSACTIONID);
 									$prepayment = array();
 									$user = $this->getUser();
 									foreach($repl AS $k => $v){

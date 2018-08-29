@@ -3404,7 +3404,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					"createPayments inserting new paymethods| SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'hgw_san' for key 'name'",
 			);
 
-			if (in_array($prms_text, $prmsTextIgnore)) {
+			if (in_array($prms_text, $prmsTextToIgnore)) {
 				return ;
 			} else {
 				return Shopware()->Db()->query($sql, $params);
@@ -3592,7 +3592,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			return;
 		}
 
-		foreach($langs as $key => $lang){
+		foreach($langs as $lang){
 			if(is_int(strpos($lang['locale'],'de_'))){
 				$snipLang = 'de';
 			}else{
@@ -3601,7 +3601,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 			$snippets = $this->snippets();
 
-			foreach($snippets as $key => $snippet){
+			foreach($snippets as $snippet){
 				// check if all array elements are set and lang matches
 
                 if($snippet[1] == "de")
@@ -4539,15 +4539,15 @@ Mit freundlichen Gruessen
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Credit Card booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Debit Card booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DD_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Direct Debit booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DD_GUARANTEE_MODE' => array(
 									'label' 			=> 'Direct debit with guarantee',
@@ -4559,7 +4559,7 @@ Mit freundlichen Gruessen
 							),
 							'HGW_MPA_BOOKING_MODE' 	=> array(
 									'label' 			=> 'MasterPass booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_CHB_STATUS' 		=> array(
 									'label' 			=> 'Chargeback State',

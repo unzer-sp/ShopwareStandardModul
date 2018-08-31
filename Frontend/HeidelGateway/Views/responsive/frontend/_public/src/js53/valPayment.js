@@ -130,7 +130,6 @@ document.asyncReady(function () {
             // case to set or remove required attribute for payolution checkbos
             var paymentMethod = $('input:radio:checked').attr('class');
             if(paymentMethod != undefined) {
-
                 if(paymentMethod.indexOf("hgw_") != -1){
                     // payment is payolution
                     $('#hgw_privpol_ivpd').attr("required","required");
@@ -244,6 +243,24 @@ document.asyncReady(function () {
                         return false;
                     }
                 }
+
+                if (pm.indexOf("hgw_hps") != -1){
+                    var errorsHps = new Array();
+                    errorsHps = valSantanderHP();
+                    if(errorsHps.length > 0){
+
+                        jQuery('#payment .alert .alert--content ul li').remove();
+
+                        jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+                        jQuery.each(errorsHps, function(key, value){
+                            jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+                        });
+
+                        jQuery('.alert').removeClass("is--hidden");
+                        jQuery('html, body').animate({scrollTop: 0}, 0);
+                        return false;
+                    }
+                }
             } else {
                 // case for other payment methods than heidelpay's on account/payment
                 $('#hgw_privpol_ivpd').removeAttr("required");
@@ -254,7 +271,6 @@ document.asyncReady(function () {
                 var birthMonth = null;
                 var birthYear = null;
                 var pm = null;
-
 
                 if(jQuery("#payType").attr("class") == undefined){
                     var classes = jQuery(".payment_method.debit").attr("class");

@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	// SELECT PAYMENT
+    console.log(window.location.pathname);
 	if(window.location.pathname.indexOf('gateway') == '-1'){
 		// save original form action
 		var orgLink = jQuery('form.payment').attr('action');
@@ -67,6 +68,49 @@ $(document).ready(function(){
 			jQuery('.newreg'+pm).toggle(500);
 		});
 	}
+
+	if(
+        (window.location.pathname.indexOf('checkout/index/success/payment')) ||
+        (window.location.pathname.indexOf('checkout/payment'))
+    ){
+	    console.log("drin");
+        var checkedOpt = jQuery('.payment_method input:radio:checked').attr('class');
+        if(checkedOpt != undefined && checkedOpt.indexOf('hgw_') >= 0){
+            var prefix = 'hgw_';
+            var checkedOptPos = checkedOpt.indexOf(prefix);
+            if(checkedOptPos >= 0) {
+                var pm = checkedOpt.substr(checkedOptPos + prefix.length);
+
+                if(pm == "hps" || pm == "hpr"){
+                    jQuery('#basketButton').val('zur Ratenauswahl');
+                }
+            }
+
+        }
+    }
+    // case für Santander HP to remove payment-method form
+    if(
+        (window.location.pathname.indexOf('checkout/confirm')) ||
+        (window.location.pathname.indexOf('account/payment'))
+    ){
+        var checkedOpt = jQuery('.payment_method input:radio:checked').attr('class');
+        if(checkedOpt != undefined && checkedOpt.indexOf('hgw_') >= 0){
+            var prefix = 'hgw_';
+            var checkedOptPos = checkedOpt.indexOf(prefix);
+            if(checkedOptPos >= 0) {
+                var pm = checkedOpt.substr(checkedOptPos + prefix.length);
+
+                if(
+                    (jQuery('#sanHps_preContract').val() == "true")||
+                    (jQuery('#easyHpr_preContract').val() == "true")
+                ){
+                    jQuery('form.payment').remove();
+                    jQuery('#basketButton').val('Zahlungspflichtig bestellen');
+                }
+            }
+
+        }
+    }
 	
 	//Function to set Birthdate in hidden field for Chrome on mac
 	jQuery("input[type='submit'], .right").click(function(e){
@@ -146,6 +190,12 @@ $(document).ready(function(){
                 $(".button-right.large").append('<input type="hidden" name="BRAND" id="handover_brand_ivpd" value="PAYOLUTION_DIRECT">');
                 $(".button-right.large").append('<input type="hidden" name="NAME.BIRTHDATE" value="'+birthdate+'">');
                 $(".button-right.large").append('<input type="hidden" name="NAME.SALUTATION" value="'+salutation+'">');
+            }
+
+            if(pm.indexOf("hgw_hps") > 0){
+                var errorsHps = valSantanderHP();
+                var birthdateHps = $('#birthdate_sanHps').val();
+                $("#sAGB").append('<input type="hidden" name="NAME.BIRTHDATE" value="'+birthdateHps+'">')
             }
         }
 
@@ -249,6 +299,14 @@ $(document).ready(function(){
         jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
     });
 
+    jQuery('.newreg_hps').change(function (e) {
+        var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+        var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+        var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+        jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    });
+
     jQuery('.button-right.large.right').click(function(e) {
         if (jQuery('.radio.hgw_ivpd').is(':checked')) {
             var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
@@ -333,6 +391,7 @@ $(document).ready(function(){
 
 // VALIDATE FORM
 function valForm(){
+console.log("valForm");
 	if(jQuery('.payment_method input:radio:checked').length != 0){
 		var checkedOpt = jQuery('.payment_method input:radio:checked').attr('class');
 		if(checkedOpt != undefined){
@@ -386,6 +445,13 @@ function valForm(){
                             var errors = valPayolutionDirect();
 
                         }
+                        if(pm == 'hps'){
+                            var errors = valSantanderHP();
+                            var birthdateHps = $('#birthdate_sanHps').val();
+                            $("#sAGB").append('<input type="hidden" name="NAME.BIRTHDATE" value="'+birthdateHps+'">')
+
+                        }
+
 					}
 				}else{
 					checkedOpt = checkedOpt.replace('radio','').trim();
@@ -423,6 +489,7 @@ function valForm(){
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm(){
+console.log("valGatewayForm");
 	checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
 	var pm = checkedOpt.substr(checkedOpt.indexOf('_')+1);
 
@@ -507,7 +574,6 @@ function valInputDdIban(iban, pm){
 
 	return errors;
 }
-
 
 function valInputDdAccount(acc, bank, pm){
 	var errors = {};
@@ -792,6 +858,44 @@ function valDirectDebitSecured(errors) {
         errors[i++] = '.msg_dob';
     }
     return errors;
+}
+
+//Function to validate Santander Hire purchace
+function valSantanderHP() {
+    console.log("valSantanderHP");
+    var errorsSan = new Array();
+    var i = 0;
+
+    var birthdate = $('#birthdate_sanHps').val();
+    console.log(birthdate);
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/) && birthdate != "0000-00-00")
+    {
+
+        var dob = new Date(jQuery('.newreg_hps select[name="Date_Year"]').val(), jQuery('.newreg_hps select[name="Date_Month"]').val()-1, jQuery('.newreg_hps select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+
+        if(age < 18 || birthdate == '0000-00-00'){
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+            errorsSan[i++] = '.msg_dob';
+        } else{
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.outer-select').removeClass('instyle_error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.outer-select').removeClass('instyle_error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.newreg_hps select[name="Date_Year"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.newreg_hps select[name="Date_Month"]').parent('.outer-select').addClass('instyle_error');
+        jQuery('.newreg_hps select[name="Date_Day"]').parent('.outer-select').addClass('instyle_error');
+        errorsSan[i++] = '.msg_dob';
+    }
+    if(errorsSan.length > 0){
+        return errorsSan;
+    }
+
 }
 
 // function to show iFrame form

@@ -94,6 +94,16 @@ $(document).ready(function(){
                             $('#hgw_privpol_ivpd').attr("required","required");
                         });
 
+                        jQuery('#hps_customerBirthdate').change(function(e){
+                            var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+
+                        });
+
+
                         if(((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)){
                             // load fancy-js for select boxes
                             if(swVersion >= '5.1'){
@@ -326,6 +336,14 @@ $(document).ready(function(){
                             $('#hgw_privpol_ivpd').prop("required", null);
                             $('#hgw_privpol_ivpd').removeAttr("required");
                         }
+
+                        // if(chosenPaymentMethod == 'hps'){
+                        //     console.log("342");
+                        //     var errorsHps = valSantanderHP();
+                        //     if(errorsHps.length > 0){
+                        //         return valShippingPaymentForm();
+                        //     }
+                        // }
                     } else {
                         $('#hgw_privpol_ivpd').prop("required", null);
                         $('#hgw_privpol_ivpd').removeAttr("required");
@@ -410,7 +428,6 @@ $(document).ready(function(){
                         }else{
                             jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
                         }
-
                         // set width for XS-State (with SW-Statemanger)
                         StateManager.registerListener({
                             state: 'xs',
@@ -482,7 +499,7 @@ $(document).ready(function(){
                 var birthYear = null;
                 var pm = null;
                 pm = jQuery("#payType").attr("class");
-
+console.log("505");
                 if(pm != undefined) {
                     pm = pm.substr(7);
 
@@ -908,7 +925,7 @@ function valGatewayForm(){
 function valShippingPaymentForm(){
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_')+4);
-
+    var errors = new Array();
     // remove check vor cc and dc
     if((pm != 'cc') && (pm != 'dc')){
         // check if 'newreg' is shown
@@ -955,18 +972,27 @@ function valShippingPaymentForm(){
                 $('#hgw_privpol_ivpd').removeAttr("required");
             }
 
-
+            if(pm == 'hps'){
+                var errors = valSantanderHP();
+                // if(errors.length >0)
+                // {
+                //     return false;
+                // }
+            }
         }
-
+console.log(jQuery('div.hgw_'+pm+' .has--error').length);
         if((jQuery('div.hgw_'+pm+' .has--error').length > 0)){
+            console.log("970")
             if(jQuery('.content-main--inner .content .alert--content ul').length == 0){
+                console.log("972")
                 jQuery('.content-main--inner .content .alert--content').html('<ul class="alert--list"></ul>');
             }
 
             jQuery('.content-main--inner .content .alert--content ul li').remove();
             jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
-
+console.log("978")
             jQuery.each(errors, function(key, value){
+console.log("980")
                 jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
             });
 
@@ -1055,9 +1081,8 @@ function valBirthdate(age){
 }
 
 function valSantander() {
-    var errors = {};
+    var errors = new Array();
     var i = 0;
-
     // validation of salutation
     var salutation = $('select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "UNKNOWN")
@@ -1267,4 +1292,44 @@ function valDirectDebitSecured(errors) {
         errors[i++] = '.msg_dob';
     }
     return errors;
+}
+
+/**
+ * valSantanderHP
+ * Function to validate Santander Hire purchace
+ */
+function valSantanderHP() {
+    var errorsSan = new Array();
+    var i = 0;
+
+    console.log("valSantanderHP Call");
+    var birthdate = $('#birthdate_sanHps').val();
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+
+        var dob = new Date(jQuery('.newreg_hps select[name="Date_Year"]').val(), jQuery('.newreg_hps select[name="Date_Month"]').val()-1, jQuery('.newreg_hps select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+
+        if(age < 18 || birthdate == '0000-00-00'){
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            errorsSan[i++] = '.msg_dob';
+        } else{
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        errorsSan[i++] = '.msg_dob';
+    }
+    if(errorsSan.length > 0){
+        return errorsSan;
+    }
+
 }

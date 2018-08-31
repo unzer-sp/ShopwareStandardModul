@@ -236,6 +236,23 @@ $(document).ready(function(){
                         }
                     }
 
+                    if (pm.indexOf("hgw_hps") != -1){
+                        var errorsHps = valSantanderHP();
+                        if(errorsHps.length > 0){
+
+                            jQuery('#payment .alert .alert--content ul li').remove();
+
+                            jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+                            jQuery.each(errorsHps, function(key, value){
+                                jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+                            });
+
+                            jQuery('.alert').removeClass("is--hidden");
+                            jQuery('html, body').animate({scrollTop: 0}, 0);
+                            return false;
+                        }
+                    }
+
                 } else {
                     // case for other payment methods than heidelpay's on account/payment
                     $('#hgw_privpol_ivpd').removeAttr("required");
@@ -276,6 +293,8 @@ $(document).ready(function(){
                         } else {
                             $("#hgw_privpol_ivpd").attr("required", "required");
                         }
+
+
                     }
 
                     var cssClasses = jQuery('input:radio:checked').attr('class');
@@ -458,6 +477,12 @@ $(document).ready(function(){
                     $('#hgw_privpol_ivpd').prop("required", null);
                     $('#hgw_privpol_ivpd').removeAttr("required");
                 }
+                // if(chosenPaymentMethod == 'hps'){
+                //     var errorsHps = valSantanderHP();
+                //     if(errorsHps.length > 0){
+                //         return valShippingPaymentForm();
+                //     }
+                // }
                 jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
             }
         },
@@ -758,6 +783,7 @@ function valGatewayForm() {
 
 // VALIDATE FORM ON SHIPPINGPAYMENT
 function valShippingPaymentForm() {
+    console.log("valShippingPaymentForm");
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
     // disable all other input fields
@@ -823,6 +849,14 @@ function valShippingPaymentForm() {
                 $(".newreg_ivpd .js--fancy-select").attr('disabled', 'disabled');
                 $("#birthdate_ivpd").attr('disabled', 'disabled');
                 $(".hgw_val_ivpd #salutation").attr('disabled', 'disabled');
+            }
+
+            if(pm == 'hps'){
+                var errors = valSantanderHP();
+                if(errors.length >0)
+                {
+                    return false;
+                }
             }
 
         }
@@ -1036,6 +1070,45 @@ function valSantander() {
         errors[i++] = '.msg_cb';
     }
     return errors;
+}
+
+/**
+ * valSantanderHP
+ * Function to validate Santander Hire purchace
+ */
+function valSantanderHP() {
+    var errors = new Array();
+    var i = 0;
+
+    var birthdate = $('#birthdate_sanHps').val();
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+
+        var dob = new Date(jQuery('.newreg_hps select[name="Date_Year"]').val(), jQuery('.newreg_hps select[name="Date_Month"]').val()-1, jQuery('.newreg_hps select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+
+        if(age < 18 || birthdate == '0000-00-00'){
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            errors[i++] = '.msg_dob';
+        }else{
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        errors[i++] = '.msg_dob';
+    }
+    if(errors.length > 0){
+        return errors;
+    }
+
 }
 
 function valPayolutionDirect() {

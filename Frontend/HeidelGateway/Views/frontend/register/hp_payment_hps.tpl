@@ -5,16 +5,16 @@
         </div>
         <div id="hps_genderData">
             <div>
-                <label for="sanGenders">{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label></br>
+                <label for="sanGenders">{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label>
                 {html_radios id="sanGenders" name='NAME.SALUTATION' values=$sanGenderVal output=$sanGenderOut selected=$genderShop_HpSan separator=' '}</br>
             </div>
-            <div>
+            <div style="margin-top: 5px">
                 <input type="text" value="{$accountHolder_HpSan}" disabled><br />
             </div>
         </div>
         <div id="hps_customerBirthdate" style="margin-top: 10px">
             <div>
-                <label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
+                <label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label>
                 {if isset($birthdate_hps) && $birthdate_hps != '0000-00-00'}
                     {html_select_date|utf8_encode time=$birthdate_hps start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
                 {else}

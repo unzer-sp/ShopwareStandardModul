@@ -198,8 +198,6 @@ $(document).ready(function(){
 			}else if(paymentFrameForm.detachEvent){ // IE DOM
 				paymentFrameForm.detachEvent('onsubmit', sendHandler);
 			}
-console.log("receiveMessage");
-console.log(origEvent.type);
 			// do default action
 			$(paymentFrameForm).trigger(origEvent.type);
 		}

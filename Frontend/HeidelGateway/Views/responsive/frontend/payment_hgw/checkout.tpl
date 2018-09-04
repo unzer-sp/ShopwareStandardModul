@@ -19,7 +19,7 @@
 		{if !empty($linkPrecontactInfos)}
 			<div class="panel has--border dispatch-methods">
 				<div class="panel--title primary is--underline">
-					<h3 class="underline">Vorvertragliche Informationen:</h3>
+					Vorvertragliche Informationen:
 				</div>
 				<div class="panel--body is--wide">
 					<a href="{$linkPrecontactInfos}" target="_blank">Vorvertragliche Informationen zum Ratenkauf hier abrufen</a>

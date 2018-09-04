@@ -1,6 +1,5 @@
 $(document).ready(function(){
 	// SELECT PAYMENT
-    console.log(window.location.pathname);
 	if(window.location.pathname.indexOf('gateway') == '-1'){
 		// save original form action
 		var orgLink = jQuery('form.payment').attr('action');
@@ -73,7 +72,6 @@ $(document).ready(function(){
         (window.location.pathname.indexOf('checkout/index/success/payment')) ||
         (window.location.pathname.indexOf('checkout/payment'))
     ){
-	    console.log("drin");
         var checkedOpt = jQuery('.payment_method input:radio:checked').attr('class');
         if(checkedOpt != undefined && checkedOpt.indexOf('hgw_') >= 0){
             var prefix = 'hgw_';
@@ -391,7 +389,6 @@ $(document).ready(function(){
 
 // VALIDATE FORM
 function valForm(){
-console.log("valForm");
 	if(jQuery('.payment_method input:radio:checked').length != 0){
 		var checkedOpt = jQuery('.payment_method input:radio:checked').attr('class');
 		if(checkedOpt != undefined){
@@ -489,7 +486,6 @@ console.log("valForm");
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm(){
-console.log("valGatewayForm");
 	checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
 	var pm = checkedOpt.substr(checkedOpt.indexOf('_')+1);
 
@@ -862,12 +858,10 @@ function valDirectDebitSecured(errors) {
 
 //Function to validate Santander Hire purchace
 function valSantanderHP() {
-    console.log("valSantanderHP");
     var errorsSan = new Array();
     var i = 0;
 
     var birthdate = $('#birthdate_sanHps').val();
-    console.log(birthdate);
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/) && birthdate != "0000-00-00")
     {
 

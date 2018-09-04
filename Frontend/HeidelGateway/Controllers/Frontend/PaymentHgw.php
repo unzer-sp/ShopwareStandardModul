@@ -99,7 +99,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			/* PaymentMethode */
 			$activePayment	= preg_replace('/hgw_/', '', $this->getPaymentShortName());
 //			$tempID = $this->createPaymentUniqueId();
-//			Shopware()->Session()->HPOrderID = $tempID;
+//			Shopware()->Session()->HPOrderId = $tempID;
 
 			$bookingMode = array('cc','dc','dd','va');
 			$basket['currency']	= Shopware()->Currency()->getShortName();
@@ -402,7 +402,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
 					$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
-mail("sascha.pflueger@heidelpay.com","405 Gateway",print_r("",1));
 
                     // Masterpass
 					if($activePayment == 'mpa'){
@@ -494,9 +493,8 @@ mail("sascha.pflueger@heidelpay.com","405 Gateway",print_r("",1));
                     }
                     // easyCredit hire purchase
                     if ($activePayment == 'hpr') {
-mail("sascha.pflueger@heidelpay.com","497 Gateway TransId",print_r(Shopware()->Session()->HPOrderID,1));
                         // fetch INI Transaction to set the ReferenceId
-                        $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
+                        $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
                         //setting
                         $ppd_bskt['PRESENTATION.AMOUNT'] 	= $this->hgw()->formatNumber($basket['amount']);
                         $ppd_bskt['PRESENTATION.CURRENCY'] 	= $basket['currency'];
@@ -512,11 +510,9 @@ mail("sascha.pflueger@heidelpay.com","497 Gateway TransId",print_r(Shopware()->S
 
                     // Santander hire Purchace
                     if ($activePayment == 'hps') {
-mail("sascha.pflueger@heidelpay.com","516 Gateway TransId",print_r(Shopware()->Session()->HPOrderID,1));
                         // fetch INI Transaction to set the ReferenceId
-                        $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
+                        $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
                         $transactionParams = json_decode($transaction['jsonresponse'],1);
-mail("sascha.pflueger@heidelpay.com","520 Gateway Transacktion",print_r($transaction,1));
 
                         if(
                             ($transactionParams['ACCOUNT_HOLDER'] != $user['shippingaddress']['firstname'].' '.$user['shippingaddress']['lastname'])
@@ -525,7 +521,7 @@ mail("sascha.pflueger@heidelpay.com","520 Gateway Transacktion",print_r($transac
                             || ($transactionParams['ADDRESS_ZIP'] != $user['shippingaddress']['zipcode'])
 
                         ){
-                            Shopware()->Session()->HPOrderID = $transaction['transactionid'];
+                            Shopware()->Session()->HPOrderId = $transaction['transactionid'];
                             Shopware()->Session()->HpHpsErrorAdress = true;
                             return $this->forward('fail');
 
@@ -543,7 +539,6 @@ mail("sascha.pflueger@heidelpay.com","520 Gateway Transacktion",print_r($transac
                     }
 
 					$params = $this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit);
-
 					if($activePayment == 'bs'){
 						if(!$this->mergeAddress()){
 							$locId = (Shopware()->Locale()->getLanguage() == 'de') ? 1 : 2;
@@ -558,8 +553,6 @@ mail("sascha.pflueger@heidelpay.com","520 Gateway Transacktion",print_r($transac
 					}
 
 					$response = $this->hgw()->doRequest($params);
-mail("sascha.pflueger@heidelpay.de","559 Response",print_r($response,1));
-//mail("sascha.pflueger@heidelpay.de","554 Request",print_r($params,1));
 				}
 			}
 
@@ -725,16 +718,14 @@ mail("sascha.pflueger@heidelpay.de","559 Response",print_r($response,1));
 							'o_attr2' => $response['IDENTIFICATION_UNIQUEID'],
 							'internalcomment' => "ShortID: ".$response['IDENTIFICATION_SHORTID']
 					);
-//mail("sascha.pflueger@heidelpay.de","Gateway 726",print_r($transactionId,1));
 					$this->addOrderInfos($transactionId, $params, $paymentStatus);
 
                     // save Response for HP.PA
                     if ($response['PAYMENT_CODE'] == 'HP.PA') {
                         $this->hgw()->saveRes($response);
-                        Shopware()->Session()->HPOrderID = $transactionId;
+                        Shopware()->Session()->HPOrderId = $transactionId;
 
                     }
-//mail("sascha.pflueger@heidelpay.de","Gateway 735 Response TransID",print_r($transactionId,1));
 					return $this->redirect(array(
 							'forceSecure' => 1,
 							'action' => 'success',
@@ -747,9 +738,7 @@ mail("sascha.pflueger@heidelpay.de","559 Response",print_r($response,1));
 				}
 			}
 		}catch(Exception $e){
-
 			$this->hgw()->Logging('gatewayAction | '.$e->getMessage());
-
 			return;
 		}
 	}
@@ -1247,10 +1236,6 @@ mail("sascha.pflueger@heidelpay.de","559 Response",print_r($response,1));
             $flag = ENT_COMPAT;
             $enc = 'UTF-8';
             if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
-
-            $flag = ENT_COMPAT;
-            $enc = 'UTF-8';
-            if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
             $resp['REQUEST_VERSION']			= $this->Request()->getPost('REQUEST_VERSION') == true ? htmlspecialchars($this->Request()->getPost('REQUEST_VERSION'), $flag, $enc) : '';
             $resp['SECURITY_SENDER']			= $this->Request()->getPost('SECURITY_SENDER') == true ? htmlspecialchars($this->Request()->getPost('SECURITY_SENDER'), $flag, $enc) : '';
             $resp['USER_LOGIN']					= $this->Request()->getPost('USER_LOGIN') == true ? htmlspecialchars($this->Request()->getPost('USER_LOGIN'), $flag, $enc) : '';
@@ -1365,12 +1350,10 @@ mail("sascha.pflueger@heidelpay.de","559 Response",print_r($response,1));
             // case for suspected Manipulation
             $orgHash = $this->createSecretHash($resp['IDENTIFICATION_TRANSACTIONID']);
 
-//            if($resp['CRITERION_SECRET'] != $orgHash){
             if($resp['CRITERION_SECRET'] != $orgHash){
-mail("sascha.pflueger@heidelpay.com","1368 responseHpr MANIPULATION CASE",print_r("",1));
                 Shopware()->Session()->HPError = '';
                 $this->hgw()->Logging(
-                    "Hash verification error, suspecting manipulation.".
+                    "Hash verification error at ".$resp['PAYMENT_CODE'].", suspecting manipulation.".
                     "<br />PaymentUniqeID: " . $resp['IDENTIFICATION_TRANSACTIONID']  .
                     "<br />IP: " . $_SERVER['REMOTE_ADDR'] .
                     "<br />Hash: " .htmlspecialchars($orgHash) .
@@ -1382,27 +1365,28 @@ mail("sascha.pflueger@heidelpay.com","1368 responseHpr MANIPULATION CASE",print_
                 exit;
             }
             //save Temporary Order-Id to Session to get the order in failAction() or successAction()
-            Shopware()->Session()->HPOrderID = $resp['IDENTIFICATION_TRANSACTIONID'];
+            Shopware()->Session()->HPOrderId = $resp['IDENTIFICATION_TRANSACTIONID'];
             Shopware()->Session()->sessionId = $resp['CRITERION_SESS'];
 
             if ($resp['PROCESSING_RESULT'] == 'ACK') {
-mail("sascha.pflueger@heidelpay.com","1398 responseHPR Response",print_r($resp,1));
                 switch ($resp['PAYMENT_CODE'] == 'HP.IN') {
                     case 'HP.IN':
                         //save result to hgw_transactions
                         $this->hgw()->saveRes($resp);
-                        Shopware()->Session()->HPOrderID = $resp['IDENTIFICATION_TRANSACTIONID'];
+                        Shopware()->Session()->HPOrderId = $resp['IDENTIFICATION_TRANSACTIONID'];
+
                         //Weiterleitung auf "checkout/confirm";
                         print Shopware()->Front()->Router()->assemble(array(
                             'forceSecure' 	=> 1,
                             'controller' 	=> 'paymentHgw',
                             'action' 		=> 'afterEasy',
+                            'HpTransId'     => $resp['IDENTIFICATION_TRANSACTIONID']
                         ));
                         break;
                     case 'HP.PA':
                         //save result to hgw_transactions
                         $this->hgw()->saveRes($resp);
-                        Shopware()->Session()->HPOrderID = $resp['IDENTIFICATION_TRANSACTIONID'];
+                        Shopware()->Session()->HPOrderId = $resp['IDENTIFICATION_TRANSACTIONID'];
 
                         // Weiterleitung auf "success";
                         print Shopware()->Front()->Router()->assemble(array(
@@ -1414,7 +1398,7 @@ mail("sascha.pflueger@heidelpay.com","1398 responseHPR Response",print_r($resp,1
 
                     default:
                         $this->hgw()->saveRes($resp);
-                        Shopware()->Session()->HPOrderID = $resp['IDENTIFICATION_TRANSACTIONID'];
+                        Shopware()->Session()->HPOrderId = $resp['IDENTIFICATION_TRANSACTIONID'];
                         print Shopware()->Front()->Router()->assemble(array(
                             'forceSecure' => 1,
                             'controller' => 'checkout',
@@ -1422,11 +1406,10 @@ mail("sascha.pflueger@heidelpay.com","1398 responseHPR Response",print_r($resp,1
                         ));
                         break;
                 }
-mail("sascha.pflueger@heidelpay.com","1425 responseHPR HPOrderId",print_r(Shopware()->Session()->HPOrderID,1));
             }else {
                 //save result to hgw_transactions
                 $this->hgw()->saveRes($resp);
-                Shopware()->Session()->HPOrderID = $resp['IDENTIFICATION_TRANSACTIONID'];
+                Shopware()->Session()->HPOrderId = $resp['IDENTIFICATION_TRANSACTIONID'];
 
                 // Weiterleitung auf Fehlercontroller
                 print Shopware()->Front()->Router()->assemble(array(
@@ -1477,7 +1460,7 @@ mail("sascha.pflueger@heidelpay.com","1425 responseHPR HPOrderId",print_r(Shopwa
 			$data = Shopware()->Db()->fetchAll($sql, array($pm, $user['additional']['user']['id']));
 
 			$tempID = $this->createPaymentUniqueId();
-			Shopware()->Session()->HPOrderID = $tempID;
+			Shopware()->Session()->HPOrderId = $tempID;
 
 			$booking = 'HGW_'.strtoupper($data[0]['payType']).'_BOOKING_MODE';
 			$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $data[0]['payType'], $data[0]['uid'], true, true);
@@ -1681,12 +1664,11 @@ mail("sascha.pflueger@heidelpay.com","1425 responseHPR HPOrderId",print_r(Shopwa
 	 */
 	public function failAction(){
 		try{
-//		    mail("sascha.pflueger@heidelpay.de","FailAction Treffer ",print_r("",1));
-            if (empty(Shopware()->Session()->HPOrderID)) {
+            if (empty(Shopware()->Session()->HPOrderId)) {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
                 $parameters = json_decode($transaction['jsonresponse']);
             } else {
-                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
+                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
                 $parameters = json_decode($transaction['jsonresponse']);
             }
 
@@ -1706,6 +1688,8 @@ mail("sascha.pflueger@heidelpay.com","1425 responseHPR HPOrderId",print_r(Shopwa
                     Shopware()->Session()->HPError = $this->getHPErrorMsg("700.400.XXX",false);
                     Shopware()->Session()->HpHpsErrorAdress = false;
                 }
+                unset(Shopware()->Session()->HPdidRequest);
+                unset(Shopware()->Session()->wantEasy);
 
                 print Shopware()->Front()->Router()->assemble(array(
 						'forceSecure' => 1,
@@ -1760,16 +1744,14 @@ mail("sascha.pflueger@heidelpay.com","1425 responseHPR HPOrderId",print_r(Shopwa
             unset($this->View()->amortisationText);
 
             // get transaction from hgw_transactions
-            if (empty(Shopware()->Session()->HPOrderID)) {
+            if (empty(Shopware()->Session()->HPOrderId)) {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
                 $parameters = json_decode($transaction['jsonresponse']);
             } else {
-                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
+                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
                 $parameters = json_decode($transaction['jsonresponse']);
             }
-//mail("sascha.pflueger@heidelpay.de","success 1752 HPorderID",print_r(Shopware()->Session()->HPOrderID,1));
-//mail("sascha.pflueger@heidelpay.de","success 1752 Session",print_r(Shopware()->Session()->sessionId,1));
-mail("sascha.pflueger@heidelpay.de","success 1763 Transaktion",print_r($parameters,1));
+
 			if ($parameters->PROCESSING_RESULT == 'NOK') {
 				Shopware()->Session()->HPError = $parameters->PROCESSING_RETURN_CODE;
 				print Shopware()->Front()->Router()->assemble(array(
@@ -2133,8 +2115,10 @@ mail("sascha.pflueger@heidelpay.de","success 1763 Transaktion",print_r($paramete
 						);
 
 						$this->addOrderInfos($parameters->IDENTIFICATION_TRANSACTIONID, $params, $paymentStatus);
-                        Shopware()->Session()->HPdidRequest == false;
+						Shopware()->Session()->HPdidRequest == false;
 						unset(Shopware()->Session()->HPdidRequest);
+						unset(Shopware()->Session()->HPOrderId);
+
 						print Shopware()->Front()->Router()->assemble(array(
 								'forceSecure' 	=> 1,
 								'controller' 	=> 'PaymentHgw',
@@ -2174,7 +2158,6 @@ mail("sascha.pflueger@heidelpay.de","success 1763 Transaktion",print_r($paramete
                         }
                         break;
                     case 'hp':
-mail("sascha.pflueger@heidelpay.com","2168 SuccessAct Durchlauf",print_r("",1));
                         unset(Shopware()->Session()->HPdidRequest);
                         unset(Shopware()->Session()->wantEasy);
                         break;
@@ -2220,7 +2203,8 @@ mail("sascha.pflueger@heidelpay.com","2168 SuccessAct Durchlauf",print_r("",1));
             }
             Shopware()->Session()->HPdidRequest == false;
             unset(Shopware()->Session()->HPdidRequest);
-mail("sascha.pflueger@heidelpay.com","2214 Weiterleit ChoFi",print_r(Shopware()->Session()->HPTrans,1));
+            unset(Shopware()->Session()->HPOrderId);
+
             return $this->redirect(array(
 					'controller' 	=> 'checkout',
 					'action' 		=> 'finish',
@@ -2420,10 +2404,7 @@ mail("sascha.pflueger@heidelpay.com","2214 Weiterleit ChoFi",print_r(Shopware()-
 			Shopware()->Models()->persist($orderModel);
 			// save to database
 			Shopware()->Models()->flush();
-//$result = \Doctrine\Common\Util\Debug::dump($orderModel, 2, true, false);
-//mail("sascha.pflueger@heidelpay.de","addOrderInfos 2405 OrderModel ",print_r($result,1));
 		}catch(Exception $e){
-			// 			$this->hgw()->Logging('addOrderInfos | '.$e->getMessage());
 			self::hgw()->Logging('addOrderInfos | '.$e->getMessage());
 			return;
 		}
@@ -2680,7 +2661,7 @@ mail("sascha.pflueger@heidelpay.com","2214 Weiterleit ChoFi",print_r(Shopware()-
 
 
 					$getFormUrl = $this->getFormUrl($pm, $bookingMode, $user['additional']['user']['id'], $tempID, NULL, $basket, $ppd_crit, false);
-					Shopware()->Session()->HPOrderID = $tempID;
+					Shopware()->Session()->HPOrderId = $tempID;
 
 					if((strtoupper($getFormUrl['PROCESSING_RESULT']) == 'ACK') && isset($getFormUrl['FRONTEND_REDIRECT_URL'])){
 						//return $this->redirect($getFormUrl['PROCESSING_REDIRECT_URL'], array('code' => '302'));
@@ -3505,7 +3486,7 @@ mail("sascha.pflueger@heidelpay.com","2214 Weiterleit ChoFi",print_r(Shopware()-
 	public function createAccAction(){
 		try{
 
-			$transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderID);
+			$transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
 			$parameters = json_decode($transaction['jsonresponse'],1);
 
 			if((strtolower($parameters['NAME_SALUTATION']) == 'herr') || (strtolower($parameters['NAME_SALUTATION']) == 'mr') || ($parameters['NAME_SALUTATION'] == '')){
@@ -3804,8 +3785,9 @@ mail("sascha.pflueger@heidelpay.com","2214 Weiterleit ChoFi",print_r(Shopware()-
      */
     public function afterEasyAction()
     {
-mail("sascha.pflueger@heidelpay.com","3807 afterEasy HPOrderID",print_r(Shopware()->Session()->HPOrderID,1));
         Shopware()->Session()->HPdidRequest = 'TRUE';
+        Shopware()->Session()->HPOrderId = $this->Request()->getParam('HpTransId');
+
         $this->redirect(
             array(
                 'controller' => 'checkout',

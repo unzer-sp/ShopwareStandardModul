@@ -4,7 +4,6 @@ $(document).ready(function(){
         var token = jQuery('input[name="__csrf_token"]').val();
 
         if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
-
             var orgLink = jQuery('form.payment').attr('action');
             // SELECT PAYMENT
             if(window.location.pathname.indexOf('gateway') == '-1'){
@@ -12,7 +11,6 @@ $(document).ready(function(){
                 var orgLink = jQuery('form.payment').attr('action');
                 if(window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1'){
                     $(document).reuse();
-
                     // change checked option
                     jQuery('.register--payment').click(function(){
                         // change form action
@@ -20,13 +18,14 @@ $(document).ready(function(){
                         changeUrl(checkedOpt, orgLink);
                     });
 
+                    // add validation for form
+                    jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
 
                 }else{
                     var clicked = '';
                     $(this).click(function(e){
                         clicked = e.target.className;
                     });
-
                     jQuery('.payment--method-list').click(function(){
                         // change form action
                         var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
@@ -37,7 +36,6 @@ $(document).ready(function(){
                     // set original form action (before AJAX is sent)
                     $.ajaxSetup({
                         beforeSend: function(event, xhr, settings){
-
                             // check for right ajax request
                             if(xhr.data != undefined){
                                 // just execute if hgw pay. method is selected
@@ -102,7 +100,6 @@ $(document).ready(function(){
                             jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
 
                         });
-
 
                         if(((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)){
                             // load fancy-js for select boxes
@@ -313,6 +310,13 @@ $(document).ready(function(){
 
                     jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                 }
+                jQuery('.newreg_hps').change(function () {
+                    var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                });
             });
 
         }
@@ -337,17 +341,11 @@ $(document).ready(function(){
                             $('#hgw_privpol_ivpd').removeAttr("required");
                         }
 
-                        // if(chosenPaymentMethod == 'hps'){
-                        //     console.log("342");
-                        //     var errorsHps = valSantanderHP();
-                        //     if(errorsHps.length > 0){
-                        //         return valShippingPaymentForm();
-                        //     }
-                        // }
                     } else {
                         $('#hgw_privpol_ivpd').prop("required", null);
                         $('#hgw_privpol_ivpd').removeAttr("required");
                     }
+
                 }
 
             },
@@ -499,7 +497,7 @@ $(document).ready(function(){
                 var birthYear = null;
                 var pm = null;
                 pm = jQuery("#payType").attr("class");
-console.log("505");
+
                 if(pm != undefined) {
                     pm = pm.substr(7);
 
@@ -639,6 +637,14 @@ console.log("505");
 
                 jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
             }
+
+            jQuery('.newreg_hps').change(function () {
+                var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            });
 
             var chosenPaymentMethod = $('input:radio:checked').attr('class');
             if(chosenPaymentMethod != undefined) {
@@ -980,19 +986,16 @@ function valShippingPaymentForm(){
                 // }
             }
         }
-console.log(jQuery('div.hgw_'+pm+' .has--error').length);
+
         if((jQuery('div.hgw_'+pm+' .has--error').length > 0)){
-            console.log("970")
             if(jQuery('.content-main--inner .content .alert--content ul').length == 0){
-                console.log("972")
                 jQuery('.content-main--inner .content .alert--content').html('<ul class="alert--list"></ul>');
             }
 
             jQuery('.content-main--inner .content .alert--content ul li').remove();
             jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
-console.log("978")
+
             jQuery.each(errors, function(key, value){
-console.log("980")
                 jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
             });
 
@@ -1301,8 +1304,6 @@ function valDirectDebitSecured(errors) {
 function valSantanderHP() {
     var errorsSan = new Array();
     var i = 0;
-
-    console.log("valSantanderHP Call");
     var birthdate = $('#birthdate_sanHps').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {

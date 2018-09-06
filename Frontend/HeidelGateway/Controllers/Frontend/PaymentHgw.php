@@ -134,6 +134,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			// BookingMode: CC, DC, DD, VA
 			if(in_array($activePayment, $bookingMode)){
 				$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
+                $tempID = $this->createPaymentUniqueId();
+                Shopware()->Session()->HPOrderId = $tempID;
 
 				if($this->Config()->$booking == 3 || $this->Config()->$booking == 4){
 					// Registrierung ist vorhanden
@@ -328,74 +330,78 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$ppd_bskt['PRESENTATION.AMOUNT'] = $this->hgw()->formatNumber($basket['amount']);
 				$ppd_bskt['PRESENTATION.CURRENCY'] = $basket['currency'];
 
-				if( 	($activePayment != 'pp') &&
-						($activePayment != 'iv') &&
-						($activePayment != 'bs') &&
-						($activePayment != 'mk') &&
-                        ($activePayment != 'mpa')&&
-                        ($activePayment != 'san')&&
-                        ($activePayment != 'ivpd')&&
-                        ($activePayment != 'hpr') &&
-                        ($activePayment != 'hps')
-						){
+				if(
+				    ($activePayment != 'pp') &&
+					($activePayment != 'iv') &&
+					($activePayment != 'bs') &&
+					($activePayment != 'mk') &&
+                    ($activePayment != 'mpa')&&
+                    ($activePayment != 'san')&&
+                    ($activePayment != 'ivpd')&&
+                    ($activePayment != 'hpr') &&
+                    ($activePayment != 'hps')
+				){
+                    $tempID = $this->createPaymentUniqueId();
+                    Shopware()->Session()->HPOrderId = $tempID;
+				    //adding a basketId for papg payment
 
-							//adding a basketId for papg payment
-							if($activePayment == 'papg') {
-								$basketId = self::getBasketId();
+                    if($activePayment == 'papg') {
+					    $basketId = self::getBasketId();
 
-								if($basketId['result'] == 'NOK'){
-									return $this->forward('fail');
-								}else{
-									$basketId = $basketId['basketId'];
-								}
-								$ppd_crit['BASKET.ID'] = $basketId;
-							}
-							$getFormUrl = $this->getFormUrl($activePayment, NULL, $user['additional']['user']['id'], $tempID, NULL, $basket, $ppd_crit);
-							if(isset($getFormUrl['FRONTEND_REDIRECT_URL'])){
-								$redirectUrl = $getFormUrl['FRONTEND_REDIRECT_URL'];
-							}elseif(isset($getFormUrl['PROCESSING_REDIRECT_URL'])){
-								$redirectUrl = $getFormUrl['PROCESSING_REDIRECT_URL'];
-							}
+						if($basketId['result'] == 'NOK'){
+						    return $this->forward('fail');
+						}else{
+						    $basketId = $basketId['basketId'];
+						}
+						    $ppd_crit['BASKET.ID'] = $basketId;
+                    }
+					$getFormUrl = $this->getFormUrl($activePayment, NULL, $user['additional']['user']['id'], $tempID, NULL, $basket, $ppd_crit);
+
+					if(isset($getFormUrl['FRONTEND_REDIRECT_URL'])){
+					    $redirectUrl = $getFormUrl['FRONTEND_REDIRECT_URL'];
+					}elseif(isset($getFormUrl['PROCESSING_REDIRECT_URL'])){
+					    $redirectUrl = $getFormUrl['PROCESSING_REDIRECT_URL'];
+					}
 
 
-							if($getFormUrl['POST_VALIDATION'] == 'NOK' || trim($redirectUrl) == ''){
-								$this->hgw()->Logging($activePayment.' | '.$getFormUrl['PROCESSING_RETURN_CODE'].' | '.$getFormUrl['PROCESSING_RETURN']);
-								Shopware()->Session()->HPError = $getFormUrl['PROCESSING_RETURN_CODE'];
-								return $this->forward('fail');
-							}
+					if($getFormUrl['POST_VALIDATION'] == 'NOK' || trim($redirectUrl) == ''){
+					    $this->hgw()->Logging($activePayment.' | '.$getFormUrl['PROCESSING_RETURN_CODE'].' | '.$getFormUrl['PROCESSING_RETURN']);
+						Shopware()->Session()->HPError = $getFormUrl['PROCESSING_RETURN_CODE'];
+						return $this->forward('fail');
+					}
 
-							/* Paymentmethod Sofortueberweisung, Prezlewy24, iDeal, EPS*/
-							$cardBrands[$activePayment]	= json_decode($getFormUrl['CONFIG_BRANDS'], true);
-							$bankCountry[$activePayment]= json_decode($getFormUrl['CONFIG_BANKCOUNTRY'], true);
-							$this->View()->formUrl 		= $redirectUrl;
-							$this->View()->cardBrands 	= $cardBrands;
-							$this->View()->bankCountry	= $bankCountry;
+					/* Paymentmethod Sofortueberweisung, Prezlewy24, iDeal, EPS*/
+					$cardBrands[$activePayment]	= json_decode($getFormUrl['CONFIG_BRANDS'], true);
+					$bankCountry[$activePayment]= json_decode($getFormUrl['CONFIG_BANKCOUNTRY'], true);
+					$this->View()->formUrl 		= $redirectUrl;
+					$this->View()->cardBrands 	= $cardBrands;
+					$this->View()->bankCountry	= $bankCountry;
 
-							if(	$activePayment != 'sue' && $activePayment != 'p24' ){
-								$this->View()->pm 		= $activePayment;
-							}
+					if(	$activePayment != 'sue' && $activePayment != 'p24' ){
+					    $this->View()->pm 		= $activePayment;
+					}
 
-							if($activePayment == 'papg'){
+					if($activePayment == 'papg'){
+                        $regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
 
-								$regData = self::hgw()->getRegData($user['additional']['user']['id'], $activePayment);
+						setlocale(LC_TIME, Shopware()->Locale()->getLanguage(), Shopware()->Shop()->getLocale()->getLocale());
 
-								setlocale(LC_TIME, Shopware()->Locale()->getLanguage(), Shopware()->Shop()->getLocale()->getLocale());
-								if(!empty($regData)){
-									$dobPapg = json_decode($regData['payment_data'], true);
-								}
+						if(!empty($regData)){
+						    $dobPapg = json_decode($regData['payment_data'], true);
+						}
 
-								if((isset($dobPapg)) && ($dobPapg['NAME_BIRTHDATE'] != '')){
-									$ppd_crit['NAME.BIRTHDATE'] = $dobPapg['NAME_BIRTHDATE'];
-									$this->View()->salutation	= $dobPapg['NAME_SALUTATION'];
-									$this->View()->birthdate_papg	= $dobPapg['NAME_BIRTHDATE'];
-								}
+						if((isset($dobPapg)) && ($dobPapg['NAME_BIRTHDATE'] != '')){
+						    $ppd_crit['NAME.BIRTHDATE'] = $dobPapg['NAME_BIRTHDATE'];
+							$this->View()->salutation	= $dobPapg['NAME_SALUTATION'];
+							$this->View()->birthdate_papg	= $dobPapg['NAME_BIRTHDATE'];
+						}
 
-								$this->View()->accountHolder = $getFormUrl['ACCOUNT_HOLDER'];
-							}
+						$this->View()->accountHolder = $getFormUrl['ACCOUNT_HOLDER'];
+					}
 
-							$this->View()->heidel_iban 	= $this->Config()->HGW_IBAN;
-							$this->View()->user			= $user;
-							$this->View()->pluginPath 	= $pref .$basepath .$pluginPath;
+					$this->View()->heidel_iban 	= $this->Config()->HGW_IBAN;
+					$this->View()->user			= $user;
+					$this->View()->pluginPath 	= $pref .$basepath .$pluginPath;
 
 				}else{
                     //payment methods: pp, iv, bs, mk, mpa, san, ivpd, hpr, hps

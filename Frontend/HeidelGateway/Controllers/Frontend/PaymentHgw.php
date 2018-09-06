@@ -113,8 +113,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					'action' => 'notify',
 					'appendSession' => 'SESSION_ID'
 			));
-			$ppd_crit['CRITERION.SECRET'] = $this->createSecretHash($tempID);
-			$ppd_crit['IDENTIFICATION.TRANSACTIONID'] = $tempID;
+//			$ppd_crit['CRITERION.SECRET'] = $this->createSecretHash($tempID);
+//			$ppd_crit['IDENTIFICATION.TRANSACTIONID'] = $tempID;
 			$ppd_crit['CRITERION.SESS'] = $user['additional']['user']['sessionID'];
 
 			$realpath 		= realpath(dirname(__FILE__));
@@ -136,6 +136,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
                 $tempID = $this->createPaymentUniqueId();
                 Shopware()->Session()->HPOrderId = $tempID;
+                $ppd_crit['CRITERION.SECRET'] = $this->createSecretHash($tempID);
+                $ppd_crit['IDENTIFICATION.TRANSACTIONID'] = $tempID;
 
 				if($this->Config()->$booking == 3 || $this->Config()->$booking == 4){
 					// Registrierung ist vorhanden
@@ -343,6 +345,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				){
                     $tempID = $this->createPaymentUniqueId();
                     Shopware()->Session()->HPOrderId = $tempID;
+                    $ppd_crit['CRITERION.SECRET'] = $this->createSecretHash($tempID);
+                    $ppd_crit['IDENTIFICATION.TRANSACTIONID'] = $tempID;
 				    //adding a basketId for papg payment
 
                     if($activePayment == 'papg') {
@@ -404,6 +408,21 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$this->View()->pluginPath 	= $pref .$basepath .$pluginPath;
 
 				}else{
+				    if(
+				        ($activePayment == "pp") ||
+				        ($activePayment == "iv") ||
+				        ($activePayment == "bs") ||
+				        ($activePayment == "mk") ||
+				        ($activePayment == "mpa") ||
+				        ($activePayment == "san") ||
+				        ($activePayment == "ivpd")
+                    ){
+                        $tempID = $this->createPaymentUniqueId();
+                        Shopware()->Session()->HPOrderId = $tempID;
+                        $ppd_crit['CRITERION.SECRET'] = $this->createSecretHash($tempID);
+                        $ppd_crit['IDENTIFICATION.TRANSACTIONID'] = $tempID;
+                    }
+
                     //payment methods: pp, iv, bs, mk, mpa, san, ivpd, hpr, hps
 					$booking = 'HGW_'.strtoupper($activePayment).'_BOOKING_MODE';
 					$ppd_config = $this->hgw()->ppd_config($this->Config()->$booking, $activePayment, NULL, true);
@@ -411,7 +430,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
                     // Masterpass
 					if($activePayment == 'mpa'){
-						if(empty($regData)){
+                        if(empty($regData)){
 							$basketId = self::getBasketId();
 
 							if($basketId['result'] == 'NOK'){
@@ -440,7 +459,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         $ppd_crit['BASKET.ID'] = $basketId;
 
                         $regDataParameters = json_decode($regData["payment_data"]);
-
                         $ppd_crit["NAME.BIRTHDATE"] = $regDataParameters->NAME_BIRTHDATE;
                         $ppd_crit["NAME.SALUTATION"] = $regDataParameters->NAME_SALUTATION;
                         $ppd_crit["CUSTOMER.OPTIN"] = strtoupper($regDataParameters->CUSTOMER_OPTIN);

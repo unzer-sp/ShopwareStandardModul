@@ -5,17 +5,21 @@ $(document).ready(function(){
             var orgLink = jQuery('form.payment').attr('action');
             // SELECT PAYMENT
             if(window.location.pathname.indexOf('gateway') == '-1'){
+
                 // save original form action
                 var orgLink = jQuery('form.payment').attr('action');
-                if(window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1'){
+                if(
+                    (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1')
+                    ||(window.location.pathname.toLowerCase().indexOf('zahlungsart-und-versand') == '-1')
+                ){
                     $(document).reuse();
-
                     // change checked option
                     jQuery('.register--payment').click(function(){
                         // change form action
                         var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
                         changeUrl(checkedOpt, orgLink);
                     });
+
                 }else{
                     var clicked = '';
                     $(this).click(function(e){
@@ -28,6 +32,8 @@ $(document).ready(function(){
                         changeUrl(checkedOpt, orgLink);
 
                     });
+                    // add validation for form
+                    jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
 
                     // set original form action (before AJAX is sent)
                     $.ajaxSetup({
@@ -88,6 +94,7 @@ $(document).ready(function(){
                             });
                             // add validation for form
                             jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
+
                             // just call changeUrl() after all animations are done
                             $(document).promise().done(function(){
                                 $(document).ready(function(){
@@ -135,12 +142,17 @@ $(document).ready(function(){
             //Function to set Birthdate in hidden field for Chrome on mac
             jQuery("input[type='submit'], .right").click(function(e){
                 var pm = $('input:radio:checked').attr('class');
+                if(window.location.pathname.indexOf("zahlungsart-und-versand")){
+                    jQuery('form#shippingPaymentForm').attr('onSubmit', 'return valShippingPaymentForm();');
+                }
+
                 if(pm != undefined) {
                     if(pm.indexOf("hgw_san") != -1)
                     {
                         $('#hgw_privpol_ivpd').attr("required","required");
 
                         var errorsSan = valSantander();
+
                         if((jQuery('.'+"hgw_san"+'  .has--error').length > 0)){
                             jQuery('#payment .alert .alert--content ul li').remove();
 
@@ -373,21 +385,28 @@ $(document).ready(function(){
                 jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
             }
 
-            jQuery('.newreg_san').click(function(e){
+            // jQuery('.newreg_san').click(function(e){
+            //     var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+            //     var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+            //     var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+            //
+            //     jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            // });
+            jQuery('.newreg_san').change(function (e) {
                 var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
                 var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
                 var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
 
                 jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
+
             });
-
-            if(jQuery('.newreg_san')) {
-                var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
-
-                jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
-            }
+            // if(jQuery('.newreg_san')) {
+            //     var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
+            //     var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
+            //     var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+            //
+            //     jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            // }
 
             jQuery('.newreg_papg').click(function(e){
 
@@ -590,7 +609,6 @@ function hgwToggleReuse (pm)
 
 // VALIDATE FORM
 function valForm() {
-
     if (jQuery('.register--payment input:radio:checked').length != 0) {
         var checkedOpt = jQuery('.register--payment input:radio:checked').attr('class');
         if (checkedOpt != undefined) {
@@ -675,6 +693,7 @@ function valForm() {
                     // jQuery('.register--payment select').attr('disabled', 'disabled');
                     // jQuery('.register--payment input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
                     // jQuery('.register--payment input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
+
                     jQuery('.payment--method .block input').attr('disabled', 'disabled');
                     jQuery('.payment--method .block select').attr('disabled', 'disabled');
                     jQuery("input:radio").removeAttr('disabled');
@@ -786,12 +805,15 @@ function valShippingPaymentForm() {
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
     // disable all other input fields
-    jQuery('.payment--method .block input').attr('disabled', 'disabled');
-    jQuery('.payment--method .block select').attr('disabled', 'disabled');
+    // jQuery('.payment--method .block input').attr('disabled', 'disabled');
+    // jQuery('.payment--method .block select').attr('disabled', 'disabled');
+    jQuery('div.payment--method.block.method :input').attr('disabled', 'disabled');
     jQuery("input:radio").removeAttr('disabled');
-    jQuery(".hgw_"+pm).parents('.payment--method .block').find('input').removeAttr('disabled');
-    jQuery(".hgw_"+pm).parents('.payment--method .block').find('select').removeAttr('disabled');
+    // jQuery(".hgw_"+pm).parents('.payment--method .block').find('input').removeAttr('disabled');
+    // jQuery(".hgw_"+pm).parents('.payment--method .block').find('select').removeAttr('disabled');
 
+    jQuery("input.hgw_"+pm).parent().parent('div.payment--method.block.method').find('input').removeAttr('disabled');
+    jQuery("input.hgw_"+pm).parent().parent('div.payment--method.block.method').find('select').removeAttr('disabled');
     // remove check vor cc and dc
     if ((pm != 'cc') && (pm != 'dc')) {
         // check if 'newreg' is shown
@@ -818,7 +840,6 @@ function valShippingPaymentForm() {
 
             if(pm == 'san'){
                 var errors = valSantander();
-
                 if(errors.length >0)
                 {
                     return false;
@@ -878,11 +899,11 @@ function valShippingPaymentForm() {
             return false;
         } else {
             // disable all other input fields
-            jQuery('.payment--method .block input').attr('disabled', 'disabled');
-            jQuery('.payment--method .block select').attr('disabled', 'disabled');
+            jQuery('.payment--method :input').attr('disabled', 'disabled');
+            jQuery('.payment--method select').attr('disabled', 'disabled');
             jQuery("input:radio").removeAttr('disabled');
-            jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
-            jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
+            jQuery("input:radio:checked").parent().parent().find('input').removeAttr('disabled')
+            jQuery("input:radio:checked").parent().parent().find('select').removeAttr('disabled')
         }
     }
 }
@@ -1007,7 +1028,6 @@ function valDirectDebitSecured(errors) {
 }
 
 function valSantander() {
-
     var errors = {};
     var i = 0;
 
@@ -1111,6 +1131,7 @@ function valSantanderHP() {
 }
 
 function valPayolutionDirect() {
+
     var errors = {};
     var i = 0;
     // validation of salutation

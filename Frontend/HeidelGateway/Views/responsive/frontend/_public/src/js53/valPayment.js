@@ -39,7 +39,7 @@ document.asyncReady(function () {
                     changeUrl(checkedOpt, orgLink);
 
                 });
-                // add validation for form
+
                 // add validation for form
                 jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
 

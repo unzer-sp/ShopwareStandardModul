@@ -62,7 +62,9 @@ $(document).ready(function(){
 		// trigger 'click' on document.ready() to get functionality if paymet method is preselected
 		$('.register--payment').trigger('click');
 		
-	}else if(window.location.pathname.indexOf('gateway') >= '0'){
+	}else if(
+		(window.location.pathname.indexOf('gateway') >= '0')
+	){
 		// GATEWAY
 		var errorDiv = '#payment .alert .alert--content';
 
@@ -101,7 +103,10 @@ $(document).ready(function(){
 				}
 			}else{ pm = ''; }
 		}
-	}else if(window.location.pathname.indexOf('shippingPayment') >= '0'){
+	}else if(
+		(window.location.pathname.indexOf('shippingPayment') >= '0') ||
+        (window.location.pathname.indexOf('zahlungsart-und-versand') >= '0')
+	){
 		// SHIPPINGPAYMENT
 		var errorDiv = '.content-main--inner .content .alert .alert--content';
 

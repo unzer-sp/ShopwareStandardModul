@@ -331,7 +331,20 @@ $(document).ready(function(){
                             }
                         }
                     }
-                    if(pm.indexOf("hgw_") != -1) {
+
+                    if(typeof pm == 'undefined')
+                    {
+                        var heidelCssClasses = jQuery(".payment_method").attr('class');
+                        if (heidelCssClasses.indexOf('hgw_') >= -1){
+                            var positionOfhgw = heidelCssClasses.indexOf('hgw_');
+                            pm = heidelCssClasses.substring(positionOfhgw + 4);
+                            // disable all other input fields
+                            jQuery('.payment--method input').attr('disabled', 'disabled');
+                            jQuery('.payment--method select').attr('disabled', 'disabled');
+                            jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
+                            jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
+                        }
+                    } else {
                         // disable all other input fields
                         jQuery('.payment--method input').attr('disabled', 'disabled');
                         jQuery('.payment--method select').attr('disabled', 'disabled');
@@ -342,19 +355,22 @@ $(document).ready(function(){
 
                 if(jQuery("#confirm--form").is(":visible") == false )
                 {
-                    // getting payment method
-                    if(jQuery('input:radio:checked').attr('class') == undefined)
+                    if(typeof pm == undefined)
                     {
-                        var cssClasses = jQuery('#payType').attr('class');
-                        var indexOfHgw = cssClasses.indexOf("newreg_");
-                        pm = cssClasses.substring(indexOfHgw + 7);
-                    } else {
-                        var cssClasses = jQuery('input:radio:checked').attr('class');
-                        var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
-                        pm = cssClasses.substring(indexOfHgw + 4);
+                        // getting payment method
+                        if(jQuery('input:radio:checked').attr('class') == undefined)
+                        {
+                            var cssClasses = jQuery('#payType').attr('class');
+                            var indexOfHgw = cssClasses.indexOf("newreg_");
+                            pm = cssClasses.substring(indexOfHgw + 7);
+                        } else {
+                            var cssClasses = jQuery('input:radio:checked').attr('class');
+                            var indexOfHgw = jQuery('input:radio:checked').attr('class').indexOf("hgw_");
+                            pm = cssClasses.substring(indexOfHgw + 4);
+                        }
                     }
 
-                    if(pm.indexOf("hgw_") != -1) {
+                    if(typeof pm != undefined) {
                         // disable all other input fields
                         jQuery('.payment--method input').attr('disabled', 'disabled');
                         jQuery('.payment--method select').attr('disabled', 'disabled');
@@ -362,7 +378,6 @@ $(document).ready(function(){
                         jQuery(".hgw_" + pm).parents('.payment--method').find('input').removeAttr('disabled');
                         jQuery(".hgw_" + pm).parents('.payment--method').find('select').removeAttr('disabled');
                     }
-
                 }
 
             }); // Ende input:submitt:right

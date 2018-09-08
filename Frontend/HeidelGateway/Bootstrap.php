@@ -2235,7 +2235,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $flag = ENT_COMPAT;
                     $enc = 'UTF-8';
                     $birthdate = $request->getPost("NAME_BIRTHDATE");
-
                     if(!empty($birthdate)){
                         $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
                     } else {
@@ -2246,7 +2245,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     }
                     //daten in DB Speichern
                     $user = Shopware()->Modules()->Admin()->sGetUserData();
-
+                    
                     // Benoetigte User-Indexe bei SW.516 anders vergeben
                     $user = self::formatUserInfos($user);
 

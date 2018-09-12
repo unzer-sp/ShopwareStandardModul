@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.09.04';
+		return '18.09.01';
 	}
 
 	/**
@@ -212,7 +212,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
      * @return bool
      */
     public function update($oldVersion){
-
         $msg = 'Update Fehler. Alte Modulversion: '.$oldVersion.'<br />';
         $form = $this->Form();
         switch($oldVersion){
@@ -889,17 +888,18 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.07.24':
+            case '18.08.08':
                 // fixed an issue for saving regdata for Santander and Payolution
-                // refactoring EasyCredit events
+                // refactored easyCredit events
+                // tested for SW 5.4.6
                 try{
                     $this->addSnippets();
-                    $msg .= '* update 18.07.11 <br />';
+                    $msg .= '* update 18.08.08 <br />';
                 } catch (Exception $e) {
                     $this->logError($msg, $e);
                 }
 
-            case '18.09.04':
+            case '18.09.01':
                 // integration of Santander HP
                 try{
                     $this->addSnippets();
@@ -911,12 +911,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 18.09.04<br />';
+                    $msg .= '* update 18.09.01<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
                 // overwrite $msg if update was successful
-                $msg .= 'Update auf Version '.$this->getVersion().' erfolgreich.';
+                $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
 
 //        $form->save();
@@ -1165,7 +1165,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				SELECT `s_core_shops`.`id`, `s_core_locales`.`locale` FROM `s_core_shops`, `s_core_locales`
 				WHERE `s_core_shops`.`locale_id` = `s_core_locales`.`id`
 			';
-
 			try {
 				$shops = Shopware()->Db()->fetchAll($sql);
 				$dbErrors = Shopware()->Db()->getErrorMessage();

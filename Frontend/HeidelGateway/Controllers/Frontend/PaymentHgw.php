@@ -3224,6 +3224,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$params['FRONTEND.LANGUAGE'] 	= strtoupper(Shopware()->Locale()->getLanguage());
 			$params['FRONTEND.MODE'] 		= "WHITELABEL";
 
+			if($params['FRONTEND.LANGUAGE'] == 'ja'){
+                $params['FRONTEND.LANGUAGE'] = 'jp';
+            }
+
 			// set payment method
             switch(strtolower($config['PAYMENT.METHOD'])){
 				/* prezlewy24 */

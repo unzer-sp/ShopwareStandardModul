@@ -13,6 +13,7 @@ $(document).ready(function(){
 	var checkedOpt = '';
 	
 	var sendHandler = function(e){
+		// console.log("sendhandler");
 		origEvent = e;
 		sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt);
 	}
@@ -111,51 +112,93 @@ $(document).ready(function(){
 		var errorDiv = '.content-main--inner .content .alert .alert--content';
 
 		// $(document).ajaxComplete(function(event, xhr, settings){
-			// reset the flags for the frame listener, because event bindings are deleted due to ajax
-			// 'msg' flag don't need a reset because the listener is on the window
-			hasListener['dc'] = false;
-			hasListener['cc'] = false;
+		// reset the flags for the frame listener, because event bindings are deleted due to ajax
+		// 'msg' flag don't need a reset because the listener is on the window
+		hasListener['dc'] = false;
+		hasListener['cc'] = false;
 
-			checkedOpt = jQuery('.payment--method-list input:radio:checked');
-			var checkedClass = checkedOpt.attr('class');
+		checkedOpt = jQuery('.payment--method-list input:radio:checked');
+		var checkedClass = checkedOpt.attr('class');
 
-			if(typeof checkedClass != 'undefined'){
-				var prefix = 'hgw_';
-				var checkedClassPos = checkedClass.indexOf(prefix);
+		if(typeof checkedClass != 'undefined'){
+			var prefix = 'hgw_';
+			var checkedClassPos = checkedClass.indexOf(prefix);
 
-				if(checkedClassPos >= 0){
-					pm = checkedClass.substr(checkedClassPos+prefix.length);					
-					if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
-						// get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
-						targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
-						paymentFrameForm = document.getElementsByName('shippingPaymentForm');
-						paymentFrameIframe = document.getElementById('hp_frame_'+pm);
-						// get right element from nodelist
-						for(var i = 0; i < paymentFrameForm.length; i++){
-							var item = paymentFrameForm[i];							
-							if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
-								paymentFrameForm = paymentFrameForm[i];
-								break;
-							}
-						}
-
-						if(!hasListener[pm]){
-							setSubmitListener();
-							hasListener[pm] = true;
-						}
-						
-						if(!hasListener['msg']){
-							setMessageListener();
-							hasListener['msg'] = true;
+			if(checkedClassPos >= 0){
+				pm = checkedClass.substr(checkedClassPos+prefix.length);
+				if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
+					// get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
+					targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
+					paymentFrameForm = document.getElementsByName('shippingPaymentForm');
+					paymentFrameIframe = document.getElementById('hp_frame_'+pm);
+					// get right element from nodelist
+					for(var i = 0; i < paymentFrameForm.length; i++){
+						var item = paymentFrameForm[i];
+						if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
+							paymentFrameForm = paymentFrameForm[i];
+							break;
 						}
 					}
-				}else{ pm = ''; }
+
+					if(!hasListener[pm]){
+						setSubmitListener();
+						hasListener[pm] = true;
+					}
+						
+					if(!hasListener['msg']){
+						setMessageListener();
+						hasListener['msg'] = true;
+					}
+				}
+			}else{ pm = ''; }
+		}
+
+        $.ajaxSetup({
+        	complete: function(event, xhr, settings){
+                hasListener['dc'] = false;
+                hasListener['cc'] = false;
+                checkedOpt = jQuery('.payment--method-list input:radio:checked');
+                var checkedClass = checkedOpt.attr('class');
+
+                if(typeof checkedClass != 'undefined'){
+                    var prefix = 'hgw_';
+                    var checkedClassPos = checkedClass.indexOf(prefix);
+
+                    if(checkedClassPos >= 0){
+                        pm = checkedClass.substr(checkedClassPos+prefix.length);
+                        if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
+                            // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
+                            targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
+                            paymentFrameForm = document.getElementsByName('shippingPaymentForm');
+                            paymentFrameIframe = document.getElementById('hp_frame_'+pm);
+                            // get right element from nodelist
+                            for(var i = 0; i < paymentFrameForm.length; i++){
+                                var item = paymentFrameForm[i];
+                                if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
+                                    paymentFrameForm = paymentFrameForm[i];
+                                    break;
+                                }
+                            }
+
+                            if(!hasListener[pm]){
+                                setSubmitListener();
+                                hasListener[pm] = true;
+                            }
+
+                            if(!hasListener['msg']){
+                                setMessageListener();
+                                hasListener['msg'] = true;
+                            }
+                        }
+                    }else{ pm = ''; }
+                }
 			}
-		// });
+        });
 	}
 
 	// add an event listener that will execute the sendMessage() function when the send button is clicked.
 	function setSubmitListener(){
+// console.log("SubitListener");
 		if(paymentFrameForm.addEventListener){ // W3C DOM
 			paymentFrameForm.addEventListener('submit', sendHandler);
 		}else if(paymentFrameForm.attachEvent){ // IE DOM
@@ -224,7 +267,7 @@ $(document).ready(function(){
 	function receiveMessage(e, origEvent, targetOrigin, paymentFrameForm, checkedOpt){
 		// Check to make sure that this message came from the correct domain
 		if(e.origin !== targetOrigin){
-			console.log(e.origin+' !== '+targetOrigin);
+			// console.log(e.origin+' !== '+targetOrigin);
 			return;
 		}
 		

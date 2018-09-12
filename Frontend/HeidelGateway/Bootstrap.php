@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.09.01';
+		return '18.09.03';
 	}
 
 	/**
@@ -899,7 +899,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.09.01':
+            case '18.09.03':
                 // integration of Santander HP
                 try{
                     $this->addSnippets();
@@ -911,7 +911,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 18.09.01<br />';
+                    $msg .= '* update 18.09.03<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

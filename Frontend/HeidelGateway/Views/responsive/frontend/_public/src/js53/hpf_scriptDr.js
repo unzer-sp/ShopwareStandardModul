@@ -13,7 +13,6 @@ $(document).ready(function(){
 	var checkedOpt = '';
 	
 	var sendHandler = function(e){
-		// console.log("sendhandler");
 		origEvent = e;
 		sendMessage(e, pm, targetOrigin, paymentFrameForm, paymentFrameIframe, checkedOpt);
 	}
@@ -198,7 +197,6 @@ $(document).ready(function(){
 
 	// add an event listener that will execute the sendMessage() function when the send button is clicked.
 	function setSubmitListener(){
-// console.log("SubitListener");
 		if(paymentFrameForm.addEventListener){ // W3C DOM
 			paymentFrameForm.addEventListener('submit', sendHandler);
 		}else if(paymentFrameForm.attachEvent){ // IE DOM
@@ -267,7 +265,7 @@ $(document).ready(function(){
 	function receiveMessage(e, origEvent, targetOrigin, paymentFrameForm, checkedOpt){
 		// Check to make sure that this message came from the correct domain
 		if(e.origin !== targetOrigin){
-			// console.log(e.origin+' !== '+targetOrigin);
+			console.log(e.origin+' !== '+targetOrigin);
 			return;
 		}
 		

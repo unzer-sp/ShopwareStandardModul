@@ -256,19 +256,22 @@ $(document).ready(function(){
 
                     if (pm.indexOf("hgw_hps") != -1){
                         var errorsHps = valSantanderHP();
-                        if(errorsHps.length > 0){
+                        if(errorsHps != undefined){
+                            if(errorsHps.length > 0){
 
-                            jQuery('#payment .alert .alert--content ul li').remove();
+                                jQuery('#payment .alert .alert--content ul li').remove();
 
-                            jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
-                            jQuery.each(errorsHps, function(key, value){
-                                jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
-                            });
+                                jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+                                jQuery.each(errorsHps, function(key, value){
+                                    jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+                                });
 
-                            jQuery('.alert').removeClass("is--hidden");
-                            jQuery('html, body').animate({scrollTop: 0}, 0);
-                            return false;
+                                jQuery('.alert').removeClass("is--hidden");
+                                jQuery('html, body').animate({scrollTop: 0}, 0);
+                                return false;
+                            }
                         }
+
                     }
 
                 } else {
@@ -495,9 +498,23 @@ $(document).ready(function(){
 
                     jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                 }
-                /**
-                 * Zahlart von Heidelpay dann sperre die inputs
-                 */
+
+                jQuery('.newreg_hps').click(function(e){
+                    var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                });
+
+                if(jQuery('.newreg_hps')) {
+                    var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                }
+
                 jQuery('.payment--method input:radio:checked').attr('class').indexOf("hgw_")
                 if(jQuery('.payment--method input:radio:checked').attr('class').indexOf("hgw_")){
                     jQuery('#shippingPaymentForm').attr('onSubmit', 'return valShippingPaymentForm();');
@@ -900,12 +917,13 @@ function valShippingPaymentForm() {
 
             if(pm == 'hps'){
                 var errors = valSantanderHP();
-                if(errors.length >0)
-                {
-                    return false;
+                if(errors != undefined){
+                    if(errors.length > 0)
+                    {
+                        return false;
+                    }
                 }
             }
-
         }
 
         if ((jQuery('div.hgw_' + pm + ' .has--error').length > 0)) {

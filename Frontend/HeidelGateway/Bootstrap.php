@@ -2661,7 +2661,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
 
-                    
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';
@@ -4183,7 +4182,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.802','Activation deadline is in the past');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.804','Transaktion wurde zum Versicherer bereits &uuml;bermittelt');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.804','Transaction already submitted to insurance provider');
-        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.XXX','Ihre Lieferadresse stimmt nicht mit der bei der Santander vorliegenden Daten überein');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.XXX','Ihre Adressdaten wurden ge&auml;ndert. Bitte klicken Sie auf „Zur&uuml;ck zum Warenkorb“, um Ihre Bestellung mit den ge&auml;nderten Daten abzuschließen');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.XXX','Your delivery address differs from your prior given address');
         // Ende Santander Codes
 

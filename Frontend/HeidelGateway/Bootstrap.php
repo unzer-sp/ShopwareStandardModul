@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.09.10';
+		return '18.09.17';
 	}
 
 	/**
@@ -899,7 +899,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.09.10':
+            case '18.09.17':
                 // integration of Santander HP
                 try{
                     $this->addSnippets();
@@ -911,7 +911,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 18.09.10<br />';
+                    $msg .= '* update 18.09.11<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -2825,6 +2825,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             $view->extendsTemplate('payment_hgw/checkout.tpl');
                         }
                     } else {
+                        Shopware()->Session()->HpHpsErrorAdress = true;
                         return $args->getSubject()->redirect(array(
                             'forceSecure' => 1,
                             'controller' => 'PaymentHgw',
@@ -4004,7 +4005,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 'trans_desc' 	=> 'Hire Purchace by Santander',
                 'additionalDescription' => '
 								<div class="SanPermission">
-									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge (XXX - XXXX EUR). </p>
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMAXAMOUNT.' EUR). </p>
 								</div>',
                 'template' 		=> 'hp_payment_hps.tpl',
 
@@ -4182,8 +4183,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.802','Activation deadline is in the past');
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.804','Transaktion wurde zum Versicherer bereits &uuml;bermittelt');
         $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.804','Transaction already submitted to insurance provider');
-        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.XXX','Ihre Adressdaten wurden ge&auml;ndert. Bitte klicken Sie auf „Zur&uuml;ck zum Warenkorb“, um Ihre Bestellung mit den ge&auml;nderten Daten abzuschließen');
-        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.XXX','Your delivery address differs from your prior given address');
+        $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-700.400.XXX','Ihre Bestelldaten wurden ge&auml;ndert. Bitte klicken Sie auf „Zur&uuml;ck zum Warenkorb“, um Ihre Bestellung mit den ge&auml;nderten Daten abzuschlie&szlig;en.');
+        $snippets[] = array('frontend/payment_heidelpay/error','en','HPError-700.400.XXX','Your data has been changed. Please click on „Return to shopping cart“ to complete your order with the changed data. ');
         // Ende Santander Codes
 
         $snippets[] = array('frontend/payment_heidelpay/error','de','HPError-800.100.151','Bitte w&auml;hlen Sie eine andere Zahlart');

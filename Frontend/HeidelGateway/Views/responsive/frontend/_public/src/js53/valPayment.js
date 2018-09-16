@@ -11,7 +11,6 @@ document.asyncReady(function () {
             if (orgLink == 'undefined') {
                 var orglink = jQuery('form[name="shippingPaymentForm"]').attr('action');
             }
-
             if (
                 (window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1')
                 ||(window.location.pathname.toLowerCase().indexOf('zahlungsart-und-versand') == '-1')
@@ -39,7 +38,6 @@ document.asyncReady(function () {
                     changeUrl(checkedOpt, orgLink);
 
                 });
-
                 // add validation for form
                 jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
 
@@ -432,6 +430,8 @@ document.asyncReady(function () {
                 var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
                 var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
                 jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+                // change form action
+                changeUrl('hgw_dd', orgLink);
             });
 
 

@@ -547,7 +547,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         ){
                             Shopware()->Session()->HPOrderId = $transaction['transactionid'];
                             Shopware()->Session()->HpHpsErrorAdress = true;
-                            return $this->forward('fail');
+                            return $this->forward('fail',"PaymentHgw");
 
                         }
                         //setting

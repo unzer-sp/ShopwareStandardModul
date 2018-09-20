@@ -105,7 +105,6 @@
 				}
 			});
 		</script>
-
 		<h2 class="headingbox_dark largesize">{s name='PaymentHeader' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>
 		{if ($pm == 'cc') || ($pm == 'dc')}
 			<form name="heidelpay" class="payment" action='' method='post' autocomplete="off" onsubmit="return valGatewayForm();">

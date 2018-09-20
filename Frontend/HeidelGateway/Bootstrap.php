@@ -26,6 +26,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function getVersion(){
 		return '18.09.17';
+
 	}
 
 	/**

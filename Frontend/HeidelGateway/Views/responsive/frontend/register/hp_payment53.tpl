@@ -105,14 +105,22 @@
 	</script>
     {if $action != 'cart' && $action != 'orders'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-        {if $swVersion >= "5.3"}
+        {if $swVersion >= "5.5"}
             {if $theme.asyncJavascriptLoading}
-                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
-                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/valPayment.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/hpf_script.js' defer='defer'></script>
             {else}
-                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPaymentDr.js' defer='defer'></script>
-                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_scriptDr.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/valPaymentDr.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/hpf_scriptDr.js' defer='defer'></script>
             {/if}
+        {elseif $swVersion >= "5.3"}
+                {if $theme.asyncJavascriptLoading}
+                    <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
+                    <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
+                {else}
+                    <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPaymentDr.js' defer='defer'></script>
+                    <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_scriptDr.js' defer='defer'></script>
+                {/if}
         {else}
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>

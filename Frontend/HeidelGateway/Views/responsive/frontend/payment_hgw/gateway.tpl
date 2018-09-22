@@ -1,9 +1,54 @@
 {extends file="parent:frontend/checkout/confirm.tpl"}
 {block name='frontend_index_content_left'}{/block}
-
 {* Javascript *}
 {block name="frontend_index_header_javascript_jquery_lib" append}
-	{if $swVersion >= "5.3"}
+    {* For Shopware 5.5 and higher*}
+    {if $swVersion >= "5.5"}
+        {if $theme.asyncJavascriptLoading}
+            <script type="text/javascript">
+                document.asyncReady(function() {
+                    jQuery('#payment_frame').css('display', 'none');
+                    jQuery('#payment_loader').css('display', 'block');
+
+                    jQuery('#payment_frame').on('load',function(){
+                        jQuery('#payment_loader').css('display', 'none');
+                        jQuery('#payment_frame').css('display', 'block');
+                    });
+                });
+            </script>
+
+            <script type='text/javascript'>
+                document.asyncReady(function() {
+                    //add error div
+                    if(jQuery('#payment .panel.has--border .alert--content').length < 1){
+                        jQuery('#payment').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div></div>');
+                    }
+                });
+            </script>
+        {else}
+            <script type="text/javascript">
+                $(function() {
+                    jQuery('#payment_frame').css('display', 'none');
+                    jQuery('#payment_loader').css('display', 'block');
+
+                    jQuery('#payment_frame').load(function(){
+                        jQuery('#payment_loader').css('display', 'none');
+                        jQuery('#payment_frame').css('display', 'block');
+                    });
+                });
+            </script>
+
+            <script type='text/javascript'>
+                $(function() {
+                    //add error div
+                    if(jQuery('#payment .panel.has--border .alert--content').length < 1){
+                        jQuery('#payment').prepend('<div class="alert is--error is--rounded" style="display: none;"><div class="alert--icon"><i class="icon--element icon--cross"></i></div><div class="alert--content"><ul class="alert--list"></ul></div></div>');
+                    }
+                });
+            </script>
+        {/if}
+	{elseif ($swVersion >= "5.3") && ($swVersion < "5.5")}
+        {* For Shopware between 5.3 and 5.5*}
         {if $theme.asyncJavascriptLoading}
             <script type="text/javascript">
                 document.asyncReady(function() {
@@ -49,6 +94,7 @@
         {/if}
 
     {else}
+        {* For Shopware < 5.3*}
 		<script type="text/javascript">
             $(document).ready(function(){
                 jQuery('#payment_frame').css('display', 'none');
@@ -72,7 +118,17 @@
 
 	{if isset($pluginPath) && $pluginPath != ''}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-		{if $swVersion >= "5.3"}
+        {if $swVersion >= "5.5"}
+            {* For Shopware > 5.5*}
+            {if $theme.asyncJavascriptLoading}
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/valPayment.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/hpf_script.js' defer='defer'></script>
+            {else}
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/valPaymentDr.js' defer='defer'></script>
+                <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/hpf_scriptDr.js' defer='defer'></script>
+            {/if}
+        {elseif ($swVersion >= "5.3") && ($swVersion < "5.5") }
+            {* For Shopware between 5.3 and 5.5*}
             {if $theme.asyncJavascriptLoading}
                 <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
                 <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
@@ -81,6 +137,7 @@
                 <script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_scriptDr.js' defer='defer'></script>
             {/if}
         {else}
+            {* For Shopware < 5.3*}
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
 		{/if}
@@ -88,7 +145,95 @@
 
 	{/if}
 
-    {if $swVersion >= "5.3"}
+    {if $swVersion >= "5.5"}
+        {* For Shopware > 5.5*}
+        {if $theme.asyncJavascriptLoading}
+            <script type='text/javascript'>
+                //sepa switch
+                document.asyncReady(function() {
+                    var call = true;
+                    if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                    if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+
+                    jQuery('#sepa_switch').change(function(){
+                        if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                        if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+                    });
+
+                    function iban(){
+                        if(jQuery('#iban').parent().is(':hidden') || call){
+                            jQuery('#account').parent().hide();
+                            jQuery('#bankcode').parent().hide();
+                            jQuery('#iban').parent().show();
+                            jQuery('#bic').parent().show();
+                            call = false;
+                        }
+                    }
+                    function noiban(){
+                        if(jQuery('#account').parent().is(':hidden') || call){
+                            jQuery('#account').parent().show();
+                            jQuery('#bankcode').parent().show();
+                            jQuery('#iban').parent().hide();
+                            jQuery('#bic').parent().hide();
+                            call = false;
+                        }
+                    }
+                    jQuery('#iban').on('input', function(){
+                        if(jQuery(this).val().match(/^(D|d)(E|e)/) && !$('#bic').parent().parent().hasClass('newreg_gir')){
+                            jQuery('#bic').parent().fadeOut();
+                            jQuery('#bic').attr('disabled', 'disabled');
+                        }else{
+                            jQuery('#bic').removeAttr('disabled');
+                            jQuery('#bic').parent().fadeIn();
+                        }
+                    });
+                });
+            </script>
+        {else}
+            <script type='text/javascript'>
+                //sepa switch
+                $(function() {
+                    var call = true;
+                    if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                    if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+
+                    jQuery('#sepa_switch').change(function(){
+                        if(jQuery('#sepa_switch :selected').val() == 'iban'){ iban(); }
+                        if(jQuery('#sepa_switch :selected').val() == 'noiban'){ noiban(); }
+                    });
+
+                    function iban(){
+                        if(jQuery('#iban').parent().is(':hidden') || call){
+                            jQuery('#account').parent().hide();
+                            jQuery('#bankcode').parent().hide();
+                            jQuery('#iban').parent().show();
+                            jQuery('#bic').parent().show();
+                            call = false;
+                        }
+                    }
+                    function noiban(){
+                        if(jQuery('#account').parent().is(':hidden') || call){
+                            jQuery('#account').parent().show();
+                            jQuery('#bankcode').parent().show();
+                            jQuery('#iban').parent().hide();
+                            jQuery('#bic').parent().hide();
+                            call = false;
+                        }
+                    }
+                    jQuery('#iban').on('input', function(){
+                        if(jQuery(this).val().match(/^(D|d)(E|e)/) && !$('#bic').parent().parent().hasClass('newreg_gir')){
+                            jQuery('#bic').parent().fadeOut();
+                            jQuery('#bic').attr('disabled', 'disabled');
+                        }else{
+                            jQuery('#bic').removeAttr('disabled');
+                            jQuery('#bic').parent().fadeIn();
+                        }
+                    });
+                });
+            </script>
+        {/if}
+    {elseif ($swVersion >= "5.3") && ($swVersion < "5.5")}
+        {* For Shopware between 5.3 and < 5.5*}
         {if $theme.asyncJavascriptLoading}
             <script type='text/javascript'>
                 //sepa switch
@@ -176,6 +321,7 @@
         {/if}
 
     {else}
+        {* For Shopware < 5.3*}
 		<script type='text/javascript'>
             //sepa switch
             $(document).ready(function(){
@@ -220,7 +366,33 @@
 	{/if}
 
 	{if isset($PaymentUrl)}
-    	{if $swVersion >= "5.3"}
+        {* For Shopware >= 5.5*}
+        {if $swVersion >= "5.5"}
+            {if $theme.asyncJavascriptLoading}
+                {if isset($Input)}
+                    <script type='text/javascript'>
+                        document.asyncReady(function () {
+                            jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                            $.overlay.open();
+                            $.loadingIndicator.open();
+                            document.forms['heidelpay'].submit();
+                        });
+                    </script>
+                {/if}
+            {else}
+                {if isset($Input)}
+                    <script type='text/javascript'>
+                        $(function() {
+                            jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                            $.overlay.open();
+                            $.loadingIndicator.open();
+                            document.forms['heidelpay'].submit();
+                        });
+                    </script>
+                {/if}
+            {/if}
+    	{elseif ($swVersion >= "5.3") && ($swVersion < "5.5")}
+            {* For Shopware between 5.3 and < 5.5*}
             {if $theme.asyncJavascriptLoading}
                 {if isset($Input)}
 				    <script type='text/javascript'>
@@ -245,6 +417,7 @@
                 {/if}
             {/if}
 		{else}
+            {* For Shopware < 5.3*}
             {if isset($Input)}
 				<script type='text/javascript'>
                     $(document).ready(function(){
@@ -257,10 +430,36 @@
             {/if}
 		{/if}
 	{elseif isset($formUrl)}
-    	{if $swVersion >= "5.3"}
+        {* For Shopware > 5.5.*}
+    	{if $swVersion >= "5.5"}
             {if $theme.asyncJavascriptLoading}
                 {if !isset($pm)}
 				    <script type='text/javascript'>
+                        document.asyncReady(function () {
+                            jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                            $.overlay.open();
+                            $.loadingIndicator.open();
+                            document.forms['heidelpay'].submit();
+                        });
+                    </script>
+                {/if}
+            {else}
+                {if !isset($pm)}
+                    <script type='text/javascript'>
+                        $(function() {
+                            jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                            $.overlay.open();
+                            $.loadingIndicator.open();
+                            document.forms['heidelpay'].submit();
+                        });
+                    </script>
+                {/if}
+            {/if}
+        {* For Shopware between 5.3 and < 5.5.*}
+        {elseif ($swVersion >= "5.3") && ($swVersion < "5.5")}
+            {if $theme.asyncJavascriptLoading}
+                {if !isset($pm)}
+                    <script type='text/javascript'>
                         document.asyncReady(function () {
                             jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
                             $.overlay.open();
@@ -281,6 +480,7 @@
                     </script>
                 {/if}
             {/if}
+        {* For Shopware < 5.3.*}
         {else}
             {if !isset($pm)}
 				<script type='text/javascript'>
@@ -295,7 +495,29 @@
 		{/if}
 
 	{else}
-    	{if $swVersion >= "5.3"}
+        {* For Shopware >= 5.5*}
+        {if $swVersion >= "5.5"}
+            {if $theme.asyncJavascriptLoading}
+                <script type='text/javascript'>
+                    document.asyncReady(function () {
+                        jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                        $.overlay.open();
+                        $.loadingIndicator.open();
+                        document.forms['heidelpay'].submit();
+                    });
+                </script>
+            {else}
+                <script type='text/javascript'>
+                    $(function() {
+                        jQuery('#payment form[name="heidelpay"] div').prepend("<h2>{s name='PaymentRedirectInfo' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>");
+                        $.overlay.open();
+                        $.loadingIndicator.open();
+                        document.forms['heidelpay'].submit();
+                    });
+                </script>
+            {/if}
+        {*For Shopware between 5.3 and < 5.5*}
+    	{elseif ($swVersion >= "5.3") && ($swVersion < "5.5")}
             {if $theme.asyncJavascriptLoading}
                 <script type='text/javascript'>
                     document.asyncReady(function () {
@@ -315,6 +537,7 @@
                     });
                 </script>
             {/if}
+        {*For Shopware < 5.3*}
         {else}
 			<script type='text/javascript'>
 				$(document).ready(function(){

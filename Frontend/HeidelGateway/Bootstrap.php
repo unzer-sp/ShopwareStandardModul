@@ -1940,7 +1940,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						$view->lang			= Shopware()->Locale()->getLanguage();
 						$view->swVersion	= Shopware()->Config()->Version;
 
-						if(Shopware()->Config()->Version >= 5.3){
+						if(Shopware()->Config()->Version >= 5.5){
+                            $view->extendsTemplate('register/hp_payment55.tpl');
+                        }elseif(
+                            (Shopware()->Config()->Version < 5.5) &&
+                            (Shopware()->Config()->Version >= 5.3)
+                        ){
                             $view->extendsTemplate('register/hp_payment53.tpl');
                         } else{
                             $view->extendsTemplate('register/hp_payment.tpl');
@@ -2099,7 +2104,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 													}
 												}
 
-                                                if((!empty($data)) && (($data['expMonth'] != '0') && ($data['expYear'] != '0') && ($last < time())) || (($data['shippingHash'] != $shippingHash) && $config->HGW_SHIPPINGHASH == 0) || (($bookingMode == 1) || ($bookingMode == 2))){
+												if((!empty($data)) && (($data['expMonth'] != '0') && ($data['expYear'] != '0') && ($last < time())) || (($data['shippingHash'] != $shippingHash) && $config->HGW_SHIPPINGHASH == 0) || (($bookingMode == 1) || ($bookingMode == 2))){
 													unset($regData[$pm]);
 												}
 											}
@@ -2343,6 +2348,20 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 				if($action == 'confirm'){
 					$user = Shopware()->Modules()->Admin()->sGetUserData();
+
+                    $activePayment	= preg_replace('/hgw_/', '', $user['additional']['payment']['name']);
+                    $regData = $this->getRegData($user['additional']['user']['id'], $activePayment);
+                    $address = json_decode($regData['payment_data']);
+
+                    $view->billingAdd 	= $address->billing;
+                    $view->shippingAdd = $address->shipping;
+                    $view->regData 		= $regData;
+                    $view->tPath		= $pluginPath;
+                    if(!empty($regData)){
+//                        if($user['additional']['payment']['name'] == 'hgw_mpa'){ // or every other wallet
+                            $view->extendsTemplate('register/hp_checkout_confirm.tpl');
+//                        }
+                    }
 
 					if($_SESSION['Shopware']['HPWallet'] == '1'){
 						$activePayment	= preg_replace('/hgw_/', '', $user['additional']['payment']['name']);

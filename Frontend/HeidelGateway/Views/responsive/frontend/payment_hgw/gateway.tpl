@@ -493,7 +493,6 @@
 				</script>
             {/if}
 		{/if}
-
 	{else}
         {* For Shopware >= 5.5*}
         {if $swVersion >= "5.5"}
@@ -553,7 +552,6 @@
 
 {* Main content *} 
 {block name="frontend_index_content"}
-
 {if $isMobile || $swfActive}<link rel="stylesheet" media="all" type="text/css" href="{$pluginPath}/Views/responsive/frontend/register/mobile.css">{/if}
 
 <div id="payment" class="grid_20">
@@ -670,3 +668,4 @@
 </div>
 <div class="doublespace">&nbsp;</div>
 {/block}
+

@@ -228,12 +228,12 @@
 {/block}
 
 {* confirm Checkout Payment method Block *}
+{* frontend_checkout_confirm_left_shipping_method *}
 {block name='frontend_checkout_confirm_left_payment_method'}
 	<strong class="payment--description">{$sUserData.additional.payment.description}</strong><br />
 	{if !$sUserData.additional.payment.esdactive}
 		<p class="payment--confirm-esd">{s name="ConfirmInfoInstantDownload" namespace="frontend/checkout/confirm_left"}{/s}</p>
 	{/if}
-	
 	{if $swfActive}
 		{$smarty.block.parent}
 	{else}

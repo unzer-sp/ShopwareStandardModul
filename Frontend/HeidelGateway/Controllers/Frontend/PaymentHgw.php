@@ -3351,12 +3351,13 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					/* credit- & debitcard */
 				case 'cc':
 				case 'dc':
-					$params['PAYMENT.CODE'] = strtoupper($config['PAYMENT.METHOD']).'.'.$config['PAYMENT.TYPE'];
+				    $params['PAYMENT.CODE'] = strtoupper($config['PAYMENT.METHOD']).'.'.$config['PAYMENT.TYPE'];
 					$params['FRONTEND.ENABLED'] = "true";
-
+					$params['PROCESSING.RECOVERABLE'] = "TRUE";
 					$url = parse_url(Shopware()->Front()->Router()->assemble(array('forceSecure' => 1)));
 					$params['FRONTEND.PAYMENT_FRAME_ORIGIN']	= $url['scheme'] .'://'. $url['host'];
 					$params['FRONTEND.PREVENT_ASYNC_REDIRECT'] = 'TRUE';
+                $ppd_crit['PROCESSING.RECOVERABLE'] = "TRUE";
 					// path to CSS
 					$cssVar = 'HGW_HPF_'.strtoupper($config['PAYMENT.METHOD']).'_CSS';
 					$konfiguration = self::Config();

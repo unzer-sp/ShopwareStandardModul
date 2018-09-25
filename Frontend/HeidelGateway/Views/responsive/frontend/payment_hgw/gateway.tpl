@@ -31,7 +31,7 @@
                     jQuery('#payment_frame').css('display', 'none');
                     jQuery('#payment_loader').css('display', 'block');
 
-                    jQuery('#payment_frame').load(function(){
+                    jQuery('#payment_frame').on('load', function() {
                         jQuery('#payment_loader').css('display', 'none');
                         jQuery('#payment_frame').css('display', 'block');
                     });

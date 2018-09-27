@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.09.17';
+		return '18.09.25';
 
 	}
 
@@ -900,8 +900,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.09.17':
+            case '18.09.25':
                 // integration of Santander HP
+                // tested for SW 5.5.1
                 try{
                     $this->addSnippets();
                     $this->createPayments();
@@ -912,7 +913,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 18.09.17<br />';
+                    $msg .= '* update 18.09.25<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -1804,7 +1805,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($document->_order->payment['name'] == 'hgw_papg') ||
                 ($document->_order->payment['name'] == 'hgw_san') ||
                 ($document->_order->payment['name'] == 'hgw_ivpd')
-//                || ($document->_order->payment['name'] == 'hgw_pp')
+                || ($document->_order->payment['name'] == 'hgw_pp')
 				){
 				    $orderData = $view->getTemplateVars('Order');
 					$containers = $view->getTemplateVars('Containers');

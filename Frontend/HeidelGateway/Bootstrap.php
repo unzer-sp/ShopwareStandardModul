@@ -26,7 +26,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function getVersion(){
 		return '18.09.25';
-
 	}
 
 	/**
@@ -917,6 +916,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
+            case '18.09.25':
+                // Integration of Invioce B2B
+                $this->createPayments();
+                $form->setElement('text', 'HGW_IVB2B_CHANNEL',
+                    array(
+                        'label'=>'gesicherter B2B-Rechnungskauf Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                    )
+                );
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
@@ -1524,6 +1533,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setElement('text', 'HGW_PP_CHANNEL', array('label'=>'Prepayment Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_IV_CHANNEL', array('label'=>'Invoice Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_PAPG_CHANNEL', array('label'=>'Invoice with guarantee Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+            $form->setElement('text', 'HGW_IVB2B_CHANNEL', array('label'=>'Invoice for company customers', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_SAN_CHANNEL', array('label'=>'Santander Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_IVPD_CHANNEL', array('label'=>'Payolution branded Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_P24_CHANNEL', array('label'=>'Przelewy24 Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
@@ -3950,6 +3960,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'description'	=> 'Heidelpay CD-Edition gesicherter Rechnungskauf',
 					'trans_desc' 	=> 'Heidelpay CD-Edition invoice with guarantee',
 			);
+            $inst[] = array(
+                    'name'			=> 'ivb2b',
+                    'description'	=> 'Heidelpay CD-Edition gesicherter B2B Rechnungskauf',
+                    'trans_desc' 	=> 'Heidelpay CD-Edition invoice for business customer',
+            );
 			$inst[] = array(
 					'name'			=> 'san',
 					'description'	=> 'Rechnungskauf von Santander',

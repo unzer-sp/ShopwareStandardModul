@@ -361,6 +361,98 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						}
 						    $ppd_crit['BASKET.ID'] = $basketId;
                     }
+                    if($activePayment == 'ivb2b') {
+                        $basketId = self::getBasketId();
+
+                        if($basketId['result'] == 'NOK'){
+                            return $this->forward('fail');
+                        }else{
+                            $basketId = $basketId['basketId'];
+                        }
+                        $ppd_crit['BASKET.ID'] = $basketId;
+
+                        $this->View()->b2bCompanyName = $user['billingaddress']['company'];
+                        $this->View()->b2bCompanyStreet = $user['billingaddress']['street'];
+                        $this->View()->b2bCompanyZip = $user['billingaddress']['zipcode'];
+                        $this->View()->b2bCompanyCity = $user['billingaddress']['city'];
+                        $this->View()->b2bCompanyCountry = $user['additional']['country']['countryname'];
+                        $this->View()->B2bCompanyUstNr = $user['billingaddress']['ustid'];
+//                        $this->View()->b2bCompanyRegisterNr = "";
+                        $this->View()->b2bCompanyPreName = $user['additional']['user']['firstname'];
+                        $this->View()->b2bCompanySurName = $user['additional']['user']['lastname'];
+                        $this->View()->b2bCompanyEmail = $user['additional']['user']['email'];
+                        $this->View()->b2bBirthdate = $user['additional']['user']['birthday'];
+                        $this->View()->b2bSelectedSalutation = strtoupper($user['billingaddress']['salutation']== 'mr' ? $user['billingaddress']['salutation'] : 'MRS');
+                        $this->View()->companyCountry = [
+                            "DE" => "Deutschland",
+                            "AT" => "&Ouml;sterreich",
+                            "CH" => "Schweiz",
+                        ];
+                        $this->View()->B2Bsalutation = [
+                            "MR" => "Herr",
+                            "MRS" => "Frau",
+                            "UNKNOWN" => "Unbekannt",
+                        ];
+                        $this->View()->B2bCompanyRegisteredOut = ['ja','nein'];
+                        $this->View()->B2bCompanyRegisteredVal = ['REGISTERED','NOT_REGISTERED'];
+                        $this->View()->companyIndustry = [
+                            "OTHERS_COMMERCIAL_SECTORS"                             => "Andere Branche",
+                            "WHOLESALE_TRADE_EXCEPT_VEHICLE_TRADE"                  => "Gro&szlig;handel au&szlig;er Fahrzeuge",
+                            "RETAIL_TRADE_EXCEPT_VEHICLE_TRADE"                     => "Einzelhandel au&szlig;er Fahrzeuge",
+                            "WATER_TRANSPORT"                                       => "Seetransport",
+                            "AIR_TRANSPORT"                                         => "Lufttransport",
+                            "WAREHOUSING_AND_SUPPORT_ACTIVITIES_FOR_TRANSPORTATION" => "Lagerhaltung und Versand",
+                            "POSTAL_AND_COURIER_ACTIVITIES"                         => "Versand",
+                            "ACCOMMODATION"                                         => "Beherbergung",
+                            "FOOD_AND_BEVERAGE_SERVICE_ACTIVITIES"                  => "Lebensmittel und Getränke Branche",
+                            "MOTION_PICTURE_PRODUCTION_AND_SIMILAR_ACTIVITIES"      => "Filmproduktion und &auml;hnliches",
+                            "TELECOMMUNICATIONS"                                    => "Telekommunikation",
+                            "COMPUTER_PROGRAMMING_CONSULTANCY_AND_RELATED_ACTIVITIES" => "Programmierung und Consulting und &auml;hnliches",
+                            "INFORMATION_SERVICE_ACTIVITIES"                        => "Informationsdienst",
+                            "RENTAL_AND_LEASING_ACTIVITIES"                         => "Vermietung und Leasing",
+                            "TRAVEL_AGENCY_AND_RELATED_ACTIVITIES"                  => "Reiseb&uuml;ro und &auml;hnliches",
+                            "SERVICES_TO_BUILDINGS_AND_LANDSCAPE_ACTIVITIES"        => "Geb&auml;udepflege und Landschaftsbau",
+                            "LIBRARIES_AND_SIMILAR_CULTURAL_ACTIVITIES"             => "B&uuml;cherei und sonstige Kulturpflege",
+                            "SPORTS_ACTIVITIES_AND_AMUSEMENT_AND_RECREATION_ACTIVITIES" => "Sport oder andere Fitness",
+                            "OTHER_PERSONAL_SERVICE_ACTIVITIES"                     => "andere Personaldienstleistungen",
+                            "NON_RESIDENTIAL_REAL_ESTATE_ACTIVITIES"                => "Nicht niedergelassene Immobilienbranche",
+                            "MANAGEMENT_CONSULTANCY_ACTIVITIES"                     => "Beratungst&auml;tigkeit Management",
+                            "ELECTRICITY_GAS_AND_STEAM_SUPPLY"                      => "Elektrizit&auml;t, Gas oder sonst. Versorgung",
+                            "WATER_COLLECTION_TREATMENT_AND_SUPPLY"                 => "Wassergewinnung und -versorgung",
+                            "SEWERAGE"                                              => "Abwasser",
+                            "MANUFACTURE_OF_FOOD_PRODUCTS"                          => "Lebensmittelproduktion",
+                            "MANUFACTURE_OF_BEVERAGES"                              => "Spirituosenproduktion",
+                            "MANUFACTURE_OF_TEXTILES"                               => "Textilindustrie (Herstellung)",
+                            "MANUFACTURE_OF_WEARING_APPAREL"                        => "Kleidung (Herstellung)",
+                            "MANUFACTURE_OF_LEATHER_AND_RELATED_PRODUCTS"           => "Lederproduktion oder Verarbeitung",
+                            "MANUFACTURE_OF_PHARMACEUTICAL_PRODUCTS"                => "Pharmazie",
+                            "REPAIR_AND_INSTALLATION_OF_MACHINERY_AND_EQUIPMENT"    => "Wartung und Einbau maschinelles Zubeh&ouml;r",
+                            "TRADE_AND_REPAIR_OF_MOTOR_VEHICLES"                    => "Handel und Wartung von Fahrzeugen",
+                            "PUBLISHING_ACTIVITIES"                                 => "Veröffentlichungen",
+                            "REPAIR_OF_COMPUTERS_AND_GOODS"                         => "Wartung von Computern",
+                            "PRINTING_AND_REPRODUCTION_OF_RECORDED_MEDIA"           => "Druck und Reproduktion von Medien",
+                            "MANUFACTURE_OF_FURNITURE"                              => "Möbelbranche",
+                            "OTHER_MANUFACTURING"                                   => "Anderer Produzent",
+                            "ADVERTISING_AND_MARKET_RESEARCH"                       => "Werbung und Marktforschung",
+                            "OTHER_PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_ACTIVITIES" => "Forschung",
+                            "ARTS_ENTERTAINMENT_AND_RECREATION"                     => "Kunst und Unterhaltung",
+                        ];
+                        $this->View()->heidelB2bFunction = [
+                            "OWNER"             => "Inhaber",
+                            "PARTNER"           => "Partner",
+                            "SHAREHOLDER"       => "Shareholder",
+                            "DIRECTOR"          => "Direktor",
+                            "MANAGER"           => "Manager",
+                            "REGISTERED_MANAGER"=> "Registrierter Manager"
+                        ];
+                        $this->View()->b2bCompanyExeCountry = [
+                            "DE" => "Deutschland",
+                            "AT" => "&Ouml;sterreich",
+                        ];
+
+//                        mail("sascha.pflueger@heidelpay.com","373 gateway User",print_r($user,1));
+                    }
+
 					$getFormUrl = $this->getFormUrl($activePayment, NULL, $user['additional']['user']['id'], $tempID, NULL, $basket, $ppd_crit);
 
 					if(isset($getFormUrl['FRONTEND_REDIRECT_URL'])){
@@ -3296,6 +3388,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$params['PAYMENT.CODE'] 		= "IV.".$type;
 					$params['FRONTEND.ENABLED'] 	= "true";
 					break;
+                /* cms / universum / invoice with insurance */
+                case 'ivb2b':
+                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+                    $params['PAYMENT.CODE'] 		= "IV.".$type;
+                    $params['FRONTEND.ENABLED'] 	= "true";
+                    break;
 					/* santander */
 				case 'san':
 					$type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];

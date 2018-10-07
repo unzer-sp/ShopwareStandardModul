@@ -1,5 +1,6 @@
 document.asyncReady(function () {
     if (swVersion.substring(0, 3) >= '5.2') {
+
         var orgLink = jQuery('form.payment').attr('action');
         if (orgLink == 'undefined') {
             var orglink = jQuery('form[name="shippingPaymentForm"]').attr('action');
@@ -26,7 +27,6 @@ document.asyncReady(function () {
                     var checkedOpt = "hgw_dd";
                     changeUrl(checkedOpt, orgLink);
                 });
-
             } else {
                 var clicked = '';
                 $(this).click(function (e) {
@@ -140,6 +140,28 @@ document.asyncReady(function () {
                 $('#hgw_privpol_ivpd').removeAttr("required");
             }
         }
+
+        // jQuery('#heidelB2bCompanyRegistered').change(function (e) {
+        jQuery('[name="COMPANY.REGISTRATIONTYPE"]').change(function (e) {
+           if(jQuery('.heidelB2bRegistered').is(":visible")){
+               // company is registered
+                jQuery('.heidelB2bRegistered').toggle(500);
+                jQuery('.heidelB2bNotRegistered').toggle(500);
+
+                jQuery('.heidelB2bRegistered :input').prop("disabled","disabled");
+                jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
+                console.log("NOT");
+                console.log(jQuery('.heidelB2bRegistered :input').length);
+           } else {
+               // company NOT registered
+               jQuery('.heidelB2bNotRegistered').toggle(500);
+               jQuery('.heidelB2bRegistered').toggle(500);
+               jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
+               jQuery('.heidelB2bNotRegistered :input').prop("disabled","disabled");
+               console.log("Registered");
+               console.log(jQuery('.heidelB2bNotRegistered :input').length);
+           }
+        });
 
         // Function to set Birthdate in hidden field for Chrome on mac
         jQuery("button[type='submit'], .right").click(function (e) {

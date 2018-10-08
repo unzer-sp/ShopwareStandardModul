@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.09.25';
+		return '18.10.07';
 
 	}
 
@@ -900,7 +900,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.09.25':
+            case '18.10.07':
                 // integration of Santander HP
                 // tested for SW 5.5.1
                 try{
@@ -2358,12 +2358,39 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $view->shippingAdd = $address->shipping;
                     $view->regData 		= $regData;
                     $view->tPath		= $pluginPath;
+
+                    if(Shopware()->Shop()->getTemplate()->getVersion() < 3){
+                        $view->addTemplateDir(dirname(__FILE__) . '/Views/frontend/');
+                    }else{
+                        $view->addTemplateDir(dirname(__FILE__) . '/Views/responsive/frontend/');
+                    }
                     if(!empty($regData)){
-//                        if($user['additional']['payment']['name'] == 'hgw_mpa'){ // or every other wallet
-                            $view->extendsTemplate('register/hp_checkout_confirm.tpl');
+                        switch ($user['additional']['payment']['name']){
+                            case 'hgw_mpa':
+                                $view->extendsTemplate('register/hp_checkout_confirm.tpl');
+                                break;
+                            case 'hgw_cc':
+                            case 'hgw_dc':
+                            case 'hgw_dd':
+//                                mail("sascha.pflueger@heidelpay.com","Juhgu",print_r(dirname(__FILE__) . '/Views/frontend/',1));
+                                $view->extendsTemplate('register/hp_checkout_confirmreg.tpl');
+                                break;
+                        }
+//                        if(
+//                            ($user['additional']['payment']['name'] == 'hgw_mpa')
+////                            ||
+////                            ($user['additional']['payment']['name'] == 'hgw_cc') ||
+////                            ($user['additional']['payment']['name'] == 'hgw_dc') ||
+////                            ($user['additional']['payment']['name'] == 'hgw_dd')
+//
+//                        ){ // or every other wallet
+//                            $view->extendsTemplate('register/hp_checkout_confirm.tpl');
 //                        }
                     }
-
+$result = \Doctrine\Common\Util\Debug::dump($view, 2, true, false);
+//mail("sascha.pflueger@heidelpay.com","Bootstrap 2366",print_r($result,1));
+//mail("sascha.pflueger@heidelpay.com","Bootstrap 2367 Billing",print_r($address->billing,1));
+//mail("sascha.pflueger@heidelpay.com","Bootstrap 2368 Shipping",print_r($address->shipping,1));
 					if($_SESSION['Shopware']['HPWallet'] == '1'){
 						$activePayment	= preg_replace('/hgw_/', '', $user['additional']['payment']['name']);
 						$regData = $this->getRegData($user['additional']['user']['id'], $activePayment);

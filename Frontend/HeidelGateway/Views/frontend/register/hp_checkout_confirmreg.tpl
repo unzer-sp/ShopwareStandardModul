@@ -37,6 +37,33 @@
 									</div>
 								{/if}
 							{/if}
+
+							{if ($sUserData.additional.payment.name == 'hgw_dd')}
+								{if !empty($regData)}
+									<h3 class="underline">{s name="ConfirmHeaderPayment" namespace='frontend/checkout/confirm_left'}{/s}</h3>
+									<div class="payment_method">
+										<div class="inner_container">
+											<p>
+												<strong>{$sUserData.additional.payment.description}</strong><br />
+
+												{if !$sUserData.additional.payment.esdactive}
+													{s name="ConfirmInfoInstantDownload" namespace='frontend/checkout/confirm_left'}{/s}
+												{/if}
+											</p>
+											<p>
+												{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>
+												{s name='hp_iban' namespace='frontend/register/hp_payment'}{/s}: {$regData.kto}<br/>
+												<br/>
+												<a href="{url controller=account action=payment sTarget=checkout}" class="button-middle small">
+													{s name="ConfirmLinkChangePayment" namespace='frontend/checkout/confirm_left'}{/s}
+												</a>
+											</p>
+
+
+										</div>
+									</div>
+								{/if}
+							{/if}
 						{else}
 							{$smarty.block.parent}
 						{/if}

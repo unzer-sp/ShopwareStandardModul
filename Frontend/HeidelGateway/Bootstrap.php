@@ -2372,7 +2372,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             case 'hgw_cc':
                             case 'hgw_dc':
                             case 'hgw_dd':
-//                                mail("sascha.pflueger@heidelpay.com","Juhgu",print_r(dirname(__FILE__) . '/Views/frontend/',1));
                                 $view->extendsTemplate('register/hp_checkout_confirmreg.tpl');
                                 break;
                         }
@@ -2387,10 +2386,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 //                            $view->extendsTemplate('register/hp_checkout_confirm.tpl');
 //                        }
                     }
-$result = \Doctrine\Common\Util\Debug::dump($view, 2, true, false);
-//mail("sascha.pflueger@heidelpay.com","Bootstrap 2366",print_r($result,1));
-//mail("sascha.pflueger@heidelpay.com","Bootstrap 2367 Billing",print_r($address->billing,1));
-//mail("sascha.pflueger@heidelpay.com","Bootstrap 2368 Shipping",print_r($address->shipping,1));
+
 					if($_SESSION['Shopware']['HPWallet'] == '1'){
 						$activePayment	= preg_replace('/hgw_/', '', $user['additional']['payment']['name']);
 						$regData = $this->getRegData($user['additional']['user']['id'], $activePayment);

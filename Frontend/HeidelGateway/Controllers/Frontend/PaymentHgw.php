@@ -370,6 +370,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             $basketId = $basketId['basketId'];
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
+                        $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERUM_B2B';
 
                         $this->View()->b2bCompanyName = $user['billingaddress']['company'];
                         $this->View()->b2bCompanyStreet = $user['billingaddress']['street'];

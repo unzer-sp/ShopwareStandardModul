@@ -148,7 +148,7 @@ document.asyncReady(function () {
                 jQuery('.heidelB2bRegistered').toggle(500);
                 jQuery('.heidelB2bNotRegistered').toggle(500);
 
-                jQuery('.heidelB2bRegistered :input').prop("disabled","disabled");
+                jQuery('.heidelB2bRegistered :input').attr('disabled', 'disabled');
                 jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
                 console.log("NOT");
                 console.log(jQuery('.heidelB2bRegistered :input').length);
@@ -157,7 +157,7 @@ document.asyncReady(function () {
                jQuery('.heidelB2bNotRegistered').toggle(500);
                jQuery('.heidelB2bRegistered').toggle(500);
                jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
-               jQuery('.heidelB2bNotRegistered :input').prop("disabled","disabled");
+               jQuery('.heidelB2bNotRegistered :input').attr('disabled', 'disabled');
                console.log("Registered");
                console.log(jQuery('.heidelB2bNotRegistered :input').length);
            }
@@ -694,58 +694,117 @@ function valForm() {
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm() {
+console.log("valGatewayForm");
     checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('_') + 1);
-
+console.log(pm);
     // set 'error' to empty inputs
     jQuery('.' + checkedOpt).find('input').each(function () {
         if (jQuery(this).val() == '') {
             jQuery(this).addClass('has--error');
+console.log(this);
         } else {
             jQuery(this).removeClass('has--error');
         }
     });
-    if (pm == 'dd') {
-        var errors = new Array();
-        // direct debit
-        errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
 
-        // direct debit secured
-        if(jQuery('#salutation').is(':visible')){
-            // getting Values from input fields
-            var birthDay = jQuery('select[name=Date_Day]').val();
-            var birthMonth = jQuery('select[name=Date_Month]').val();
-            var birthYear = jQuery('select[name=Date_Year]').val();
+    switch (pm) {
+        case 'dd':
+            var errors = new Array();
+            // direct debit
+            errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
 
-            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+            // direct debit secured
+            if(jQuery('#salutation').is(':visible')){
+                // getting Values from input fields
+                var birthDay = jQuery('select[name=Date_Day]').val();
+                var birthMonth = jQuery('select[name=Date_Month]').val();
+                var birthYear = jQuery('select[name=Date_Year]').val();
 
-            errors = valDirectDebitSecured(errors);
-        }
-    } else if (pm == 'gir') {
-        var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
-    } else if (pm == "papg"){
-        var errorsPapg = valInvoiceSec();
+                jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
 
-        if((jQuery('.newreg_papg .has--error'))){
-            if(jQuery.isEmptyObject(errorsPapg) == false){
-                jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
-                jQuery.each(errorsPapg, function(key, value){
-                    jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
-                });
-
-                jQuery('.alert').removeClass("is--hidden");
-                jQuery('.alert').show();
-                jQuery('html, body').animate({scrollTop: 0}, 0);
-
-                return false;
+                errors = valDirectDebitSecured(errors);
             }
+            break;
+        case 'gir':
+            var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+            break;
+        case 'papg':
+            var errorsPapg = valInvoiceSec();
 
-        } else {
-            jQuery('#payment .alert .is--error .is--rounded div').remove();
-        }
+            if((jQuery('.newreg_papg .has--error'))){
+                if(jQuery.isEmptyObject(errorsPapg) == false){
+                    jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+                    jQuery.each(errorsPapg, function(key, value){
+                        jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+                    });
+
+                    jQuery('.alert').removeClass("is--hidden");
+                    jQuery('.alert').show();
+                    jQuery('html, body').animate({scrollTop: 0}, 0);
+
+                    return false;
+                }
+
+            } else {
+                jQuery('#payment .alert .is--error .is--rounded div').remove();
+            }
+            break;
+        case 'ivb2b':
+
+            // var errors = valInvoiceB2b();
+            if(jQuery('.heidelB2bRegistered').is(':visible')){
+                jQuery('.heidelB2bNotRegistered').remove();
+            } else {
+                jQuery('.heidelB2bRegistered').remove();
+            }
+            console.log("treffer Switch");
+            break;
+
     }
 
+    // if (pm == 'dd') {
+    //     var errors = new Array();
+    //     // direct debit
+    //     errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+    //
+    //     // direct debit secured
+    //     if(jQuery('#salutation').is(':visible')){
+    //         // getting Values from input fields
+    //         var birthDay = jQuery('select[name=Date_Day]').val();
+    //         var birthMonth = jQuery('select[name=Date_Month]').val();
+    //         var birthYear = jQuery('select[name=Date_Year]').val();
+    //
+    //         jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //
+    //         errors = valDirectDebitSecured(errors);
+    //     }
+    // } else if (pm == 'gir') {
+    //     var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+    // } else if (pm == "papg"){
+    //     var errorsPapg = valInvoiceSec();
+    //
+    //     if((jQuery('.newreg_papg .has--error'))){
+    //         if(jQuery.isEmptyObject(errorsPapg) == false){
+    //             jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+    //             jQuery.each(errorsPapg, function(key, value){
+    //                 jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+    //             });
+    //
+    //             jQuery('.alert').removeClass("is--hidden");
+    //             jQuery('.alert').show();
+    //             jQuery('html, body').animate({scrollTop: 0}, 0);
+    //
+    //             return false;
+    //         }
+    //
+    //     } else {
+    //         jQuery('#payment .alert .is--error .is--rounded div').remove();
+    //     }
+    // }
+
     if ((jQuery('.' + checkedOpt + '  .has--error').length > 0)) {
+        console.log((jQuery('.'+checkedOpt + '  .has--error')).length);
         jQuery('#payment .alert .alert--content ul li').remove();
         jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">' + jQuery('.msg_fill').html() + '</li>');
 

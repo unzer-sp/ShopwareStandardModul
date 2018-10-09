@@ -40,7 +40,9 @@
 
 				<div class="heidelB2bRegistered" style="margin-top: 10px">
 					<label for="heidelb2bCompanyRegisterNr">{s name='B2bCompanyRegisterNr' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bCompanyRegisterNr" type="text" value="{$b2bCompanyRegisterNr}" name="COMPANY.TAXNUMBER"><br />
+					<input id="heidelb2bCompanyRegisterNr" type="text" value="{$b2bCompanyRegisterNr}" name="COMPANY.TAXNUMBER" required><br />
+
+                    <p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 				</div>
 				<div class="heidelB2bNotRegistered" style="margin-top: 10px; display: none">
 					<label class="is--strong">{s name='B2bHeaderPersonal' namespace='frontend/payment_heidelpay/gateway'}{/s}</label><br />
@@ -55,24 +57,24 @@
 
 					{* Company Executive Preame *}
 					<label for="heidelb2bPreName">{s name='B2bPreName' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bPreName" type="text" value="{$b2bCompanyPreName}" name="COMPANY.EXECUTIVE.1.GIVEN" required="required"><br />
+					<input id="heidelb2bPreName" type="text" value="{$b2bCompanyPreName}" name="COMPANY.EXECUTIVE.1.GIVEN" required><br />
 
 					{* Company Executive Surname *}
 					<label for="heidelb2bLastName">{s name='B2bLastName' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bLastName" type="text" value="{$b2bCompanySurName}" name="COMPANY.EXECUTIVE.1.FAMILY" required="required"><br />
+					<input id="heidelb2bLastName" type="text" value="{$b2bCompanySurName}" name="COMPANY.EXECUTIVE.1.FAMILY" required><br />
 
 					{* Company Executive Birthdate *}
 					<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
 					{if isset($b2bBirthdate) && $b2bBirthdate != '0000-00-00'}
 						{html_select_date|utf8_encode time=$b2bBirthdate start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}</br>
 					{else}
-						{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben"}</br>
+						{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben" required="required"}</br>
 					{/if}
-					<input type="hidden" name="COMPANY.EXECUTIVE.1.BIRTHDATE" id="birthdate_ivb2b" value="{$b2bBirthdate}" required="required">
+					<input type="hidden" name="COMPANY.EXECUTIVE.1.BIRTHDATE" id="birthdate_ivb2b" value="{$b2bBirthdate}">
 
 					{* Company Executive Email *}
 					<label for="heidelb2bEmail">{s name='B2bEmail' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bEmail" type="text" value="{$b2bCompanyEmail}" name="COMPANY.EXECUTIVE.1.EMAIL" required="required"><br />
+					<input id="heidelb2bEmail" type="text" value="{$b2bCompanyEmail}" name="COMPANY.EXECUTIVE.1.EMAIL"><br />
 
 					{* Company Executive Phone *}
 					<label for="heidelb2bExePhone">{s name='B2bExePhone' namespace='frontend/payment_heidelpay/gateway'}{/s}:</label></br>
@@ -80,20 +82,21 @@
 
                     {* Company Executive Street *}
                     <label for="heidelb2bExeStreet">{s name='B2bExeStreet' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-                    <input id="heidelb2bExeStreet" type="text" value="{$b2bCompanyExeStreet}" name="COMPANY.EXECUTIVE.1.HOMESTREET" required="required"><br />
+                    <input id="heidelb2bExeStreet" type="text" value="{$b2bCompanyExeStreet}" name="COMPANY.EXECUTIVE.1.HOMESTREET"><br />
 
                     {* Company Executive Zip *}
                     <label for="heidelb2bExeZip">{s name='B2bExeZip' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-                    <input id="heidelb2bExeZip" type="text" value="{$b2bCompanyExeZip}" name="COMPANY.EXECUTIVE.1.HOME.ZIP" required="required"><br />
+                    <input id="heidelb2bExeZip" type="text" value="{$b2bCompanyExeZip}" name="COMPANY.EXECUTIVE.1.HOME.ZIP"><br />
 
                     {* Company Executive Zip *}
                     <label for="heidelb2bExeCity">{s name='B2bExeCity' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-                    <input id="heidelb2bExeCity" type="text" value="{$b2bCompanyExeCity}" name="COMPANY.EXECUTIVE.1.HOME.CITY" required="required"><br />
+                    <input id="heidelb2bExeCity" type="text" value="{$b2bCompanyExeCity}" name="COMPANY.EXECUTIVE.1.HOME.CITY"><br />
 
                     {* Company Executive Country *}
                     <label for="heidelb2bExeCountry">{s name='B2bExeCountry' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					{html_options id="heidelb2bExeCountry" options=$b2bCompanyExeCountry selected="DE" name="COMPANY.EXECUTIVE.1.HOME.COUNTRY" required="required"}<br />
+					{html_options id="heidelb2bExeCountry" options=$b2bCompanyExeCountry selected="DE" name="COMPANY.EXECUTIVE.1.HOME.COUNTRY"}<br />
 
+                    <p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 			</div>
 				{* Company UstId *}
 				{*<label for="heidelb2bCompanyUstNr">{s name='B2bCompanyUstNr' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>*}
@@ -110,18 +113,18 @@
 			</br>
 			<br />
 		<h1>Testbereich</h1>
-			<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
-			{assign var=payment_data value=$birthdate_papg}
-			{if isset($birthdate_papg)}
-				{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
-			{else}
-				{html_select_date|utf8_encode time=$payment_data start_year='-14' end_year='-100' reverse_years='true'
-				day_value_format='%02d' field_order='DMY'
-				day_empty="{s name='hp_valueDay' namespace='frontend/register/hp_payment'}{/s}"
-				month_empty="{s name='hp_valueMonth' namespace='frontend/register/hp_payment'}{/s}"
-				year_empty="{s name='hp_valueYear' namespace='frontend/register/hp_payment'}{/s}"}
-			{/if}
-			<p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
+			{*<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />*}
+			{*{assign var=payment_data value=$birthdate_papg}*}
+			{*{if isset($birthdate_papg)}*}
+				{*{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}*}
+			{*{else}*}
+				{*{html_select_date|utf8_encode time=$payment_data start_year='-14' end_year='-100' reverse_years='true'*}
+				{*day_value_format='%02d' field_order='DMY'*}
+				{*day_empty="{s name='hp_valueDay' namespace='frontend/register/hp_payment'}{/s}"*}
+				{*month_empty="{s name='hp_valueMonth' namespace='frontend/register/hp_payment'}{/s}"*}
+				{*year_empty="{s name='hp_valueYear' namespace='frontend/register/hp_payment'}{/s}"}*}
+			{*{/if}*}
+
 		</div>
 	</div>
 {/block}

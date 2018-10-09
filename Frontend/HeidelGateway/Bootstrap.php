@@ -3736,7 +3736,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
-
+if (
+($params['PAYMENT.CODE'] == "IV.PA") &&
+($params['ACCOUNT.BRAND']!= "PAYOLUTION_DIRECT") &&
+($params['ACCOUNT.BRAND']!= "SANTANDER")
+){
+    mail("sascha.pflueger@heidelpay.com","DoRequest 3740",print_r($params,1));
+}
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();
 				$adapter->setCurlOption(CURLOPT_SSL_VERIFYPEER, false);

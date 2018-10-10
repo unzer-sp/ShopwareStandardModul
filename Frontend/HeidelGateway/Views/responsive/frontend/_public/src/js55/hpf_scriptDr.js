@@ -222,7 +222,7 @@ $(document).ready(function(){
 				$.loadingIndicator.open({ animationSpeed: 50 });
 				$(paymentFrameForm).find('input[type="submit"]').attr('disabled', 'disabled');
 				var checkedClass = checkedOpt.attr('class');
-				
+
 				if(typeof checkedClass != 'undefined'){
 					var prefix = 'hgw_';
 					var checkedClassPos = checkedClass.indexOf(prefix);		

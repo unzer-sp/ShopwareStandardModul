@@ -245,18 +245,20 @@ document.asyncReady(function () {
                 if (pm.indexOf("hgw_hps") != -1){
                     var errorsHps = new Array();
                     errorsHps = valSantanderHP();
-                    if(errorsHps.length > 0){
+                    if(errorsHps != undefined) {
+                        if (errorsHps.length > 0) {
 
-                        jQuery('#payment .alert .alert--content ul li').remove();
+                            jQuery('#payment .alert .alert--content ul li').remove();
 
-                        jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
-                        jQuery.each(errorsHps, function(key, value){
-                            jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
-                        });
+                            jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">' + jQuery('.msg_fill').html() + '</li>');
+                            jQuery.each(errorsHps, function (key, value) {
+                                jQuery('.alert--content ul').append('<li class="list--entry">' + jQuery(value).html() + '</li>');
+                            });
 
-                        jQuery('.alert').removeClass("is--hidden");
-                        jQuery('html, body').animate({scrollTop: 0}, 0);
-                        return false;
+                            jQuery('.alert').removeClass("is--hidden");
+                            jQuery('html, body').animate({scrollTop: 0}, 0);
+                            return false;
+                        }
                     }
                 }
             } else {
@@ -738,6 +740,7 @@ function valGatewayForm() {
 
 // VALIDATE FORM ON SHIPPINGPAYMENT
 function valShippingPaymentForm() {
+    $(".alert.is--error.is--rounded").remove();
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
     // remove check vor cc and dc

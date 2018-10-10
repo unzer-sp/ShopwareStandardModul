@@ -53,7 +53,7 @@
 			</div>
 			{/if}
 
-			<div id="ibanLabelField">
+			<div id="ibanLabelField" class="register--payment">
 				<label>{s name='hp_iban' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
 
                 {if !empty($iban_heidel_dd)}

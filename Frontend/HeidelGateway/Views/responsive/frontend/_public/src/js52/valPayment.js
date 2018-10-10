@@ -4,7 +4,6 @@ $(document).ready(function(){
         var token = jQuery('input[name="__csrf_token"]').val();
 
         if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
-
             var orgLink = jQuery('form.payment').attr('action');
             // SELECT PAYMENT
             if(window.location.pathname.indexOf('gateway') == '-1'){
@@ -12,7 +11,6 @@ $(document).ready(function(){
                 var orgLink = jQuery('form.payment').attr('action');
                 if(window.location.pathname.toLowerCase().indexOf('shippingpayment') == '-1'){
                     $(document).reuse();
-
                     // change checked option
                     jQuery('.register--payment').click(function(){
                         // change form action
@@ -20,13 +18,14 @@ $(document).ready(function(){
                         changeUrl(checkedOpt, orgLink);
                     });
 
+                    // add validation for form
+                    jQuery('form.payment').attr('onSubmit', 'return valShippingPaymentForm();');
 
                 }else{
                     var clicked = '';
                     $(this).click(function(e){
                         clicked = e.target.className;
                     });
-
                     jQuery('.payment--method-list').click(function(){
                         // change form action
                         var checkedOpt = jQuery('.payment--method input:radio:checked').attr('class');
@@ -37,7 +36,6 @@ $(document).ready(function(){
                     // set original form action (before AJAX is sent)
                     $.ajaxSetup({
                         beforeSend: function(event, xhr, settings){
-
                             // check for right ajax request
                             if(xhr.data != undefined){
                                 // just execute if hgw pay. method is selected
@@ -92,6 +90,15 @@ $(document).ready(function(){
 
                             jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
                             $('#hgw_privpol_ivpd').attr("required","required");
+                        });
+
+                        jQuery('#hps_customerBirthdate').change(function(e){
+                            var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                            var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                            var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                            jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+
                         });
 
                         if(((settings.data != undefined) && (settings.data.indexOf('hgw=1') != -1)) || ($('.payment--method-list input:radio:checked').attr('class').indexOf('hgw_') != -1)){
@@ -303,6 +310,13 @@ $(document).ready(function(){
 
                     jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                 }
+                jQuery('.newreg_hps').change(function () {
+                    var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                    var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                    var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                    jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+                });
             });
 
         }
@@ -326,10 +340,12 @@ $(document).ready(function(){
                             $('#hgw_privpol_ivpd').prop("required", null);
                             $('#hgw_privpol_ivpd').removeAttr("required");
                         }
+
                     } else {
                         $('#hgw_privpol_ivpd').prop("required", null);
                         $('#hgw_privpol_ivpd').removeAttr("required");
                     }
+
                 }
 
             },
@@ -410,7 +426,6 @@ $(document).ready(function(){
                         }else{
                             jQuery('select:not([data-no-fancy-select="true"])').selectboxReplacement();
                         }
-
                         // set width for XS-State (with SW-Statemanger)
                         StateManager.registerListener({
                             state: 'xs',
@@ -622,6 +637,14 @@ $(document).ready(function(){
 
                 jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
             }
+
+            jQuery('.newreg_hps').change(function () {
+                var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
+                var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
+                var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+
+                jQuery('#birthdate_sanHps').val(birthYear+'-'+birthMonth+'-'+birthDay);
+            });
 
             var chosenPaymentMethod = $('input:radio:checked').attr('class');
             if(chosenPaymentMethod != undefined) {
@@ -908,7 +931,7 @@ function valGatewayForm(){
 function valShippingPaymentForm(){
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_')+4);
-
+    var errors = new Array();
     // remove check vor cc and dc
     if((pm != 'cc') && (pm != 'dc')){
         // check if 'newreg' is shown
@@ -955,7 +978,13 @@ function valShippingPaymentForm(){
                 $('#hgw_privpol_ivpd').removeAttr("required");
             }
 
-
+            if(pm == 'hps'){
+                var errors = valSantanderHP();
+                // if(errors.length >0)
+                // {
+                //     return false;
+                // }
+            }
         }
 
         if((jQuery('div.hgw_'+pm+' .has--error').length > 0)){
@@ -1055,9 +1084,8 @@ function valBirthdate(age){
 }
 
 function valSantander() {
-    var errors = {};
+    var errors = new Array();
     var i = 0;
-
     // validation of salutation
     var salutation = $('select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "UNKNOWN")
@@ -1267,4 +1295,42 @@ function valDirectDebitSecured(errors) {
         errors[i++] = '.msg_dob';
     }
     return errors;
+}
+
+/**
+ * valSantanderHP
+ * Function to validate Santander Hire purchace
+ */
+function valSantanderHP() {
+    var errorsSan = new Array();
+    var i = 0;
+    var birthdate = $('#birthdate_sanHps').val();
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+
+        var dob = new Date(jQuery('.newreg_hps select[name="Date_Year"]').val(), jQuery('.newreg_hps select[name="Date_Month"]').val()-1, jQuery('.newreg_hps select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+
+        if(age < 18 || birthdate == '0000-00-00'){
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            errorsSan[i++] = '.msg_dob';
+        } else{
+            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        errorsSan[i++] = '.msg_dob';
+    }
+    if(errorsSan.length > 0){
+        return errorsSan;
+    }
+
 }

@@ -126,6 +126,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					$payName = 'wt';
 					break;
                 case 'hpr':
+                case 'hps':
                     $payName = 'hp';
                     break;
 				default:
@@ -569,6 +570,18 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                             if($payInfo['payType'] == 'pa'){
                                 $btns['fi']['active'] = 'true';
                             }
+                            if($payInfo['payType'] == 'fi'){
+                                $btns['fi']['active'] = 'false';
+                            }
+                            break;
+                        case 'hps':
+                            $maxFi = $value['PRESENTATION_AMOUNT'];
+                            if($payInfo['payType'] == 'pa'){
+                                $btns['fi']['active'] = 'true';
+                            }
+                            if($payInfo['payType'] == 'fi'){
+                                $btns['fi']['active'] = 'false';
+                            }
                             break;
 						default:
 							break;
@@ -775,6 +788,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$snipRf	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('rf', $beLocaleId, 'backend/heidelBackend');
 			$snipCb	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('cb', $beLocaleId, 'backend/heidelBackend');
 			$snipFi	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('fi', $beLocaleId, 'backend/heidelBackend');
+			$snipIn	= Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('in', $beLocaleId, 'backend/heidelBackend');
 
 			$payCode = explode('.', $payCode);
 			/*
@@ -812,6 +826,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 					break;
 				case 'fi':
 					$retArr['typeName'] = $snipFi;
+					break;
+				case 'in':
+					$retArr['typeName'] = $snipIn;
 					break;
 				default:
 					$retArr['typeName'] = $retArr['payType'];

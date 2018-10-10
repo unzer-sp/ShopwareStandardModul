@@ -46,6 +46,8 @@
 		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_ivpd.tpl" pm='ivpd'}
 	{elseif $payment_mean.name == "hgw_hpr"}
 		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_hpr.tpl" pm='hpr'}
+	{elseif $payment_mean.name == "hgw_hps"}
+		{include file="{$tPath|substr:1}/Views/frontend/register/hp_payment_hps.tpl" pm='hps'}
 	{else}
 		{$smarty.block.parent}
 	{/if}
@@ -167,7 +169,6 @@
 		{block name='frontend_account_payment_error_messages'}
 			{include file="frontend/register/error_message.tpl" error_messages=$sErrorMessages}
 		{/block}
-		
 		{* Payment form *}
 		<form name="frmRegister" method="post" action="{url controller=account action=savePayment sTarget=$sTarget}" class="payment" onsubmit="return valForm();" autocomplete="off">		
 			{include file='frontend/register/payment_fieldset.tpl' form_data=$sFormData error_flags=$sErrorFlag payment_means=$sPaymentMeans}

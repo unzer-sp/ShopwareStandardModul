@@ -1,4 +1,5 @@
-$(document).ready(function(){
+// $(document).ready(function(){
+$(function() {
     if(swVersion.substring(0,3) >= '5.2'){
         var token = jQuery('input[name="__csrf_token"]').val();
         if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
@@ -102,7 +103,7 @@ $(document).ready(function(){
 
                             // just call changeUrl() after all animations are done
                             $(document).promise().done(function(){
-                                $(document).ready(function(){
+                                $(function() {
                                     $(document).reuse();
                                     // $(document).ibanCheck();
                                     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');

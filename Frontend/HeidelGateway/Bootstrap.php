@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.10.07';
+		return '18.10.10';
 
 	}
 
@@ -900,7 +900,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg, $e);
                 }
 
-            case '18.10.07':
+            case '18.10.10':
                 // integration of Santander HP
                 // tested for SW 5.5.1
                 try{
@@ -913,7 +913,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 18.09.25<br />';
+                    $msg .= '* update 18.10.10<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

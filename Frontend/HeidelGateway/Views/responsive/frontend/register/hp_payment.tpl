@@ -16,14 +16,22 @@
 
     {if $action != 'cart' && $action != 'orders'}
 		<script type='text/javascript'>var swVersion = "{$swVersion}";</script>
-		{if $swVersion >= "5.3"}
+		{if $swVersion >= "5.5"}
             {if $theme.asyncJavascriptLoading}
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/valPayment.js' defer='defer'></script>
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/hpf_script.js' defer='defer'></script>
+            {else}
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/valPaymentDr.js' defer='defer'></script>
+				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js55/hpf_scriptDr.js' defer='defer'></script>
+            {/if}
+		{elseif $swVersion >= "5.3"}
+			{if $theme.asyncJavascriptLoading}
 				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPayment.js' defer='defer'></script>
 				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_script.js' defer='defer'></script>
-            {else}
+			{else}
 				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/valPaymentDr.js' defer='defer'></script>
 				<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js53/hpf_scriptDr.js' defer='defer'></script>
-            {/if}
+			{/if}
 		{else}
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/valPayment.js'></script>
 			<script type='text/javascript' src='{$pluginPath}/Views/responsive/frontend/_public/src/js52/hpf_script.js'></script>
@@ -220,12 +228,12 @@
 {/block}
 
 {* confirm Checkout Payment method Block *}
+{* frontend_checkout_confirm_left_shipping_method *}
 {block name='frontend_checkout_confirm_left_payment_method'}
 	<strong class="payment--description">{$sUserData.additional.payment.description}</strong><br />
 	{if !$sUserData.additional.payment.esdactive}
 		<p class="payment--confirm-esd">{s name="ConfirmInfoInstantDownload" namespace="frontend/checkout/confirm_left"}{/s}</p>
 	{/if}
-	
 	{if $swfActive}
 		{$smarty.block.parent}
 	{else}

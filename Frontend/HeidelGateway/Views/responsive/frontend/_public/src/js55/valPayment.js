@@ -752,13 +752,16 @@ console.log(this);
             break;
         case 'ivb2b':
 
-            // var errors = valInvoiceB2b();
+
             if(jQuery('.heidelB2bRegistered').is(':visible')){
                 jQuery('.heidelB2bNotRegistered').remove();
             } else {
                 jQuery('.heidelB2bRegistered').remove();
             }
             console.log("treffer Switch");
+            var errors = valInvoiceB2b();
+
+            
             break;
 
     }
@@ -1286,6 +1289,46 @@ function valSantanderHP() {
         return errors;
     }
 
+}
+
+function valInvoiceB2b() {
+    var birthdateIvB2b = $('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val();
+    $('#birthdate_ivb2b').val($('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val());
+
+    var birthdate = birthdateIvB2b;
+    if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+    {
+        var dob = new Date(jQuery('.newreg_ivb2b select[name="Date_Year"]').val(), jQuery('.newreg_ivb2b select[name="Date_Month"]').val()-1, jQuery('.newreg_ivb2b select[name="Date_Day"]').val());
+        var today = new Date();
+        var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+        if(age < 18){
+
+            jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Year"]').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Month"]').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Day"]').addClass('has--error');
+
+            errors[i++] = '.msg_dob';
+        }else{
+            jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Year"]').removeClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Month"]').removeClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Day"]').removeClass('has--error');
+        }
+    } else {
+        //birthdate doesn't fit to formate YYYY-MM-DD
+        jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_ivb2b select[name="Date_Year"]').addClass('has--error');
+        jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_ivb2b select[name="Date_Month"]').addClass('has--error');
+        jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_ivb2b select[name="Date_Day"]').addClass('has--error');
+        errors[i++] = '.msg_dob';
+    }
 }
 
 /**

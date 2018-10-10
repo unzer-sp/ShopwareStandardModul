@@ -3736,13 +3736,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
-if (
-($params['PAYMENT.CODE'] == "IV.PA") &&
-($params['ACCOUNT.BRAND']!= "PAYOLUTION_DIRECT") &&
-($params['ACCOUNT.BRAND']!= "SANTANDER")
-){
-    mail("sascha.pflueger@heidelpay.com","DoRequest 3740",print_r($params,1));
-}
+//if (
+//($params['PAYMENT.CODE'] == "IV.PA") &&
+//($params['ACCOUNT.BRAND']!= "PAYOLUTION_DIRECT") &&
+//($params['ACCOUNT.BRAND']!= "SANTANDER")
+//){
+//    mail("sascha.pflueger@heidelpay.com","DoRequest 3740",print_r($params,1));
+//}
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();
 				$adapter->setCurlOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -3878,7 +3878,7 @@ if (
 					"createPayments inserting new paymethods| SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'hgw_san' for key 'name'",
 			);
 
-			if (in_array($prms_text, $prmsTextIgnore)) {
+			if (in_array($prms_text, $prmsTextToIgnore)) {
 				return ;
 			} else {
 				return Shopware()->Db()->query($sql, $params);
@@ -5074,15 +5074,15 @@ Mit freundlichen Gruessen
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Credit Card booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Debit Card booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DD_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Direct Debit booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DD_GUARANTEE_MODE' => array(
 									'label' 			=> 'Direct debit with guarantee',
@@ -5094,7 +5094,7 @@ Mit freundlichen Gruessen
 							),
 							'HGW_MPA_BOOKING_MODE' 	=> array(
 									'label' 			=> 'MasterPass booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_CHB_STATUS' 		=> array(
 									'label' 			=> 'Chargeback State',

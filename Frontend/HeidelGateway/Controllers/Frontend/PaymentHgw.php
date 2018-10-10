@@ -371,19 +371,21 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
                         $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERUM_B2B';
-
-                        $this->View()->b2bCompanyName = $user['billingaddress']['company'];
-                        $this->View()->b2bCompanyStreet = $user['billingaddress']['street'];
-                        $this->View()->b2bCompanyZip = $user['billingaddress']['zipcode'];
-                        $this->View()->b2bCompanyCity = $user['billingaddress']['city'];
-                        $this->View()->b2bCompanyCountry = $user['additional']['country']['countryname'];
-                        $this->View()->B2bCompanyUstNr = $user['billingaddress']['ustid'];
-//                        $this->View()->b2bCompanyRegisterNr = "";
-                        $this->View()->b2bCompanyPreName = $user['additional']['user']['firstname'];
-                        $this->View()->b2bCompanySurName = $user['additional']['user']['lastname'];
-                        $this->View()->b2bCompanyEmail = $user['additional']['user']['email'];
-                        $this->View()->b2bBirthdate = $user['additional']['user']['birthday'];
+mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
+                        $this->View()->b2bCompanyName       = $user['billingaddress']['company'];
+                        $this->View()->b2bCompanyStreet     = $user['billingaddress']['street'];
+                        $this->View()->b2bCompanyZip        = $user['billingaddress']['zipcode'];
+                        $this->View()->b2bCompanyCity       = $user['billingaddress']['city'];
+                        $this->View()->b2bCompanyCountry    = $user['additional']['country']['countryname'];
+                        $this->View()->B2bCompanyUstNr      = $user['billingaddress']['ustid'];
+                        $this->View()->b2bCompanyPreName    = $user['additional']['user']['firstname'];
+                        $this->View()->b2bCompanySurName    = $user['additional']['user']['lastname'];
+                        $this->View()->b2bCompanyEmail      = $user['additional']['user']['email'];
+                        $this->View()->b2bBirthdate         = $user['additional']['user']['birthday'];
                         $this->View()->b2bSelectedSalutation = strtoupper($user['billingaddress']['salutation']== 'mr' ? $user['billingaddress']['salutation'] : 'MRS');
+
+                        $this->View()->b2bBirthdate         = $user['additional']['user']['birthday'];
+
                         $this->View()->companyCountry = [
                             "DE" => "Deutschland",
                             "AT" => "&Ouml;sterreich",
@@ -904,6 +906,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function responseAction(){
 		try{
+mail("sascha.pflueger@heidelpay.com","907 responseAction POST",print_r($_POST,1));
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
@@ -1011,7 +1014,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['__csrf_token']		= $this->Request()->getPost('__csrf_token') == true ? htmlspecialchars($this->Request()->getPost('__csrf_token'), $flag, $enc) : '';
 
 				$resp['CONFIG_OPTIN_TEXT']	= $this->Request()->getPost('CONFIG_OPTIN_TEXT') == true ? htmlspecialchars(json_decode($this->Request()->getPost('CONFIG_OPTIN_TEXT'), $flag, $enc),true) : '';
-
+mail("sascha.pflueger@heidelpay.com","1015 responseAction Array",print_r($resp,1));
 				if (isset($resp['NAME_BIRTHDATE']) && !(empty($resp['NAME_BIRTHDATE'])) ) {
 					$resp['NAME_BIRTHDATE'] 	= $resp['NAME_BIRTHDATE'];
 				} else {
@@ -1666,7 +1669,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 			$this->Request()->setPost('sRegister', $postparams);
 
-			$target = false;
+//			$target = false;
 			$target = $this->Request()->getParam('sTarget');
 			if(!empty($target)){
 				$this->Request()->setParam('sTarget', $target);
@@ -1938,7 +1941,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             (strtolower($payType) == 'pp')
                         ) {
 
-                            $comment .= '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
+                            $comment = '<strong>' . $this->getSnippet('InvoiceHeader', $locId) . ": </strong>";
                             $comment .= strtr($this->getSnippet('PrepaymentText', $locId), $repl);
 
                             if($parameters->ACCOUNT_BRAND == "SANTANDER" || $parameters->ACCOUNT_BRAND == "PAYOLUTION_DIRECT")
@@ -1984,9 +1987,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						if ($swAmount - $hpAmount >= 0.01) {
 							$paymentStatus = '21'; // review necessary
 							// expand the comment for order in case of suspected manipulation
-							$comment .= ' | Suspected manipulation! Please check the amount of the order and the amount payment | Amount paid: '.$responseAmount;
+							$comment .= ' | Suspected manipulation! Please check the amount of the order and the amount payment | Amount paid: '.$hpAmount;
 							$params = array(
-									'internalcomment' => ' | Suspected manipulation! Please check the amount of the order and the amount payment | Amount paid: '.$responseAmount,
+									'internalcomment' => ' | Suspected manipulation! Please check the amount of the order and the amount payment | Amount paid: '.$hpAmount,
 							);
 						}
 

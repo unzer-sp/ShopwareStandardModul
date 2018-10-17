@@ -371,7 +371,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
                         $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERUM_B2B';
-mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
+//mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
                         $this->View()->b2bCompanyName       = $user['billingaddress']['company'];
                         $this->View()->b2bCompanyStreet     = $user['billingaddress']['street'];
                         $this->View()->b2bCompanyZip        = $user['billingaddress']['zipcode'];
@@ -399,55 +399,55 @@ mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
                         $this->View()->B2bCompanyRegisteredOut = ['ja','nein'];
                         $this->View()->B2bCompanyRegisteredVal = ['REGISTERED','NOT_REGISTERED'];
                         $this->View()->companyIndustry = [
-                            "OTHERS_COMMERCIAL_SECTORS"                             => "Andere Branche",
-                            "WHOLESALE_TRADE_EXCEPT_VEHICLE_TRADE"                  => "Gro&szlig;handel au&szlig;er Fahrzeuge",
-                            "RETAIL_TRADE_EXCEPT_VEHICLE_TRADE"                     => "Einzelhandel au&szlig;er Fahrzeuge",
-                            "WATER_TRANSPORT"                                       => "Seetransport",
-                            "AIR_TRANSPORT"                                         => "Lufttransport",
-                            "WAREHOUSING_AND_SUPPORT_ACTIVITIES_FOR_TRANSPORTATION" => "Lagerhaltung und Versand",
-                            "POSTAL_AND_COURIER_ACTIVITIES"                         => "Versand",
-                            "ACCOMMODATION"                                         => "Beherbergung",
-                            "FOOD_AND_BEVERAGE_SERVICE_ACTIVITIES"                  => "Lebensmittel und Getränke Branche",
-                            "MOTION_PICTURE_PRODUCTION_AND_SIMILAR_ACTIVITIES"      => "Filmproduktion und &auml;hnliches",
+                            "OTHERS_COMMERCIAL_SECTORS"                             => "Bitte angeben",
+                            "WHOLESALE_TRADE_EXCEPT_VEHICLE_TRADE"                  => "Großhandel (ohne Handel mit Kraftfahrzeugen)",
+                            "RETAIL_TRADE_EXCEPT_VEHICLE_TRADE"                     => "Einzelhandel (ohne Handel mit Kraftfahrzeugen)",
+                            "WATER_TRANSPORT"                                       => "Schiff-Fahrt",
+                            "AIR_TRANSPORT"                                         => "Luftfahrt",
+                            "WAREHOUSING_AND_SUPPORT_ACTIVITIES_FOR_TRANSPORTATION" => "Lagerei sowie Erbringung von sonstigen Dienstleistungen für den Verkehr",
+                            "POSTAL_AND_COURIER_ACTIVITIES"                         => "Post-, Kurier- und Expressdienste",
+                            "ACCOMMODATION"                                         => "Beherbergung: Hotels, Gasth&ouml;fe und Pensionen",
+                            "FOOD_AND_BEVERAGE_SERVICE_ACTIVITIES"                  => "Gastronomie",
+                            "MOTION_PICTURE_PRODUCTION_AND_SIMILAR_ACTIVITIES"      => "Herstellung, Verleih, Vertrieb von Filmen / Fernsehprogrammen; Kinos; Tonstud./ Verlegen von Musik",
                             "TELECOMMUNICATIONS"                                    => "Telekommunikation",
-                            "COMPUTER_PROGRAMMING_CONSULTANCY_AND_RELATED_ACTIVITIES" => "Programmierung und Consulting und &auml;hnliches",
-                            "INFORMATION_SERVICE_ACTIVITIES"                        => "Informationsdienst",
-                            "RENTAL_AND_LEASING_ACTIVITIES"                         => "Vermietung und Leasing",
-                            "TRAVEL_AGENCY_AND_RELATED_ACTIVITIES"                  => "Reiseb&uuml;ro und &auml;hnliches",
-                            "SERVICES_TO_BUILDINGS_AND_LANDSCAPE_ACTIVITIES"        => "Geb&auml;udepflege und Landschaftsbau",
-                            "LIBRARIES_AND_SIMILAR_CULTURAL_ACTIVITIES"             => "B&uuml;cherei und sonstige Kulturpflege",
-                            "SPORTS_ACTIVITIES_AND_AMUSEMENT_AND_RECREATION_ACTIVITIES" => "Sport oder andere Fitness",
-                            "OTHER_PERSONAL_SERVICE_ACTIVITIES"                     => "andere Personaldienstleistungen",
-                            "NON_RESIDENTIAL_REAL_ESTATE_ACTIVITIES"                => "Nicht niedergelassene Immobilienbranche",
-                            "MANAGEMENT_CONSULTANCY_ACTIVITIES"                     => "Beratungst&auml;tigkeit Management",
-                            "ELECTRICITY_GAS_AND_STEAM_SUPPLY"                      => "Elektrizit&auml;t, Gas oder sonst. Versorgung",
-                            "WATER_COLLECTION_TREATMENT_AND_SUPPLY"                 => "Wassergewinnung und -versorgung",
-                            "SEWERAGE"                                              => "Abwasser",
-                            "MANUFACTURE_OF_FOOD_PRODUCTS"                          => "Lebensmittelproduktion",
-                            "MANUFACTURE_OF_BEVERAGES"                              => "Spirituosenproduktion",
-                            "MANUFACTURE_OF_TEXTILES"                               => "Textilindustrie (Herstellung)",
-                            "MANUFACTURE_OF_WEARING_APPAREL"                        => "Kleidung (Herstellung)",
-                            "MANUFACTURE_OF_LEATHER_AND_RELATED_PRODUCTS"           => "Lederproduktion oder Verarbeitung",
-                            "MANUFACTURE_OF_PHARMACEUTICAL_PRODUCTS"                => "Pharmazie",
-                            "REPAIR_AND_INSTALLATION_OF_MACHINERY_AND_EQUIPMENT"    => "Wartung und Einbau maschinelles Zubeh&ouml;r",
-                            "TRADE_AND_REPAIR_OF_MOTOR_VEHICLES"                    => "Handel und Wartung von Fahrzeugen",
-                            "PUBLISHING_ACTIVITIES"                                 => "Veröffentlichungen",
-                            "REPAIR_OF_COMPUTERS_AND_GOODS"                         => "Wartung von Computern",
-                            "PRINTING_AND_REPRODUCTION_OF_RECORDED_MEDIA"           => "Druck und Reproduktion von Medien",
-                            "MANUFACTURE_OF_FURNITURE"                              => "Möbelbranche",
-                            "OTHER_MANUFACTURING"                                   => "Anderer Produzent",
+                            "COMPUTER_PROGRAMMING_CONSULTANCY_AND_RELATED_ACTIVITIES" => "Erbringung von Dienstleistungen der Informationstechnologie",
+                            "INFORMATION_SERVICE_ACTIVITIES"                        => "Informationsdienstleistungen",
+                            "RENTAL_AND_LEASING_ACTIVITIES"                         => "Vermietung von beweglichen Sachen",
+                            "TRAVEL_AGENCY_AND_RELATED_ACTIVITIES"                  => "Reiseb&uuml;ros, Reiseveranstalter und Erbringung sonstiger Reservierungsdienstleistungen",
+                            "SERVICES_TO_BUILDINGS_AND_LANDSCAPE_ACTIVITIES"        => "Geb&auml;udebetreuung; Garten- und Landschaftsbau",
+                            "LIBRARIES_AND_SIMILAR_CULTURAL_ACTIVITIES"             => "Bibliotheken, Archive, Museen, botanische und zoologische G&auml;rten",
+                            "SPORTS_ACTIVITIES_AND_AMUSEMENT_AND_RECREATION_ACTIVITIES" => "Erbringung von Dienstleistungen des Sports, der Unterhaltung und der Erholung",
+                            "OTHER_PERSONAL_SERVICE_ACTIVITIES"                     => "Erbringung von sonstigen &uuml;berwiegend pers&ouml;nlichen Dienstleistungen",
+                            "NON_RESIDENTIAL_REAL_ESTATE_ACTIVITIES"                => "Sonstiges Grundst&uuml;ckswesen",
+                            "MANAGEMENT_CONSULTANCY_ACTIVITIES"                     => "Public-Relations- und Unternehmensberatung",
+                            "ELECTRICITY_GAS_AND_STEAM_SUPPLY"                      => "Energieversorgung",
+                            "WATER_COLLECTION_TREATMENT_AND_SUPPLY"                 => "Wasserversorgung",
+                            "SEWERAGE"                                              => "Abwasserentsorgung",
+                            "MANUFACTURE_OF_FOOD_PRODUCTS"                          => "Herstellung von Nahrungs- und Futtermitteln",
+                            "MANUFACTURE_OF_BEVERAGES"                              => "Getr&auml;nkeherstellung",
+                            "MANUFACTURE_OF_TEXTILES"                               => "Herstellung von Textilien",
+                            "MANUFACTURE_OF_WEARING_APPAREL"                        => "Herstellung von Bekleidung",
+                            "MANUFACTURE_OF_LEATHER_AND_RELATED_PRODUCTS"           => "Herstellung von Leder, Lederwaren und Schuhen",
+                            "MANUFACTURE_OF_PHARMACEUTICAL_PRODUCTS"                => "Herstellung von pharmazeutischen Erzeugnissen",
+                            "REPAIR_AND_INSTALLATION_OF_MACHINERY_AND_EQUIPMENT"    => "Reparatur und Installation von Maschinen und Ausr&uuml;stungen",
+                            "TRADE_AND_REPAIR_OF_MOTOR_VEHICLES"                    => "Handel mit Kraftfahrzeugen, Instandhaltung und Reparatur von Kraftfahrzeugen",
+                            "PUBLISHING_ACTIVITIES"                                 => "Verlagswesen",
+                            "REPAIR_OF_COMPUTERS_AND_GOODS"                         => "Reparatur von Datenverarbeitungsger&auml;ten und Gebrauchsg&uuml;tern",
+                            "PRINTING_AND_REPRODUCTION_OF_RECORDED_MEDIA"           => "Herstellung von Druckerzeugnissen, Vervielf&auml;ltigung von bespielten Ton-, Bild- und Datentr&auml;gern",
+                            "MANUFACTURE_OF_FURNITURE"                              => "Herstellung von M&ouml;beln",
+                            "OTHER_MANUFACTURING"                                   => "Herstellung von sonstigen Waren",
                             "ADVERTISING_AND_MARKET_RESEARCH"                       => "Werbung und Marktforschung",
-                            "OTHER_PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_ACTIVITIES" => "Forschung",
-                            "ARTS_ENTERTAINMENT_AND_RECREATION"                     => "Kunst und Unterhaltung",
+                            "OTHER_PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_ACTIVITIES" => "Sonstige freiberufliche, wissenschaftliche und technische T&auml;tigkeiten",
+                            "ARTS_ENTERTAINMENT_AND_RECREATION"                     => "Kreative, k&uuml;nstlerische und unterhaltende T&auml;tigkeiten",
                         ];
-                        $this->View()->heidelB2bFunction = [
-                            "OWNER"             => "Inhaber",
-                            "PARTNER"           => "Partner",
-                            "SHAREHOLDER"       => "Shareholder",
-                            "DIRECTOR"          => "Direktor",
-                            "MANAGER"           => "Manager",
-                            "REGISTERED_MANAGER"=> "Registrierter Manager"
-                        ];
+//                        $this->View()->heidelB2bFunction = [
+//                            "OWNER"             => "Inhaber",
+//                            "PARTNER"           => "Partner",
+//                            "SHAREHOLDER"       => "Shareholder",
+//                            "DIRECTOR"          => "Direktor",
+//                            "MANAGER"           => "Manager",
+//                            "REGISTERED_MANAGER"=> "Registrierter Manager"
+//                        ];
                         $this->View()->b2bCompanyExeCountry = [
                             "DE" => "Deutschland",
                             "AT" => "&Ouml;sterreich",
@@ -674,7 +674,12 @@ mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
 					}
 
 					$response = $this->hgw()->doRequest($params);
-				}
+if($activePayment == 'san'){
+//    mail("sascha.pflueger@heidelpay.com","SanRequest",print_r($params,1));
+//    mail("sascha.pflueger@heidelpay.com","SanResponse",print_r($response,1));
+}
+
+                }
 			}
 
 			$this->View()->pluginPath = $pref .$basepath .$pluginPath;
@@ -906,7 +911,7 @@ mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
 	 */
 	public function responseAction(){
 		try{
-mail("sascha.pflueger@heidelpay.com","907 responseAction POST",print_r($_POST,1));
+//mail("sascha.pflueger@heidelpay.com","907 responseAction POST",print_r($_POST,1));
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
@@ -1014,7 +1019,7 @@ mail("sascha.pflueger@heidelpay.com","907 responseAction POST",print_r($_POST,1)
 				$resp['__csrf_token']		= $this->Request()->getPost('__csrf_token') == true ? htmlspecialchars($this->Request()->getPost('__csrf_token'), $flag, $enc) : '';
 
 				$resp['CONFIG_OPTIN_TEXT']	= $this->Request()->getPost('CONFIG_OPTIN_TEXT') == true ? htmlspecialchars(json_decode($this->Request()->getPost('CONFIG_OPTIN_TEXT'), $flag, $enc),true) : '';
-mail("sascha.pflueger@heidelpay.com","1015 responseAction Array",print_r($resp,1));
+//mail("sascha.pflueger@heidelpay.com","1015 responseAction Array",print_r($resp,1));
 				if (isset($resp['NAME_BIRTHDATE']) && !(empty($resp['NAME_BIRTHDATE'])) ) {
 					$resp['NAME_BIRTHDATE'] 	= $resp['NAME_BIRTHDATE'];
 				} else {
@@ -3271,7 +3276,9 @@ mail("sascha.pflueger@heidelpay.com","1015 responseAction Array",print_r($resp,1
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest($this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
 				$errorMsg = $this->getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}
-
+if($pm = "san"){
+//    mail("sascha.pflueger@heidelpay.com","3280 getFormUrl",print_r(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit),1));
+}
 			if($response['PROCESSING_RESULT'] == 'ACK'){
 				return $response;
 			}else{

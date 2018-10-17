@@ -156,6 +156,7 @@ document.asyncReady(function () {
                // company NOT registered
                jQuery('.heidelB2bNotRegistered').toggle(500);
                jQuery('.heidelB2bRegistered').toggle(500);
+
                jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
                jQuery('.heidelB2bNotRegistered :input').attr('disabled', 'disabled');
                console.log("Registered");
@@ -1294,7 +1295,7 @@ function valSantanderHP() {
 function valInvoiceB2b() {
     var birthdateIvB2b = $('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val();
     $('#birthdate_ivb2b').val($('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val());
-
+console.log(birthdateIvB2b);
     var birthdate = birthdateIvB2b;
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {

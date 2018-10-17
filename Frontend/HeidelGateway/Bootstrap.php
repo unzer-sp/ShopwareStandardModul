@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.09.25';
+		return '18.10.11';
 	}
 
 	/**
@@ -916,7 +916,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '18.09.25':
+            case '18.10.11':
                 // Integration of Invioce B2B
                 $this->createPayments();
                 $form->setElement('text', 'HGW_IVB2B_CHANNEL',
@@ -2037,7 +2037,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                                                 ';
 
                                                     $sanJson 			= json_decode($getFormUrl['CONFIG_OPTIN_TEXT'],true);
-
+//mail("sascha.pflueger@heidelpay.com","2040 Bootstrap SanIn",print_r($getFormUrl,1));
                                                     $view->optin_San_logoUrl 		= empty($sanJson['logolink'])       ? $recoveryLogoUrl          : $sanJson['logolink'];
                                                     $view->optin_San_adv		    = empty($sanJson['optin'])          ? $recoveryTextOptin        : $sanJson['optin'];
                                                     $view->optin_San_privpol		= empty($sanJson['privacy_policy']) ? $recoveryTextPrivacyPolicy: $sanJson['privacy_policy'];
@@ -4128,16 +4128,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/gateway','de','PaymentRedirect',"Sollten Sie nicht automatisch zum Zahlungssystem weitergeleitet werden, klicken Sie bitte auf 'Weiter'");
 		$snippets[] = array('frontend/payment_heidelpay/gateway','en','PaymentRedirect',"If you're not automatically forwarded to the payment system, please click 'Continue'");
 
-        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyName','Firmenname inkl. Rechtsform');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyName','Name inkl. Rechtsform');
         $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyName','Name of company');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyStreet','Firmenadresse Straße');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyStreet','Street of company');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyZip','Firmenadresse Plz.');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyZip','Zip of company');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyCity','Firmenadresse Stadt');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyCity','City of company');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyCountry','Firmenadresse Land');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyCountry','Country of company');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyStreet','Straße');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyStreet','Street');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyZip','PLZ');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyZip','Zip');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyCity','Stadt');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyCity','City');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyCountry','Land');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyCountry','Country');
         $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyUstNr','USt-IdNr.');
         $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyUstNr','Vat Id');
         $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyRegistered','Registriert');
@@ -4146,7 +4146,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyIndustry','Type of trade');
         $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyPobox','Postfach');
         $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyPobox','PoBox');
-        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyRegisterNr','Register Nr.');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyRegisterNr','Registernummer');
         $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyRegisterNr','Commercialregisternumber');
         $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bLastName','Nachname');
         $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bLastName','Lastname');

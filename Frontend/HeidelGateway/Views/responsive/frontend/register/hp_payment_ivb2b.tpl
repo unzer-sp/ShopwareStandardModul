@@ -39,8 +39,13 @@
 				{html_radios id="heidelB2bCompanyRegistered" values=$B2bCompanyRegisteredVal output=$B2bCompanyRegisteredOut selected="REGISTERED" separator=' ' name="COMPANY.REGISTRATIONTYPE"}</br>
 
 				<div class="heidelB2bRegistered" style="margin-top: 10px">
+					{* Company CommercialRegisterNumber *}
 					<label for="heidelb2bCompanyRegisterNr">{s name='B2bCompanyRegisterNr' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bCompanyRegisterNr" type="text" value="{$b2bCompanyRegisterNr}" name="COMPANY.TAXNUMBER" required><br />
+					<input id="heidelb2bCompanyRegisterNr" type="text" value="{$b2bCompanyRegisterNr}" name="COMPANY.COMMERCIALREGISTERNUMBER" required><br />
+
+					{* Company VatId /UstId *}
+					<label for="heidelb2bCompanyUstNr">{s name='B2bCompanyUstNr' namespace='frontend/payment_heidelpay/gateway'}{/s}:</label></br>
+					<input id="heidelb2bCompanyUstNr" type="text" value="{$B2bCompanyUstNr}" name="COMPANY.VATID"><br />
 
                     <p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 				</div>
@@ -49,7 +54,8 @@
 
                     {* Dropdown Executive function *}
                     <label for="heidelb2bExecutiveFunction">{s name='B2bFunction' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-                    {html_options id="heidelb2bExecutiveFunction" options=$heidelB2bFunction selected="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION" required="required"}<br />
+                    {*{html_options id="heidelb2bExecutiveFunction" options=$heidelB2bFunction selected="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION" required="required"}<br />*}
+					<input id="heidelb2bExecutiveFunction" type="text" value="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION" required disabled><br />
 
                     {* Company Executive Salutation *}
 					<label for="B2Bsalutation">{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}:</label><br />

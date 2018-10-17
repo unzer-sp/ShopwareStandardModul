@@ -12,7 +12,7 @@
 
 				{* Company adress pobox *}
 				<label for="heidelb2bCompanyPobox">{s name='B2bCompanyPobox' namespace='frontend/payment_heidelpay/gateway'}{/s}:</label></br>
-				<input id="heidelb2bCompanyPobox" type="text" value="" name="COMPANY.LOCATION.POBOX"><br />
+				<input id="heidelb2bCompanyPobox" type="text" value="" name="COMPANY.LOCATION.POBOX" novalidate><br />
 
 				{* Company adress street *}
 				<label for="heidelb2bCompanyStreet">{s name='B2bCompanyStreet' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
@@ -53,9 +53,10 @@
 					<label class="is--strong">{s name='B2bHeaderPersonal' namespace='frontend/payment_heidelpay/gateway'}{/s}</label><br />
 
                     {* Dropdown Executive function *}
-                    <label for="heidelb2bExecutiveFunction">{s name='B2bFunction' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
+                    <label for="heidelb2bExecutiveFunction">{s name='B2bFunction' namespace='frontend/payment_heidelpay/gateway'}{/s}:</label></br>
                     {*{html_options id="heidelb2bExecutiveFunction" options=$heidelB2bFunction selected="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION" required="required"}<br />*}
-					<input id="heidelb2bExecutiveFunction" type="text" value="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION" required disabled><br />
+					<input id="heidelb2bExecutiveFunction" type="text" value="Inhaber" required readonly disabled>
+					<input id="heidelb2bExecutiveFunction" type="hidden" value="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION"><br />
 
                     {* Company Executive Salutation *}
 					<label for="B2Bsalutation">{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}:</label><br />

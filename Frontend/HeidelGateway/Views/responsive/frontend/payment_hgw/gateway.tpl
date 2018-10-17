@@ -629,7 +629,9 @@
 					{include file="frontend/register/hp_payment_pf.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
 				{elseif $pm == 'papg'}
 					{include file="frontend/register/hp_payment_papg.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
-				{elseif $pm == 'san'}
+                {elseif $pm == 'ivb2b'}
+                    {include file="frontend/register/hp_payment_ivb2b.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
+                {elseif $pm == 'san'}
 					{include file="frontend/register/hp_payment_san.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
                 {elseif $pm == 'ivpd'}
                     {include file="frontend/register/hp_payment_ivpd.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
@@ -643,12 +645,12 @@
 		{/if}
 					<input type="hidden" name='CRITERION.GATEWAY' value='1' />
 					{if $DbOnRg}<input type="hidden" name='CRITERION.DBONRG' value='{$DbOnRg}' />{/if}
-					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg' and $pm != 'ivpd'}<noscript>{/if}
+					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg' and $pm != 'ivpd' and $pm != 'ivb2b'}<noscript>{/if}
 						<a class="btn is--secondary left" href="{url controller=payment_hgw action=cancel}">
 							<span>{s name='hp_cancelPay' namespace='frontend/register/hp_payment'}{/s}</span>
 						</a>
 						<input type="submit" class="btn is--primary register--submit right" value="{s name='ListingLinkNext' namespace='frontend/content/paging'}{/s}">
-					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'san' and $pm != 'papg' and $pm != 'ivpd'}</noscript>{/if}
+					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'san' and $pm != 'papg' and $pm != 'ivpd' and $pm != 'ivb2b'}</noscript>{/if}
 				</div>
 			</form>
 	{else}

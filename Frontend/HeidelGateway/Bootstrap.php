@@ -25,8 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.10.10';
-
+		return '18.10.11';
 	}
 
 	/**
@@ -917,6 +916,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
+            case '18.10.11':
+                // Integration of Invioce B2B
+                $this->createPayments();
+                $form->setElement('text', 'HGW_IVB2B_CHANNEL',
+                    array(
+                        'label'=>'gesicherter B2B-Rechnungskauf Channel',
+                        'value'=>'',
+                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                    )
+                );
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
@@ -1524,6 +1533,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$form->setElement('text', 'HGW_PP_CHANNEL', array('label'=>'Prepayment Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_IV_CHANNEL', array('label'=>'Invoice Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_PAPG_CHANNEL', array('label'=>'Invoice with guarantee Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+            $form->setElement('text', 'HGW_IVB2B_CHANNEL', array('label'=>'Invoice for company customers', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_SAN_CHANNEL', array('label'=>'Santander Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_IVPD_CHANNEL', array('label'=>'Payolution branded Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_P24_CHANNEL', array('label'=>'Przelewy24 Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
@@ -2027,7 +2037,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                                                 ';
 
                                                     $sanJson 			= json_decode($getFormUrl['CONFIG_OPTIN_TEXT'],true);
-
+//mail("sascha.pflueger@heidelpay.com","2040 Bootstrap SanIn",print_r($getFormUrl,1));
                                                     $view->optin_San_logoUrl 		= empty($sanJson['logolink'])       ? $recoveryLogoUrl          : $sanJson['logolink'];
                                                     $view->optin_San_adv		    = empty($sanJson['optin'])          ? $recoveryTextOptin        : $sanJson['optin'];
                                                     $view->optin_San_privpol		= empty($sanJson['privacy_policy']) ? $recoveryTextPrivacyPolicy: $sanJson['privacy_policy'];
@@ -3749,7 +3759,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
-
+//if (
+//($params['PAYMENT.CODE'] == "IV.PA") &&
+//($params['ACCOUNT.BRAND']!= "PAYOLUTION_DIRECT") &&
+//($params['ACCOUNT.BRAND']!= "SANTANDER")
+//){
+//    mail("sascha.pflueger@heidelpay.com","DoRequest 3740",print_r($params,1));
+//}
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();
 				$adapter->setCurlOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -3885,7 +3901,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					"createPayments inserting new paymethods| SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry 'hgw_san' for key 'name'",
 			);
 
-			if (in_array($prms_text, $prmsTextIgnore)) {
+			if (in_array($prms_text, $prmsTextToIgnore)) {
 				return ;
 			} else {
 				return Shopware()->Db()->query($sql, $params);
@@ -3973,6 +3989,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'description'	=> 'Heidelpay CD-Edition gesicherter Rechnungskauf',
 					'trans_desc' 	=> 'Heidelpay CD-Edition invoice with guarantee',
 			);
+            $inst[] = array(
+                    'name'			=> 'ivb2b',
+                    'description'	=> 'Heidelpay CD-Edition gesicherter B2B Rechnungskauf',
+                    'trans_desc' 	=> 'Heidelpay CD-Edition invoice for business customer',
+            );
 			$inst[] = array(
 					'name'			=> 'san',
 					'description'	=> 'Rechnungskauf von Santander',
@@ -4130,7 +4151,50 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/payment_heidelpay/gateway','de','PaymentRedirect',"Sollten Sie nicht automatisch zum Zahlungssystem weitergeleitet werden, klicken Sie bitte auf 'Weiter'");
 		$snippets[] = array('frontend/payment_heidelpay/gateway','en','PaymentRedirect',"If you're not automatically forwarded to the payment system, please click 'Continue'");
 
-		$snippets[] = array('frontend/payment_heidelpay/fail','de','PaymentProcess','Bezahlvorgang');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyName','Name inkl. Rechtsform');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyName','Name of company');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyStreet','Straße');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyStreet','Street');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyZip','PLZ');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyZip','Zip');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyCity','Stadt');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyCity','City');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyCountry','Land');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyCountry','Country');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyUstNr','USt-IdNr.');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyUstNr','Vat Id');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyRegistered','Registriert');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyRegistered','Registered');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyIndustry','Branche');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyIndustry','Type of trade');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyPobox','Postfach');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyPobox','PoBox');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bCompanyRegisterNr','Registernummer');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bCompanyRegisterNr','Commercialregisternumber');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bLastName','Nachname');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bLastName','Lastname');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bPreName','Vorname');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bPreName','Prename');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bEmail','E-Mail');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bEmail','Email');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bExePhone','Telefon');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bExePhone','Phone');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bFunction','Funktion im Unternehmen');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bFunction','Function in Company');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bExeStreet','Straße u. Hausnummer');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bExeStreet','Street and housenumber');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bExeZip','Postleitzahl');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bExeZip','Zip');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bExeCity','Stadt');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bExeCity','City');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bExeCountry','Land');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bExeCountry','Country');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bHeaderPersonal','Angaben zum Inhaber:');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bHeaderPersonal','Personal information of company owner:');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','de','B2bHeaderFirm','Angaben zum Unternehmen:');
+        $snippets[] = array('frontend/payment_heidelpay/gateway','en','B2bHeaderFirm','Company information:');
+
+        $snippets[] = array('frontend/payment_heidelpay/fail','de','PaymentProcess','Bezahlvorgang');
 		$snippets[] = array('frontend/payment_heidelpay/fail','en','PaymentProcess','Payment process');
 		$snippets[] = array('frontend/payment_heidelpay/fail','de','basket','Zur&uuml;ck zum Warenkorb');
 		$snippets[] = array('frontend/payment_heidelpay/fail','en','basket','back to basket');
@@ -5033,15 +5097,15 @@ Mit freundlichen Gruessen
                             'HGW_HPR_CHANNEL' 		=> array('label' => 'EasyCredit Channel'),
 							'HGW_CC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Credit Card booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DC_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Debit Card booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DD_BOOKING_MODE' 	=> array(
 									'label' 			=> 'Direct Debit booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_DD_GUARANTEE_MODE' => array(
 									'label' 			=> 'Direct debit with guarantee',
@@ -5053,7 +5117,7 @@ Mit freundlichen Gruessen
 							),
 							'HGW_MPA_BOOKING_MODE' 	=> array(
 									'label' 			=> 'MasterPass booking mode',
-									'description' 		=> $bookingModeDescEn,
+									'description' 		=> $bookingModeDescEN,
 							),
 							'HGW_CHB_STATUS' 		=> array(
 									'label' 			=> 'Chargeback State',

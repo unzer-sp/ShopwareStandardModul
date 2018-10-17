@@ -229,9 +229,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				unset($data[$key]);
 			}
 
-			$resp = $this->callDoRequest($data);
-			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
-				
+            $resp = $this->callDoRequest($data);
+            Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
+
 			// switch, to update right table, depending on used frontend module
 			if(($trans->payName == 'bs') && ($meth == 'fi')){
 				if(strtolower($modul) == 'heidelpay'){
@@ -353,6 +353,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 }
                 $transactions[$tKey] = $transaction;
             }
+
             return $transactions;
         }catch(Exception $e){
             Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());

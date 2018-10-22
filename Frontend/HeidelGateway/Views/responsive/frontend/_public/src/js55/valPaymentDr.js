@@ -140,9 +140,6 @@ $(function() {
                     //payment is not one of heidelpay's
                     $('#hgw_privpol_ivpd').removeAttr("required");
                 }
-
-
-
             }
 
             //Function to set Birthdate in hidden field for Chrome on mac
@@ -316,6 +313,14 @@ $(function() {
                             $("#hgw_privpol_ivpd").attr("required", "required");
                         }
 
+                        // to remove unused inputs for IVB2B
+                        if(pm == "ivb2b"){
+                            if(jQuery('.heidelB2bRegistered').is(':visible')){
+                                jQuery('.heidelB2bNotRegistered').remove();
+                            } else {
+                                jQuery('.heidelB2bRegistered').remove();
+                            }
+                        }
 
                     }
 
@@ -772,63 +777,98 @@ function valGatewayForm() {
         }
     });
 
-    // switch (pm.toLocaleLowerCase()) {
-    //     case "dd":
-    //         var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
-    //
-    //         if (jQuery('#salutation').is(':visible')) {
-    //             // getting Values from input fields
-    //             var salutation = jQuery('#salutation').val();
-    //             var birthDay = jQuery('select[name=Date_Day]').val();
-    //             var birthMonth = jQuery('select[name=Date_Month]').val();
-    //             var birthYear = jQuery('select[name=Date_Year]').val();
-    //
-    //             jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-    //
-    //             errors = valDirectDebitSecured(errors);
-    //     break
-    //     case "gir":
-    // }
+    switch (pm.toLocaleLowerCase()) {
+        case 'dd':
+            var errors = new Array();
+            // direct debit
+            errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
 
+            // direct debit secured
+            if(jQuery('#salutation').is(':visible')){
+                // getting Values from input fields
+                var birthDay = jQuery('select[name=Date_Day]').val();
+                var birthMonth = jQuery('select[name=Date_Month]').val();
+                var birthYear = jQuery('select[name=Date_Year]').val();
 
+                jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
 
-    if (pm == 'dd') {
-        var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
-
-        if (jQuery('#salutation').is(':visible')) {
-            // getting Values from input fields
-            var salutation = jQuery('#salutation').val();
-            var birthDay = jQuery('select[name=Date_Day]').val();
-            var birthMonth = jQuery('select[name=Date_Month]').val();
-            var birthYear = jQuery('select[name=Date_Year]').val();
-
-            jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-
-            errors = valDirectDebitSecured(errors);
-        }
-    } else if (pm == 'gir') {
-        var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
-    } else if (pm == "papg"){
-        var errorsPapg = valInvoiceSec();
-
-        if((jQuery('.newreg_papg .has--error'))){
-            if(jQuery.isEmptyObject(errorsPapg) == false){
-                jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
-                jQuery.each(errorsPapg, function(key, value){
-                    jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
-                });
-
-                jQuery('.alert').removeClass("is--hidden");
-                jQuery('.alert').show();
-                jQuery('html, body').animate({scrollTop: 0}, 0);
-
-                return false;
+                errors = valDirectDebitSecured(errors);
             }
+            break;
+        case 'gir':
+            var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+            break;
+        case 'papg':
+            var errorsPapg = valInvoiceSec();
 
-        } else {
-            jQuery('#payment .alert .is--error .is--rounded div').remove();
-        }
+            if((jQuery('.newreg_papg .has--error'))){
+                if(jQuery.isEmptyObject(errorsPapg) == false){
+                    jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+                    jQuery.each(errorsPapg, function(key, value){
+                        jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+                    });
+
+                    jQuery('.alert').removeClass("is--hidden");
+                    jQuery('.alert').show();
+                    jQuery('html, body').animate({scrollTop: 0}, 0);
+
+                    return false;
+                }
+
+            } else {
+                jQuery('#payment .alert .is--error .is--rounded div').remove();
+            }
+        break;
+        case "ivb2b":
+            if(jQuery('.heidelB2bRegistered').is(':visible')){
+                jQuery('.heidelB2bNotRegistered').remove();
+            } else {
+                jQuery('.heidelB2bRegistered').remove();
+            }
+            var errors = valInvoiceB2b();
+        break;
+
     }
+
+
+
+    // if (pm == 'dd') {
+    //     var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+    //
+    //     if (jQuery('#salutation').is(':visible')) {
+    //         // getting Values from input fields
+    //         var salutation = jQuery('#salutation').val();
+    //         var birthDay = jQuery('select[name=Date_Day]').val();
+    //         var birthMonth = jQuery('select[name=Date_Month]').val();
+    //         var birthYear = jQuery('select[name=Date_Year]').val();
+    //
+    //         jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
+    //
+    //         errors = valDirectDebitSecured(errors);
+    //     }
+    // } else if (pm == 'gir') {
+    //     var errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
+    // } else if (pm == "papg"){
+    //     var errorsPapg = valInvoiceSec();
+    //
+    //     if((jQuery('.newreg_papg .has--error'))){
+    //         if(jQuery.isEmptyObject(errorsPapg) == false){
+    //             jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">'+jQuery('.msg_fill').html()+'</li>');
+    //             jQuery.each(errorsPapg, function(key, value){
+    //                 jQuery('.alert--content ul').append('<li class="list--entry">'+jQuery(value).html()+'</li>');
+    //             });
+    //
+    //             jQuery('.alert').removeClass("is--hidden");
+    //             jQuery('.alert').show();
+    //             jQuery('html, body').animate({scrollTop: 0}, 0);
+    //
+    //             return false;
+    //         }
+    //
+    //     } else {
+    //         jQuery('#payment .alert .is--error .is--rounded div').remove();
+    //     }
+    // }
 
     if ((jQuery('.' + checkedOpt + '  .has--error').length > 0)) {
         jQuery('#payment .alert .alert--content ul li').remove();
@@ -1296,6 +1336,134 @@ function valInvoiceSec() {
     if(errors.length > 0){
         return errors;
     }
+}
+
+/**
+ * valInvoiceB2B
+ * Validates the Inputs of B2B, returns and marks missing fields
+ * @return {errors[]}
+ */
+function valInvoiceB2b() {
+    var errors = new Array();
+    var i = 0;
+    // checking Company name
+    var heidelCompanyName = $('.newreg_ivb2b #heidelb2bCompanyName').val();
+    if(heidelCompanyName == '' || heidelCompanyName == "undefined"){
+        $('.newreg_ivb2b #heidelb2bCompanyName').addClass('has--error');
+        errors[i++] = '.msg_fill';
+    }
+    // checking Company Street
+    var heidelCompanyStreet = $('.newreg_ivb2b #heidelb2bCompanyStreet').val();
+    if(heidelCompanyStreet == '' || heidelCompanyStreet == "undefined"){
+        $('.newreg_ivb2b #heidelCompanyStreet').addClass('has--error');
+        errors[i++] = '.msg_fill';
+    }
+    // checking Company Zip
+    var heidelb2bCompanyZip = $('.newreg_ivb2b #heidelb2bCompanyZip').val();
+    if(heidelb2bCompanyZip == '' || heidelb2bCompanyZip == "undefined"){
+        $('.newreg_ivb2b #heidelb2bCompanyZip').addClass('has--error');
+        errors[i++] = '.msg_fill';
+    }
+    // checking Company City
+    var heidelb2bCompanyCity = $('.newreg_ivb2b #heidelb2bCompanyCity').val();
+    if(heidelb2bCompanyCity == '' || heidelb2bCompanyCity == "undefined"){
+        $('.newreg_ivb2b #heidelb2bCompanyCity').addClass('has--error');
+        errors[i++] = '.msg_fill';
+    }
+
+    // checking depending registered fields
+    if($('.newreg_ivb2b #heidelB2bCompanyRegistered').val()== "REGISTERED"){
+        // checking Company Commercial registernuimber
+        var heidelb2bCompanyRegisterNr = $('.newreg_ivb2b #heidelb2bCompanyRegisterNr').val();
+        if(heidelb2bCompanyRegisterNr == '' || heidelb2bCompanyRegisterNr == "undefined"){
+            $('.newreg_ivb2b #heidelb2bCompanyRegisterNr').addClass('has--error');
+            errors[i++] = '.msg_fill';
+        }
+        $('.newreg_ivb2b #heidelb2bCompanyUstNr').removeClass('has--error');
+    } else {
+        // checking Executive Prename
+        var heidelb2bPreName = $('.newreg_ivb2b #heidelb2bPreName').val();
+        if(heidelb2bPreName == '' || heidelb2bPreName == "undefined"){
+            $('.newreg_ivb2b #heidelb2bPreName').addClass('has--error');
+            errors[i++] = '.msg_fill';
+        }
+
+        // checking Executive Lastname
+        var heidelb2bLastName = $('.newreg_ivb2b #heidelb2bLastName').val();
+        if(heidelb2bLastName == '' || heidelb2bLastName == "undefined"){
+            $('.newreg_ivb2b #heidelb2bLastName').addClass('has--error');
+            errors[i++] = '.msg_fill';
+        }
+
+        // checking Executive Email
+        var heidelb2bEmail = $('.newreg_ivb2b #heidelb2bEmail').val();
+        if(heidelb2bLastName == '' || heidelb2bLastName == "undefined"){
+            $('.newreg_ivb2b #heidelb2bEmail').addClass('has--error');
+            errors[i++] = '.msg_fill';
+        }
+
+        // checking Executive Street
+        var heidelb2bExeStreet = $('.newreg_ivb2b #heidelb2bExeStreet').val();
+        if(heidelb2bExeStreet == '' || heidelb2bExeStreet == "undefined"){
+            $('.newreg_ivb2b #heidelb2bExeStreet').addClass('has--error');
+            errors[i++] = '.msg_fill';
+        }
+
+        // checking Executive Zip
+        var heidelb2bExeZip = $('.newreg_ivb2b #heidelb2bExeZip').val();
+        if(heidelb2bExeZip == '' || heidelb2bExeZip == "undefined"){
+            $('.newreg_ivb2b #heidelb2bExeZip').addClass('has--error');
+            errors[i++] = '.msg_fill';
+        }
+
+        // checking Executive City
+        var heidelb2bExeCity = $('.newreg_ivb2b #heidelb2bExeCity').val();
+        if(heidelb2bExeCity == '' || heidelb2bExeCity == "undefined"){
+            $('.newreg_ivb2b #heidelb2bExeCity').addClass('has--error');
+            errors[i++] = '.msg_fill';
+        }
+
+        var birthdateIvB2b = $('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val();
+        $('#birthdate_ivb2b').val($('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val());
+
+        var birthdate = birthdateIvB2b;
+        if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
+        {
+            var dob = new Date(jQuery('.newreg_ivb2b select[name="Date_Year"]').val(), jQuery('.newreg_ivb2b select[name="Date_Month"]').val()-1, jQuery('.newreg_ivb2b select[name="Date_Day"]').val());
+            var today = new Date();
+            var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
+            if(age < 18){
+
+                jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Year"]').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Month"]').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Day"]').addClass('has--error');
+
+                errors[i++] = '.msg_dob';
+            }else{
+                jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Year"]').removeClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Month"]').removeClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Day"]').removeClass('has--error');
+            }
+        } else {
+            //birthdate doesn't match to formate YYYY-MM-DD
+            jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Year"]').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Month"]').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Day"]').addClass('has--error');
+            errors[i++] = '.msg_dob';
+        }
+    }
+    //removing error marks for not necessary inputs
+    $('.newreg_ivb2b #heidelb2bCompanyPobox').removeClass('has--error');
+    return errors;
 }
 
 /**

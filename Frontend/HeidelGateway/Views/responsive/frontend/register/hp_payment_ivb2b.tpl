@@ -78,6 +78,7 @@
 						{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben" required="required"}</br>
 					{/if}
 					<input type="hidden" name="COMPANY.EXECUTIVE.1.BIRTHDATE" id="birthdate_ivb2b" value="{$b2bBirthdate}">
+					{*<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivb2b" value="1985-06-18">*}
 
 					{* Company Executive Email *}
 					<label for="heidelb2bEmail">{s name='B2bEmail' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
@@ -118,7 +119,6 @@
 			</br>
 			</br>
 			</br>
-			<br />
 		<h1>Testbereich</h1>
 			{*<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />*}
 			{*{assign var=payment_data value=$birthdate_papg}*}

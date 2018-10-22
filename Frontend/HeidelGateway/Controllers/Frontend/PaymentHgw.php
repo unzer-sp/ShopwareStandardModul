@@ -674,10 +674,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 
 					$response = $this->hgw()->doRequest($params);
-if($activePayment == 'san'){
-//    mail("sascha.pflueger@heidelpay.com","SanRequest",print_r($params,1));
-//    mail("sascha.pflueger@heidelpay.com","SanResponse",print_r($response,1));
-}
+//if($activePayment == 'hps'){
+//    mail("sascha.pflueger@heidelpay.com","SanRequest PA",print_r($params,1));
+//    mail("sascha.pflueger@heidelpay.com","SanResponse PA",print_r($response,1));
+//}
 
                 }
 			}
@@ -1473,7 +1473,7 @@ if($activePayment == 'san'){
             } else {
                 $resp['NAME_BIRTHDATE'] 		= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('birthdate_san'), $flag, $enc) : '';
             }
-
+//mail("sascha.pflueger@heidelpay.com","1476 responseHPR POST",print_r($_POST,1));
             // case for suspected Manipulation
             $orgHash = $this->createSecretHash($resp['IDENTIFICATION_TRANSACTIONID']);
 

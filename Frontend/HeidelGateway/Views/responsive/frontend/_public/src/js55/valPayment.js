@@ -150,8 +150,6 @@ document.asyncReady(function () {
 
                 jQuery('.heidelB2bRegistered :input').attr('disabled', 'disabled');
                 jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
-                console.log("NOT");
-                console.log(jQuery('.heidelB2bRegistered :input').length);
            } else {
                // company NOT registered
                jQuery('.heidelB2bNotRegistered').toggle(500);
@@ -159,8 +157,6 @@ document.asyncReady(function () {
 
                jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
                jQuery('.heidelB2bNotRegistered :input').attr('disabled', 'disabled');
-               console.log("Registered");
-               console.log(jQuery('.heidelB2bNotRegistered :input').length);
            }
         });
 
@@ -706,15 +702,12 @@ function valForm() {
 
 // VALIDATE FORM ON GATEWAY
 function valGatewayForm() {
-console.log("valGatewayForm");
     checkedOpt = jQuery('#payment .payment_method').find('div').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('_') + 1);
-console.log(pm);
     // set 'error' to empty inputs
     jQuery('.' + checkedOpt).find('input').each(function () {
         if (jQuery(this).val() == '') {
             jQuery(this).addClass('has--error');
-console.log(this);
         } else {
             jQuery(this).removeClass('has--error');
         }
@@ -768,10 +761,7 @@ console.log(this);
             } else {
                 jQuery('.heidelB2bRegistered').remove();
             }
-console.log("treffer Switch");
             var errors = valInvoiceB2b();
-console.log(errors);
-            
             break;
 
     }
@@ -817,7 +807,6 @@ console.log(errors);
     // }
 
     if ((jQuery('.' + checkedOpt + '  .has--error').length > 0)) {
-        console.log((jQuery('.'+checkedOpt + '  .has--error')).length);
         jQuery('#payment .alert .alert--content ul li').remove();
         jQuery('#payment .alert .alert--content ul').append('<li class="list--entry">' + jQuery('.msg_fill').html() + '</li>');
 
@@ -1301,6 +1290,11 @@ function valSantanderHP() {
 
 }
 
+/**
+ * valInvoiceB2B
+ * Validates the Inputs of B2B, returns and marks missing fields
+ * @return {errors[]}
+ */
 function valInvoiceB2b() {
     var errors = new Array();
     var i = 0;
@@ -1383,7 +1377,7 @@ function valInvoiceB2b() {
 
         var birthdateIvB2b = $('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val();
         $('#birthdate_ivb2b').val($('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val());
-console.log(birthdateIvB2b);
+
         var birthdate = birthdateIvB2b;
         if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
         {
@@ -1409,7 +1403,7 @@ console.log(birthdateIvB2b);
                 jQuery('.newreg_ivb2b select[name="Date_Day"]').removeClass('has--error');
             }
         } else {
-            //birthdate doesn't fit to formate YYYY-MM-DD
+            //birthdate doesn't match to formate YYYY-MM-DD
             jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
             jQuery('.newreg_ivb2b select[name="Date_Year"]').addClass('has--error');
             jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
@@ -1418,9 +1412,8 @@ console.log(birthdateIvB2b);
             jQuery('.newreg_ivb2b select[name="Date_Day"]').addClass('has--error');
             errors[i++] = '.msg_dob';
         }
-
     }
-    //removing
+    //removing error marks for not necessary inputs
     $('.newreg_ivb2b #heidelb2bCompanyPobox').removeClass('has--error');
     return errors;
 }

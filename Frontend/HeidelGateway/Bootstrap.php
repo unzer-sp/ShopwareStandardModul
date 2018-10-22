@@ -2037,7 +2037,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                                                 ';
 
                                                     $sanJson 			= json_decode($getFormUrl['CONFIG_OPTIN_TEXT'],true);
-//mail("sascha.pflueger@heidelpay.com","2040 Bootstrap SanIn",print_r($getFormUrl,1));
+
                                                     $view->optin_San_logoUrl 		= empty($sanJson['logolink'])       ? $recoveryLogoUrl          : $sanJson['logolink'];
                                                     $view->optin_San_adv		    = empty($sanJson['optin'])          ? $recoveryTextOptin        : $sanJson['optin'];
                                                     $view->optin_San_privpol		= empty($sanJson['privacy_policy']) ? $recoveryTextPrivacyPolicy: $sanJson['privacy_policy'];
@@ -2487,6 +2487,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ){
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
+//mail("sascha.pflueger@heidelpay.com","2490 Request SantanderHP ",print_r($requestData,1));
+//mail("sascha.pflueger@heidelpay.com","2491 Response SantanderHP ",print_r($responseHps,1));
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';
@@ -2714,7 +2716,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 {
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
-
+//mail("sascha.pflueger@heidelpay.com","2719 Request SantanderHP ",print_r($requestData,1));
+//mail("sascha.pflueger@heidelpay.com","2720 Response SantanderHP ",print_r($responseHps,1));
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';

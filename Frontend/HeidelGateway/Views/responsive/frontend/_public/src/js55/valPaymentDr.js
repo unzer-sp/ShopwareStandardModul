@@ -142,6 +142,25 @@ $(function() {
                 }
             }
 
+            // jQuery('#heidelB2bCompanyRegistered').change(function (e) {
+            jQuery('[name="COMPANY.REGISTRATIONTYPE"]').change(function (e) {
+                if(jQuery('.heidelB2bRegistered').is(":visible")){
+                    // company is registered
+                    jQuery('.heidelB2bRegistered').toggle(500);
+                    jQuery('.heidelB2bNotRegistered').toggle(500);
+
+                    jQuery('.heidelB2bRegistered :input').attr('disabled', 'disabled');
+                    jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
+                } else {
+                    // company NOT registered
+                    jQuery('.heidelB2bNotRegistered').toggle(500);
+                    jQuery('.heidelB2bRegistered').toggle(500);
+
+                    jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
+                    jQuery('.heidelB2bNotRegistered :input').attr('disabled', 'disabled');
+                }
+            });
+
             //Function to set Birthdate in hidden field for Chrome on mac
             jQuery("input[type='submit'], .right").click(function(e){
                 var pm = $('input:radio:checked').attr('class');
@@ -315,10 +334,19 @@ $(function() {
 
                         // to remove unused inputs for IVB2B
                         if(pm == "ivb2b"){
+                            // if(jQuery('.heidelB2bRegistered').is(':visible')){
+                            //     jQuery('.heidelB2bNotRegistered').remove();
+                            // } else {
+                            //     jQuery('.heidelB2bRegistered').remove();
+                            // }
                             if(jQuery('.heidelB2bRegistered').is(':visible')){
-                                jQuery('.heidelB2bNotRegistered').remove();
+                                // jQuery('.heidelB2bNotRegistered').remove();
+                                jQuery('.heidelB2bNotRegistered :input').attr("disabled","disabled");
+                                jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
                             } else {
-                                jQuery('.heidelB2bRegistered').remove();
+                                // jQuery('.heidelB2bRegistered').remove();
+                                jQuery('.heidelB2bRegistered :input').attr("disabled","disabled");
+                                jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
                             }
                         }
 
@@ -821,9 +849,13 @@ function valGatewayForm() {
         break;
         case "ivb2b":
             if(jQuery('.heidelB2bRegistered').is(':visible')){
-                jQuery('.heidelB2bNotRegistered').remove();
+                // jQuery('.heidelB2bNotRegistered').remove();
+                jQuery('.heidelB2bNotRegistered :input').attr("disabled","disabled");
+                jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
             } else {
-                jQuery('.heidelB2bRegistered').remove();
+                // jQuery('.heidelB2bRegistered').remove();
+                jQuery('.heidelB2bRegistered :input').attr("disabled","disabled");
+                jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
             }
             var errors = valInvoiceB2b();
         break;

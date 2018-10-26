@@ -370,7 +370,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             $basketId = $basketId['basketId'];
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
-                        $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERUM_B2B';
+                        $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERSUM_B2B';
 //mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
                         $this->View()->b2bCompanyName       = $user['billingaddress']['company'];
                         $this->View()->b2bCompanyStreet     = $user['billingaddress']['street'];

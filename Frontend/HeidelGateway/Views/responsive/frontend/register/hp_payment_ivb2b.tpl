@@ -36,7 +36,7 @@
 
 				{* Options company registered *}
 				<label for="heidelB2bCompanyRegistered">{s name='B2bCompanyRegistered' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-				{html_radios id="heidelB2bCompanyRegistered" values=$B2bCompanyRegisteredVal output=$B2bCompanyRegisteredOut selected="REGISTERED" separator=' ' name="COMPANY.REGISTRATIONTYPE"}</br>
+				{html_radios id="heidelB2bCompanyRegistered" values=$B2bCompanyRegisteredVal output=$B2bCompanyRegisteredOut separator=' ' selected="REGISTERED" name="COMPANY.REGISTRATIONTYPE"}</br>
 
 				<div class="heidelB2bRegistered" style="margin-top: 10px">
 					{* Company CommercialRegisterNumber *}

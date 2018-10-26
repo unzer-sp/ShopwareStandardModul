@@ -328,9 +328,13 @@ document.asyncReady(function () {
                 // to remove unused inputs for IVB2B
                 if(pm == "ivb2b"){
                     if(jQuery('.heidelB2bRegistered').is(':visible')){
-                        jQuery('.heidelB2bNotRegistered').remove();
+                        // jQuery('.heidelB2bNotRegistered').remove();
+                        jQuery('.heidelB2bNotRegistered :input').attr("disabled","disabled");
+                        jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
                     } else {
-                        jQuery('.heidelB2bRegistered').remove();
+                        // jQuery('.heidelB2bRegistered').remove();
+                        jQuery('.heidelB2bRegistered :input').attr("disabled","disabled");
+                        jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
                     }
                 }
 
@@ -1301,78 +1305,89 @@ function valInvoiceB2b() {
     // checking Company name
     var heidelCompanyName = $('.newreg_ivb2b #heidelb2bCompanyName').val();
     if(heidelCompanyName == '' || heidelCompanyName == "undefined"){
-        $('.newreg_ivb2b #heidelb2bCompanyName').addClass('has--error');
+        $('.newreg_ivb2b #heidelb2bCompanyName').prop('class','has--error');
         errors[i++] = '.msg_fill';
     }
     // checking Company Street
     var heidelCompanyStreet = $('.newreg_ivb2b #heidelb2bCompanyStreet').val();
     if(heidelCompanyStreet == '' || heidelCompanyStreet == "undefined"){
-        $('.newreg_ivb2b #heidelCompanyStreet').addClass('has--error');
-        errors[i++] = '.msg_fill';
+        $('.newreg_ivb2b #heidelCompanyStreet').prop('class','has--error');
+        errors[i] = '.msg_fill';
     }
     // checking Company Zip
     var heidelb2bCompanyZip = $('.newreg_ivb2b #heidelb2bCompanyZip').val();
     if(heidelb2bCompanyZip == '' || heidelb2bCompanyZip == "undefined"){
-        $('.newreg_ivb2b #heidelb2bCompanyZip').addClass('has--error');
-        errors[i++] = '.msg_fill';
+        $('.newreg_ivb2b #heidelb2bCompanyZip').prop('class','has--error');
+        errors[i] = '.msg_fill';
     }
     // checking Company City
     var heidelb2bCompanyCity = $('.newreg_ivb2b #heidelb2bCompanyCity').val();
     if(heidelb2bCompanyCity == '' || heidelb2bCompanyCity == "undefined"){
-        $('.newreg_ivb2b #heidelb2bCompanyCity').addClass('has--error');
-        errors[i++] = '.msg_fill';
+        $('.newreg_ivb2b #heidelb2bCompanyCity').prop('class','has--error');
+        errors[i] = '.msg_fill';
     }
 
     // checking depending registered fields
-    if($('.newreg_ivb2b #heidelB2bCompanyRegistered').val()== "REGISTERED"){
+    // if($('.newreg_ivb2b #heidelB2bCompanyRegistered :checked').val()== "REGISTERED"){
+    if($('.newreg_ivb2b input:checked').val()== "REGISTERED"){
         // checking Company Commercial registernuimber
         var heidelb2bCompanyRegisterNr = $('.newreg_ivb2b #heidelb2bCompanyRegisterNr').val();
         if(heidelb2bCompanyRegisterNr == '' || heidelb2bCompanyRegisterNr == "undefined"){
-            $('.newreg_ivb2b #heidelb2bCompanyRegisterNr').addClass('has--error');
-            errors[i++] = '.msg_fill';
+            $('.newreg_ivb2b #heidelb2bCompanyRegisterNr').prop('class','has--error');
+            errors[i] = '.msg_fill';
         }
         $('.newreg_ivb2b #heidelb2bCompanyUstNr').removeClass('has--error');
+        $('.newreg_ivb2b #B2Bsalutation').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bPreName').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bLastName').removeClass('has--error');
+        $('.newreg_ivb2b #birthdate_ivb2b').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bEmail').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bExePhone').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bExeStreet').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bExeZip').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bExeCity').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bExeCountry').removeClass('has--error');
     } else {
         // checking Executive Prename
         var heidelb2bPreName = $('.newreg_ivb2b #heidelb2bPreName').val();
         if(heidelb2bPreName == '' || heidelb2bPreName == "undefined"){
-            $('.newreg_ivb2b #heidelb2bPreName').addClass('has--error');
-            errors[i++] = '.msg_fill';
+            $('.newreg_ivb2b #heidelb2bPreName').prop('class','has--error');
+            errors[i] = '.msg_fill';
         }
 
         // checking Executive Lastname
         var heidelb2bLastName = $('.newreg_ivb2b #heidelb2bLastName').val();
         if(heidelb2bLastName == '' || heidelb2bLastName == "undefined"){
-            $('.newreg_ivb2b #heidelb2bLastName').addClass('has--error');
-            errors[i++] = '.msg_fill';
+            $('.newreg_ivb2b #heidelb2bLastName').prop('class','has--error');
+            errors[i] = '.msg_fill';
         }
 
         // checking Executive Email
         var heidelb2bEmail = $('.newreg_ivb2b #heidelb2bEmail').val();
         if(heidelb2bLastName == '' || heidelb2bLastName == "undefined"){
-            $('.newreg_ivb2b #heidelb2bEmail').addClass('has--error');
-            errors[i++] = '.msg_fill';
+            $('.newreg_ivb2b #heidelb2bEmail').prop('class','has--error');
+            errors[i] = '.msg_fill';
         }
 
         // checking Executive Street
         var heidelb2bExeStreet = $('.newreg_ivb2b #heidelb2bExeStreet').val();
         if(heidelb2bExeStreet == '' || heidelb2bExeStreet == "undefined"){
-            $('.newreg_ivb2b #heidelb2bExeStreet').addClass('has--error');
-            errors[i++] = '.msg_fill';
+            $('.newreg_ivb2b #heidelb2bExeStreet').prop('class','has--error');
+            errors[i] = '.msg_fill';
         }
 
         // checking Executive Zip
         var heidelb2bExeZip = $('.newreg_ivb2b #heidelb2bExeZip').val();
         if(heidelb2bExeZip == '' || heidelb2bExeZip == "undefined"){
-            $('.newreg_ivb2b #heidelb2bExeZip').addClass('has--error');
-            errors[i++] = '.msg_fill';
+            $('.newreg_ivb2b #heidelb2bExeZip').prop('class','has--error');
+            errors[i] = '.msg_fill';
         }
 
         // checking Executive City
         var heidelb2bExeCity = $('.newreg_ivb2b #heidelb2bExeCity').val();
         if(heidelb2bExeCity == '' || heidelb2bExeCity == "undefined"){
-            $('.newreg_ivb2b #heidelb2bExeCity').addClass('has--error');
-            errors[i++] = '.msg_fill';
+            $('.newreg_ivb2b #heidelb2bExeCity').prop('class','has--error');
+            errors[i] = '.msg_fill';
         }
 
         var birthdateIvB2b = $('.newreg_ivb2b [name="Date_Year"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Month"]').val() + '-'+ $('.newreg_ivb2b [name="Date_Day"]').val();
@@ -1387,11 +1402,11 @@ function valInvoiceB2b() {
             if(age < 18){
 
                 jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-                jQuery('.newreg_ivb2b select[name="Date_Year"]').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Year"]').prop('class','has--error');
                 jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-                jQuery('.newreg_ivb2b select[name="Date_Month"]').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Month"]').prop('class','has--error');
                 jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-                jQuery('.newreg_ivb2b select[name="Date_Day"]').addClass('has--error');
+                jQuery('.newreg_ivb2b select[name="Date_Day"]').prop('class','has--error');
 
                 errors[i++] = '.msg_dob';
             }else{
@@ -1405,13 +1420,18 @@ function valInvoiceB2b() {
         } else {
             //birthdate doesn't match to formate YYYY-MM-DD
             jQuery('.newreg_ivb2b select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_ivb2b select[name="Date_Year"]').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Year"]').prop('class','has--error');
             jQuery('.newreg_ivb2b select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_ivb2b select[name="Date_Month"]').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Month"]').prop('class','has--error');
             jQuery('.newreg_ivb2b select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_ivb2b select[name="Date_Day"]').addClass('has--error');
+            jQuery('.newreg_ivb2b select[name="Date_Day"]').prop('class','has--error');
             errors[i++] = '.msg_dob';
         }
+        // remove errors from unsed inputs
+        $('.newreg_ivb2b #heidelb2bCompanyRegisterNr').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bExePhone').removeClass('has--error');
+        $('.newreg_ivb2b #heidelb2bCompanyUstNr').removeClass('has--error');
+
     }
     //removing error marks for not necessary inputs
     $('.newreg_ivb2b #heidelb2bCompanyPobox').removeClass('has--error');

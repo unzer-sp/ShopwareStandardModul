@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.10.11';
+		return '18.10.12';
 	}
 
 	/**
@@ -916,17 +916,23 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '18.10.11':
-                // Integration of Invioce B2B
-                $this->createPayments();
-                $form->setElement('text', 'HGW_IVB2B_CHANNEL',
-                    array(
-                        'label'=>'gesicherter B2B-Rechnungskauf Channel',
-                        'value'=>'',
-                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
-                    )
-                );
-                // overwrite $msg if update was successful
+            case '18.10.12':
+                try{
+                    // Integration of Invioce B2B
+                    $this->addSnippets();
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_IVB2B_CHANNEL',
+                        array(
+                            'label'=>'gesicherter B2B-Rechnungskauf Channel',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
+                    $msg .= '* update 18.10.12<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+                    // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
 
@@ -2581,7 +2587,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $basketData = $this->getBasketId();
             $konfiguration = self::Config();
             $secret = $konfiguration['HGW_SECRET'];
-
             //fetching count of orders of customer
             $countOrderForCustomer = '';
             $sql = 'SELECT COUNT(id) FROM `s_order` WHERE userID ="'.$user['additional']['user']['userID'].'" AND ordernumber != "0"';
@@ -3560,7 +3565,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'login'			=> trim($this->Config()->HGW_USER_LOGIN),
 					'password'		=> trim($this->Config()->HGW_USER_PW),
 			);
-				
 			// catching item basket-Api-information
 			foreach ($basket['content'] as $item){
 				$amountNet 		= str_replace(',','.',$item['amountnet']);
@@ -5000,6 +5004,7 @@ Mit freundlichen Gruessen
 							'HGW_PP_CHANNEL' 		=> array('label' => 'Vorkasse Channel'),
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Rechnung Channel'),
                             'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Rechnungskauf Channel'),
+                            'HGW_IVB2B_CHANNEL' 	=> array('label' => 'Rechnungskauf B2B Channel'),
                             'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
 							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Channel'),

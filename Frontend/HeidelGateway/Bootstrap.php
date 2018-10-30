@@ -1993,13 +1993,22 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 											$prefix = 'hgw_';
 											$pos = strpos($avPayment['name'], $prefix);
 											if(is_int($pos)){
-
-												$pm = substr($avPayment['name'],$pos+strlen($prefix));
+											    $pm = substr($avPayment['name'],$pos+strlen($prefix));
 												if($pm == 'pay'){ $pm = va; }
 												$bookingMode = $config->{'HGW_'.strtoupper($pm).'_BOOKING_MODE'};
 												$data = $this->getRegData($user['additional']['user']['id'], $pm);
 												$last = mktime(23,59,00,$data['expMonth']+1,0,$data['expYear']);	//timestamp: last day of registration month
-												$shippingHash = $this->createShippingHash($user , $pm);
+
+                                               if(!empty($user)){
+                                                   $shippingHash = $this->createShippingHash($user , $pm);
+                                               } else {
+//                                                   $user['shippingaddress']['firstname'] = "Payment";
+//                                                   $user['shippingaddress']['lastname'] = "Heidelpay";
+//                                                   $user['shippingaddress']['street'] = "Heidelstrasse 18";
+//                                                   $user['shippingaddress']['zipcode']= "69115";
+//                                                   $user['shippingaddress']['countryID']= "2";
+                                                   return false;
+                                               }
 
 												if(!empty($data)){
 													$regData[$pm] = $data;
@@ -2493,8 +2502,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ){
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
-//mail("sascha.pflueger@heidelpay.com","2490 Request SantanderHP ",print_r($requestData,1));
-//mail("sascha.pflueger@heidelpay.com","2491 Response SantanderHP ",print_r($responseHps,1));
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';
@@ -2721,8 +2728,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 {
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
-//mail("sascha.pflueger@heidelpay.com","2719 Request SantanderHP ",print_r($requestData,1));
-//mail("sascha.pflueger@heidelpay.com","2720 Response SantanderHP ",print_r($responseHps,1));
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';
@@ -3766,13 +3771,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
-//if (
-//($params['PAYMENT.CODE'] == "IV.PA") &&
-//($params['ACCOUNT.BRAND']!= "PAYOLUTION_DIRECT") &&
-//($params['ACCOUNT.BRAND']!= "SANTANDER")
-//){
-//    mail("sascha.pflueger@heidelpay.com","DoRequest 3740",print_r($params,1));
-//}
+
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();
 				$adapter->setCurlOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -5273,10 +5272,10 @@ Mit freundlichen Gruessen
 				empty($user['shippingaddress']['street']) ||
 				empty($user['shippingaddress']['zipcode']) ||
 				empty($user['shippingaddress']['countryID'])
-				) {
-					self::Logging('createShippingHash  | bei Payment: '.$pm.' leeres UserArray');
-					return false;
-				}
+		) {
+//			    self::Logging('createShippingHash  | bei Payment: '.$pm.' leeres UserArray');
+				return false;
+		}
 
 
 		return 	hash('sha512',

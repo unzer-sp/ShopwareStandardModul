@@ -511,6 +511,33 @@ $(document).ready(function(){
             }
         }
 
+
+        jQuery('[name="COMPANY.REGISTRATIONTYPE"]').change(function (e) {
+            if(jQuery('.heidelB2bRegistered').is(":visible")){
+                // company is registered
+                jQuery('.heidelB2bRegistered').toggle(500);
+                jQuery('.heidelB2bNotRegistered').toggle(500);
+
+                jQuery('.heidelB2bRegistered :input').attr('disabled', 'disabled');
+                jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
+                $('.newreg_ivb2b [name="Date_Day"]').prop('required','');
+                $('.newreg_ivb2b [name="Date_Month"]').prop('required','');
+                $('.newreg_ivb2b [name="Date_Year"]').prop('required','');
+                $('.newreg_ivb2b [name="COMPANY.COMMERCIALREGISTERNUMBER"]').prop('required','required');
+            } else {
+                // company NOT registered
+                jQuery('.heidelB2bNotRegistered').toggle(500);
+                jQuery('.heidelB2bRegistered').toggle(500);
+
+                jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
+                jQuery('.heidelB2bNotRegistered :input').attr('disabled', 'disabled');
+                $('.newreg_ivb2b [name="Date_Day"]').prop('required','required');
+                $('.newreg_ivb2b [name="Date_Month"]').prop('required','required');
+                $('.newreg_ivb2b [name="Date_Year"]').prop('required','required');
+                $('.newreg_ivb2b [name="COMPANY.COMMERCIALREGISTERNUMBER"]').prop('required','');
+            }
+        });
+
         //Function to set Birthdate in hidden field for Chrome on mac
         jQuery("input[type='submit'], .right").click(function(e){
 
@@ -560,6 +587,29 @@ $(document).ready(function(){
                         var birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
                         var birthDay = jQuery(".newreg_" + pm + " [name = 'Date_Day']").next("div.js--fancy-select-text").text();
                         jQuery("#birthdate_" + pm).val(birthYear + '-' + birthMonth + '-' + birthDay);
+                    }
+
+                    if(pm == "ivb2b"){
+                        if(jQuery('.heidelB2bRegistered').is(":visible")){
+                            jQuery('.heidelB2bRegistered :input').attr('disabled', 'disabled');
+                            jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
+                            $('.newreg_ivb2b [name="Date_Day"]').prop('required','');
+                            $('.newreg_ivb2b [name="Date_Month"]').prop('required','');
+                            $('.newreg_ivb2b [name="Date_Year"]').prop('required','');
+                            $('.newreg_ivb2b [name="COMPANY.EXECUTIVE.1.GIVEN"]').prop('required','');
+                            $('.newreg_ivb2b [name="COMPANY.EXECUTIVE.1.FAMILY"]').prop('required','');
+                            $('.newreg_ivb2b [name="Date_Year"]').prop('required','');
+                            $('.newreg_ivb2b [name="COMPANY.COMMERCIALREGISTERNUMBER"]').prop('required','required');
+                        } else {
+                            jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
+                            jQuery('.heidelB2bNotRegistered :input').attr('disabled', 'disabled');
+                            $('.newreg_ivb2b [name="Date_Day"]').prop('required','required');
+                            $('.newreg_ivb2b [name="Date_Month"]').prop('required','required');
+                            $('.newreg_ivb2b [name="Date_Year"]').prop('required','required');
+                            $('.newreg_ivb2b [name="COMPANY.EXECUTIVE.1.GIVEN"]').prop('required','required');
+                            $('.newreg_ivb2b [name="COMPANY.EXECUTIVE.1.FAMILY"]').prop('required','required');
+                            $('.newreg_ivb2b [name="COMPANY.COMMERCIALREGISTERNUMBER"]').prop('required','');
+                        }
                     }
                 }
             }
@@ -957,7 +1007,6 @@ function valGatewayForm(){
             }
             break;
         case "ivb2b":
-            console.log("940");
             if(jQuery('.heidelB2bRegistered').is(':visible')){
                 // jQuery('.heidelB2bNotRegistered').remove();
                 jQuery('.heidelB2bNotRegistered :input').attr("disabled","disabled");

@@ -231,8 +231,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 
             $resp = $this->callDoRequest($data);
             Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
-//mail("sascha.pflueger@heidelpay.com","234 BackendHgw FI Request",print_r($data,1));
-//mail("sascha.pflueger@heidelpay.com","234 BackendHgw FI Response",print_r($resp,1));
 			// switch, to update right table, depending on used frontend module
 			if(($trans->payName == 'bs') && ($meth == 'fi')){
 				if(strtolower($modul) == 'heidelpay'){

@@ -1353,10 +1353,6 @@ function valInvoiceB2b() {
         $('.newreg_ivb2b #heidelb2bExeZip').removeClass('has--error');
         $('.newreg_ivb2b #heidelb2bExeCity').removeClass('has--error');
         $('.newreg_ivb2b #heidelb2bExeCountry').removeClass('has--error');
-        // $('.newreg_ivb2b [name="Date_Day"]').prop('required','');
-        // $('.newreg_ivb2b [name="Date_Month"]').prop('required','');
-        // $('.newreg_ivb2b [name="Date_Year"]').prop('required','');
-        console.log('1351');
     } else {
         // checking Executive Prename
         var heidelb2bPreName = $('.newreg_ivb2b #heidelb2bPreName').val();

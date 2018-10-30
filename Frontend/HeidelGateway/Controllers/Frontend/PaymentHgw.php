@@ -371,7 +371,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
                         $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERSUM_B2B';
-//mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
                         $this->View()->b2bCompanyName       = $user['billingaddress']['company'];
                         $this->View()->b2bCompanyStreet     = $user['billingaddress']['street'];
                         $this->View()->b2bCompanyZip        = $user['billingaddress']['zipcode'];
@@ -440,20 +439,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             "OTHER_PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_ACTIVITIES" => "Sonstige freiberufliche, wissenschaftliche und technische T&auml;tigkeiten",
                             "ARTS_ENTERTAINMENT_AND_RECREATION"                     => "Kreative, k&uuml;nstlerische und unterhaltende T&auml;tigkeiten",
                         ];
-//                        $this->View()->heidelB2bFunction = [
-//                            "OWNER"             => "Inhaber",
-//                            "PARTNER"           => "Partner",
-//                            "SHAREHOLDER"       => "Shareholder",
-//                            "DIRECTOR"          => "Direktor",
-//                            "MANAGER"           => "Manager",
-//                            "REGISTERED_MANAGER"=> "Registrierter Manager"
-//                        ];
+
                         $this->View()->b2bCompanyExeCountry = [
                             "DE" => "Deutschland",
                             "AT" => "&Ouml;sterreich",
                         ];
 
-//                        mail("sascha.pflueger@heidelpay.com","373 gateway User",print_r($user,1));
                     }
 
 					$getFormUrl = $this->getFormUrl($activePayment, NULL, $user['additional']['user']['id'], $tempID, NULL, $basket, $ppd_crit);
@@ -674,11 +665,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 
 					$response = $this->hgw()->doRequest($params);
-//if($activePayment == 'hps'){
-//    mail("sascha.pflueger@heidelpay.com","SanRequest PA",print_r($params,1));
-//    mail("sascha.pflueger@heidelpay.com","SanResponse PA",print_r($response,1));
-//}
-
                 }
 			}
 
@@ -911,7 +897,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function responseAction(){
 		try{
-//mail("sascha.pflueger@heidelpay.com","907 responseAction POST",print_r($_POST,1));
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
@@ -1019,7 +1004,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['__csrf_token']		= $this->Request()->getPost('__csrf_token') == true ? htmlspecialchars($this->Request()->getPost('__csrf_token'), $flag, $enc) : '';
 
 				$resp['CONFIG_OPTIN_TEXT']	= $this->Request()->getPost('CONFIG_OPTIN_TEXT') == true ? htmlspecialchars(json_decode($this->Request()->getPost('CONFIG_OPTIN_TEXT'), $flag, $enc),true) : '';
-//mail("sascha.pflueger@heidelpay.com","1015 responseAction Array",print_r($resp,1));
+
 				if (isset($resp['NAME_BIRTHDATE']) && !(empty($resp['NAME_BIRTHDATE'])) ) {
 					$resp['NAME_BIRTHDATE'] 	= $resp['NAME_BIRTHDATE'];
 				} else {
@@ -1473,7 +1458,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             } else {
                 $resp['NAME_BIRTHDATE'] 		= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('birthdate_san'), $flag, $enc) : '';
             }
-//mail("sascha.pflueger@heidelpay.com","1476 responseHPR POST",print_r($_POST,1));
             // case for suspected Manipulation
             $orgHash = $this->createSecretHash($resp['IDENTIFICATION_TRANSACTIONID']);
 
@@ -3276,9 +3260,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest($this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
 				$errorMsg = $this->getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}
-if($pm = "san"){
-//    mail("sascha.pflueger@heidelpay.com","3280 getFormUrl",print_r(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit),1));
-}
+
 			if($response['PROCESSING_RESULT'] == 'ACK'){
 				return $response;
 			}else{

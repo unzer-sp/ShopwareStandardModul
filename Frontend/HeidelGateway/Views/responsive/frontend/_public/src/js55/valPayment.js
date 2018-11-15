@@ -330,10 +330,13 @@ document.asyncReady(function () {
                     if(jQuery('.heidelB2bRegistered').is(':visible')){
                         // jQuery('.heidelB2bNotRegistered').remove();
                         jQuery('.heidelB2bNotRegistered :input').attr("disabled","disabled");
+                        jQuery('.heidelB2bNotRegistered :input').removeAttr("required");
                         jQuery('.heidelB2bRegistered :input').removeAttr("disabled");
+
                     } else {
                         // jQuery('.heidelB2bRegistered').remove();
                         jQuery('.heidelB2bRegistered :input').attr("disabled","disabled");
+                        jQuery('.heidelB2bRegistered :input').removeAttr("required");
                         jQuery('.heidelB2bNotRegistered :input').removeAttr("disabled");
                     }
                 }

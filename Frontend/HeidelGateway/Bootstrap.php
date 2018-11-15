@@ -1820,6 +1820,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			    ($document->_order->payment['name'] == 'hgw_iv') ||
                 ($document->_order->payment['name'] == 'hgw_papg') ||
                 ($document->_order->payment['name'] == 'hgw_san') ||
+                ($document->_order->payment['name'] == 'hgw_ivb2b') ||
                 ($document->_order->payment['name'] == 'hgw_ivpd')
 //                || ($document->_order->payment['name'] == 'hgw_pp')
 				){
@@ -1830,7 +1831,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     {
                         $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'SAN');
                         $containers['Hgw_SAN_Content_Info']['value'] = $rawFooter['value'];
-                    } elseif ($document->_order->payment['name'] == 'hgw_ivpd'){
+                    } elseif (
+                        $document->_order->payment['name'] == 'hgw_ivpd' ||
+                        $document->_order->payment['name'] == 'hgw_ivb2b'
+                    ){
                         $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'IVPD');
                         $containers['Hgw_IVPD_Content_Info']['value'] = $rawFooter['value'];
                     } else {

@@ -1821,7 +1821,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ($document->_order->payment['name'] == 'hgw_papg') ||
                 ($document->_order->payment['name'] == 'hgw_san') ||
                 ($document->_order->payment['name'] == 'hgw_ivpd')
-                || ($document->_order->payment['name'] == 'hgw_pp')
+//                || ($document->_order->payment['name'] == 'hgw_pp')
 				){
 				    $orderData = $view->getTemplateVars('Order');
 					$containers = $view->getTemplateVars('Containers');

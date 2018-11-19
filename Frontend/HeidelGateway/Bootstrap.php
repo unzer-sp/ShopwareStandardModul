@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.10.12';
+		return '18.11.19';
 	}
 
 	/**
@@ -916,7 +916,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '18.10.12':
+            case '18.11.19':
                 try{
                     // Integration of Invioce B2B
                     $this->addSnippets();
@@ -928,7 +928,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 18.10.12<br />';
+                    $msg .= '* update 18.11.19<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

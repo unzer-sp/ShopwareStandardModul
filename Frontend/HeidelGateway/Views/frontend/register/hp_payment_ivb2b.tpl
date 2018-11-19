@@ -3,11 +3,10 @@
 	<div class="{$grid} {$classname}" style='background-color: transparent;'>
 		<div class="newreg_{$pm}" id="payType" style="width: 30rem;">
 			<div>
-                <label class="is--strong"><label class="is--strong">{s name='B2bHeaderFirm' namespace='frontend/payment_heidelpay/gateway'}{/s}</label><br />
-				</label><br />
+                <label class="is--strong" style="width: 200px">{s name='B2bHeaderFirm' namespace='frontend/payment_heidelpay/gateway'}{/s}</label><br /><br />
 
 				{* Company Name *}
-				<label for="heidelb2bCompanyName">{s name='B2bCompanyName' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
+				<label for="heidelb2bCompanyName" style="width: 200px">{s name='B2bCompanyName' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
 				<input id="heidelb2bCompanyName" type="text" value="{$b2bCompanyName}" name="COMPANY.COMPANYNAME" required><br />
 
 				{* Company adress pobox *}
@@ -50,10 +49,10 @@
                     <p class="description">{s name='PaymentDebitInfoFields' namespace='frontend/plugins/payment/debit'}{/s}</p>
 				</div>
 				<div class="heidelB2bNotRegistered" style="margin-top: 10px; display: none">
-					<label class="is--strong">{s name='B2bHeaderPersonal' namespace='frontend/payment_heidelpay/gateway'}{/s}</label><br />
+					<label class="is--strong" style="width: 200px">{s name='B2bHeaderPersonal' namespace='frontend/payment_heidelpay/gateway'}{/s}</label><br />
 
                     {* Dropdown Executive function *}
-                    <label for="heidelb2bExecutiveFunction">{s name='B2bFunction' namespace='frontend/payment_heidelpay/gateway'}{/s}:</label></br>
+                    <label for="heidelb2bExecutiveFunction" style="width: 200px">{s name='B2bFunction' namespace='frontend/payment_heidelpay/gateway'}{/s}:</label></br>
                     {*{html_options id="heidelb2bExecutiveFunction" options=$heidelB2bFunction selected="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION" required="required"}<br />*}
 					<input id="heidelb2bExecutiveFunction" type="text" value="Inhaber" required readonly disabled>
 					<input id="heidelb2bExecutiveFunction" type="hidden" value="OWNER" name="COMPANY.EXECUTIVE.1.FUNCTION"><br />
@@ -89,7 +88,7 @@
 					<input id="heidelb2bExePhone" type="text" value="{$b2bCompanyExePhone}" name="COMPANY.EXECUTIVE.1.PHONE"><br />
 
                     {* Company Executive Street *}
-                    <label for="heidelb2bExeStreet">{s name='B2bExeStreet' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
+                    <label for="heidelb2bExeStreet" style="width: 200px">{s name='B2bExeStreet' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
                     <input id="heidelb2bExeStreet" type="text" value="{$b2bCompanyExeStreet}" name="COMPANY.EXECUTIVE.1.HOMESTREET"><br />
 
                     {* Company Executive Zip *}
@@ -116,6 +115,22 @@
 
 
 			</div>
+			</br>
+			</br>
+			</br>
+		<h1>Testbereich</h1>
+			{*<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />*}
+			{*{assign var=payment_data value=$birthdate_papg}*}
+			{*{if isset($birthdate_papg)}*}
+				{*{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}*}
+			{*{else}*}
+				{*{html_select_date|utf8_encode time=$payment_data start_year='-14' end_year='-100' reverse_years='true'*}
+				{*day_value_format='%02d' field_order='DMY'*}
+				{*day_empty="{s name='hp_valueDay' namespace='frontend/register/hp_payment'}{/s}"*}
+				{*month_empty="{s name='hp_valueMonth' namespace='frontend/register/hp_payment'}{/s}"*}
+				{*year_empty="{s name='hp_valueYear' namespace='frontend/register/hp_payment'}{/s}"}*}
+			{*{/if}*}
+
 		</div>
 	</div>
 {/block}

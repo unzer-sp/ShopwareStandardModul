@@ -1027,7 +1027,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					));
 					exit;
 				}
-
+//if($resp['PAYMENT_CODE'] == "IV.PA"){
+//    mail("sascha.pflueger@heidelpay.com","Response IV",print_r($_POST,1));
+//} elseif ($resp['PAYMENT_CODE'] == "DD.DB"){
+//    mail("sascha.pflueger@heidelpay.com","Response DD",print_r($_POST,1));
+//}
 				if ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] != 'WT.IN') {
 					// save result to database hgw_transactions
 					$this->hgw()->saveRes($resp);

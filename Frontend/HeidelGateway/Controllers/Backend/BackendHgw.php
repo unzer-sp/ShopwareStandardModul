@@ -904,7 +904,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 	 * @param string $data
 	 */
 	public function callDoRequest($data){
-		return Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest($data);
+	    return Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest($data);
 	}
 
 	/**

@@ -64,7 +64,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				'source' => "Default",
 				'description' =>
                     '<p style="font-size:12px">
-                        <img src="' .$hp_logo. '"/><br/> 
+                        <img src="' .$hp_logo. '"/><br/>
                         Die heidelpay GmbH kurz: heidelpay bietet als BaFin-zertifizierter Payment Service Provider 
                         alles was zum Online-Payment geh&ouml;rt.<br><br>
                         <a href="http://testshops.heidelpay.de/contactform/?campaign=shopware4.0&shop=shopware" target="_blank" style="font-size: 12px; color: #000; font-weight: bold;">&gt;&gt;&gt; Informationen anfordern &lt;&lt;&lt;</a><br/>
@@ -1868,7 +1868,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $containerData['Content_Info'] = $containerData['Hgw_SAN_Content_Info'];
                         $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
                         $view->assign('Containers', $containerData);
-                    } elseif($document->_order->payment['name'] == 'hgw_ivpd') {
+                    } elseif(
+                        ($document->_order->payment['name'] == 'hgw_ivpd') ||
+                        ($document->_order->payment['name'] == 'hgw_ivb2b')
+                    ) {
                         $containerData['Content_Info'] = $containerData['Hgw_IVPD_Content_Info'];
                         $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
                         $view->assign('Containers', $containerData);
@@ -3775,7 +3778,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
-
+//mail("sascha.pflueger@heidelpay.com","params",print_r($params,1));
+//if(strtolower($params['PAYMENT.CODE'])=="IV.PA" && $params['CRITERION.IVBRAND'] == "UNIVERSUM_B2B"){
+//    mail("sascha.pflueger@heidelpay.com","Request B2B Params",print_r($params,1));
+//} elseif ($params['PAYMENT.CODE'] =="IV.PA" ){
+//    mail("sascha.pflueger@heidelpay.com","Request B2C Params",print_r($params,1));
+//} elseif ($params['PAYMENT.CODE'] =="DD.DB" ){
+//    mail("sascha.pflueger@heidelpay.com","Request DD Params",print_r($params,1));
+//}
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();
 				$adapter->setCurlOption(CURLOPT_SSL_VERIFYPEER, false);

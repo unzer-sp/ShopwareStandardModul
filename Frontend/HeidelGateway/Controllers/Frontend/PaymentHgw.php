@@ -360,6 +360,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						    $basketId = $basketId['basketId'];
 						}
 						    $ppd_crit['BASKET.ID'] = $basketId;
+
+                        $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERSUM_B2C';
+
                     }
                     if($activePayment == 'ivb2b') {
                         $basketId = self::getBasketId();
@@ -924,6 +927,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['CRITERION_SHIPPAY']			= $this->Request()->getPost('CRITERION_SHIPPAY') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHIPPAY'), $flag, $enc) : '';
 				$resp['CRITERION_GATEWAY']			= $this->Request()->getPost('CRITERION_GATEWAY') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_GATEWAY'), $flag, $enc) : '';
 				$resp['CRITERION_WALLET']			= $this->Request()->getPost('CRITERION_WALLET') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_WALLET'), $flag, $enc) : '';
+				$resp['CRITERION.IVBRAND']			= $this->Request()->getPost('CRITERION.IVBRAND') == true ? htmlspecialchars($this->Request()->getPost('CRITERION.IVBRAND'), $flag, $enc) : '';
 				$resp['CRITERION_WALLET_PAYNAME']	= $this->Request()->getPost('CRITERION_WALLET_PAYNAME') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_WALLET_PAYNAME'), $flag, $enc) : '';
 				$resp['CRITERION_SECRET']			= $this->Request()->getPost('CRITERION_SECRET') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SECRET'), $flag, $enc) : '';
 				$resp['CRITERION_SHIPPINGHASH']		= $this->Request()->getPost('CRITERION_SHIPPINGHASH') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHIPPINGHASH'), $flag, $enc) : '';
@@ -1027,11 +1031,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					));
 					exit;
 				}
-//if($resp['PAYMENT_CODE'] == "IV.PA"){
-//    mail("sascha.pflueger@heidelpay.com","Response IV",print_r($_POST,1));
-//} elseif ($resp['PAYMENT_CODE'] == "DD.DB"){
-//    mail("sascha.pflueger@heidelpay.com","Response DD",print_r($_POST,1));
-//}
+if($resp['PAYMENT_CODE'] == "IV.PA"){
+    mail("sascha.pflueger@heidelpay.com","Response IV",print_r($_POST,1));
+} elseif ($resp['PAYMENT_CODE'] == "DD.DB"){
+    mail("sascha.pflueger@heidelpay.com","Response DD",print_r($_POST,1));
+}
 				if ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] != 'WT.IN') {
 					// save result to database hgw_transactions
 					$this->hgw()->saveRes($resp);

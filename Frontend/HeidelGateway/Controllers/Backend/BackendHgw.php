@@ -101,6 +101,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$beLocaleId = $this->getBeLocaleId();
 			$this->setSubShop($transID);
 
+            $config = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
+
             $payName = '';
             if (isset($trans->payName) && (!empty($trans->payName))) {
                 $payName = $trans->payName;
@@ -152,7 +154,17 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$data['FRONTEND_ENABLED'] = 'false';
 //			$data['FRONTEND_MODE'] = 'DEFAULT';
 			$data['FRONTEND_MODE'] = 'WHITELABEL';
-            $data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
+			$data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
+            if(
+                ($config->HGW_FACTORING_MODE == "1") &&
+                (
+                    ($this->Request()->getParam('modul') == "hgw_ivb2b")||
+                    ($this->Request()->getParam('modul') == "hgw_papg")
+                )
+            ){
+                //setting Invoice ID for factoring solution
+                $data['IDENTIFICATION_INVOICEID'] = $this->getInvoiceidByTransactionId($transID);
+            }
 
             // switching request-url
 			$hgwBootstrapVariables = Shopware()->Plugins()->Frontend()->HeidelGateway();
@@ -209,13 +221,19 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 }
             }
 
-            // deleting unneccessary Data
-            unset($data['IDENTIFICATION_UNIQUEID']);
-            unset($data['FRONTEND_RESPONSE_URL']);  unset($data['FRONTEND_CSS_PATH']);          unset($data['ACCOUNT_NUMBER']);
-            unset($data['CRITERION_DBONRG']);       unset($data['CRITERION_SHIPPAY']);          unset($data['CRITERION_GATEWAY']);
-            unset($data['CRITERION_WALLET']);       unset($data['CRITERION_WALLET_PAYNAME']);   unset($data['CUSTOMER_OPTIN']);
-            unset($data['CUSTOMER_OPTIN_2']);       unset($data['CONFIG_OPTIN_TEXT']);          unset($data['var.Register']);
-            unset($data['var.sTarget']);            unset($data['var.sepa']);                   unset($data['._csrf_token']);
+            // deleting unneccessary Data from data
+            unset($data['IDENTIFICATION_UNIQUEID']);unset($data['FRONTEND_RESPONSE_URL']);unset($data['FRONTEND_CSS_PATH']);
+            unset($data['ACCOUNT_NUMBER']);unset($data['CRITERION_DBONRG']);unset($data['CRITERION_SHIPPAY']);unset($data['CRITERION_GATEWAY']);
+            unset($data['CRITERION_WALLET']);unset($data['CRITERION_WALLET_PAYNAME']);unset($data['CRITERION_RESPONSE_URL']);
+            unset($data['CRITERION_PUSH_URL']);unset($data['CRITERION_INSURANCE-RESERVATION']);unset($data['CUSTOMER_OPTIN']);
+            unset($data['PROCESSING_RESULT']);unset($data['PROCESSING_RETURN']);unset($data['PROCESSING_CODE']);
+            unset($data['PROCESSING_RETURN_CODE']);unset($data['PROCESSING_STATUS_CODE']);unset($data['PROCESSING_REASON_CODE']);
+            unset($data['PROCESSING_REASON']);unset($data['PROCESSING_TIMESTAMP']);unset($data['PROCESSING_STATUS']);
+            unset($data['CONNECTOR_ACCOUNT_BANK']);unset($data['CONNECTOR_ACCOUNT_BIC']);unset($data['CONNECTOR_ACCOUNT_NUMBER']);
+            unset($data['CONNECTOR_ACCOUNT_IBAN']);unset($data['CONNECTOR_ACCOUNT_COUNTRY']);unset($data['CONNECTOR_ACCOUNT_HOLDER']);
+            unset($data['CONNECTOR_ACCOUNT_USAGE']);unset($data['CLEARING_AMOUNT']);unset($data['CLEARING_CURRENCY']);
+            unset($data['CLEARING_DESCRIPTOR']);unset($data['CUSTOMER_OPTIN_2']);unset($data['CONFIG_OPTIN_TEXT']);
+            unset($data['var.Register']);unset($data['var.sTarget']);unset($data['var.sepa']);unset($data['._csrf_token']);
 
             // prepare parameters for sending and replace all "_" with "."
 			foreach($data as $key => $value){
@@ -1019,6 +1037,17 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
         $shoppingCart['basket']['itemCount'] = $count;
         $basketReturn = $shoppingCart;
         return $basketReturn;
+    }
+
+    protected function getInvoiceidByTransactionId($transactionId){
+        $sql = 'SELECT `s_order_documents`.`docID` FROM `s_order` 
+                INNER JOIN `s_order_documents` ON `s_order`.`id` = `s_order_documents`.`orderID` 
+                WHERE `s_order`.`transactionID` = ?
+                ;';
+
+        $parameters = [$transactionId];
+        $invoiceId = Shopware()->Db()->fetchAll($sql,$parameters);
+        return $invoiceId[0]['docID'];
     }
 
 

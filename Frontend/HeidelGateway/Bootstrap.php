@@ -25,7 +25,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.11.19';
+//		return '18.11.19';
+		return '18.11.27';
 	}
 
 	/**
@@ -932,7 +933,24 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-                    // overwrite $msg if update was successful
+            case '18.11.27':
+                try{
+                    // Integration of Invioce B2B
+                    // Integration of Invoice and dierect debit factoring
+                    $this->addSnippets();
+                    $form->setElement('select', 'HGW_FACTORING_MODE', array(
+                        'label' => 'heidelpay Factoring Modus aktiv',
+                        'value' => 2,
+                        'store' => array( array(1, 'Yes'), array(2, 'No')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Bitte beachten Sie, dass zur Nutzung ein spezieller heidelpay-Vertrag nötig ist'
+                    ));
+                    $msg .= '* update 18.11.27<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+
+                // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
 
@@ -1555,6 +1573,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $form->setElement('text', 'HGW_HPR_CHANNEL', array('label'=>'EasyCredit Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_HPS_CHANNEL', array('label'=>'Santander Ratenkauf Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array('label' => 'Gesicherte Lastschrift', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use direct debit with guarantee.'));
+            $form->setElement('select', 'HGW_FACTORING_MODE', array('label' => 'Factoring über heidelpay aktiv', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use heidelpay factoring.'));
 
             $bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
 			$form->setElement('select', 'HGW_CC_BOOKING_MODE', array(
@@ -1586,6 +1605,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'description' => 'Please consider, that a special contract is needed'
 
 			));
+            $form->setElement('select', 'HGW_FACTORING_MODE', array(
+                'label' => 'heidelpay Factoring mode active',
+                'value' => 2,
+                'store' => array( array(1, 'Yes'), array(2, 'No')),
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Please consider, that a special heidelpay contract is needed'
+
+            ));
 			$form->setElement('select', 'HGW_VA_BOOKING_MODE', array(
 					'label' => 'PayPal booking mode',
 					'value' => 1,
@@ -5031,6 +5058,10 @@ Mit freundlichen Gruessen
 									'label' 			=> 'Gesicherte Lastschrift',
 									'description' 		=> 'Bitte beachten Sie, dass zur Aktivierung ein gesonderter Vertrag notwendig ist.',
 							),
+                            'HGW_FACTORING_MODE' => array(
+                                'label' 			=> 'heidelpay Factoring Modus aktiv',
+                                'description' 		=> 'Bitte beachten Sie, dass zur Aktivierung ein gesonderter Vertrag notwendig ist.',
+                            ),
 							'HGW_VA_BOOKING_MODE' 	=> array(
 									'label' 			=> 'PayPal Buchungsmodus',
 									'description' 		=> '<b>Wichtig: Ihr PayPal Accout muss für Referenztransaktionen konfiguriert sein, wenn sie das Registierungs-Feature benutzen wollen.</b>',
@@ -5125,6 +5156,10 @@ Mit freundlichen Gruessen
 									'label' 			=> 'Direct debit with guarantee',
 									'description' 		=> 'Please consider, that a special contract is needed.',
 							),
+                            'HGW_FACTORING_MODE' => array(
+                                'label' 			=> 'heidelpay factoring active',
+                                'description' 		=> 'Please consider, that a special contract is needed.',
+                            ),
 							'HGW_VA_BOOKING_MODE' 	=> array(
 									'label' 			=> 'PayPal booking mode',
 									'description' 		=> '<b>Please note: PayPal Account needs to be configured for recurring transactions, if you want use the registration feature.<b>',

@@ -904,7 +904,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
 				$enc = 'UTF-8';
-				mail("sascha.pflueger@heidelpay.com","Response POST",print_r($_POST,1));
 				if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
 				$resp['REQUEST_VERSION']			= $this->Request()->getPost('REQUEST_VERSION') == true ? htmlspecialchars($this->Request()->getPost('REQUEST_VERSION'), $flag, $enc) : '';
 				$resp['SECURITY_SENDER']			= $this->Request()->getPost('SECURITY_SENDER') == true ? htmlspecialchars($this->Request()->getPost('SECURITY_SENDER'), $flag, $enc) : '';

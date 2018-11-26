@@ -904,6 +904,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
 				$enc = 'UTF-8';
+				mail("sascha.pflueger@heidelpay.com","Response POST",print_r($_POST,1));
 				if($this->Request()->getPost('TRANSACTION_SOURCE') == false){ $this->Request()->setPost('TRANSACTION_SOURCE', 'RESPONSE'); }
 				$resp['REQUEST_VERSION']			= $this->Request()->getPost('REQUEST_VERSION') == true ? htmlspecialchars($this->Request()->getPost('REQUEST_VERSION'), $flag, $enc) : '';
 				$resp['SECURITY_SENDER']			= $this->Request()->getPost('SECURITY_SENDER') == true ? htmlspecialchars($this->Request()->getPost('SECURITY_SENDER'), $flag, $enc) : '';
@@ -1000,9 +1001,31 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['CLEARING_AMOUNT']			= $this->Request()->getPost('CLEARING_AMOUNT') == true ? htmlspecialchars($this->Request()->getPost('CLEARING_AMOUNT'), $flag, $enc) : '';
 				$resp['CLEARING_CURRENCY']			= $this->Request()->getPost('CLEARING_CURRENCY') == true ? htmlspecialchars($this->Request()->getPost('CLEARING_CURRENCY'), $flag, $enc) : '';
 				$resp['CLEARING_DESCRIPTOR']		= $this->Request()->getPost('CLEARING_DESCRIPTOR') == true ? htmlspecialchars($this->Request()->getPost('CLEARING_DESCRIPTOR'), $flag, $enc) : '';
+                // B2B Data
+                $resp['COMPANY_COMPANYNAME']		= $this->Request()->getPost('COMPANY_COMPANYNAME') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_COMPANYNAME'), $flag, $enc) : '';
+                $resp['COMPANY_COMMERCIALSECTOR']   = $this->Request()->getPost('COMPANY_COMMERCIALSECTOR') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_COMMERCIALSECTOR'), $flag, $enc) : '';
+                $resp['COMPANY_REGISTRATIONTYPE']	= $this->Request()->getPost('COMPANY_REGISTRATIONTYPE') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_REGISTRATIONTYPE'), $flag, $enc) : '';
+                $resp['COMPANY_COMMERCIALREGISTERNUMBER']	= $this->Request()->getPost('COMPANY_COMMERCIALREGISTERNUMBER') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_COMMERCIALREGISTERNUMBER'), $flag, $enc) : '';
+                $resp['COMPANY_VATID']	            = $this->Request()->getPost('COMPANY_VATID') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_VATID'), $flag, $enc) : '';
+                $resp['COMPANY_LOCATION_COUNTRY']	= $this->Request()->getPost('COMPANY_LOCATION_COUNTRY') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_LOCATION_COUNTRY'), $flag, $enc) : '';
+                $resp['COMPANY_LOCATION_CITY']		= $this->Request()->getPost('COMPANY_LOCATION_CITY') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_LOCATION_CITY'), $flag, $enc) : '';
+                $resp['COMPANY_LOCATION_STREET']	= $this->Request()->getPost('COMPANY_LOCATION_STREET') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_LOCATION_STREET'), $flag, $enc) : '';
+                $resp['COMPANY_LOCATION_ZIP']		= $this->Request()->getPost('COMPANY_LOCATION_ZIP') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_LOCATION_ZIP'), $flag, $enc) : '';
+                $resp['COMPANY_LOCATION_POBOX']		= $this->Request()->getPost('COMPANY_LOCATION_POBOX') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_LOCATION_POBOX'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_FUNCTION']   = $this->Request()->getPost('COMPANY_EXECUTIVE_1_FUNCTION') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_FUNCTION'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_SALUTATION']	= $this->Request()->getPost('COMPANY_EXECUTIVE_1_SALUTATION') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_SALUTATION'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_GIVEN']		= $this->Request()->getPost('COMPANY_EXECUTIVE_1_GIVEN') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_GIVEN'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_FAMILY']		= $this->Request()->getPost('COMPANY_EXECUTIVE_1_FAMILY') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_FAMILY'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_EMAIL']		= $this->Request()->getPost('COMPANY_EXECUTIVE_1_EMAIL') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_EMAIL'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_BIRTHDATE']	= $this->Request()->getPost('COMPANY_EXECUTIVE_1_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_BIRTHDATE'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_HOMESTREET']	= $this->Request()->getPost('COMPANY_EXECUTIVE_1_HOMESTREET') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_HOMESTREET'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_HOME_ZIP']	= $this->Request()->getPost('COMPANY_EXECUTIVE_1_HOME_ZIP') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_HOME_ZIP'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_HOME_CITY']	= $this->Request()->getPost('COMPANY_EXECUTIVE_1_HOME_CITY') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_HOME_CITY'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_HOME_COUNTRY']= $this->Request()->getPost('COMPANY_EXECUTIVE_1_HOME_COUNTRY') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_HOME_COUNTRY'), $flag, $enc) : '';
+                $resp['COMPANY_EXECUTIVE_1_PHONE']		= $this->Request()->getPost('COMPANY_EXECUTIVE_1_PHONE') == true ? htmlspecialchars($this->Request()->getPost('COMPANY_EXECUTIVE_1_PHONE'), $flag, $enc) : '';
 
 
-				$resp['var_Register']		= ($this->Request()->getPost('register') == true && gettype($this->Request()->getPost('register')) == 'array') ? $this->Request()->getPost('register') : '';
+                $resp['var_Register']		= ($this->Request()->getPost('register') == true && gettype($this->Request()->getPost('register')) == 'array') ? $this->Request()->getPost('register') : '';
 				$resp['var_sTarget']		= $this->Request()->getPost('sTarget') == true ? htmlspecialchars($this->Request()->getPost('sTarget'), $flag, $enc) : '';
 				$resp['var_sepa']			= $this->Request()->getPost('hpdd_sepa') == true ? htmlspecialchars($this->Request()->getPost('hpdd_sepa'), $flag, $enc) : '';
 				$resp['__csrf_token']		= $this->Request()->getPost('__csrf_token') == true ? htmlspecialchars($this->Request()->getPost('__csrf_token'), $flag, $enc) : '';

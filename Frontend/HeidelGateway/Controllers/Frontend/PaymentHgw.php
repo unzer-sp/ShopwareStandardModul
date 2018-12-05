@@ -841,6 +841,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         Shopware()->Session()->HPOrderId = $transactionId;
 
                     }
+
 					return $this->redirect(array(
 							'forceSecure' => 1,
 							'action' => 'success',
@@ -900,6 +901,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function responseAction(){
 		try{
+
 			unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
@@ -939,6 +941,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['CRITERION_MODULE_VERSION']	= $this->Request()->getPost('CRITERION_MODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_MODULE_VERSION'), $flag, $enc) : '';
 				$resp['SHOPMODULE_VERSION']			= $this->Request()->getPost('SHOPMODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('SHOPMODULE_VERSION'), $flag, $enc) : '';
 				$resp['CRITERION_INSURANCE-RESERVATION'] = $this->Request()->getPost('CRITERION_INSURANCE-RESERVATION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_INSURANCE-RESERVATION'), $flag, $enc) : '';
+				$resp['CRITERION_FACTORING']        = $this->Request()->getPost('CRITERION_FACTORING') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_FACTORING'), $flag, $enc) : '';
 
 				$resp['PAYMENT_CODE']				= $this->Request()->getPost('PAYMENT_CODE') == true ? htmlspecialchars($this->Request()->getPost('PAYMENT_CODE'), $flag, $enc) : '';
 
@@ -2231,6 +2234,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 
 						$this->addOrderInfos($parameters->IDENTIFICATION_TRANSACTIONID, $params, $paymentStatus);
 						Shopware()->Session()->HPdidRequest == false;
+                        $txnId = Shopware()->Session()->HPOrderId;
 						unset(Shopware()->Session()->HPdidRequest);
 						unset(Shopware()->Session()->HPOrderId);
 
@@ -2316,6 +2320,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 				}
             }
+
             Shopware()->Session()->HPdidRequest == false;
             unset(Shopware()->Session()->HPdidRequest);
             unset(Shopware()->Session()->HPOrderId);
@@ -2325,6 +2330,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					'action' 		=> 'finish',
 					'forceSecure'	=> 1,
 					'sUniqueID' 	=> Shopware()->Session()->HPTrans,
+                    'txnId'         => $txnId,
                     'sAGB'          => true
 			)
 					);
@@ -3384,12 +3390,23 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
 					$params['PAYMENT.CODE'] 		= "IV.".$type;
 					$params['FRONTEND.ENABLED'] 	= "true";
-					break;
+                    if($this->Config()->HGW_FACTORING_MODE == "1"){
+                        $params['CRITERION.FACTORING'] = 'true';
+                    } else {
+                        $params['CRITERION.FACTORING'] = 'false';
+                    }
+
+                    break;
                 /* cms / universum / invoice with insurance */
                 case 'ivb2b':
                     $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
                     $params['PAYMENT.CODE'] 		= "IV.".$type;
                     $params['FRONTEND.ENABLED'] 	= "true";
+                    if($this->Config()->HGW_FACTORING_MODE == "1"){
+                        $params['CRITERION.FACTORING'] = 'true';
+                    } else {
+                        $params['CRITERION.FACTORING'] = 'false';
+                    }
                     break;
 					/* santander */
 				case 'san':

@@ -63,7 +63,6 @@ Ext.define('Shopware.apps.Order.view.detail.HeidelBackend', {
 
 	loadData: function(transID, payName, payDesc) {
 		var me = this;
-		
 		Ext.Ajax.request({
 			url: '{url controller="BackendHgw" action="loadData"}',
 			method: 'POST',
@@ -95,13 +94,13 @@ Ext.define('Shopware.apps.Order.view.detail.HeidelBackend', {
 			cont.update('<div class="notrans"><span class="fa fa-warning fa-2x"></span>'+resp.snippets.notrans+'</div>');
 			return;
 		}
-		
+
 		var i = 0;
 		var activeMeth = '';
-		
+
 		Ext.Object.each(resp.buttons.ref, function(key, value, myself){
-			button = Ext.select('#buttontable .'+key);
-			
+            button = Ext.select('#buttontable .'+key);
+
 			if(i == 0){ me.changeAction(button, key, value); activeMeth = key; }
 			button.on('click', function(){ me.changeAction(this, key, value); activeMeth = key; });
 			i++;
@@ -110,13 +109,13 @@ Ext.define('Shopware.apps.Order.view.detail.HeidelBackend', {
 		if(i > 0){
 			var submit = Ext.select(parent+' #submit');
 			var amount = Ext.select(parent+' #amount');
-			
+
 			submit.on('click', function(){
 				if(typeof resp.buttons.ref[activeMeth] !== 'undefined'){
 					if((amount.elements[0].value != '') && (amount.elements[0].value.replace(',','.') > 0)){
 						Ext.select('#cont-heidel-'+renderId+' .loader').show();
 						amount.removeCls('error');
-						
+
 						Ext.Ajax.request({
 							url: '{url controller="BackendHgw" action="request"}',
 							method: 'POST',
@@ -214,6 +213,9 @@ Ext.define('Shopware.apps.Order.view.detail.HeidelBackend', {
 		
 		if(key == 'rf'){ amount.elements[0].value = value.trans[0].maxRf; }
 		else if(key == 'rv'){ amount.elements[0].value = value.trans[0].maxRv; }
+		else if(key == 'rv1'){ amount.elements[0].value = value.trans[0].maxRv1; }
+		else if(key == 'rv2'){ amount.elements[0].value = value.trans[0].maxRv2; }
+		else if(key == 'rv3'){ amount.elements[0].value = value.trans[0].maxRv3; }
 		else if(key == 'cp'){ amount.elements[0].value = value.trans[0].maxCp; }
 		else if(key == 'fi'){ amount.elements[0].value = value.trans[0].maxFi; }
 		else{ amount.elements[0].value = '0.00'; }

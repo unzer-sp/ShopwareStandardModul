@@ -25,8 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-//		return '18.11.19';
-		return '18.11.27';
+		return '18.12.05';
 	}
 
 	/**
@@ -933,10 +932,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '18.11.27':
+            case '18.12.05':
                 try{
-                    // Integration of Invioce B2B
-                    // Integration of Invoice and dierect debit factoring
+                    // Integration of Invioce B2B factoring
+                    // Integration of Invoice B2C factoring
+                    // after a finalize orders will be marked as paid for all paymentmethods (IV and HP)
+                    // fixed bug for easyCredit to show interests on checkout/finish
+                    // tested between Sw 5.1.6 - 5.5.4
                     $this->addSnippets();
                     $form->setElement('select', 'HGW_FACTORING_MODE', array(
                         'label' => 'heidelpay Factoring Modus aktiv',
@@ -945,7 +947,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                         'description' => 'Bitte beachten Sie, dass zur Nutzung ein spezieller heidelpay-Vertrag nötig ist'
                     ));
-                    $msg .= '* update 18.11.27<br />';
+                    $msg .= '* update 18.12.05<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -2536,6 +2538,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ){
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
+
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';
@@ -2963,7 +2966,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
         )
         {
-            $transaction 	= self::getHgwTransactions(Shopware()->Session()->HPOrderId);
+            if(
+                (!empty(Shopware()->Session()->HPOrderId))
+                && (isset(Shopware()->Session()->HPOrderId))
+                && Shopware()->Session()->HPOrderId != ""
+            ){
+                $transaction 	= self::getHgwTransactions(Shopware()->Session()->HPOrderId);
+            } else {
+                $transaction 	= self::getHgwTransactions($request->getParams()['txnId']);
+            }
+
             $parameters 	= json_decode($transaction['jsonresponse']);
 
             $view->zinsen 				= str_replace('.', ',', $this->formatNumber($parameters->CRITERION_EASYCREDIT_ACCRUINGINTEREST));
@@ -3280,7 +3292,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         try {
 
             $transactionResult = Shopware()->Db()->fetchRow($sql, $params);
-
             if (empty($transactionResult) || $transactionResult == '') {
                 self::Logging('getHgwTransactions Bootstrap  | No Transaction found for '.$transactionId);
             }

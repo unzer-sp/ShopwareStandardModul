@@ -304,7 +304,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 }
             }
 
-
 			$transactions = $this->getTransactions($transID);
 			$transTable = $this->getTransTable($transactions, $beLocaleId, true);
 			$retArr['transTable'] = $transTable;

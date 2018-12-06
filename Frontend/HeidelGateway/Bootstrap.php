@@ -3816,6 +3816,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
+if ($params['PAYMENT.CODE'] == "IV.PA"){
+    mail("sascha.pflueger@heidelpay.com","Parameter",print_r($params,1));
+}
 
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();

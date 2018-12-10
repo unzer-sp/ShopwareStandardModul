@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.12.05';
+		return '18.12.12';
 	}
 
 	/**
@@ -932,13 +932,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '18.12.05':
+            case '18.12.12':
                 try{
-                    // Integration of Invioce B2B factoring
+                    // Integration of Invoice B2B factoring
                     // Integration of Invoice B2C factoring
                     // after a finalize orders will be marked as paid for all paymentmethods (IV and HP)
                     // fixed bug for easyCredit to show interests on checkout/finish
-                    // tested between Sw 5.1.6 - 5.5.4
+                    // tested for Sw 5.1.6 - 5.5.4
                     $this->addSnippets();
                     $form->setElement('select', 'HGW_FACTORING_MODE', array(
                         'label' => 'heidelpay Factoring Modus aktiv',
@@ -947,7 +947,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                         'description' => 'Bitte beachten Sie, dass zur Nutzung ein spezieller heidelpay-Vertrag nötig ist'
                     ));
-                    $msg .= '* update 18.12.05<br />';
+                    $msg .= '* update 18.12.12<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -3816,9 +3816,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
-if ($params['PAYMENT.CODE'] == "IV.PA"){
-    mail("sascha.pflueger@heidelpay.com","Parameter",print_r($params,1));
-}
 
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();

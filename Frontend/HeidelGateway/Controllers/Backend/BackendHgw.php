@@ -122,6 +122,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				case 'bs':
                 case 'san':
                 case 'ivpd':
+                case 'papg':
                 case 'ivb2b':
 					$payName = 'iv';
 					break;
@@ -155,8 +156,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 //			$data['FRONTEND_MODE'] = 'DEFAULT';
 			$data['FRONTEND_MODE'] = 'WHITELABEL';
 			$data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
-
-			// specials for heidelpay factoring
+            // specials for heidelpay factoring
 			if(
                 ($config->HGW_FACTORING_MODE == "1") &&
                 (
@@ -540,7 +540,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                     if ($ivpd || $san) {
                                         $btns['fi']['active'] = $btns['rv']['active'] = 'false';
 //                                        $btns['rf']['active'] = 'true';
-
                                         if (!isset($maxRf)) {
                                             $maxRf = $value['PRESENTATION_AMOUNT'];
                                         }

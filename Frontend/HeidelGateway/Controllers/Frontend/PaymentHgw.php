@@ -901,8 +901,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 	 */
 	public function responseAction(){
 		try{
-
-			unset(Shopware()->Session()->HPError);
+		    unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
 				$enc = 'UTF-8';
@@ -1018,9 +1017,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$resp['NAME_BIRTHDATE'] 	= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('birthdate_san'), $flag, $enc) : '';
 				}
 				$orgHash 					= $this->createSecretHash($resp['IDENTIFICATION_TRANSACTIONID']);
-if ($resp['PAYMENT_CODE'] == "IV.PA"){
-    mail("sascha.pflueger@heidelpay.com","Response",print_r($_POST,1));
-}
+
 				if($resp['CRITERION_SECRET'] != $orgHash){
 					Shopware()->Session()->HPError = '';
 					$this->hgw()->Logging(

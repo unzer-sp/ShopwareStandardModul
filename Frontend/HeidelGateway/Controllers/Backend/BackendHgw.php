@@ -277,7 +277,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 
 			$resp = $this->callDoRequest($data);
             Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
-
 			// switch, to update right table, depending on used frontend module
 			if(($trans->payName == 'bs') && ($meth == 'fi')){
 				if(strtolower($modul) == 'heidelpay'){
@@ -552,16 +551,15 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                 }
                             } elseif ($papg || $ivb2b){
                                 if ($payInfo['payType'] == 'pa') {
-//                                    $btns['rf']['active'] =
                                     $btns['rv']['active'] =
                                     $btns['fi']['active'] = 'true';
 
                                     $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
-//                                    $btns['rv']['trans'][] =
                                     $btns['fi']['trans'][] =
                                     $btns['rf']['trans'][] = $this->storeTrans($value,$payName, $payInfo);
+
+                                    // activates reversal-buttons for invoice secured with factoring
                                     if($this->FrontendConfigHGW()->HGW_FACTORING_MODE == "1"){
-                                        /***************** Beginn neuer Code ************************/
                                         $btns['rv1']['active'] =
                                         $btns['rv2']['active'] =
                                         $btns['rv3']['active'] = 'true';
@@ -570,19 +568,24 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                         $btns['rv2']['trans'][] =
                                         $btns['rv3']['trans'][] = $this->storeTrans($value,$payName, $payInfo);
                                         $maxRv1 = $maxRv2 = $maxRv3 = $value['PRESENTATION_AMOUNT'];
-
                                     unset($btns['rv']);
-                                        /****************** Ende neuer Code ***********************/
                                     }
 
                                 }
 
-                                if ($payInfo['payType'] == 'fi') {
+                                if (
+                                    ($payInfo['payType'] == 'fi') &&
+                                    ($value['PROCESSING_RESULT'] == "ACK")
+                                ) {
                                     $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
                                     $btns['rv']['active'] = 'true';
                                     $btns['fi']['active'] =	'false';
 //                                    $btns['rf']['active'] = 'true';
 //                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+                                } else {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['active'] =
+                                    $btns['fi']['active'] =	'true';
                                 }
 
                                 if ($payInfo['payType'] == 'rc') {
@@ -597,6 +600,13 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                         $maxRf = $value['PRESENTATION_AMOUNT'];
                                     }
                                     $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+
+                                if ($payInfo['payType'] == 'rv') {
+                                    $btns['fi']['active'] =
+                                    $btns['rv']['active'] = 'true';
+//                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $maxRv = $maxFi = $btns['fi']['trans']['0']['amount'];
                                 }
 
                             }

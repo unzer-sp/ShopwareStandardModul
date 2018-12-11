@@ -55,7 +55,7 @@
 				{$optin_San_adv}
 				</br>
 
-				<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}:</label></br>
+				<label for="hgw_privacyPolicy">{s name='hp_sanPrivacyPolicy' namespace='frontend/register/hp_payment'}{/s}*:</label></br>
 
 				<p id="hgw_ParaPrivacyPolicy">
                 	{if $checkPrivacyPolicy_San == "TRUE" }

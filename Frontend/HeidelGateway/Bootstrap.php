@@ -3533,6 +3533,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $ppd_user['NAME.SALUTATION']	= strtoupper($user['billingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['billingaddress']['salutation']);
                     $ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'];
                     $ppd_user['NAME.FAMILY']		= $user['billingaddress']['lastname'];
+                    $ppd_user['NAME.COMPANY']		= $user['billingaddress']['company'].' - '.$user['billingaddress']['department'];
                     $ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
                     $ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
                     $ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];

@@ -207,9 +207,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
              || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
              || ($data['CRITERION_IVBRAND'] == 'PAYOLUTION')
              || ($data['CRITERION_IVBRAND'] == 'SANTANDER')
+             || ($data['CRITERION_FACTORING'] == 'true')
             )
             {
-
                 // call Heidelpay-Basket-Api
                 switch ($data['PAYMENT_CODE'])
                 {
@@ -277,6 +277,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 
 			$resp = $this->callDoRequest($data);
             Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
+
 			// switch, to update right table, depending on used frontend module
 			if(($trans->payName == 'bs') && ($meth == 'fi')){
 				if(strtolower($modul) == 'heidelpay'){
@@ -694,6 +695,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 							$maxRv = number_format($maxRv, 2,'.','') - $value['PRESENTATION_AMOUNT'];
 							$maxCp = number_format($maxCp, 2,'.','') - $value['PRESENTATION_AMOUNT'];
 							$maxFi = number_format($maxFi, 2,'.','') - $value['PRESENTATION_AMOUNT'];
+                            $maxRv1 = number_format($maxRv1, 2,'.','') - $value['PRESENTATION_AMOUNT'];
+                            $maxRv2 = number_format($maxRv2, 2,'.','') - $value['PRESENTATION_AMOUNT'];
+                            $maxRv3 = number_format($maxRv3, 2,'.','') - $value['PRESENTATION_AMOUNT'];
 						}
 						if($maxCp <= 0){ $btns['cp']['active'] = 'false'; }else{ $btns['cp']['active'] = 'true'; }
 						if($maxRf <= 0){ $btns['rf']['active'] = 'false'; }

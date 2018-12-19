@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.12.12';
+		return '19.01.15';
 	}
 
 	/**
@@ -932,7 +932,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '18.12.12':
+            case '19.01.15':
                 try{
                     // Integration of Invoice B2B factoring
                     // Integration of Invoice B2C factoring
@@ -947,7 +947,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
                         'description' => 'Bitte beachten Sie, dass zur Nutzung ein spezieller heidelpay-Vertrag nötig ist'
                     ));
-                    $msg .= '* update 18.12.12<br />';
+                    $msg .= '* update 19.01.15<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

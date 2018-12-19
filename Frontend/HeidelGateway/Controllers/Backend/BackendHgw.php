@@ -462,14 +462,15 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$btns['fi']['name']		= 'Finalize';
 			$btns['fi']['icon']		= 'fa-truck';
 			$btns['fi']['active']	= 'false';
-
 			if($this->showButtons){
 				foreach(array_reverse($transactions) as $key => $value){
-					$payChan = 'HGW_'.strtoupper($payName).'_CHANNEL';
+                    if($payName == 'pay'){ $payName = 'va'; }
+
+                    $payChan = 'HGW_'.strtoupper($payName).'_CHANNEL';
 					if($value['TRANSACTION_CHANNEL'] != $this->FrontendConfigHGW()->$payChan){ break; }
 
 					$payInfo = $this->getPayInfo($value['PAYMENT_CODE'], $beLocaleId);
-					if($payName == 'pay'){ $payName = 'va'; }
+
 					if($payName == 'papg'){ $payName = 'iv'; $papg = true; }
 					if($payName == 'ivb2b'){ $payName = 'iv'; $ivb2b = true; }
 					if($payName == 'san'){ $payName = 'iv'; $san = true; }

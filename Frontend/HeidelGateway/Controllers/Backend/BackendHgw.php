@@ -719,7 +719,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$btns['rf']['trans'][0]['maxRf'] = number_format($maxRf, 2,'.','');
 				$btns['rv']['trans'] = array_reverse($btns['rv']['trans']);
 				$btns['rv']['trans'][0]['maxRv'] = number_format($maxRv, 2,'.','');
-
                 $btns['rv1']['trans'] = array_reverse($btns['rv1']['trans']);
 				$btns['rv1']['trans'][0]['maxRv1'] = number_format($maxRv1, 2,'.','');
                 $btns['rv2']['trans'] = array_reverse($btns['rv2']['trans']);

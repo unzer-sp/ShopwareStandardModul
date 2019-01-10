@@ -32,7 +32,7 @@
 
 							{if ($sUserData.additional.payment.name == 'hgw_dd')}
 								{if !empty($regData)}
-									{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>
+									{s name='hp_AccountHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>
 									{s name='hp_iban' namespace='frontend/register/hp_payment'}{/s}: {$regData.kto}<br/>
 								{/if}
 							{/if}

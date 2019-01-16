@@ -3206,7 +3206,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             if(
                 ($request->getPost('NAME_BIRTHDATE') != "--") &&
                 ($request->getPost('NAME_BIRTHDATE') != "0000-00-00") &&
-                (!empty($request->getPost('NAME_BIRTHDATE')))
+                ($request->getPost('NAME_BIRTHDATE') != "")
             )
             {
                 $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);

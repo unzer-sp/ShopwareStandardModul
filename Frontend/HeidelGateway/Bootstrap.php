@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '18.10.11';
+		return '19.01.14';
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				'source' => "Default",
 				'description' =>
                     '<p style="font-size:12px">
-                        <img src="' .$hp_logo. '"/><br/> 
+                        <img src="' .$hp_logo. '"/><br/>
                         Die heidelpay GmbH kurz: heidelpay bietet als BaFin-zertifizierter Payment Service Provider 
                         alles was zum Online-Payment geh&ouml;rt.<br><br>
                         <a href="http://testshops.heidelpay.de/contactform/?campaign=shopware4.0&shop=shopware" target="_blank" style="font-size: 12px; color: #000; font-weight: bold;">&gt;&gt;&gt; Informationen anfordern &lt;&lt;&lt;</a><br/>
@@ -916,16 +916,42 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '18.10.11':
-                // Integration of Invioce B2B
-                $this->createPayments();
-                $form->setElement('text', 'HGW_IVB2B_CHANNEL',
-                    array(
-                        'label'=>'gesicherter B2B-Rechnungskauf Channel',
-                        'value'=>'',
-                        'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
-                    )
-                );
+            case '18.11.19':
+                try{
+                    // Integration of Invioce B2B
+                    $this->addSnippets();
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_IVB2B_CHANNEL',
+                        array(
+                            'label'=>'gesicherter B2B-Rechnungskauf Channel',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
+                    $msg .= '* update 18.11.19<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+            case '19.01.14':
+                try{
+                    // Integration of Invoice B2B factoring
+                    // Integration of Invoice B2C factoring
+                    // after a finalize orders will be marked as paid for all paymentmethods (IV and HP)
+                    // fixed bug for easyCredit to show interests on checkout/finish
+                    // tested for Sw 5.1.6 - 5.5.4
+                    $this->addSnippets();
+                    $form->setElement('select', 'HGW_FACTORING_MODE', array(
+                        'label' => 'heidelpay Factoring Modus aktiv',
+                        'value' => 2,
+                        'store' => array( array(1, 'Yes'), array(2, 'No')),
+                        'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                        'description' => 'Bitte beachten Sie, dass zur Nutzung ein spezieller heidelpay-Vertrag nötig ist'
+                    ));
+                    $msg .= '* update 19.01.14<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }
@@ -1549,6 +1575,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $form->setElement('text', 'HGW_HPR_CHANNEL', array('label'=>'EasyCredit Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_HPS_CHANNEL', array('label'=>'Santander Ratenkauf Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('select', 'HGW_DD_GUARANTEE_MODE', array('label' => 'Gesicherte Lastschrift', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use direct debit with guarantee.'));
+            $form->setElement('select', 'HGW_FACTORING_MODE', array('label' => 'Factoring über heidelpay aktiv', 'value' => 1, 'store' => array(array(1, 'No'), array(2, 'Yes')), 'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP, 'description' => 'Please consider, that you need a special contract to use heidelpay factoring.'));
 
             $bookingModeDesc = 'Debit: The payment for the order happens right away<br />Reservation: The basket amout is reserved for a number of days and can be captured in a second step<br />Registration: Payment information is stored to reuse it for further orders';
 			$form->setElement('select', 'HGW_CC_BOOKING_MODE', array(
@@ -1580,6 +1607,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'description' => 'Please consider, that a special contract is needed'
 
 			));
+            $form->setElement('select', 'HGW_FACTORING_MODE', array(
+                'label' => 'heidelpay Factoring mode active',
+                'value' => 2,
+                'store' => array( array(1, 'Yes'), array(2, 'No')),
+                'scope' => \Shopware\Models\Config\Element::SCOPE_SHOP,
+                'description' => 'Please consider, that a special heidelpay contract is needed'
+
+            ));
 			$form->setElement('select', 'HGW_VA_BOOKING_MODE', array(
 					'label' => 'PayPal booking mode',
 					'value' => 1,
@@ -1814,8 +1849,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			    ($document->_order->payment['name'] == 'hgw_iv') ||
                 ($document->_order->payment['name'] == 'hgw_papg') ||
                 ($document->_order->payment['name'] == 'hgw_san') ||
+                ($document->_order->payment['name'] == 'hgw_ivb2b') ||
                 ($document->_order->payment['name'] == 'hgw_ivpd')
-                || ($document->_order->payment['name'] == 'hgw_pp')
+//                || ($document->_order->payment['name'] == 'hgw_pp')
 				){
 				    $orderData = $view->getTemplateVars('Order');
 					$containers = $view->getTemplateVars('Containers');
@@ -1824,7 +1860,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     {
                         $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'SAN');
                         $containers['Hgw_SAN_Content_Info']['value'] = $rawFooter['value'];
-                    } elseif ($document->_order->payment['name'] == 'hgw_ivpd'){
+                    } elseif (
+                        $document->_order->payment['name'] == 'hgw_ivpd' ||
+                        $document->_order->payment['name'] == 'hgw_ivb2b'
+                    ){
                         $rawFooter = $this->getInvoiceContentInfo($containers, $orderData, 'IVPD');
                         $containers['Hgw_IVPD_Content_Info']['value'] = $rawFooter['value'];
                     } else {
@@ -1858,7 +1897,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $containerData['Content_Info'] = $containerData['Hgw_SAN_Content_Info'];
                         $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
                         $view->assign('Containers', $containerData);
-                    } elseif($document->_order->payment['name'] == 'hgw_ivpd') {
+                    } elseif(
+                        ($document->_order->payment['name'] == 'hgw_ivpd') ||
+                        ($document->_order->payment['name'] == 'hgw_ivb2b')
+                    ) {
                         $containerData['Content_Info'] = $containerData['Hgw_IVPD_Content_Info'];
                         $containerData['Content_Info']['value'] = $document->_template->fetch('string:' . $containerData['Content_Info']['value']);
                         $view->assign('Containers', $containerData);
@@ -1987,13 +2029,22 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 											$prefix = 'hgw_';
 											$pos = strpos($avPayment['name'], $prefix);
 											if(is_int($pos)){
-
-												$pm = substr($avPayment['name'],$pos+strlen($prefix));
+											    $pm = substr($avPayment['name'],$pos+strlen($prefix));
 												if($pm == 'pay'){ $pm = va; }
 												$bookingMode = $config->{'HGW_'.strtoupper($pm).'_BOOKING_MODE'};
 												$data = $this->getRegData($user['additional']['user']['id'], $pm);
 												$last = mktime(23,59,00,$data['expMonth']+1,0,$data['expYear']);	//timestamp: last day of registration month
-												$shippingHash = $this->createShippingHash($user , $pm);
+
+                                               if(!empty($user)){
+                                                   $shippingHash = $this->createShippingHash($user , $pm);
+                                               } else {
+//                                                   $user['shippingaddress']['firstname'] = "Payment";
+//                                                   $user['shippingaddress']['lastname'] = "Heidelpay";
+//                                                   $user['shippingaddress']['street'] = "Heidelstrasse 18";
+//                                                   $user['shippingaddress']['zipcode']= "69115";
+//                                                   $user['shippingaddress']['countryID']= "2";
+                                                   return false;
+                                               }
 
 												if(!empty($data)){
 													$regData[$pm] = $data;
@@ -2037,7 +2088,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                                                                                 ';
 
                                                     $sanJson 			= json_decode($getFormUrl['CONFIG_OPTIN_TEXT'],true);
-//mail("sascha.pflueger@heidelpay.com","2040 Bootstrap SanIn",print_r($getFormUrl,1));
+
                                                     $view->optin_San_logoUrl 		= empty($sanJson['logolink'])       ? $recoveryLogoUrl          : $sanJson['logolink'];
                                                     $view->optin_San_adv		    = empty($sanJson['optin'])          ? $recoveryTextOptin        : $sanJson['optin'];
                                                     $view->optin_San_privpol		= empty($sanJson['privacy_policy']) ? $recoveryTextPrivacyPolicy: $sanJson['privacy_policy'];
@@ -2487,6 +2538,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 ){
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
+
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';
@@ -2579,7 +2631,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $basketData = $this->getBasketId();
             $konfiguration = self::Config();
             $secret = $konfiguration['HGW_SECRET'];
-
             //fetching count of orders of customer
             $countOrderForCustomer = '';
             $sql = 'SELECT COUNT(id) FROM `s_order` WHERE userID ="'.$user['additional']['user']['userID'].'" AND ordernumber != "0"';
@@ -2714,7 +2765,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 {
                     $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
                     $responseHps 	= $this->doRequest($requestData);
-
                     // redirect to santander / Gillardorn
                     if($responseHps['FRONTEND_REDIRECT_URL']){
                         Shopware()->Session()->HPdidRequest = 'TRUE';
@@ -2916,7 +2966,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             (strtolower($user['additional']['payment']['name']) == 'hgw_hpr')
         )
         {
-            $transaction 	= self::getHgwTransactions(Shopware()->Session()->HPOrderId);
+            if(
+                (!empty(Shopware()->Session()->HPOrderId))
+                && (isset(Shopware()->Session()->HPOrderId))
+                && Shopware()->Session()->HPOrderId != ""
+            ){
+                $transaction 	= self::getHgwTransactions(Shopware()->Session()->HPOrderId);
+            } else {
+                $transaction 	= self::getHgwTransactions($request->getParams()['txnId']);
+            }
+
             $parameters 	= json_decode($transaction['jsonresponse']);
 
             $view->zinsen 				= str_replace('.', ',', $this->formatNumber($parameters->CRITERION_EASYCREDIT_ACCRUINGINTEREST));
@@ -3233,7 +3292,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         try {
 
             $transactionResult = Shopware()->Db()->fetchRow($sql, $params);
-
             if (empty($transactionResult) || $transactionResult == '') {
                 self::Logging('getHgwTransactions Bootstrap  | No Transaction found for '.$transactionId);
             }
@@ -3475,6 +3533,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $ppd_user['NAME.SALUTATION']	= strtoupper($user['billingaddress']['salutation']) == 'MS' ? 'MRS' : strtoupper($user['billingaddress']['salutation']);
                     $ppd_user['NAME.GIVEN']			= $user['billingaddress']['firstname'];
                     $ppd_user['NAME.FAMILY']		= $user['billingaddress']['lastname'];
+                    $ppd_user['NAME.COMPANY']		= $user['billingaddress']['company'].' - '.$user['billingaddress']['department'];
                     $ppd_user['ADDRESS.STREET']		= $user['billingaddress']['street'].' '.$user['billingaddress']['streetnumber'];
                     $ppd_user['ADDRESS.ZIP']		= $user['billingaddress']['zipcode'];
                     $ppd_user['ADDRESS.CITY']		= $user['billingaddress']['city'];
@@ -3557,7 +3616,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'login'			=> trim($this->Config()->HGW_USER_LOGIN),
 					'password'		=> trim($this->Config()->HGW_USER_PW),
 			);
-				
 			// catching item basket-Api-information
 			foreach ($basket['content'] as $item){
 				$amountNet 		= str_replace(',','.',$item['amountnet']);
@@ -3759,13 +3817,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}else{
 				$client->setParameterPost($params);
 			}
-//if (
-//($params['PAYMENT.CODE'] == "IV.PA") &&
-//($params['ACCOUNT.BRAND']!= "PAYOLUTION_DIRECT") &&
-//($params['ACCOUNT.BRAND']!= "SANTANDER")
-//){
-//    mail("sascha.pflueger@heidelpay.com","DoRequest 3740",print_r($params,1));
-//}
+
 			if(extension_loaded('curl')){
 				$adapter = new Zend_Http_Client_Adapter_Curl();
 				$adapter->setCurlOption(CURLOPT_SSL_VERIFYPEER, false);
@@ -4396,6 +4448,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$snippets[] = array('frontend/register/hp_payment','en','hp_cardNumber','Card No.');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_cardHolder','Karteninhaber');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_cardHolder','Card holder');
+		$snippets[] = array('frontend/register/hp_payment','de','hp_AccountHolder','Kontoinhaber');
+		$snippets[] = array('frontend/register/hp_payment','en','hp_AccountHolder','Account holder');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_cardExpiry','Ablaufdatum');
 		$snippets[] = array('frontend/register/hp_payment','en','hp_cardExpiry','Expiry Date');
 		$snippets[] = array('frontend/register/hp_payment','de','hp_cardVeri','Pr&uuml;fnummer');
@@ -4997,6 +5051,7 @@ Mit freundlichen Gruessen
 							'HGW_PP_CHANNEL' 		=> array('label' => 'Vorkasse Channel'),
 							'HGW_IV_CHANNEL' 		=> array('label' => 'Rechnung Channel'),
                             'HGW_IVPD_CHANNEL' 		=> array('label' => 'Payolution Rechnungskauf Channel'),
+                            'HGW_IVB2B_CHANNEL' 	=> array('label' => 'Rechnungskauf B2B Channel'),
                             'HGW_PAPG_CHANNEL'		=> array('label' => 'Rechnung mit Zahlungssicherung Channel'),
 							'HGW_SAN_CHANNEL'		=> array('label' => 'Santander Channel'),
 							'HGW_SU_CHANNEL' 		=> array('label' => 'Sofort Channel'),
@@ -5017,6 +5072,10 @@ Mit freundlichen Gruessen
 									'label' 			=> 'Gesicherte Lastschrift',
 									'description' 		=> 'Bitte beachten Sie, dass zur Aktivierung ein gesonderter Vertrag notwendig ist.',
 							),
+                            'HGW_FACTORING_MODE' => array(
+                                'label' 			=> 'heidelpay Factoring Modus aktiv',
+                                'description' 		=> 'Bitte beachten Sie, dass zur Aktivierung ein gesonderter Vertrag notwendig ist.',
+                            ),
 							'HGW_VA_BOOKING_MODE' 	=> array(
 									'label' 			=> 'PayPal Buchungsmodus',
 									'description' 		=> '<b>Wichtig: Ihr PayPal Accout muss für Referenztransaktionen konfiguriert sein, wenn sie das Registierungs-Feature benutzen wollen.</b>',
@@ -5111,6 +5170,10 @@ Mit freundlichen Gruessen
 									'label' 			=> 'Direct debit with guarantee',
 									'description' 		=> 'Please consider, that a special contract is needed.',
 							),
+                            'HGW_FACTORING_MODE' => array(
+                                'label' 			=> 'heidelpay factoring active',
+                                'description' 		=> 'Please consider, that a special contract is needed.',
+                            ),
 							'HGW_VA_BOOKING_MODE' 	=> array(
 									'label' 			=> 'PayPal booking mode',
 									'description' 		=> '<b>Please note: PayPal Account needs to be configured for recurring transactions, if you want use the registration feature.<b>',
@@ -5265,10 +5328,10 @@ Mit freundlichen Gruessen
 				empty($user['shippingaddress']['street']) ||
 				empty($user['shippingaddress']['zipcode']) ||
 				empty($user['shippingaddress']['countryID'])
-				) {
-					self::Logging('createShippingHash  | bei Payment: '.$pm.' leeres UserArray');
-					return false;
-				}
+		) {
+//			    self::Logging('createShippingHash  | bei Payment: '.$pm.' leeres UserArray');
+				return false;
+		}
 
 
 		return 	hash('sha512',

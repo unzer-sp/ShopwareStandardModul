@@ -360,6 +360,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						    $basketId = $basketId['basketId'];
 						}
 						    $ppd_crit['BASKET.ID'] = $basketId;
+
+                        $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERSUM_B2C';
+
                     }
                     if($activePayment == 'ivb2b') {
                         $basketId = self::getBasketId();
@@ -370,8 +373,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             $basketId = $basketId['basketId'];
                         }
                         $ppd_crit['BASKET.ID'] = $basketId;
-                        $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERUM_B2B';
-//mail("sascha.pflueger@heidelpay.com","374 gatewayAct",print_r($user,1));
+                        $ppd_crit['CRITERION.IVBRAND'] = 'UNIVERSUM_B2B';
                         $this->View()->b2bCompanyName       = $user['billingaddress']['company'];
                         $this->View()->b2bCompanyStreet     = $user['billingaddress']['street'];
                         $this->View()->b2bCompanyZip        = $user['billingaddress']['zipcode'];
@@ -440,20 +442,12 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             "OTHER_PROFESSIONAL_SCIENTIFIC_AND_TECHNICAL_ACTIVITIES" => "Sonstige freiberufliche, wissenschaftliche und technische T&auml;tigkeiten",
                             "ARTS_ENTERTAINMENT_AND_RECREATION"                     => "Kreative, k&uuml;nstlerische und unterhaltende T&auml;tigkeiten",
                         ];
-//                        $this->View()->heidelB2bFunction = [
-//                            "OWNER"             => "Inhaber",
-//                            "PARTNER"           => "Partner",
-//                            "SHAREHOLDER"       => "Shareholder",
-//                            "DIRECTOR"          => "Direktor",
-//                            "MANAGER"           => "Manager",
-//                            "REGISTERED_MANAGER"=> "Registrierter Manager"
-//                        ];
+
                         $this->View()->b2bCompanyExeCountry = [
                             "DE" => "Deutschland",
                             "AT" => "&Ouml;sterreich",
                         ];
 
-//                        mail("sascha.pflueger@heidelpay.com","373 gateway User",print_r($user,1));
                     }
 
 					$getFormUrl = $this->getFormUrl($activePayment, NULL, $user['additional']['user']['id'], $tempID, NULL, $basket, $ppd_crit);
@@ -674,11 +668,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					}
 
 					$response = $this->hgw()->doRequest($params);
-if($activePayment == 'san'){
-//    mail("sascha.pflueger@heidelpay.com","SanRequest",print_r($params,1));
-//    mail("sascha.pflueger@heidelpay.com","SanResponse",print_r($response,1));
-}
-
                 }
 			}
 
@@ -852,6 +841,7 @@ if($activePayment == 'san'){
                         Shopware()->Session()->HPOrderId = $transactionId;
 
                     }
+
 					return $this->redirect(array(
 							'forceSecure' => 1,
 							'action' => 'success',
@@ -911,8 +901,7 @@ if($activePayment == 'san'){
 	 */
 	public function responseAction(){
 		try{
-//mail("sascha.pflueger@heidelpay.com","907 responseAction POST",print_r($_POST,1));
-			unset(Shopware()->Session()->HPError);
+		    unset(Shopware()->Session()->HPError);
 			if($this->Request()->isPost()){
     			$flag = ENT_COMPAT;
 				$enc = 'UTF-8';
@@ -939,6 +928,7 @@ if($activePayment == 'san'){
 				$resp['CRITERION_SHIPPAY']			= $this->Request()->getPost('CRITERION_SHIPPAY') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHIPPAY'), $flag, $enc) : '';
 				$resp['CRITERION_GATEWAY']			= $this->Request()->getPost('CRITERION_GATEWAY') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_GATEWAY'), $flag, $enc) : '';
 				$resp['CRITERION_WALLET']			= $this->Request()->getPost('CRITERION_WALLET') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_WALLET'), $flag, $enc) : '';
+				$resp['CRITERION.IVBRAND']			= $this->Request()->getPost('CRITERION.IVBRAND') == true ? htmlspecialchars($this->Request()->getPost('CRITERION.IVBRAND'), $flag, $enc) : '';
 				$resp['CRITERION_WALLET_PAYNAME']	= $this->Request()->getPost('CRITERION_WALLET_PAYNAME') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_WALLET_PAYNAME'), $flag, $enc) : '';
 				$resp['CRITERION_SECRET']			= $this->Request()->getPost('CRITERION_SECRET') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SECRET'), $flag, $enc) : '';
 				$resp['CRITERION_SHIPPINGHASH']		= $this->Request()->getPost('CRITERION_SHIPPINGHASH') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHIPPINGHASH'), $flag, $enc) : '';
@@ -950,6 +940,7 @@ if($activePayment == 'san'){
 				$resp['CRITERION_MODULE_VERSION']	= $this->Request()->getPost('CRITERION_MODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_MODULE_VERSION'), $flag, $enc) : '';
 				$resp['SHOPMODULE_VERSION']			= $this->Request()->getPost('SHOPMODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('SHOPMODULE_VERSION'), $flag, $enc) : '';
 				$resp['CRITERION_INSURANCE-RESERVATION'] = $this->Request()->getPost('CRITERION_INSURANCE-RESERVATION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_INSURANCE-RESERVATION'), $flag, $enc) : '';
+				$resp['CRITERION_FACTORING']        = $this->Request()->getPost('CRITERION_FACTORING') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_FACTORING'), $flag, $enc) : '';
 
 				$resp['PAYMENT_CODE']				= $this->Request()->getPost('PAYMENT_CODE') == true ? htmlspecialchars($this->Request()->getPost('PAYMENT_CODE'), $flag, $enc) : '';
 
@@ -1019,7 +1010,7 @@ if($activePayment == 'san'){
 				$resp['__csrf_token']		= $this->Request()->getPost('__csrf_token') == true ? htmlspecialchars($this->Request()->getPost('__csrf_token'), $flag, $enc) : '';
 
 				$resp['CONFIG_OPTIN_TEXT']	= $this->Request()->getPost('CONFIG_OPTIN_TEXT') == true ? htmlspecialchars(json_decode($this->Request()->getPost('CONFIG_OPTIN_TEXT'), $flag, $enc),true) : '';
-//mail("sascha.pflueger@heidelpay.com","1015 responseAction Array",print_r($resp,1));
+
 				if (isset($resp['NAME_BIRTHDATE']) && !(empty($resp['NAME_BIRTHDATE'])) ) {
 					$resp['NAME_BIRTHDATE'] 	= $resp['NAME_BIRTHDATE'];
 				} else {
@@ -1473,7 +1464,6 @@ if($activePayment == 'san'){
             } else {
                 $resp['NAME_BIRTHDATE'] 		= $this->Request()->getPost('NAME_BIRTHDATE') == true ? htmlspecialchars($this->Request()->getPost('birthdate_san'), $flag, $enc) : '';
             }
-
             // case for suspected Manipulation
             $orgHash = $this->createSecretHash($resp['IDENTIFICATION_TRANSACTIONID']);
 
@@ -2243,6 +2233,7 @@ if($activePayment == 'san'){
 
 						$this->addOrderInfos($parameters->IDENTIFICATION_TRANSACTIONID, $params, $paymentStatus);
 						Shopware()->Session()->HPdidRequest == false;
+                        $txnId = Shopware()->Session()->HPOrderId;
 						unset(Shopware()->Session()->HPdidRequest);
 						unset(Shopware()->Session()->HPOrderId);
 
@@ -2328,6 +2319,7 @@ if($activePayment == 'san'){
 					}
 				}
             }
+
             Shopware()->Session()->HPdidRequest == false;
             unset(Shopware()->Session()->HPdidRequest);
             unset(Shopware()->Session()->HPOrderId);
@@ -2337,6 +2329,7 @@ if($activePayment == 'san'){
 					'action' 		=> 'finish',
 					'forceSecure'	=> 1,
 					'sUniqueID' 	=> Shopware()->Session()->HPTrans,
+                    'txnId'         => $txnId,
                     'sAGB'          => true
 			)
 					);
@@ -3276,9 +3269,7 @@ if($activePayment == 'san'){
 				$response = Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest($this->preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit));
 				$errorMsg = $this->getHPErrorMsg($response['PROCESSING_RETURN_CODE'], $fromBootstrap);
 			}
-if($pm = "san"){
-//    mail("sascha.pflueger@heidelpay.com","3280 getFormUrl",print_r(self::preparePostData($ppd_config, array(), $ppd_user, $ppd_bskt, $ppd_crit),1));
-}
+
 			if($response['PROCESSING_RESULT'] == 'ACK'){
 				return $response;
 			}else{
@@ -3398,12 +3389,23 @@ if($pm = "san"){
 					$type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
 					$params['PAYMENT.CODE'] 		= "IV.".$type;
 					$params['FRONTEND.ENABLED'] 	= "true";
-					break;
+                    if($this->Config()->HGW_FACTORING_MODE == "1"){
+                        $params['CRITERION.FACTORING'] = 'true';
+                    } else {
+                        $params['CRITERION.FACTORING'] = 'false';
+                    }
+
+                    break;
                 /* cms / universum / invoice with insurance */
                 case 'ivb2b':
                     $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
                     $params['PAYMENT.CODE'] 		= "IV.".$type;
                     $params['FRONTEND.ENABLED'] 	= "true";
+                    if($this->Config()->HGW_FACTORING_MODE == "1"){
+                        $params['CRITERION.FACTORING'] = 'true';
+                    } else {
+                        $params['CRITERION.FACTORING'] = 'false';
+                    }
                     break;
 					/* santander */
 				case 'san':

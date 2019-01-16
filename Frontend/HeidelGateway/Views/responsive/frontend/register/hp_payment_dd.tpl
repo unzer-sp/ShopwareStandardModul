@@ -6,7 +6,7 @@
 				{s name='hp_reuse' namespace='frontend/register/hp_payment'}{/s}
 				
 				<table {if $isMobile} style="table-layout: fixed;"{else}style="table-layout: inherit;"{/if}>
-					<tr><td {if $isMobile} style="word-wrap: break-word;"{/if}>{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}:</td><td {if $isMobile} style="word-wrap: break-word;"{/if}>{$regData.$pm.owner}</td></tr>
+					<tr><td {if $isMobile} style="word-wrap: break-word;"{/if}>{s name='hp_AccountHolder' namespace='frontend/register/hp_payment'}{/s}:</td><td {if $isMobile} style="word-wrap: break-word;"{/if}>{$regData.$pm.owner}</td></tr>
 					<tr><td {if $isMobile} style="word-wrap: break-word;"{/if}>{s name='hp_ktoOrIban' namespace='frontend/register/hp_payment'}{/s}:</td><td {if $isMobile} style="word-wrap: break-word;"{/if}>{$regData.$pm.kto}</td></tr>
 					{if $regData.$pm.blz != ''}<tr><td {if $isMobile} style="word-wrap: break-word;"{/if}>{s name='hp_blzOrBic' namespace='frontend/register/hp_payment'}{/s}:</td><td {if $isMobile} style="word-wrap: break-word;"{/if}>{$regData.$pm.blz}</td></tr>{/if}
 				</table>

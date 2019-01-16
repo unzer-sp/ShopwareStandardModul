@@ -51,7 +51,7 @@
 												{/if}
 											</p>
 											<p>
-												{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>
+												{s name='hp_AccountHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>
 												{s name='hp_iban' namespace='frontend/register/hp_payment'}{/s}: {$regData.kto}<br/>
 												<br/>
 												<a href="{url controller=account action=payment sTarget=checkout}" class="button-middle small">

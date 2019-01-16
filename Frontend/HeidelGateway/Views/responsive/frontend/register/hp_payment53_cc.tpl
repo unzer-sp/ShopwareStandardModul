@@ -13,7 +13,8 @@
 			</div>
 		{/if}
 
-		<div class="newreg_{$pm}" {if {$hasReg{$pm}}} onclick="callAFunction('cc')" style="display: none;" {/if}>
+		{*<div class="newreg_{$pm}" {if {$hasReg{$pm}}} onclick="callAFunction('cc')" style="display: none;" {/if}>*}
+		<div class="newreg_{$pm}" {if {$hasReg{$pm}}}  style="display: none;" {/if}>
 			{if $frame.$pm}
 				<iframe id="hp_frame_{$pm}" src="{$formUrl.$pm}">your browser doesn't support iframes</iframe>
 			{/if}

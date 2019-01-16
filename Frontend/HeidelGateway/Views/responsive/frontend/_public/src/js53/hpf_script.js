@@ -387,34 +387,35 @@ document.asyncReady(function() {
         return arr[0] + "//" + arr[2];
     }
 
-    function callAFunction(payMeth) {
-        pm = payMeth;
+    // function callAFunction(payMeth) {
+    //     pm = payMeth;
+    //
+    //     if(((payMeth.toLowerCase() == 'cc') || (payMeth.toLowerCase() == 'dc')) && $('#hp_frame_'+payMeth).length > 0){
+    //         // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
+    //         targetOrigin = getDomainFromUrl($('#hp_frame_'+payMeth).attr('src'));
+    //         paymentFrameForm = document.getElementsByName('shippingPaymentForm');
+    //         paymentFrameIframe = document.getElementById('hp_frame_'+payMeth);
+    //         checkedOpt = jQuery("method--input input:radio:checked");
+    //
+    //         // get right element from nodelist
+    //         for(var i = 0; i < paymentFrameForm.length; i++){
+    //             var item = paymentFrameForm[i];
+    //             if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
+    //                 paymentFrameForm = paymentFrameForm[i];
+    //                 break;
+    //             }
+    //         }
+    //
+    //         if(!hasListener[pm]){
+    //             setSubmitListener();
+    //             hasListener[pm] = true;
+    //         }
+    //
+    //         if(!hasListener['msg']){
+    //             setMessageListener();
+    //             hasListener['msg'] = true;
+    //         }
+    //     }
+    // }
 
-        if(((payMeth.toLowerCase() == 'cc') || (payMeth.toLowerCase() == 'dc')) && $('#hp_frame_'+payMeth).length > 0){
-            // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
-            targetOrigin = getDomainFromUrl($('#hp_frame_'+payMeth).attr('src'));
-            paymentFrameForm = document.getElementsByName('shippingPaymentForm');
-            paymentFrameIframe = document.getElementById('hp_frame_'+payMeth);
-            checkedOpt = jQuery("method--input input:radio:checked");
-
-            // get right element from nodelist
-            for(var i = 0; i < paymentFrameForm.length; i++){
-                var item = paymentFrameForm[i];
-                if((item.className == 'payment') && (item.tagName.toLowerCase() == 'form')){
-                    paymentFrameForm = paymentFrameForm[i];
-                    break;
-                }
-            }
-
-            if(!hasListener[pm]){
-                setSubmitListener();
-                hasListener[pm] = true;
-            }
-
-            if(!hasListener['msg']){
-                setMessageListener();
-                hasListener['msg'] = true;
-            }
-        }
-    }
 });

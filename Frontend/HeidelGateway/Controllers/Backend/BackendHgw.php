@@ -29,7 +29,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$buttons = $this->getButtons($transactions, $payName, $beLocaleId);
 			$action = $this->getActionTable($beLocaleId);
 			$transTable = $this->getTransTable($transactions, $beLocaleId);
-				
+
 			$snipPay = Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('pay', $beLocaleId, 'backend/heidelBackend');
 			$snipRefresh = Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('refreshPage', $beLocaleId, 'backend/heidelBackend');
 			$snipNotrans = Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('noTrans', $beLocaleId, 'backend/heidelBackend');
@@ -47,7 +47,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$retArr['snippets']['pay'] = $snipPay;
 			$retArr['snippets']['refresh'] = $snipRefresh;
 			$retArr['snippets']['note'] = $snipNote;
-				
+
 			print json_encode($retArr);
 			exit;
 		}catch(Exception $e){
@@ -101,6 +101,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$beLocaleId = $this->getBeLocaleId();
 			$this->setSubShop($transID);
 
+            $config = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
+
             $payName = '';
             if (isset($trans->payName) && (!empty($trans->payName))) {
                 $payName = $trans->payName;
@@ -120,6 +122,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				case 'bs':
                 case 'san':
                 case 'ivpd':
+                case 'papg':
+                case 'ivb2b':
 					$payName = 'iv';
 					break;
 				case 'mpa':
@@ -151,7 +155,43 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$data['FRONTEND_ENABLED'] = 'false';
 //			$data['FRONTEND_MODE'] = 'DEFAULT';
 			$data['FRONTEND_MODE'] = 'WHITELABEL';
-            $data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
+			$data['IDENTIFICATION_REFERENCEID'] = $data['IDENTIFICATION_UNIQUEID'];
+            // specials for heidelpay factoring
+			if(
+                ($config->HGW_FACTORING_MODE == "1") &&
+                (
+                    ($this->Request()->getParam('modul') == "hgw_ivb2b")||
+                    ($this->Request()->getParam('modul') == "hgw_papg")
+                )
+            ){
+                //setting Invoice ID for factoring solution
+                $data['IDENTIFICATION_INVOICEID'] = $this->getInvoiceidByTransactionId($transID);
+
+                if(empty($data['IDENTIFICATION_INVOICEID']) || $data['IDENTIFICATION_INVOICEID'] ==""){
+                    Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('requestAction (BE) | No invoice-id found for transaction '.$transID);
+                    return false;
+                }
+
+                switch ($meth){
+                    case "rv1":
+                        $meth = "rv";
+                        $data['PAYMENT_CODE'] = strtoupper($payName).'.'.strtoupper($meth);
+                        $data["PAYMENT_REVERSALTYPE"] = "CANCEL";
+                        break;
+                    case "rv2":
+                        $meth = "rv";
+                        $data['PAYMENT_CODE'] = strtoupper($payName).'.'.strtoupper($meth);
+                        $data["PAYMENT_REVERSALTYPE"] =  "RETURN";
+                        break;
+                    case "rv3":
+                        $meth = "rv";
+                        $data['PAYMENT_CODE'] = strtoupper($payName).'.'.strtoupper($meth);
+                        $data["PAYMENT_REVERSALTYPE"] = "CREDIT";
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             // switching request-url
 			$hgwBootstrapVariables = Shopware()->Plugins()->Frontend()->HeidelGateway();
@@ -167,9 +207,9 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
              || ($data['ACCOUNT_BRAND'] == 'SANTANDER')
              || ($data['CRITERION_IVBRAND'] == 'PAYOLUTION')
              || ($data['CRITERION_IVBRAND'] == 'SANTANDER')
+             || ($data['CRITERION_FACTORING'] == 'true')
             )
             {
-
                 // call Heidelpay-Basket-Api
                 switch ($data['PAYMENT_CODE'])
                 {
@@ -208,13 +248,19 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 }
             }
 
-            // deleting unneccessary Data
-            unset($data['IDENTIFICATION_UNIQUEID']);
-            unset($data['FRONTEND_RESPONSE_URL']);  unset($data['FRONTEND_CSS_PATH']);          unset($data['ACCOUNT_NUMBER']);
-            unset($data['CRITERION_DBONRG']);       unset($data['CRITERION_SHIPPAY']);          unset($data['CRITERION_GATEWAY']);
-            unset($data['CRITERION_WALLET']);       unset($data['CRITERION_WALLET_PAYNAME']);   unset($data['CUSTOMER_OPTIN']);
-            unset($data['CUSTOMER_OPTIN_2']);       unset($data['CONFIG_OPTIN_TEXT']);          unset($data['var.Register']);
-            unset($data['var.sTarget']);            unset($data['var.sepa']);                   unset($data['._csrf_token']);
+            // deleting unneccessary Data from data
+            unset($data['IDENTIFICATION_UNIQUEID']);unset($data['FRONTEND_RESPONSE_URL']);unset($data['FRONTEND_CSS_PATH']);
+            unset($data['ACCOUNT_NUMBER']);unset($data['CRITERION_DBONRG']);unset($data['CRITERION_SHIPPAY']);unset($data['CRITERION_GATEWAY']);
+            unset($data['CRITERION_WALLET']);unset($data['CRITERION_WALLET_PAYNAME']);unset($data['CRITERION_RESPONSE_URL']);
+            unset($data['CRITERION_PUSH_URL']);unset($data['CRITERION_INSURANCE-RESERVATION']);unset($data['CUSTOMER_OPTIN']);
+            unset($data['PROCESSING_RESULT']);unset($data['PROCESSING_RETURN']);unset($data['PROCESSING_CODE']);
+            unset($data['PROCESSING_RETURN_CODE']);unset($data['PROCESSING_STATUS_CODE']);unset($data['PROCESSING_REASON_CODE']);
+            unset($data['PROCESSING_REASON']);unset($data['PROCESSING_TIMESTAMP']);unset($data['PROCESSING_STATUS']);
+            unset($data['CONNECTOR_ACCOUNT_BANK']);unset($data['CONNECTOR_ACCOUNT_BIC']);unset($data['CONNECTOR_ACCOUNT_NUMBER']);
+            unset($data['CONNECTOR_ACCOUNT_IBAN']);unset($data['CONNECTOR_ACCOUNT_COUNTRY']);unset($data['CONNECTOR_ACCOUNT_HOLDER']);
+            unset($data['CONNECTOR_ACCOUNT_USAGE']);unset($data['CLEARING_AMOUNT']);unset($data['CLEARING_CURRENCY']);
+            unset($data['CLEARING_DESCRIPTOR']);unset($data['CUSTOMER_OPTIN_2']);unset($data['CONFIG_OPTIN_TEXT']);
+            unset($data['var.Register']);unset($data['var.sTarget']);unset($data['var.sepa']);unset($data['._csrf_token']);
 
             // prepare parameters for sending and replace all "_" with "."
 			foreach($data as $key => $value){
@@ -230,8 +276,8 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			}
 
 			$resp = $this->callDoRequest($data);
-			Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
-				
+            Shopware()->Plugins()->Frontend()->HeidelGateway()->saveRes($resp);
+
 			// switch, to update right table, depending on used frontend module
 			if(($trans->payName == 'bs') && ($meth == 'fi')){
 				if(strtolower($modul) == 'heidelpay'){
@@ -243,9 +289,21 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				Shopware()->Db()->query($sql, array(serialize($resp), $resp['IDENTIFICATION_TRANSACTIONID']));
 			}
 
-            /**
-             * @todo ggf Einbau Aenderung Bezahlstatus an Bestellung
-             */
+            // mark orders as paid in case of IV.FI or HP.FI
+            if(
+                ($resp["PROCESSING_RESULT"] == "ACK") &&
+                (
+                    ($resp["PAYMENT_CODE"] == "IV.FI") ||
+                    ($resp["PAYMENT_CODE"] == "HP.FI")
+                )
+            ){
+                try{
+                    $this->updateOrderPaymentStatus($resp["IDENTIFICATION_REFERENCEID"]);
+                } catch (Exception $e){
+
+                }
+            }
+
 			$transactions = $this->getTransactions($transID);
 			$transTable = $this->getTransTable($transactions, $beLocaleId, true);
 			$retArr['transTable'] = $transTable;
@@ -353,6 +411,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                 }
                 $transactions[$tKey] = $transaction;
             }
+
             return $transactions;
         }catch(Exception $e){
             Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getTransactions (BE) | '.$e->getMessage());
@@ -370,8 +429,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 	public function getButtons($transactions, $payName, $beLocaleId){
 		try{
 			$payName = substr($payName, strpos($payName,'_')+1);
-			if($payName == 'pay'){ $payName = 'va'; }
-				
+
 			$btns['cp']['name']		= 'Capture';
 			$btns['cp']['icon']		= 'fa-download';
 			$btns['cp']['active']	= 'false';
@@ -387,20 +445,37 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 			$btns['rv']['name']		= 'Reversal';
 			$btns['rv']['icon']		= 'fa-reply';
 			$btns['rv']['active']	= 'false';
-				
+            if(in_array($payName,["papg","ivb2b"]) /*&& Factoring ist aktiv*/){
+                $btns['rv1']['name']	= 'Reversal Storno';
+                $btns['rv1']['icon']	= 'fa-reply';
+                $btns['rv1']['active']	= 'false';
+
+                $btns['rv2']['name']	= 'Reversal Retoure';
+                $btns['rv2']['icon']	= 'fa-reply';
+                $btns['rv2']['active']	= 'false';
+
+                $btns['rv3']['name']	= 'Reversal Gutschrift';
+                $btns['rv3']['icon']	= 'fa-reply';
+                $btns['rv3']['active']	= 'false';
+            }
+
 			$btns['fi']['name']		= 'Finalize';
 			$btns['fi']['icon']		= 'fa-truck';
 			$btns['fi']['active']	= 'false';
-
 			if($this->showButtons){
 				foreach(array_reverse($transactions) as $key => $value){
-					$payChan = 'HGW_'.strtoupper($payName).'_CHANNEL';
+                    if($payName == 'pay'){ $payName = 'va'; }
+
+                    $payChan = 'HGW_'.strtoupper($payName).'_CHANNEL';
 					if($value['TRANSACTION_CHANNEL'] != $this->FrontendConfigHGW()->$payChan){ break; }
 
 					$payInfo = $this->getPayInfo($value['PAYMENT_CODE'], $beLocaleId);
+
 					if($payName == 'papg'){ $payName = 'iv'; $papg = true; }
+					if($payName == 'ivb2b'){ $payName = 'iv'; $ivb2b = true; }
 					if($payName == 'san'){ $payName = 'iv'; $san = true; }
 					if($payName == 'ivpd'){ $payName = 'iv'; $ivpd = true; }
+
 					switch($payName){
 						case 'cc':
 						case 'dc':
@@ -466,7 +541,6 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                     if ($ivpd || $san) {
                                         $btns['fi']['active'] = $btns['rv']['active'] = 'false';
 //                                        $btns['rf']['active'] = 'true';
-
                                         if (!isset($maxRf)) {
                                             $maxRf = $value['PRESENTATION_AMOUNT'];
                                         }
@@ -477,29 +551,50 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                         $btns['rv']['active'] = 'true';
                                     }
                                 }
-                            } elseif ($papg) {
+                            } elseif ($papg || $ivb2b){
                                 if ($payInfo['payType'] == 'pa') {
-//                                    $btns['rf']['active'] =
                                     $btns['rv']['active'] =
                                     $btns['fi']['active'] = 'true';
 
                                     $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
-                                    $btns['rv']['trans'][] =
                                     $btns['fi']['trans'][] =
-                                    $btns['rf']['trans'][] =
-                                        $this->storeTrans($value,$payName, $payInfo);
+                                    $btns['rf']['trans'][] = $this->storeTrans($value,$payName, $payInfo);
+
+                                    // activates reversal-buttons for invoice secured with factoring
+                                    if($this->FrontendConfigHGW()->HGW_FACTORING_MODE == "1"){
+                                        $btns['rv1']['active'] =
+                                        $btns['rv2']['active'] =
+                                        $btns['rv3']['active'] = 'true';
+
+                                        $btns['rv1']['trans'][] =
+                                        $btns['rv2']['trans'][] =
+                                        $btns['rv3']['trans'][] = $this->storeTrans($value,$payName, $payInfo);
+                                        $maxRv1 = $maxRv2 = $maxRv3 = $value['PRESENTATION_AMOUNT'];
+                                    unset($btns['rv']);
+                                    }
+
                                 }
 
-                                if ($payInfo['payType'] == 'fi') {
+                                if (
+                                    ($payInfo['payType'] == 'fi') &&
+                                    ($value['PROCESSING_RESULT'] == "ACK")
+                                ) {
                                     $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
                                     $btns['rv']['active'] = 'true';
                                     $btns['fi']['active'] =	'false';
 //                                    $btns['rf']['active'] = 'true';
 //                                    if(!isset($maxRf)){	$maxRf = $value['PRESENTATION_AMOUNT']; }
+                                } else {
+                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $btns['rv']['active'] =
+                                    $btns['fi']['active'] =	'true';
                                 }
 
                                 if ($payInfo['payType'] == 'rc') {
                                     $btns['rv']['active'] =
+                                    $btns['rv1']['active'] =
+                                    $btns['rv2']['active'] =
+                                    $btns['rv3']['active'] =
                                     $btns['fi']['active'] = 'false';
                                     $btns['rf']['active'] = 'true';
 
@@ -507,6 +602,13 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                         $maxRf = $value['PRESENTATION_AMOUNT'];
                                     }
                                     $btns['rf']['trans'][] = $this->storeTrans($value, $payName, $payInfo);
+                                }
+
+                                if ($payInfo['payType'] == 'rv') {
+                                    $btns['fi']['active'] =
+                                    $btns['rv']['active'] = 'true';
+//                                    $maxRv = $maxFi = $value['PRESENTATION_AMOUNT'];
+                                    $maxRv = $maxFi = $btns['fi']['trans']['0']['amount'];
                                 }
 
                             }
@@ -594,13 +696,22 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 							$maxRv = number_format($maxRv, 2,'.','') - $value['PRESENTATION_AMOUNT'];
 							$maxCp = number_format($maxCp, 2,'.','') - $value['PRESENTATION_AMOUNT'];
 							$maxFi = number_format($maxFi, 2,'.','') - $value['PRESENTATION_AMOUNT'];
+                            $maxRv1 = number_format($maxRv1, 2,'.','') - $value['PRESENTATION_AMOUNT'];
+                            $maxRv2 = number_format($maxRv2, 2,'.','') - $value['PRESENTATION_AMOUNT'];
+                            $maxRv3 = number_format($maxRv3, 2,'.','') - $value['PRESENTATION_AMOUNT'];
 						}
 						if($maxCp <= 0){ $btns['cp']['active'] = 'false'; }else{ $btns['cp']['active'] = 'true'; }
 						if($maxRf <= 0){ $btns['rf']['active'] = 'false'; }
 						if($maxRv <= 0){ $btns['rv']['active'] = 'false'; }
-						if($maxFi <= 0){ $btns['fi']['active'] = 'false'; }
+						if($maxRv <= 0){ $btns['rv']['active'] = 'false'; }
+                        if($maxFi <= 0){ $btns['fi']['active'] = 'false'; }
+						if($maxRv1 <= 0){ $btns['rv1']['active'] = 'false'; }
+						if($maxRv2 <= 0){ $btns['rv2']['active'] = 'false'; }
+						if($maxRv3 <= 0){ $btns['rv3']['active'] = 'false'; }
+
 					}
 					if($papg)   { $payName = 'papg'; $papg = false; }
+					if($ivb2b)   { $payName = 'ivb2b'; $ivb2b = false; }
 					if($san)    { $payName = 'san'; $san = false; }
 					if($ivpd)   { $payName = 'ivpd'; $ivpd = false; }
 				}
@@ -608,6 +719,12 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$btns['rf']['trans'][0]['maxRf'] = number_format($maxRf, 2,'.','');
 				$btns['rv']['trans'] = array_reverse($btns['rv']['trans']);
 				$btns['rv']['trans'][0]['maxRv'] = number_format($maxRv, 2,'.','');
+                $btns['rv1']['trans'] = array_reverse($btns['rv1']['trans']);
+				$btns['rv1']['trans'][0]['maxRv1'] = number_format($maxRv1, 2,'.','');
+                $btns['rv2']['trans'] = array_reverse($btns['rv2']['trans']);
+				$btns['rv2']['trans'][0]['maxRv2'] = number_format($maxRv2, 2,'.','');
+                $btns['rv3']['trans'] = array_reverse($btns['rv3']['trans']);
+				$btns['rv3']['trans'][0]['maxRv3'] = number_format($maxRv3, 2,'.','');
 				$btns['cp']['trans'] = array_reverse($btns['cp']['trans']);
 				$btns['cp']['trans'][0]['maxCp'] = number_format($maxCp, 2,'.','');
 				$btns['fi']['trans'][0]['maxFi'] = number_format($maxFi, 2,'.','');
@@ -619,8 +736,30 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 				$snipNoaction = Shopware()->Plugins()->Frontend()->HeidelGateway()->getSnippets('noAction', $beLocaleId, 'backend/heidelBackend');
 				$buttonTable = '<div class="note">'.$snipNoaction.'</div>';
 			}
-				
-			$buttonTable .= '<table id="buttontable"><colgroup><col width="165px"/><col width="165px"/><col width="165px"/><col width="165px"/><col width="165px"/></colgroup><tr>';
+
+			if(
+                (($payName == 'papg') || ($payName == 'ivb2b'))
+            && ($this->FrontendConfigHGW()->HGW_FACTORING_MODE == "1")
+//            && (false)
+            ){
+                $buttonTable .= '
+                    <table id="buttontable">
+                    <colgroup>
+                        <col width="117px"/>
+                        <col width="117px"/>
+                        <col width="117px"/>
+                        <col width="118px"/>
+                        <col width="118px"/>
+                        <col width="118px"/>
+                        <col width="118px"/>
+                    </colgroup><tr>';
+                unset($btns['rv']);
+
+            } else {
+                $buttonTable .= '<table id="buttontable"><colgroup><col width="165px"/><col width="165px"/><col width="165px"/><col width="165px"/><col width="165px"/></colgroup><tr>';
+                unset($btns['rv1']);unset($btns['rv2']);unset($btns['rv3']);
+			}
+
 			foreach($btns as $key => $btn){
 				if($btn['active'] == 'true'){
 					$btnClass = 'active '.$key;
@@ -902,7 +1041,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
 	 * @param string $data
 	 */
 	public function callDoRequest($data){
-		return Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest($data);
+	    return Shopware()->Plugins()->Frontend()->HeidelGateway()->doRequest($data);
 	}
 
 	/**
@@ -1017,6 +1156,45 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
         $shoppingCart['basket']['itemCount'] = $count;
         $basketReturn = $shoppingCart;
         return $basketReturn;
+    }
+
+    protected function getInvoiceidByTransactionId($transactionId){
+        $sql = 'SELECT `s_order_documents`.`docID` FROM `s_order` 
+                INNER JOIN `s_order_documents` ON `s_order`.`id` = `s_order_documents`.`orderID` 
+                WHERE `s_order`.`transactionID` = ?
+                ;';
+
+        $parameters = [$transactionId];
+
+        try{
+            $invoiceId = Shopware()->Db()->fetchAll($sql,$parameters);
+            return $invoiceId[0]['docID'];
+        } catch (Exception $e) {
+            Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('getInvoiceidByTransactionId (BE) | '.$e->getMessage());
+            return false;
+        }
+
+    }
+
+    /**
+     * Updatetes paymentstatus of an order
+     * @param $heidelUniqueIdPa
+     * @return bool
+     */
+    protected function updateOrderPaymentStatus($heidelUniqueIdPa){
+        $sql =
+            "UPDATE `s_order` 
+              SET `cleared`='12'
+              WHERE `temporaryID`=?";
+
+        try{
+            $result = Shopware()->Db()->executeUpdate($sql,[$heidelUniqueIdPa]);
+            return $result;
+        } catch (Exception $e){
+            Shopware()->Plugins()->Frontend()->HeidelGateway()->Logging('updateOrderPaymentStatus (BE) | '.$e->getMessage());
+            return false;
+        }
+
     }
 
 

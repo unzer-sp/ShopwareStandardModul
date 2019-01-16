@@ -133,6 +133,8 @@
 					{include file="frontend/register/hp_payment_papg.tpl" pm=$pm cardBrands=$cardBrands bankCountry=$bankCountry grid=$grid classname=$classname}
                 {elseif $pm == 'hpr'}
                     {include file="frontend/register/hp_payment_hpr.tpl" pm=$pm grid=$grid classname=$classname}
+				{elseif $pm == 'ivb2b'}
+					{include file="frontend/register/hp_payment_ivb2b.tpl" pm=$pm grid=$grid classname=$classname}
 				{else}
 					{if !isset($pm)}
 						<script>
@@ -152,7 +154,7 @@
 
 					<input type="hidden" name='CRITERION.GATEWAY' value='1' />
 					{if $DbOnRg}<input type="hidden" name='CRITERION.DBONRG' value='{$DbOnRg}' />{/if}
-					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg'}<noscript>
+					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg' and $pm != 'ivb2b'}<noscript>
 						<h2 class="headingbox_dark largesize">{s name='PaymentRedirect' namespace='frontend/payment_heidelpay/gateway'}{/s}</h2>{/if}
 						<br />
 						<a class="button-left large left" href="{url controller=payment_hgw action=cancel}">
@@ -160,7 +162,7 @@
 						</a>
 						<input type="submit" class="button-right large right" value="{s name='ListingLinkNext' namespace='frontend/content/paging'}{/s}">
 
-					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg'}</noscript>{/if}
+					{if !$showButton and $pm != 'gir' and $pm != 'ide' and $pm != 'pf' and $pm != 'eps' and $pm != 'san' and $pm != 'papg' and $pm != 'ivb2b'}</noscript>{/if}
 				</div>
 			</form>
 	{else}

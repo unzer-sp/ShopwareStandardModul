@@ -23,10 +23,6 @@
 
 							{if ($sUserData.additional.payment.name == 'hgw_cc') || ($sUserData.additional.payment.name == 'hgw_dc')}
 								{if !empty($regData)}
-									{*<p class="payment--method-info">*}
-										{*<strong class="payment--title">{s name="ConfirmInfoPaymentMethod" namespace="frontend/checkout/confirm"}{/s}</strong>*}
-										{*<span class="payment--description">{$sUserData.additional.payment.description}</span>*}
-									{*</p>*}
 									{*{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>*}
 									{s name='hp_cardNumber' namespace='frontend/register/hp_payment'}{/s}: {$regData.cardnr}<br/>
 									{s name='hp_cardExpiry' namespace='frontend/register/hp_payment'}{/s}: {$regData.expMonth} / {$regData.expYear}
@@ -36,13 +32,14 @@
 
 							{if ($sUserData.additional.payment.name == 'hgw_dd')}
 								{if !empty($regData)}
-									{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>
+									{s name='hp_AccountHolder' namespace='frontend/register/hp_payment'}{/s}: {$regData.owner}<br/>
 									{s name='hp_iban' namespace='frontend/register/hp_payment'}{/s}: {$regData.kto}<br/>
 								{/if}
 							{/if}
 
 						{else}
 							{$smarty.block.parent}
+
 						{/if}
                     {/if}
                 {/block}

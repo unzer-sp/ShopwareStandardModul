@@ -5,7 +5,7 @@
 			<div class="reuse_{$pm}" {if {$hasReg{$pm}}} style="display: block;" {/if}>
 				{s name='hp_reuse' namespace='frontend/register/hp_payment'}{/s}
 				<table>
-					<tr><td>{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}:</td><td>{$regData.$pm.owner}</td></tr>
+					<tr><td>{s name='hp_AccountHolder' namespace='frontend/register/hp_payment'}{/s}:</td><td>{$regData.$pm.owner}</td></tr>
 					<tr><td>{s name='hp_ktoOrIban' namespace='frontend/register/hp_payment'}{/s}:</td><td>{$regData.$pm.kto}</td></tr>
 					{if $regData.$pm.blz != ''}<tr><td>{s name='hp_blzOrBic' namespace='frontend/register/hp_payment'}{/s}:</td><td>{$regData.$pm.blz}</td></tr>{/if}
 				</table>

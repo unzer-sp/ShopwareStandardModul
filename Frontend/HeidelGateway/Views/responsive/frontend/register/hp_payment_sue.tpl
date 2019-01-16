@@ -9,7 +9,7 @@
 				{/foreach}
 			</select><br />
 			
-			<label>{s name='hp_cardHolder' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
+			<label>{s name='hp_AccountHolder' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
 			<input type="text" class="text" value="{if $form_data.hpcc_holder == ''}{$user.billingaddress.firstname} {$user.billingaddress.lastname}{else}{$form_data.hpcc_holder|escape}{/if}" id="cardHolder" name="ACCOUNT.HOLDER"><br />
 			
 			{if ($heidel_iban == '2')}

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.01.14';
+		return '19.02.20';
 	}
 
 	/**
@@ -948,6 +948,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'description' => 'Bitte beachten Sie, dass zur Nutzung ein spezieller heidelpay-Vertrag nötig ist'
                     ));
                     $msg .= '* update 19.01.14<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+            case '19.02.20':
+                try{
+                    // refactoring ob birthdate inputs for better testing
+                    // tested for Sw 5.1.6 - 5.5.6
+
+                    $msg .= '* update 19.02.20<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

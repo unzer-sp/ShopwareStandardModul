@@ -2305,9 +2305,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     if(!empty($birthdate)){
                         $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
                     } else {
-                        $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'), $flag, $enc) : '';
-                        $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
-                        $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
+                        $nameBirthdateYear  = $request->getPost('DateSan_Year') == true ? htmlentities($request->getPost('DateSan_Year'), $flag, $enc) : '';
+                        $nameBirthdateMonth = $request->getPost('DateSan_Month') == true ? htmlspecialchars($request->getPost('DatSane_Month'), $flag, $enc) : '';
+                        $nameBirthdateDay   = $request->getPost('DateSan_Day') == true ? htmlspecialchars($request->getPost('DateSan_Day'), $flag, $enc) : '';
                         $nameBirthdate = $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay;
                     }
                     //daten in DB Speichern
@@ -2747,7 +2747,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                 Shopware()->Session()->HPOrderId = $tranactId;
                 $additional = array(
-                    'NAME.BIRTHDATE'                => $request->getPost('Date_Year').'-'.$request->getPost('Date_Month').'-'.$request->getPost('Date_Day'),
+                    'NAME.BIRTHDATE'                => $request->getPost('DateSanHp_Year').'-'.$request->getPost('DateSanHp_Month').'-'.$request->getPost('DateSanHp_Day'),
                     'PRESENTATION.AMOUNT'           => $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
                     'PRESENTATION.CURRENCY'         => Shopware()->Currency()->getShortName(),
                     'IDENTIFICATION.TRANSACTIONID' =>  $tranactId,
@@ -3806,6 +3806,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function doRequest($params = array(), $url = NULL){
 		try{
+
 		    if($url == NULL){ $url = self::$requestUrl; }
 			$client = new Zend_Http_Client($url, array(
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,
@@ -3826,11 +3827,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 			$response = $client->request('POST');
 
-			if(array_key_exists('raw', $params)){
+            if(array_key_exists('raw', $params)){
 				$res = json_decode($response->getBody(), true);
 				if($response->isError()){
                     self::Logging('doRequest '.$params["PAYMENT.CODE"].' '.'Brand:'.$params["ACCOUNT.BRAND"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
 				}
+
 				return $res;
 				exit;
 			}else{
@@ -4731,6 +4733,7 @@ Mit freundlichen Gruessen
 			INSERT INTO `s_core_config_mails` (`id`, `stateId`, `name`, `frommail`, `fromname`, `subject`, `content`, `contentHTML`, `ishtml`, `attachment`, `mailtype`, `context`)
 			VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
 			ON DUPLICATE KEY UPDATE frommail= ?, fromname= ?, subject= ?, content= ?, contentHTML= ?, ishtml= ?, attachment= ?, mailtype= ?, context= ?';
+
 
             $prms_id 		= NULL;
             $prms_stateId 	= NULL;

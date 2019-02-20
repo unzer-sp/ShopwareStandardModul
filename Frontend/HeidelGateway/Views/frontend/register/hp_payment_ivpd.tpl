@@ -29,9 +29,10 @@
             <label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
             {assign var=payment_data value=$birthdate_ivpd}
             {if isset($birthdate_ivpd)}
-                {html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
+                {html_select_date|utf8_encode prefix='DatePay_' time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}
             {else}
                 {html_select_date|utf8_encode time=$payment_data start_year='-14' end_year='-100' reverse_years='true'
+                prefix='DatePay_'
                 day_value_format='%02d' field_order='DMY'
                 day_empty="{s name='hp_day' namespace='frontend/register/hp_payment'}{/s}"
                 month_empty="{s name='hp_month' namespace='frontend/register/hp_payment'}{/s}"

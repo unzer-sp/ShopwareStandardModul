@@ -86,6 +86,7 @@
     {assign var='pm' value=$payment_mean.name|substr:($bar_at+1)}
     {if $pm == 'pay'}{assign var='pm' value='va'}{/if}
     {if $payment_mean.name == "hgw_cc" && $heidel_bm_cc && ($formUrl.$pm != '')}
+
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment53_cc.tpl"}
     {elseif $payment_mean.name == "hgw_dc" && $heidel_bm_dc && ($formUrl.$pm != '')}
         {include file="{$tPath|substr:1}/Views/responsive/frontend/register/hp_payment53_dc.tpl"}
@@ -242,7 +243,7 @@
         {$smarty.block.parent}
     {/if}
 {/block}
-
+Sehr {if $salutation eq "Mr"}geehrter Herr{elseif $salutation eq "Ms"}geehrte Frau{/if} {lastname}, beim letzten Besuch haben Sie folgende Daten verwendet.<br />M&ouml;chten Sie diese wieder verwenden?<br /><br />
 {* change Form action *}
 {block name='frontend_index_content'}
     {if ($Controller == 'account') && ($action == 'payment')}
@@ -250,6 +251,7 @@
             {* Payment headline *}
             {block name="frontend_account_payment_headline"}
 				<div class="account--welcome">
+
 					<h1 class="panel--title">{s name="PaymentHeadline"}Zahlungsart &auml;ndern{/s}</h1>
 				</div>
             {/block}

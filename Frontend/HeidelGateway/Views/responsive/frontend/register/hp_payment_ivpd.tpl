@@ -5,18 +5,18 @@
                 <label>{s name='hp_accSalutation' namespace='frontend/register/hp_payment'}{/s}*:</label><br />
                 {if isset($salutation_ivpd)}
                     {if ($salutation_ivpd == "MRS")}
-                        <select id="salutation" class="hgw_val_ivpd" name="NAME.SALUTATION">
+                        <select id="salutation_ivpd" class="hgw_val_ivpd" name="NAME.SALUTATION">
                             <option value="MR" >{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
                             <option value="MRS" selected="selected">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
                         </select><br />
                     {else}
-                        <select id="salutation" class="hgw_val_ivpd" name="NAME.SALUTATION">
+                        <select id="salutation_ivpd" class="hgw_val_ivpd" name="NAME.SALUTATION">
                             <option value="MR" selected="selected">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
                             <option value="MRS" >{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>
                         </select><br />
                     {/if}	<!-- salutation == mrs -->
                 {else}
-                    <select id="salutation" class="hgw_val_ivpd" name="NAME.SALUTATION">
+                    <select id="salutation_ivpd" class="hgw_val_ivpd" name="NAME.SALUTATION">
                         <option value="UNKNOWN">{s name='hp_accSal_unknown' namespace='frontend/register/hp_payment'}{/s}</option>
                         <option value="MR">{s name='hp_accSal_mr' namespace='frontend/register/hp_payment'}{/s}</option>
                         <option value="MRS">{s name='hp_accSal_ms' namespace='frontend/register/hp_payment'}{/s}</option>

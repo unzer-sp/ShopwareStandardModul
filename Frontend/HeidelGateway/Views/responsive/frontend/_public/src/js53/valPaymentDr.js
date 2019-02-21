@@ -1199,12 +1199,12 @@ function valPayolutionDirect() {
     var salutation = $('.newreg_ivpd select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "UNKNOWN")
     {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').addClass("has--error");
-        $('.newreg_ivpd #salutation').addClass("has--error");
+        $('.newreg_ivpd #salutation_ivpd').parent('.js--fancy-select').addClass("has--error");
+        $('.newreg_ivpd #salutation_ivpd').addClass("has--error");
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').removeClass('has--error');
-        $('.newreg_ivpd #salutation').removeClass('has--error');
+        $('.newreg_ivpd #salutation_ivpd').parent('.js--fancy-select').removeClass('has--error');
+        $('.newreg_ivpd #salutation_ivpd').removeClass('has--error');
     }
 
     // validation of birthdate

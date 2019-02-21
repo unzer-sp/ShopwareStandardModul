@@ -788,10 +788,10 @@ function valPayolutionDirect() {
     var salutation = $('.hgw_val_ivpd').val();
     if(salutation == undefined || salutation == "UNKNOWN")
     {
-        $('.newreg_ivpd #salutation').parent('div').addClass("instyle_error");
+        $('.newreg_ivpd #salutation_ivpd').parent('div').addClass("instyle_error");
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_ivpd #salutation').parent('div').removeClass('instyle_error');
+        $('.newreg_ivpd #salutation_ivpd').parent('div').removeClass('instyle_error');
     }
 
     // validation of birthdate

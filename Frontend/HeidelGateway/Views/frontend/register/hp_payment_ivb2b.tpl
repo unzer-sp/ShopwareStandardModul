@@ -115,22 +115,6 @@
 
 
 			</div>
-			</br>
-			</br>
-			</br>
-		<h1>Testbereich</h1>
-			{*<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />*}
-			{*{assign var=payment_data value=$birthdate_papg}*}
-			{*{if isset($birthdate_papg)}*}
-				{*{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}*}
-			{*{else}*}
-				{*{html_select_date|utf8_encode time=$payment_data start_year='-14' end_year='-100' reverse_years='true'*}
-				{*day_value_format='%02d' field_order='DMY'*}
-				{*day_empty="{s name='hp_valueDay' namespace='frontend/register/hp_payment'}{/s}"*}
-				{*month_empty="{s name='hp_valueMonth' namespace='frontend/register/hp_payment'}{/s}"*}
-				{*year_empty="{s name='hp_valueYear' namespace='frontend/register/hp_payment'}{/s}"}*}
-			{*{/if}*}
-
 		</div>
 	</div>
 {/block}

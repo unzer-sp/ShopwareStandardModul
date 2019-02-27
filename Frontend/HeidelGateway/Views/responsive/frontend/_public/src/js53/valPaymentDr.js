@@ -77,7 +77,7 @@ $(document).ready(function(){
                             var birthDay = jQuery(".newreg_san [name='DateSan_Day']").val();
                             var birthMonth = jQuery(".newreg_san [name = 'DateSan_Month']").val();
                             var birthYear = jQuery(".newreg_san [name = 'DateSan_Year']").val();
-console.log("80");
+
                             jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                         } else {
                             $(".hgw_required").removeAttr("required");
@@ -442,7 +442,6 @@ console.log("80");
                 var birthDay = jQuery(".newreg_san [name='DateSan_Day']").val();
                 var birthMonth = jQuery(".newreg_san [name = 'DateSan_Month']").val();
                 var birthYear = jQuery(".newreg_san [name = 'DateSan_Year']").val();
-console.log("445");
                 jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
 
             });
@@ -502,7 +501,6 @@ console.log("445");
                     var birthDay = jQuery(".newreg_san [name='DateSan_Day']").val();
                     var birthMonth = jQuery(".newreg_san [name = 'DateSan_Month']").val();
                     var birthYear = jQuery(".newreg_san [name = 'DateSan_Year']").val();
-console.log("505");
                     jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                 });
 
@@ -510,7 +508,6 @@ console.log("505");
                     var birthDay = jQuery(".newreg_san [name='DateSan_Day']").val();
                     var birthMonth = jQuery(".newreg_san [name = 'DateSan_Month']").val();
                     var birthYear = jQuery(".newreg_san [name = 'DateSan_Year']").val();
-console.log("513");
                     jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                 }
 

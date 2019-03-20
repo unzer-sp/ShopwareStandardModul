@@ -1107,25 +1107,68 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
             'currencyCode'   => !empty($orderDetails[0]["currency"])  ? $orderDetails[0]["currency"]: "",
         ];
 
+        // get Customer to get customergroup and customergroupconfig
+        $queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
+        $queryBuilder->select('*')
+            ->from('s_user')
+            ->where('id = :userID')
+            ->setParameter('userID', $orderDetails[0]["userID"]);
+        $swCustomer = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
+        if($swCustomer[0]['customergroup'] == "H"){
+            // if customergroup "händler" is not configured to "Bruttopreise im Shop" we need other values
+            $queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
+            $queryBuilder->select('*')
+                ->from('s_core_customergroups')
+                ->where('groupkey = :groupkey')
+                ->setParameter('groupkey', "H");
+            $data = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
+            $isTaxActive = $data[0]["tax"];
+        } else {
+            $isTaxActive = true;
+        }
+
         //prepare item basket data
         $count = 1;
         foreach ($orderDetails as $singleArticle)
         {
-            $shoppingCart['basket']['basketItems'][] = array(
-                'position'				=> $count,
-                'basketItemReferenceId' => $count,
-                'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['id'],
-                'unit'					=> $singleArticle['unit'],
-                'quantity'				=> $singleArticle['quantity'],
-                'vat'					=> $singleArticle['tax_rate'],
-                'amountGross'			=> bcmul($singleArticle['price'], 100, 0),
-                'amountNet'				=> bcmul(bcmul((bcdiv($singleArticle['price'],(bcadd(100,$singleArticle['tax_rate'],6)),6)),100,6), 100, 0),
-                'amountVat'				=> bcmul(bcsub($singleArticle['price'],bcmul(bcdiv($singleArticle['price'],(bcadd($singleArticle['tax_rate'],100,6)),6),100,6),6),100,0),
-                'amountPerUnit'			=> bcmul(($singleArticle['price']), 100, 0),
-                'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
-                'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
+            if($isTaxActive){
+                $shoppingCart['basket']['basketItems'][] = array(
+                    'position'				=> $count,
+                    'basketItemReferenceId' => $count,
+                    'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['id'],
+                    'unit'					=> $singleArticle['unit'],
+                    'quantity'				=> $singleArticle['quantity'],
+                    'vat'					=> $singleArticle['tax_rate'],
+                    'amountNet'				=> bcmul($singleArticle['quantity'],bcmul(bcmul((bcdiv($singleArticle['price'],(bcadd(100,$singleArticle['tax_rate'],6)),6)),100,6), 100, 0),0)   ,
+                    'amountVat'				=> bcsub(bcmul(bcmul($singleArticle['price'], 100, 0),$singleArticle['quantity'],0),bcmul($singleArticle['quantity'],bcmul(bcmul((bcdiv($singleArticle['price'],(bcadd(100,$singleArticle['tax_rate'],6)),6)),100,6), 100, 0),0),0),
+                    'amountGross'			=> bcmul(bcmul($singleArticle['price'], 100, 0),$singleArticle['quantity'],0)  ,
+                    'amountPerUnit'			=> bcmul(($singleArticle['price']), 100, 0),
+                    'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                    'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
 
-            );
+                );
+            } else {
+                $multiplicator = bcdiv(bcadd(100,$singleArticle['tax_rate'],100),100,10);
+
+                $amountGross= round(bcmul($singleArticle['price']*$multiplicator, 100, 10),0);
+
+                $shoppingCart['basket']['basketItems'][] = array(
+                    'position'				=> $count,
+                    'basketItemReferenceId' => $count,
+                    'articleId'				=> !empty($singleArticle['articleordernumber']) ? $singleArticle['articleordernumber'] : $singleArticle['id'],
+                    'unit'					=> $singleArticle['unit'],
+                    'quantity'				=> $singleArticle['quantity'],
+                    'vat'					=> $singleArticle['tax_rate'],
+                    'amountNet'				=> number_format(bcmul(bcmul($singleArticle['price'],$singleArticle['quantity'],10),100,1),0,"",""),
+                    'amountVat'				=> number_format(bcsub(bcmul(bcmul(bcmul($singleArticle['price'],$multiplicator,10),$singleArticle['quantity'],10),100,1),bcmul(bcmul($singleArticle['price'],$singleArticle['quantity'],10),100,1),1),0,"",""),
+                    'amountGross'			=> number_format(bcmul(bcmul(bcmul($singleArticle['price'],$multiplicator,10),$singleArticle['quantity'],10),100,1),0,"",""),
+                    'amountPerUnit'			=> round(bcmul($singleArticle['price'], 100, 10),0),
+                    'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                    'title'					=> strlen($singleArticle['name']) > 255 ? substr($singleArticle['name'], 0, 250).'...' : $singleArticle['name'],
+
+                );
+            }
+
 
             if($shoppingCart['basket']['basketItems'][$count]['type'] == "voucher") {
                 $shoppingCart['basket']['basketItems'][$count]['articleId'] = "voucher";
@@ -1155,6 +1198,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
         }
         $shoppingCart['basket']['itemCount'] = $count;
         $basketReturn = $shoppingCart;
+
         return $basketReturn;
     }
 

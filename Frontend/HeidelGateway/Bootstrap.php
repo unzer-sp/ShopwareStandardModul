@@ -954,7 +954,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             case '19.02.20':
                 try{
                     // refactoring ob birthdate inputs for better testing
-                    // tested for Sw 5.1.6 - 5.5.6
+                    // Fix for creating Basket while showing prices without tax in frontend for IV B2B
+                    // tested for Sw 5.1.6 - 5.5.7
 
                     $msg .= '* update 19.02.20<br />';
                 } catch (Exception $e) {
@@ -3618,7 +3619,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$count = '1';
 			$amountTotalVat = 0;
 			$shoppingCart = array();
-				
+
+			// if customergroup "händler" is not configured to "Bruttopreise im Shop" we need other values
+			$queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
+            $queryBuilder->select('*')
+                ->from('s_core_customergroups')
+                ->where('groupkey = :groupkey')
+                ->setParameter('groupkey', "H");
+
+            $data = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
+            $isTaxActive = $data[0]["tax"];
+
 			// catching basic basket-Api-information
 			$shoppingCart['authentication'] = array(
 					'sender' 		=> trim($this->Config()->HGW_SECURITY_SENDER),
@@ -3633,24 +3644,43 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				$amountPerUnit 	= str_replace(',','.',$item['price']);
 	
 				//$amountTotalVat = $amountVat + $amountTotalVat;
-	
-				$shoppingCart['basket']['basketItems'][] = array(
-						'position'				=> $count,
-						'basketItemReferenceId' => $count,
+                // fix for missing Config in customergroups "Bruttopreise im Shop"
+                if($isTaxActive){
+                    $shoppingCart['basket']['basketItems'][] = array(
+                        'position'				=> $count,
+                        'basketItemReferenceId' => $count,
                         'articleId'				=> !empty($item['ean']) ? $item['ean'] : $item['ordernumber'],
-						'unit'					=> $item['packunit'],
-						'quantity'				=> $item['quantity'],
-						'vat'					=> $item['tax_rate'],
-						'amountNet'				=> floor(bcmul($amountNet, 100, 10)),
-						'amountVat'				=> floor(bcmul($amountVat, 100, 10)),
-						'amountGross'			=> floor(bcmul($amountGross, 100, 10)),
-						'amountPerUnit'			=> floor(bcmul($amountPerUnit, 100, 10)),
-						'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
-						'title'					=> strlen($item['articlename']) > 255 ? substr($item['articlename'], 0, 250).'...' : $item['articlename'],
-						'description'			=> strlen($item['additional_details']['description']) > 255 ? substr($item['additional_details']['description'], 0, 250).'...' : $item['additional_details']['description'],
-						'imageUrl'				=> $item['image']['src']['2'], // 105px x 105px with original thumbnail mapping
-				);
-				
+                        'unit'					=> $item['packunit'],
+                        'quantity'				=> $item['quantity'],
+                        'vat'					=> $item['tax_rate'],
+                        'amountNet'				=> floor(bcmul($amountNet, 100, 10)),
+                        'amountVat'				=> floor(bcmul($amountVat, 100, 10)),
+                        'amountGross'			=> floor(bcmul($amountGross, 100, 10)),
+                        'amountPerUnit'			=> floor(bcmul($amountPerUnit, 100, 10)),
+                        'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                        'title'					=> strlen($item['articlename']) > 255 ? substr($item['articlename'], 0, 250).'...' : $item['articlename'],
+                        'description'			=> strlen($item['additional_details']['description']) > 255 ? substr($item['additional_details']['description'], 0, 250).'...' : $item['additional_details']['description'],
+                        'imageUrl'				=> $item['image']['src']['2'], // 105px x 105px with original thumbnail mapping
+                    );
+                } else {
+                    $shoppingCart['basket']['basketItems'][] = array(
+                        'position'				=> $count,
+                        'basketItemReferenceId' => $count,
+                        'articleId'				=> !empty($item['ean']) ? $item['ean'] : $item['ordernumber'],
+                        'unit'					=> $item['packunit'],
+                        'quantity'				=> $item['quantity'],
+                        'vat'					=> $item['tax_rate'],
+                        'amountNet'				=> floor(bcmul($amountNet, 100, 10)),
+                        'amountVat'				=> floor(bcmul($amountVat, 100, 10)),
+                        'amountGross'			=> floor(bcmul($amountGross+$amountVat, 100, 10)),
+                        'amountPerUnit'			=> floor(bcmul($amountPerUnit+$amountVat, 100, 10)),
+                        'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                        'title'					=> strlen($item['articlename']) > 255 ? substr($item['articlename'], 0, 250).'...' : $item['articlename'],
+                        'description'			=> strlen($item['additional_details']['description']) > 255 ? substr($item['additional_details']['description'], 0, 250).'...' : $item['additional_details']['description'],
+                        'imageUrl'				=> $item['image']['src']['2'], // 105px x 105px with original thumbnail mapping
+                    );
+                }
+
 				// Hotfix for missing articleId on voucher for secured invoice payment
 				if($shoppingCart['basket']['basketItems'][$count-1]['type'] == "voucher") {
                     $shoppingCart['basket']['basketItems'][$count - 1]['articleId'] = "voucher";
@@ -3691,7 +3721,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $amountTotalGross    = number_format($basket["AmountNumeric"], 4,".","");
             $amountTotalGross    = bcmul($amountTotalGross, 100, 0);
 
-            $amountTotalVatCalc 		= number_format(bcsub($amountTotalGross,$amountTotalNet),0,".","");
+            if($isTaxActive){
+                $amountTotalVatCalc = number_format(bcmul($basket["sAmountTax"], 100, 0),0,".","");
+            } else {
+                $amountTotalVatCalc = number_format( bcmul($basket["sAmountTax"], 100, 0),"0","","");
+            }
+
             $basketTotalData['basket'] = [
                 'amountTotalNet' => $amountTotalNet,
                 'amountTotalVat' => $amountTotalVatCalc,
@@ -3700,6 +3735,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             ];
 
             $shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
+
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());

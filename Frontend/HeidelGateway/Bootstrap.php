@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.02.20';
+		return '19.03.20';
 	}
 
 	/**
@@ -958,6 +958,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     // tested for Sw 5.1.6 - 5.5.7
 
                     $msg .= '* update 19.02.20<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+
+            case '19.03.20':
+                try{
+                    // refactoring ob birthdate inputs for better testing
+                    // Fix for creating Basket while showing prices without tax in frontend for IV B2B
+                    // tested for Sw 5.1.6 - 5.5.7
+                    $msg .= '* update 19.03.20<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -3620,15 +3630,21 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$amountTotalVat = 0;
 			$shoppingCart = array();
 
-			// if customergroup "händler" is not configured to "Bruttopreise im Shop" we need other values
-			$queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
-            $queryBuilder->select('*')
-                ->from('s_core_customergroups')
-                ->where('groupkey = :groupkey')
-                ->setParameter('groupkey', "H");
+			// if customergroup of User "händler" is not configured to "Bruttopreise im Shop" we need other values
+            $userData = Shopware()->Modules()->Admin()->sGetUserData();
+			if($userData['additional']['user']['customergroup'] == "H"){
+                $queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
+                $queryBuilder->select('*')
+                    ->from('s_core_customergroups')
+                    ->where('groupkey = :groupkey')
+                    ->setParameter('groupkey', "H");
 
-            $data = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
-            $isTaxActive = $data[0]["tax"];
+                $data = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
+                $isTaxActive = $data[0]["tax"];
+
+            } else {
+			    $isTaxActive = true;
+            }
 
 			// catching basic basket-Api-information
 			$shoppingCart['authentication'] = array(
@@ -3636,6 +3652,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'login'			=> trim($this->Config()->HGW_USER_LOGIN),
 					'password'		=> trim($this->Config()->HGW_USER_PW),
 			);
+
 			// catching item basket-Api-information
 			foreach ($basket['content'] as $item){
 				$amountNet 		= str_replace(',','.',$item['amountnet']);
@@ -3673,7 +3690,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'amountNet'				=> floor(bcmul($amountNet, 100, 10)),
                         'amountVat'				=> floor(bcmul($amountVat, 100, 10)),
                         'amountGross'			=> floor(bcmul($amountGross+$amountVat, 100, 10)),
-                        'amountPerUnit'			=> floor(bcmul($amountPerUnit+$amountVat, 100, 10)),
+                        'amountPerUnit'			=> floor(bcmul($amountPerUnit, 100, 10)),
                         'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
                         'title'					=> strlen($item['articlename']) > 255 ? substr($item['articlename'], 0, 250).'...' : $item['articlename'],
                         'description'			=> strlen($item['additional_details']['description']) > 255 ? substr($item['additional_details']['description'], 0, 250).'...' : $item['additional_details']['description'],

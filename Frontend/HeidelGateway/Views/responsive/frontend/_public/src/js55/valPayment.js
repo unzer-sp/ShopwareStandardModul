@@ -63,9 +63,9 @@ document.asyncReady(function () {
                     // function set birthdate for santander
                     if(jQuery('.newreg_san').is(":visible")) {
                         $(".hgw_required").attr("required","required");
-                        var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-                        var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-                        var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+                        var birthDay = jQuery(".newreg_san [name='DateSan_Day']").val();
+                        var birthMonth = jQuery(".newreg_san [name = 'DateSan_Month']").val();
+                        var birthYear = jQuery(".newreg_san [name = 'DateSan_Year']").val();
 
                         jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
                     } else {
@@ -73,9 +73,9 @@ document.asyncReady(function () {
                     }
 
                     if(jQuery('.newreg_dd').is(":visible") && jQuery(".newreg_dd [name='Date_Day']").is(":visible")) {
-                        var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-                        var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-                        var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+                        var birthDay = jQuery(".newreg_dd [name='DateDD_Day']").val();
+                        var birthMonth = jQuery(".newreg_dd [name = 'DateDD_Month']").val();
+                        var birthYear = jQuery(".newreg_dd [name = 'DateDD_Year']").val();
 
                         jQuery('#birthdate_dd').val(birthYear+'-'+birthMonth+'-'+birthDay);
                     }
@@ -193,9 +193,9 @@ document.asyncReady(function () {
                 {
                     //setting Birthdate to hidden input
                     if(jQuery('.newreg_ivpd').is(":visible")) {
-                        var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
-                        var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
-                        var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+                        var birthDay = jQuery(".newreg_ivpd [name='DatePay_Day']").val();
+                        var birthMonth = jQuery(".newreg_ivpd [name = 'DatePay_Month']").val();
+                        var birthYear = jQuery(".newreg_ivpd [name = 'DatePay_Year']").val();
                         jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
                     }
 
@@ -237,9 +237,9 @@ document.asyncReady(function () {
                     if(jQuery('.newreg_dd #salutation').is(':visible')){
                         // getting Values from input fields
                         // var salutation = jQuery('.newreg_' + pm + ' #salutation').val();
-                        var birthDay = jQuery('.newreg_dd select[name=Date_Day]').val();
-                        var birthMonth = jQuery('.newreg_dd select[name=Date_Month]').val();
-                        var birthYear = jQuery('.newreg_dd select[name=Date_Year]').val();
+                        var birthDay = jQuery('.newreg_dd select[name=DateDD_Day]').val();
+                        var birthMonth = jQuery('.newreg_dd select[name=DateDD_Month]').val();
+                        var birthYear = jQuery('.newreg_dd select[name=DateDD_Year]').val();
 
                         jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
                         // validation of birthdate and salutation
@@ -304,6 +304,9 @@ document.asyncReady(function () {
 
                 if(pm != undefined)
                 {
+                    /**
+                     * @todo Zahlart herausfinden, da die GebDat-Eingabefelder jetzt DateDD_Day DateSan_Day und DatePay_Day heißen
+                     */
                     if (jQuery(".newreg_" + pm).is(":visible")) {
                         birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
                         birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
@@ -396,36 +399,36 @@ document.asyncReady(function () {
         }
 
         jQuery('.newreg_ivpd').click(function (e) {
-            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_ivpd [name='DatePay_Day']").val();
+            var birthMonth = jQuery(".newreg_ivpd [name = 'DatePay_Month']").val();
+            var birthYear = jQuery(".newreg_ivpd [name = 'DatePay_Year']").val();
 
             jQuery('#birthdate_papd').val(birthYear + '-' + birthMonth + '-' + birthDay);
         });
 
         if(jQuery('.newreg_ivpd').is(":visible")) {
 
-            var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_ivpd [name='DatePay_Day']").val();
+            var birthMonth = jQuery(".newreg_ivpd [name = 'DatePay_Month']").val();
+            var birthYear = jQuery(".newreg_ivpd [name = 'DatePay_Year']").val();
 
             jQuery('#birthdate_ivpd').val(birthYear+'-'+birthMonth+'-'+birthDay);
         }
 
         jQuery('.newreg_san').click(function (e) {
             $(".hgw_required").attr("required","required");
-            var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_san [name='DateSan_Day']").val();
+            var birthMonth = jQuery(".newreg_san [name = 'DateSan_Month']").val();
+            var birthYear = jQuery(".newreg_san [name = 'DateSan_Year']").val();
 
             jQuery('#birthdate_san').val(birthYear + '-' + birthMonth + '-' + birthDay);
         });
 
         if(jQuery('.newreg_san').is(":visible")) {
             $(".hgw_required").attr("required","required");
-            var birthDay = jQuery(".newreg_san [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_san [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_san [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_san [name='DateSan_Day']").val();
+            var birthMonth = jQuery(".newreg_san [name = 'DateSan_Month']").val();
+            var birthYear = jQuery(".newreg_san [name = 'DateSan_Year']").val();
 
             jQuery('#birthdate_san').val(birthYear+'-'+birthMonth+'-'+birthDay);
         } else {
@@ -433,41 +436,41 @@ document.asyncReady(function () {
         }
 
         jQuery('.newreg_dd').click(function (e) {
-            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_dd [name='DateDD_Day']").val();
+            var birthMonth = jQuery(".newreg_dd [name = 'DateDD_Month']").val();
+            var birthYear = jQuery(".newreg_dd [name = 'DateDD_Year']").val();
             jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
         });
 
 
         if (jQuery('.newreg_dd')) {
-            var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_dd [name='DateDD_Day']").val();
+            var birthMonth = jQuery(".newreg_dd [name = 'DateDD_Month']").val();
+            var birthYear = jQuery(".newreg_dd [name = 'DateDD_Year']").val();
 
             jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
 
         jQuery('.newreg_hps').change(function (e) {
-            var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_hps [name='DateSanHp_Day']").val();
+            var birthMonth = jQuery(".newreg_hps [name = 'DateSanHp_Month']").val();
+            var birthYear = jQuery(".newreg_hps [name = 'DateSanHp_Year']").val();
             jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
         });
 
         if (jQuery('.newreg_hps')) {
-            var birthDay = jQuery(".newreg_hps [name='Date_Day']").val();
-            var birthMonth = jQuery(".newreg_hps [name = 'Date_Month']").val();
-            var birthYear = jQuery(".newreg_hps [name = 'Date_Year']").val();
+            var birthDay = jQuery(".newreg_hps [name='DateSanHp_Day']").val();
+            var birthMonth = jQuery(".newreg_hps [name = 'DateSanHp_Month']").val();
+            var birthYear = jQuery(".newreg_hps [name = 'DateSanHp_Year']").val();
 
             jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
         }
 
         $( document ).ajaxComplete(function() {
             jQuery('.newreg_dd').click(function (e) {
-                var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+                var birthDay = jQuery(".newreg_dd [name='DateDD_Day']").val();
+                var birthMonth = jQuery(".newreg_dd [name = 'DateDD_Month']").val();
+                var birthYear = jQuery(".newreg_dd [name = 'DateDD_Year']").val();
                 jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
                 // change form action
                 changeUrl('hgw_dd', orgLink);
@@ -475,25 +478,25 @@ document.asyncReady(function () {
 
 
             if (jQuery('.newreg_dd')) {
-                var birthDay = jQuery(".newreg_dd [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_dd [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_dd [name = 'Date_Year']").val();
+                var birthDay = jQuery(".newreg_dd [name='DateDD_Day']").val();
+                var birthMonth = jQuery(".newreg_dd [name = 'DateDD_Month']").val();
+                var birthYear = jQuery(".newreg_dd [name = 'DateDD_Year']").val();
 
                 jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             }
 
             jQuery('.newreg_ivpd').click(function (e) {
-                var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+                var birthDay = jQuery(".newreg_ivpd [name='DatePay_Day']").val();
+                var birthMonth = jQuery(".newreg_ivpd [name = 'DatePay_Month']").val();
+                var birthYear = jQuery(".newreg_ivpd [name = 'DatePay_Year']").val();
 
                 jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             });
 
             if (jQuery('.newreg_ivpd')) {
-                var birthDay = jQuery(".newreg_ivpd [name='Date_Day']").val();
-                var birthMonth = jQuery(".newreg_ivpd [name = 'Date_Month']").val();
-                var birthYear = jQuery(".newreg_ivpd [name = 'Date_Year']").val();
+                var birthDay = jQuery(".newreg_ivpd [name='DatePay_Day']").val();
+                var birthMonth = jQuery(".newreg_ivpd [name = 'DatePay_Month']").val();
+                var birthYear = jQuery(".newreg_ivpd [name = 'DatePay_Year']").val();
 
                 jQuery('#birthdate_ivpd').val(birthYear + '-' + birthMonth + '-' + birthDay);
             }
@@ -631,9 +634,9 @@ function valForm() {
                             if(jQuery('.newreg_' + pm + ' #salutation').is(':visible')){
                                 // getting Values from input fields
                                 // var salutation = jQuery('.newreg_' + pm + ' #salutation').val();
-                                var birthDay = jQuery('.newreg_' + pm + ' select[name=Date_Day]').val();
-                                var birthMonth = jQuery('.newreg_' + pm + ' select[name=Date_Month]').val();
-                                var birthYear = jQuery('.newreg_' + pm + ' select[name=Date_Year]').val();
+                                var birthDay = jQuery('.newreg_' + pm + ' select[name=DateDD_Day]').val();
+                                var birthMonth = jQuery('.newreg_' + pm + ' select[name=DateDD_Month]').val();
+                                var birthYear = jQuery('.newreg_' + pm + ' select[name=DateDD_Year]').val();
 
                                 jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
 
@@ -650,14 +653,14 @@ function valForm() {
                         }
 
                         if (pm == 'san') {
-                            var dob = new Date(jQuery('.hgw_san select[name="Date_Year"]').val(), jQuery('.hgw_san select[name="Date_Month"]').val() - 1, jQuery('.hgw_san select[name="Date_Day"]').val());
+                            var dob = new Date(jQuery('.hgw_san select[name="DateSan_Year"]').val(), jQuery('.hgw_san select[name="DateSan_Month"]').val() - 1, jQuery('.hgw_san select[name="DateSan_Day"]').val());
                             var today = new Date();
                             var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
                             var errors = valBirthdate(age);
                         }
 
                         if (pm == 'ivpd') {
-                            var dob = new Date(jQuery('.hgw_ivpd select[name="Date_Year"]').val(), jQuery('.hgw_ivpd select[name="Date_Month"]').val() - 1, jQuery('.hgw_ivpd select[name="Date_Day"]').val());
+                            var dob = new Date(jQuery('.hgw_ivpd select[name="DatePay_Year"]').val(), jQuery('.hgw_ivpd select[name="DatePay_Month"]').val() - 1, jQuery('.hgw_ivpd select[name="DatePay_Day"]').val());
                             var today = new Date();
                             var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
                             var errors = valBirthdate(age);
@@ -729,9 +732,9 @@ function valGatewayForm() {
             // direct debit secured
             if(jQuery('#salutation').is(':visible')){
                 // getting Values from input fields
-                var birthDay = jQuery('select[name=Date_Day]').val();
-                var birthMonth = jQuery('select[name=Date_Month]').val();
-                var birthYear = jQuery('select[name=Date_Year]').val();
+                var birthDay = jQuery('select[name=DateDD_Day]').val();
+                var birthMonth = jQuery('select[name=DateDD_Month]').val();
+                var birthYear = jQuery('select[name=DateDD_Year]').val();
 
                 jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
 
@@ -1008,7 +1011,9 @@ function valInputDdAccount(acc, bank, pm) {
 function valBirthdate(age) {
     var errors = {};
     var i = 0;
-
+    /**
+     * @todo Namen der Select-Ferlder stiommen nicht mehr. Neue Namen: DateDD_Day, DatePay_Day, DateSan_Day, DateSanHp_day
+     */
     if (age < 18) {
         jQuery('.hgw_papg select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
         jQuery('.hgw_papg select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
@@ -1040,39 +1045,39 @@ function valSantander() {
 
     // validation of birthdate
     // var birthdate = $('#birthdate_san').val();
-    var birthdate = jQuery('.hgw_san select[name="Date_Year"]').val()+"-"+jQuery('.hgw_san select[name="Date_Month"]').val()+"-"+jQuery('.hgw_san select[name="Date_Day"]').val();
+    var birthdate = jQuery('.hgw_san select[name="DateSan_Year"]').val()+"-"+jQuery('.hgw_san select[name="DateSan_Month"]').val()+"-"+jQuery('.hgw_san select[name="DateSan_Day"]').val();
     jQuery('#birthdate_san').val(birthdate);
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {
-        var dob = new Date(jQuery('.hgw_san select[name="Date_Year"]').val(), jQuery('.hgw_san select[name="Date_Month"]').val()-1, jQuery('.hgw_san select[name="Date_Day"]').val());
+        var dob = new Date(jQuery('.hgw_san select[name="DateSan_Year"]').val(), jQuery('.hgw_san select[name="DateSan_Month"]').val()-1, jQuery('.hgw_san select[name="DateSan_Day"]').val());
         var today = new Date();
         var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
         if(age < 18){
 
-            jQuery('.hgw_san select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_san select[name="Date_Year"]').addClass('has--error');
-            jQuery('.hgw_san select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_san select[name="Date_Month"]').addClass('has--error');
-            jQuery('.hgw_san select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_san select[name="Date_Day"]').addClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Year"]').addClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Month"]').addClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Day"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Day"]').addClass('has--error');
 
             errors[i++] = '.msg_dob';
         }else{
-            jQuery('.hgw_san select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_san select[name="Date_Year"]').removeClass('has--error');
-            jQuery('.hgw_san select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_san select[name="Date_Month"]').removeClass('has--error');
-            jQuery('.hgw_san select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_san select[name="Date_Day"]').removeClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Year"]').removeClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Month"]').removeClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Day"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_san select[name="DateSan_Day"]').removeClass('has--error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.hgw_san select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_san select[name="Date_Year"]').addClass('has--error');
-        jQuery('.hgw_san select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_san select[name="Date_Month"]').addClass('has--error');
-        jQuery('.hgw_san select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_san select[name="Date_Day"]').addClass('has--error');
+        jQuery('.hgw_san select[name="DateSan_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_san select[name="DateSan_Year"]').addClass('has--error');
+        jQuery('.hgw_san select[name="DateSan_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_san select[name="DateSan_Month"]').addClass('has--error');
+        jQuery('.hgw_san select[name="DateSan_Day"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_san select[name="DateSan_Day"]').addClass('has--error');
         errors[i++] = '.msg_dob';
     }
 
@@ -1096,10 +1101,10 @@ function valPayolutionDirect() {
     var salutation = $('.newreg_ivpd select[name="NAME.SALUTATION"]').val();
     if(salutation == undefined || salutation == "UNKNOWN")
     {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').addClass("has--error");
+        $('.newreg_ivpd #salutation_ivpd').parent('.js--fancy-select').addClass("has--error");
         errors[i++] = '.msg_salut';
     } else {
-        $('.newreg_ivpd #salutation').parent('.js--fancy-select').removeClass('has--error');
+        $('.newreg_ivpd #salutation_ivpd').parent('.js--fancy-select').removeClass('has--error');
     }
 
     // validation of birthdate
@@ -1111,30 +1116,30 @@ function valPayolutionDirect() {
         var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
         if(age < 18){
 
-            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Year"]').addClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').addClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Year"]').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Month"]').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Day"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Day"]').addClass('has--error');
 
             errors[i++] = '.msg_dob';
         }else{
-            jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Year"]').removeClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Month"]').removeClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.hgw_ivpd select[name="Date_Day"]').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Year"]').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Month"]').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Day"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.hgw_ivpd select[name="DatePay_Day"]').removeClass('has--error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.hgw_ivpd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_ivpd select[name="Date_Year"]').addClass('has--error');
-        jQuery('.hgw_ivpd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_ivpd select[name="Date_Month"]').addClass('has--error');
-        jQuery('.hgw_ivpd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.hgw_ivpd select[name="Date_Day"]').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="DatePay_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="DatePay_Year"]').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="DatePay_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="DatePay_Month"]').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="DatePay_Day"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.hgw_ivpd select[name="DatePay_Day"]').addClass('has--error');
         errors[i++] = '.msg_dob';
     }
 
@@ -1178,35 +1183,35 @@ function valDirectDebitSecured(errors) {
     var birthdate = $('#birthdate_dd').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {
-        var dob = new Date(jQuery('.newreg_dd select[name="Date_Year"]').val(), jQuery('.newreg_dd select[name="Date_Month"]').val()-1, jQuery('.newreg_dd select[name="Date_Day"]').val());
+        var dob = new Date(jQuery('.newreg_dd select[name="DateDD_Year"]').val(), jQuery('.newreg_dd select[name="DateDD_Month"]').val()-1, jQuery('.newreg_dd select[name="DateDD_Day"]').val());
         var today = new Date();
         var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
         if(age < 18){
 
-            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Year"]').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').addClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Year"]').addClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Month"]').addClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Day"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Day"]').addClass('has--error');
 
             errors[i++] = '.msg_dob';
         }else{
-            jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Year"]').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Month"]').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_dd select[name="Date_Day"]').removeClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Year"]').removeClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Month"]').removeClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Day"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_dd select[name="DateDD_Day"]').removeClass('has--error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.newreg_dd select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Year"]').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Month"]').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_dd select[name="Date_Day"]').addClass('has--error');
+        jQuery('.newreg_dd select[name="DateDD_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_dd select[name="DateDD_Year"]').addClass('has--error');
+        jQuery('.newreg_dd select[name="DateDD_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_dd select[name="DateDD_Month"]').addClass('has--error');
+        jQuery('.newreg_dd select[name="DateDD_Day"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_dd select[name="DateDD_Day"]').addClass('has--error');
         errors[i++] = '.msg_dob';
     }
     return errors;
@@ -1270,25 +1275,25 @@ function valSantanderHP() {
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {
 
-        var dob = new Date(jQuery('.newreg_hps select[name="Date_Year"]').val(), jQuery('.newreg_hps select[name="Date_Month"]').val()-1, jQuery('.newreg_hps select[name="Date_Day"]').val());
+        var dob = new Date(jQuery('.newreg_hps select[name="DateSanHp_Year"]').val(), jQuery('.newreg_hps select[name="DateSanHp_Month"]').val()-1, jQuery('.newreg_hps select[name="DateSanHp_Day"]').val());
         var today = new Date();
         var age = Math.floor((today-dob) / (365.25 * 24 * 60 * 60 * 1000));
 
         if(age < 18){
-            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="DateSanHp_Year"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="DateSanHp_Month"]').parent('.js--fancy-select').addClass('has--error');
+            jQuery('.newreg_hps select[name="DateSanHp_Day"]').parent('.js--fancy-select').addClass('has--error');
             errors[i++] = '.msg_dob';
         }else{
-            jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').removeClass('has--error');
-            jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="DateSanHp_Year"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="DateSanHp_Month"]').parent('.js--fancy-select').removeClass('has--error');
+            jQuery('.newreg_hps select[name="DateSanHp_Day"]').parent('.js--fancy-select').removeClass('has--error');
         }
     } else {
         //birthdate doesn't fit to formate YYYY-MM-DD
-        jQuery('.newreg_hps select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_hps select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');
-        jQuery('.newreg_hps select[name="Date_Day"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="DateSanHp_Year"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="DateSanHp_Month"]').parent('.js--fancy-select').addClass('has--error');
+        jQuery('.newreg_hps select[name="DateSanHp_Day"]').parent('.js--fancy-select').addClass('has--error');
         errors[i++] = '.msg_dob';
     }
     if(errors.length > 0){

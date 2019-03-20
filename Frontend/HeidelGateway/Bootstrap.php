@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.01.14';
+		return '19.02.20';
 	}
 
 	/**
@@ -948,6 +948,16 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         'description' => 'Bitte beachten Sie, dass zur Nutzung ein spezieller heidelpay-Vertrag nötig ist'
                     ));
                     $msg .= '* update 19.01.14<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+            case '19.02.20':
+                try{
+                    // refactoring ob birthdate inputs for better testing
+                    // Fix for creating Basket while showing prices without tax in frontend for IV B2B
+                    // tested for Sw 5.1.6 - 5.5.7
+
+                    $msg .= '* update 19.02.20<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -2305,9 +2315,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     if(!empty($birthdate)){
                         $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
                     } else {
-                        $nameBirthdateYear  = $request->getPost('Date_Year') == true ? htmlentities($request->getPost('Date_Year'), $flag, $enc) : '';
-                        $nameBirthdateMonth = $request->getPost('Date_Month') == true ? htmlspecialchars($request->getPost('Date_Month'), $flag, $enc) : '';
-                        $nameBirthdateDay   = $request->getPost('Date_Day') == true ? htmlspecialchars($request->getPost('Date_Day'), $flag, $enc) : '';
+                        $nameBirthdateYear  = $request->getPost('DateSan_Year') == true ? htmlentities($request->getPost('DateSan_Year'), $flag, $enc) : '';
+                        $nameBirthdateMonth = $request->getPost('DateSan_Month') == true ? htmlspecialchars($request->getPost('DatSane_Month'), $flag, $enc) : '';
+                        $nameBirthdateDay   = $request->getPost('DateSan_Day') == true ? htmlspecialchars($request->getPost('DateSan_Day'), $flag, $enc) : '';
                         $nameBirthdate = $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay;
                     }
                     //daten in DB Speichern
@@ -2747,7 +2757,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
                 Shopware()->Session()->HPOrderId = $tranactId;
                 $additional = array(
-                    'NAME.BIRTHDATE'                => $request->getPost('Date_Year').'-'.$request->getPost('Date_Month').'-'.$request->getPost('Date_Day'),
+                    'NAME.BIRTHDATE'                => $request->getPost('DateSanHp_Year').'-'.$request->getPost('DateSanHp_Month').'-'.$request->getPost('DateSanHp_Day'),
                     'PRESENTATION.AMOUNT'           => $this->formatNumber($basket['AmountNumeric']+$shipping['value']),
                     'PRESENTATION.CURRENCY'         => Shopware()->Currency()->getShortName(),
                     'IDENTIFICATION.TRANSACTIONID' =>  $tranactId,
@@ -3206,7 +3216,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             if(
                 ($request->getPost('NAME_BIRTHDATE') != "--") &&
                 ($request->getPost('NAME_BIRTHDATE') != "0000-00-00") &&
-                (!empty($request->getPost('NAME_BIRTHDATE')))
+                ($request->getPost('NAME_BIRTHDATE') != "")
             )
             {
                 $requestData 	= $this->prepareHprIniData($configData, NULL , $userData, $basketData,[],$additional,$brand);
@@ -3609,7 +3619,17 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			$count = '1';
 			$amountTotalVat = 0;
 			$shoppingCart = array();
-				
+
+			// if customergroup "händler" is not configured to "Bruttopreise im Shop" we need other values
+			$queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
+            $queryBuilder->select('*')
+                ->from('s_core_customergroups')
+                ->where('groupkey = :groupkey')
+                ->setParameter('groupkey', "H");
+
+            $data = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
+            $isTaxActive = $data[0]["tax"];
+
 			// catching basic basket-Api-information
 			$shoppingCart['authentication'] = array(
 					'sender' 		=> trim($this->Config()->HGW_SECURITY_SENDER),
@@ -3624,24 +3644,43 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				$amountPerUnit 	= str_replace(',','.',$item['price']);
 	
 				//$amountTotalVat = $amountVat + $amountTotalVat;
-	
-				$shoppingCart['basket']['basketItems'][] = array(
-						'position'				=> $count,
-						'basketItemReferenceId' => $count,
+                // fix for missing Config in customergroups "Bruttopreise im Shop"
+                if($isTaxActive){
+                    $shoppingCart['basket']['basketItems'][] = array(
+                        'position'				=> $count,
+                        'basketItemReferenceId' => $count,
                         'articleId'				=> !empty($item['ean']) ? $item['ean'] : $item['ordernumber'],
-						'unit'					=> $item['packunit'],
-						'quantity'				=> $item['quantity'],
-						'vat'					=> $item['tax_rate'],
-						'amountNet'				=> floor(bcmul($amountNet, 100, 10)),
-						'amountVat'				=> floor(bcmul($amountVat, 100, 10)),
-						'amountGross'			=> floor(bcmul($amountGross, 100, 10)),
-						'amountPerUnit'			=> floor(bcmul($amountPerUnit, 100, 10)),
-						'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
-						'title'					=> strlen($item['articlename']) > 255 ? substr($item['articlename'], 0, 250).'...' : $item['articlename'],
-						'description'			=> strlen($item['additional_details']['description']) > 255 ? substr($item['additional_details']['description'], 0, 250).'...' : $item['additional_details']['description'],
-						'imageUrl'				=> $item['image']['src']['2'], // 105px x 105px with original thumbnail mapping
-				);
-				
+                        'unit'					=> $item['packunit'],
+                        'quantity'				=> $item['quantity'],
+                        'vat'					=> $item['tax_rate'],
+                        'amountNet'				=> floor(bcmul($amountNet, 100, 10)),
+                        'amountVat'				=> floor(bcmul($amountVat, 100, 10)),
+                        'amountGross'			=> floor(bcmul($amountGross, 100, 10)),
+                        'amountPerUnit'			=> floor(bcmul($amountPerUnit, 100, 10)),
+                        'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                        'title'					=> strlen($item['articlename']) > 255 ? substr($item['articlename'], 0, 250).'...' : $item['articlename'],
+                        'description'			=> strlen($item['additional_details']['description']) > 255 ? substr($item['additional_details']['description'], 0, 250).'...' : $item['additional_details']['description'],
+                        'imageUrl'				=> $item['image']['src']['2'], // 105px x 105px with original thumbnail mapping
+                    );
+                } else {
+                    $shoppingCart['basket']['basketItems'][] = array(
+                        'position'				=> $count,
+                        'basketItemReferenceId' => $count,
+                        'articleId'				=> !empty($item['ean']) ? $item['ean'] : $item['ordernumber'],
+                        'unit'					=> $item['packunit'],
+                        'quantity'				=> $item['quantity'],
+                        'vat'					=> $item['tax_rate'],
+                        'amountNet'				=> floor(bcmul($amountNet, 100, 10)),
+                        'amountVat'				=> floor(bcmul($amountVat, 100, 10)),
+                        'amountGross'			=> floor(bcmul($amountGross+$amountVat, 100, 10)),
+                        'amountPerUnit'			=> floor(bcmul($amountPerUnit+$amountVat, 100, 10)),
+                        'type'					=> $amountGross >= 0 ? 'goods' : 'voucher',
+                        'title'					=> strlen($item['articlename']) > 255 ? substr($item['articlename'], 0, 250).'...' : $item['articlename'],
+                        'description'			=> strlen($item['additional_details']['description']) > 255 ? substr($item['additional_details']['description'], 0, 250).'...' : $item['additional_details']['description'],
+                        'imageUrl'				=> $item['image']['src']['2'], // 105px x 105px with original thumbnail mapping
+                    );
+                }
+
 				// Hotfix for missing articleId on voucher for secured invoice payment
 				if($shoppingCart['basket']['basketItems'][$count-1]['type'] == "voucher") {
                     $shoppingCart['basket']['basketItems'][$count - 1]['articleId'] = "voucher";
@@ -3682,7 +3721,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $amountTotalGross    = number_format($basket["AmountNumeric"], 4,".","");
             $amountTotalGross    = bcmul($amountTotalGross, 100, 0);
 
-            $amountTotalVatCalc 		= number_format(bcsub($amountTotalGross,$amountTotalNet),0,".","");
+            if($isTaxActive){
+                $amountTotalVatCalc = number_format(bcmul($basket["sAmountTax"], 100, 0),0,".","");
+            } else {
+                $amountTotalVatCalc = number_format( bcmul($basket["sAmountTax"], 100, 0),"0","","");
+            }
+
             $basketTotalData['basket'] = [
                 'amountTotalNet' => $amountTotalNet,
                 'amountTotalVat' => $amountTotalVatCalc,
@@ -3691,6 +3735,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             ];
 
             $shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
+
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());
@@ -3806,6 +3851,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function doRequest($params = array(), $url = NULL){
 		try{
+
 		    if($url == NULL){ $url = self::$requestUrl; }
 			$client = new Zend_Http_Client($url, array(
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,
@@ -3826,11 +3872,12 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			}
 			$response = $client->request('POST');
 
-			if(array_key_exists('raw', $params)){
+            if(array_key_exists('raw', $params)){
 				$res = json_decode($response->getBody(), true);
 				if($response->isError()){
                     self::Logging('doRequest '.$params["PAYMENT.CODE"].' '.'Brand:'.$params["ACCOUNT.BRAND"].' | TransId: '.$params["IDENTIFICATION.TRANSACTIONID"] .' | '.$response->getStatus().' - Message: '.$res['basketErrors'][0]['message']);
 				}
+
 				return $res;
 				exit;
 			}else{
@@ -4731,6 +4778,7 @@ Mit freundlichen Gruessen
 			INSERT INTO `s_core_config_mails` (`id`, `stateId`, `name`, `frommail`, `fromname`, `subject`, `content`, `contentHTML`, `ishtml`, `attachment`, `mailtype`, `context`)
 			VALUES(?,?,?,?,?,?,?,?,?,?,?,?)
 			ON DUPLICATE KEY UPDATE frommail= ?, fromname= ?, subject= ?, content= ?, contentHTML= ?, ishtml= ?, attachment= ?, mailtype= ?, context= ?';
+
 
             $prms_id 		= NULL;
             $prms_stateId 	= NULL;

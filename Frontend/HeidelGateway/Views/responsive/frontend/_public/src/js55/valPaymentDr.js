@@ -1,11 +1,13 @@
 // $(document).ready(function(){
 $(function() {
     if(swVersion.substring(0,3) >= '5.2'){
-        var token = jQuery('input[name="__csrf_token"]').val();
-        if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
+        // var token = jQuery('input[name="__csrf_token"]').val();
+        // if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
+
             var orgLink = jQuery('form.payment').attr('action');
             // SELECT PAYMENT
             if(window.location.pathname.indexOf('gateway') == '-1'){
+
                 // save original form action
                 var orgLink = jQuery('form.payment').attr('action');
                 if(
@@ -539,7 +541,7 @@ $(function() {
                     }
                 }
             });
-        }
+        // }
     }
 
     // Event before swiching payment method

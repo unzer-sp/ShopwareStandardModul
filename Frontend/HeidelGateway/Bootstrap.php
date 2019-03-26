@@ -3707,22 +3707,38 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 			};
 
 			// adding shipping costs as an article
-			$shoppingCart['basket']['basketItems'][] = array(
-					'position'				=> $count,
-					'basketItemReferenceId' => $count,
-					'articleId'				=> 'Ship1234',
-					'unit'					=> 'stk',
-					'quantity'				=> '1',
-					'vat'					=> $basket['sShippingcostsTax'],
+            if($isTaxActive){
+                $shoppingCart['basket']['basketItems'][] = array(
+                    'position'				=> $count,
+                    'basketItemReferenceId' => $count,
+                    'articleId'				=> 'Ship1234',
+                    'unit'					=> 'stk',
+                    'quantity'				=> '1',
+                    'vat'					=> $basket['sShippingcostsTax'],
                     'amountNet'				=> floor(bcmul($shippingCostArray['sShippingcostsNet'], 100, 10)),
                     'amountVat'				=> floor(bcmul($shippingCostArray['sShippingcostsWithTax']-$shippingCostArray['sShippingcostsNet'], 100, 10)),
                     'amountGross'			=> floor(bcmul($shippingCostArray['sShippingcosts'], 100, 10)),
                     'amountPerUnit'			=> floor(bcmul($shippingCostArray['sShippingcosts'], 100, 10)),
-					'type'					=> 'shipment',
-					'title'					=> 'Shipping',
-			);
-	
-	
+                    'type'					=> 'shipment',
+                    'title'					=> 'Shipping',
+                );
+            } else{
+                $shoppingCart['basket']['basketItems'][] = array(
+                    'position'				=> $count,
+                    'basketItemReferenceId' => $count,
+                    'articleId'				=> 'Ship1234',
+                    'unit'					=> 'stk',
+                    'quantity'				=> '1',
+                    'vat'					=> $basket['sShippingcostsTax'],
+                    'amountNet'				=> floor(bcmul($shippingCostArray['sShippingcostsNet'], 100, 10)),
+                    'amountVat'				=> floor(bcmul($shippingCostArray['sShippingcostsWithTax']-$shippingCostArray['sShippingcostsNet'], 100, 10)),
+                    'amountGross'			=> floor(bcmul($shippingCostArray['sShippingcostsWithTax'], 100, 10)),
+                    'amountPerUnit'			=> floor(bcmul($shippingCostArray['sShippingcosts'], 100, 10)),
+                    'type'					=> 'shipment',
+                    'title'					=> 'Shipping',
+                );
+            }
+
 			if (empty($basket['sAmountTax'])){
 				foreach ($shoppingCart['basket']['basketItems'] as $singleItem){
 					$amountTotalVat += $singleItem['amountVat'];

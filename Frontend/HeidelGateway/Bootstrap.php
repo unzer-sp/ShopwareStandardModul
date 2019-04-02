@@ -3751,18 +3751,15 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $amountTotalNet      = number_format($basket['AmountNetNumeric'], 4,".","");
             $amountTotalNet      = bcmul($amountTotalNet, 100, 0);
 
-            $amountTotalGross    = number_format($basket["AmountNumeric"], 4,".","");
-            $amountTotalGross    = bcmul($amountTotalGross, 100, 0);
+            $amountTotalGross    = number_format(bcmul($basket["AmountNumeric"], 100, 0), 0,".","");
 
-            if($isTaxActive){
-                $amountTotalVatCalc = number_format(bcmul($basket["sAmountTax"], 100, 0),0,".","");
-            } else {
-                $amountTotalVatCalc = number_format( bcmul($basket["sAmountTax"], 100, 0),"0","","");
-            }
+            //Vat of shippingcosts and articles
+            $amountTotalVatCalc = number_format( bcmul($shippingCostArray["sAmountTax"], 100, 0),0,".","");
+
 
             $basketTotalData['basket'] = [
-                'amountTotalNet' => $amountTotalNet,
-                'amountTotalVat' => $amountTotalVatCalc,
+                'amountTotalNet' => $amountTotalNet+floor(bcmul($shippingCostArray['sShippingcostsNet'], 100, 10)),
+                'amountTotalVat' => $amountTotalVatCalc, //+floor(bcmul($shippingCostArray['sShippingcostsWithTax']-$shippingCostArray['sShippingcostsNet'], 100, 10)),
                 'currencyCode'   => !empty($basket["sCurrencyName"])  ? $basket["sCurrencyName"]: "EUR",
                 'itemCount'		 => count($shoppingCart['basket']['basketItems']),
             ];

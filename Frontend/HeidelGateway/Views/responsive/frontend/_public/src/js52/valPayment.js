@@ -4,6 +4,7 @@ $(document).ready(function(){
         var token = jQuery('input[name="__csrf_token"]').val();
 
         if (jQuery('input[name="__csrf_token"]').length > 0 && jQuery('input[name="__csrf_token"]').val() != 0) {
+
             var orgLink = jQuery('form.payment').attr('action');
             // SELECT PAYMENT
             if(window.location.pathname.indexOf('gateway') == '-1'){
@@ -1522,8 +1523,13 @@ function valDirectDebitSecured(errors) {
         $('.newreg_dd #salutation').parent('.js--fancy-select').removeClass('has--error');
     }
 
+
     //validation of birthdate
     var birthdate = $('#birthdate_dd').val();
+    if(birthdate == "undefined-undefined-undefined"){
+        birthdate = $('.newreg_dd select[name="DateDD_Year"]').val()+"-"+$('.newreg_dd select[name="DateDD_Month"]').val()+"-"+$('.newreg_dd select[name="DateDD_Day"]').val();
+    }
+
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {
         var dob = new Date(jQuery('.newreg_dd select[name="DateDD_Year"]').val(), jQuery('.newreg_dd select[name="DateDD_Month"]').val()-1, jQuery('.newreg_dd select[name="DateDD_Day"]').val());

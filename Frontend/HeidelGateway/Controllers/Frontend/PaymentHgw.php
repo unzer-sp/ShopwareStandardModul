@@ -465,6 +465,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						return $this->forward('fail');
 					}
 
+                    if ($activePayment == 'gir') {
+                        return $this->redirect($getFormUrl['FRONTEND_REDIRECT_URL']);
+                    }
+
 					/* Paymentmethod Sofortueberweisung, Prezlewy24, iDeal, EPS*/
 					$cardBrands[$activePayment]	= json_decode($getFormUrl['CONFIG_BRANDS'], true);
 					$bankCountry[$activePayment]= json_decode($getFormUrl['CONFIG_BANKCOUNTRY'], true);
@@ -686,12 +690,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 
 			if($response['PROCESSING_RESULT'] == "ACK" || $response['POST_VALIDATION'] == "ACK"){
-				$this->View()->pluginPath = $pref.$basepath.$pluginPath;
+                $this->View()->pluginPath = $pref.$basepath.$pluginPath;
 				if(in_array($activePayment, array('mpa')) && !empty($response['FRONTEND_REDIRECT_URL'])){
 					return $this->redirect($response['FRONTEND_REDIRECT_URL'], array('code' => '302'));
 				}elseif(!empty($response['PROCESSING_REDIRECT_URL'])){
 					if($response['PROCESSING_STATUS_CODE'] == '80'){
-
 						$this->View()->PaymentUrl = $response['PROCESSING_REDIRECT_URL'];
 						$input = array();
 
@@ -1037,6 +1040,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				if ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] != 'WT.IN') {
 					// save result to database hgw_transactions
 					$this->hgw()->saveRes($resp);
+
 					print Shopware()->Front()->Router()->assemble(array(
 							'forceSecure' 	=> 1,
 							'controller' 	=> 'PaymentHgw',
@@ -1901,6 +1905,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					(strtolower($transType) == 'pa') ||
 					(((strtolower($payType) == 'ot') || (strtolower($payType) == 'pc')) && (strtolower($transType) == 'rc'))
 					){
+
 						// debit or reservation: finish Order
 						if(strtolower($transType) == 'pa' || $parameters->PROCESSING_STATUS_CODE == '80'){
 							$paymentStatus = '18'; // reserved

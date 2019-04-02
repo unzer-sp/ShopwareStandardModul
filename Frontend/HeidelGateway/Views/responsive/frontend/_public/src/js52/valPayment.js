@@ -1216,6 +1216,13 @@ function valSantander() {
         $('.newreg_san #salutation').parent('.js--fancy-select').removeClass('has--error');
     }
 
+    //validation of birthdate
+    var birthdate = $('#birthdate_san').val();
+    if(birthdate == "undefined-undefined-undefined"){
+        birthdate = $('.hgw_san select[name="DateSan_Year"]').val()+"-"+$('.hgw_san select[name="DateSan_Month"]').val()+"-"+$('.hgw_san select[name="DateSan_Day"]').val();
+        $('#birthdate_san').val(birthdate);
+    }
+
     // validation of birthdate
     var birthdate = $('#birthdate_san').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
@@ -1268,6 +1275,13 @@ function valPayolutionDirect() {
         errors[i++] = '.msg_salut';
     } else {
         $('.newreg_ivpd #salutation_ivpd').parent('.js--fancy-select').removeClass('has--error');
+    }
+
+    //validation of birthdate
+    var birthdate = $('#birthdate_ivpd').val();
+    if(birthdate == "undefined-undefined-undefined"){
+        birthdate = $('.hgw_ivpd select[name="DatePay_Year"]').val()+"-"+$('.hgw_ivpd select[name="DatePay_Month"]').val()+"-"+$('.hgw_ivpd select[name="DatePay_Day"]').val();
+        $('#birthdate_ivpd').val(birthdate);
     }
 
     // validation of birthdate
@@ -1574,6 +1588,14 @@ function valDirectDebitSecured(errors) {
 function valSantanderHP() {
     var errorsSan = new Array();
     var i = 0;
+
+    //validation of birthdate
+    var birthdate = $('#birthdate_sanHps').val();
+    if(birthdate == "undefined-undefined-undefined"){
+        birthdate = $('.newreg_hps select[name="DateSanHp_Year"]').val()+"-"+$('.newreg_hps select[name="DateSanHp_Month"]').val()+"-"+$('.newreg_hps select[name="DateSanHp_Day"]').val();
+        $('#birthdate_sanHps').val(birthdate);
+    }
+
     var birthdate = $('#birthdate_sanHps').val();
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))
     {

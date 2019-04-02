@@ -1528,6 +1528,7 @@ function valDirectDebitSecured(errors) {
     var birthdate = $('#birthdate_dd').val();
     if(birthdate == "undefined-undefined-undefined"){
         birthdate = $('.newreg_dd select[name="DateDD_Year"]').val()+"-"+$('.newreg_dd select[name="DateDD_Month"]').val()+"-"+$('.newreg_dd select[name="DateDD_Day"]').val();
+        $('#birthdate_dd').val(birthdate);
     }
 
     if(birthdate.match(/[0-9]{4}[-][0-9]{2}[-][0-9]{2}/))

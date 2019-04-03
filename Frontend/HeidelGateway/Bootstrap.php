@@ -3625,7 +3625,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
             $shippingCostVariable = Shopware()->Session()->sOrderVariables;
             $shippingCostArray = $shippingCostVariable->sBasket;
-
 			$count = '1';
 			$amountTotalVat = 0;
 			$shoppingCart = array();
@@ -3758,14 +3757,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 
             $basketTotalData['basket'] = [
-                'amountTotalNet' => $amountTotalNet+floor(bcmul($shippingCostArray['sShippingcostsNet'], 100, 10)),
+//                'amountTotalNet' => $amountTotalNet+floor(bcmul($shippingCostArray['sShippingcostsNet'], 100, 10)),
+                'amountTotalNet' => number_format(bcmul($shippingCostArray['AmountNetNumeric'], 100, 0),0,"",""),
                 'amountTotalVat' => $amountTotalVatCalc, //+floor(bcmul($shippingCostArray['sShippingcostsWithTax']-$shippingCostArray['sShippingcostsNet'], 100, 10)),
                 'currencyCode'   => !empty($basket["sCurrencyName"])  ? $basket["sCurrencyName"]: "EUR",
                 'itemCount'		 => count($shoppingCart['basket']['basketItems']),
             ];
 
             $shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
-
 			return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());

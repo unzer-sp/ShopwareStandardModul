@@ -2326,7 +2326,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $nameBirthdate = htmlentities($request->getPost('NAME_BIRTHDATE'), $flag, $enc);
                     } else {
                         $nameBirthdateYear  = $request->getPost('DateSan_Year') == true ? htmlentities($request->getPost('DateSan_Year'), $flag, $enc) : '';
-                        $nameBirthdateMonth = $request->getPost('DateSan_Month') == true ? htmlspecialchars($request->getPost('DatSane_Month'), $flag, $enc) : '';
+                        $nameBirthdateMonth = $request->getPost('DateSan_Month') == true ? htmlspecialchars($request->getPost('DateSan_Month'), $flag, $enc) : '';
                         $nameBirthdateDay   = $request->getPost('DateSan_Day') == true ? htmlspecialchars($request->getPost('DateSan_Day'), $flag, $enc) : '';
                         $nameBirthdate = $nameBirthdateYear."-".$nameBirthdateMonth."-".$nameBirthdateDay;
                     }
@@ -2335,7 +2335,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     
                     // Benoetigte User-Indexe bei SW.516 anders vergeben
                     $user = self::formatUserInfos($user);
-
                     $customerOptIn  = $request->getPost('CUSTOMER_OPTIN') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_OPTIN')), $flag, $enc) : 'FALSE';
                     $customerOptIn2 = $request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY') == true ? htmlspecialchars(strtoupper($request->getPost('CUSTOMER_ACCEPT_PRIVACY_POLICY')), $flag, $enc) : null;
                     if(empty($customerOptIn2) || $customerOptIn2 == null)

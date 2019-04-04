@@ -134,7 +134,7 @@ $(document).ready(function(){
                     return false;
                 }
 
-                var birthday = $(".hgw_san [name='DateDan_Day']").val();
+                var birthday = $(".hgw_san [name='DateSan_Day']").val();
                 var birthmonth = $(".hgw_san [name = 'DateSan_Month']").val();
                 var birthyear = $(".hgw_san [name = 'DateSan_Year']").val();
                 var birthdate = birthyear + '-' + birthmonth + '-' + birthday;

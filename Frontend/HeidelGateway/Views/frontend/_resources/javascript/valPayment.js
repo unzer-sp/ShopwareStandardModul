@@ -321,9 +321,9 @@ $(document).ready(function(){
     });
 
     jQuery('.newreg_hps').change(function (e) {
-        var birthDay = jQuery(".newreg_hps [name='DateSanHp_Day']").val();
-        var birthMonth = jQuery(".newreg_hps [name = 'DateSanHp_Month']").val();
-        var birthYear = jQuery(".newreg_hps [name = 'DateSanHp_Year']").val();
+        var birthDay = $('.newreg_hps [name="DateSanHps_Day"]').val();
+        var birthMonth = $('.newreg_hps [name="DateSanHps_Month"]').val();
+        var birthYear = $('.newreg_hps [name="DateSanHps_Year"]').val();
 
         jQuery('#birthdate_sanHps').val(birthYear + '-' + birthMonth + '-' + birthDay);
     });

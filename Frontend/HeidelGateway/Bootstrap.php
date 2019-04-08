@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.03.20';
+		return '19.04.08';
 	}
 
 	/**
@@ -962,12 +962,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg,$e);
                 }
 
-            case '19.03.20':
+            case '19.04.08':
                 try{
                     // refactoring ob birthdate inputs for better testing
                     // Fix for creating Basket while showing prices without tax in frontend for IV B2B
-                    // tested for Sw 5.1.6 - 5.5.7
-                    $msg .= '* update 19.03.20<br />';
+                    // direct redirect for giropay without entering data in shop
+                    // Fix for marking "completly paid" in case of divergent amounts in case of paypal-payments
+                    // tested for Sw 5.1.6 - 5.5.8
+                    $msg .= '* update 19.04.08<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

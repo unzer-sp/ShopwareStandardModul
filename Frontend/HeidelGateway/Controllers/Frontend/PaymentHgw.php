@@ -1037,7 +1037,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					exit;
 				}
 
-				if ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] != 'WT.IN') {
+                if ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] != 'WT.IN') {
 					// save result to database hgw_transactions
 					$this->hgw()->saveRes($resp);
 
@@ -1868,6 +1868,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             if (empty(Shopware()->Session()->HPOrderId)) {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
                 $parameters = json_decode($transaction['jsonresponse']);
+//                Shopware()->Session()->sessionId = $parameters->CRITERION_SESS;
+
             } else {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
                 $parameters = json_decode($transaction['jsonresponse']);
@@ -2634,7 +2636,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$params = array($xmlData['IDENTIFICATION_TRANSACTIONID'], $xmlData['IDENTIFICATION_UNIQUEID']);
 					$data = Shopware()->Db()->fetchRow($sql, $params);
 
-					if(
+                    if(
 						($data['result'] != $xmlData['PROCESSING_RESULT']) ||
 						($data['statuscode'] != $xmlData['PROCESSING_STATUS_CODE']) ||
 						($data['return'] != $xmlData['PROCESSING_RETURN']) ||
@@ -2669,6 +2671,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			updatestatus:
 			$url = (string)$xml->Transaction->Analysis->RESPONSE_URL;
 			$order = $this->getOrder($xmlData['IDENTIFICATION_TRANSACTIONID']);
+
 			if(strtoupper((string)$xml->Transaction->Processing->Status) != 'WAITING'){
 				if(empty($order)){
 					if(!empty($url)){
@@ -2877,7 +2880,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							break;
 
 						case 'DB':
-							$params['cleared'] = 12; // default payment status is 12 - 'Komplett bezahlt'
+                            $params['cleared'] = 12; // default payment status is 12 - 'Komplett bezahlt'
 							$params['cleareddate'] = date('Y-m-d H:i:s');
 							$params['o_attr1'] = $shortID;
 							$params['o_attr2'] = $uniqueID;
@@ -2918,9 +2921,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					// add amount to comment
 					$params['internalcomment'].= "\n".'Amount: '.$amount.' '.$currency."\n".'Original Amount: '.$ori_amount.' '.$ori_currency;
 					// check amount
-					if($transType == 'RC' && $amount > 0 && $ori_amount != $amount){
+					if(($transType == 'RC' || $transType == 'DB') && $amount > 0 && $ori_amount != $amount){
 						$params['internalcomment'].= "\n".'!!! Amount mismatch !!!';
-						$params['cleared'] = 11; // 'Teilweise bezahlt'
+//						$params['cleared'] = 11; // 'Teilweise bezahlt'
+						$params['cleared'] = 21; // 'Teilweise bezahlt'
 					}
 					// check currency
 					if(!empty($currency) && $ori_currency != $currency){

@@ -2029,7 +2029,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         $file = realpath(dirname(__FILE__)).'/Controllers/Frontend/PaymentHgw.php';
 						if(file_exists($file)){
 							require_once($file);
-							$basket	= Shopware()->Modules()->Basket()->sGetBasket();
+//							$basket	= Shopware()->Modules()->Basket()->sGetBasket();
+							$basket	= Shopware()->Modules()->Basket()->sGetBasketData();
 							$amount	= Shopware()->Modules()->Basket()->sGetAmount();
 							$amount	= $amount['totalAmount'];
 							if(!empty($basket)){
@@ -2598,7 +2599,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $user = Shopware()->Modules()->Admin()->sGetUserData();
 
         // functionality to show EasyCredit-Method if amount is fitting
-        $basket	        = Shopware()->Modules()->Basket()->sGetBasket();
+//        $basket	        = Shopware()->Modules()->Basket()->sGetBasket();
+        $basket	        = Shopware()->Modules()->Basket()->sGetBasketData();
         $basketAmount   = str_replace(',', '.', $basket['AmountNumeric']);
         $shipping	    = Shopware()->Modules()->Admin()->sGetPremiumShippingcosts();
         $shippingAmount = $shipping['value'];
@@ -3621,7 +3623,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function prepareBasketData($basket = NULL, $user = NULL){
 		try{
-            $basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
+//            $basket == NULL ? 	$basket = Shopware()->Modules()->Basket()->sGetBasket() : $basket;
+            $basket == NULL ? 	$basket = $basket	= Shopware()->Modules()->Basket()->sGetBasketData() : $basket;
 			$user == NULL	?	$user = Shopware()->Modules()->Admin()->sGetUserData()	: $user;
 
             $shippingCostVariable = Shopware()->Session()->sOrderVariables;

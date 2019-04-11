@@ -465,6 +465,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						return $this->forward('fail');
 					}
 
+                    if ($activePayment == 'gir') {
+                        return $this->redirect($getFormUrl['FRONTEND_REDIRECT_URL']);
+                    }
+
 					/* Paymentmethod Sofortueberweisung, Prezlewy24, iDeal, EPS*/
 					$cardBrands[$activePayment]	= json_decode($getFormUrl['CONFIG_BRANDS'], true);
 					$bankCountry[$activePayment]= json_decode($getFormUrl['CONFIG_BANKCOUNTRY'], true);
@@ -686,12 +690,11 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			}
 
 			if($response['PROCESSING_RESULT'] == "ACK" || $response['POST_VALIDATION'] == "ACK"){
-				$this->View()->pluginPath = $pref.$basepath.$pluginPath;
+                $this->View()->pluginPath = $pref.$basepath.$pluginPath;
 				if(in_array($activePayment, array('mpa')) && !empty($response['FRONTEND_REDIRECT_URL'])){
 					return $this->redirect($response['FRONTEND_REDIRECT_URL'], array('code' => '302'));
 				}elseif(!empty($response['PROCESSING_REDIRECT_URL'])){
 					if($response['PROCESSING_STATUS_CODE'] == '80'){
-
 						$this->View()->PaymentUrl = $response['PROCESSING_REDIRECT_URL'];
 						$input = array();
 
@@ -1034,9 +1037,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					exit;
 				}
 
-				if ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] != 'WT.IN') {
+                if ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] != 'WT.IN') {
 					// save result to database hgw_transactions
 					$this->hgw()->saveRes($resp);
+
 					print Shopware()->Front()->Router()->assemble(array(
 							'forceSecure' 	=> 1,
 							'controller' 	=> 'PaymentHgw',
@@ -1864,6 +1868,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             if (empty(Shopware()->Session()->HPOrderId)) {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
                 $parameters = json_decode($transaction['jsonresponse']);
+//                Shopware()->Session()->sessionId = $parameters->CRITERION_SESS;
+
             } else {
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
                 $parameters = json_decode($transaction['jsonresponse']);
@@ -1901,6 +1907,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					(strtolower($transType) == 'pa') ||
 					(((strtolower($payType) == 'ot') || (strtolower($payType) == 'pc')) && (strtolower($transType) == 'rc'))
 					){
+
 						// debit or reservation: finish Order
 						if(strtolower($transType) == 'pa' || $parameters->PROCESSING_STATUS_CODE == '80'){
 							$paymentStatus = '18'; // reserved
@@ -2629,7 +2636,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					$params = array($xmlData['IDENTIFICATION_TRANSACTIONID'], $xmlData['IDENTIFICATION_UNIQUEID']);
 					$data = Shopware()->Db()->fetchRow($sql, $params);
 
-					if(
+                    if(
 						($data['result'] != $xmlData['PROCESSING_RESULT']) ||
 						($data['statuscode'] != $xmlData['PROCESSING_STATUS_CODE']) ||
 						($data['return'] != $xmlData['PROCESSING_RETURN']) ||
@@ -2664,6 +2671,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			updatestatus:
 			$url = (string)$xml->Transaction->Analysis->RESPONSE_URL;
 			$order = $this->getOrder($xmlData['IDENTIFICATION_TRANSACTIONID']);
+
 			if(strtoupper((string)$xml->Transaction->Processing->Status) != 'WAITING'){
 				if(empty($order)){
 					if(!empty($url)){
@@ -2872,7 +2880,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 							break;
 
 						case 'DB':
-							$params['cleared'] = 12; // default payment status is 12 - 'Komplett bezahlt'
+                            $params['cleared'] = 12; // default payment status is 12 - 'Komplett bezahlt'
 							$params['cleareddate'] = date('Y-m-d H:i:s');
 							$params['o_attr1'] = $shortID;
 							$params['o_attr2'] = $uniqueID;
@@ -2913,9 +2921,10 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					// add amount to comment
 					$params['internalcomment'].= "\n".'Amount: '.$amount.' '.$currency."\n".'Original Amount: '.$ori_amount.' '.$ori_currency;
 					// check amount
-					if($transType == 'RC' && $amount > 0 && $ori_amount != $amount){
+					if(($transType == 'RC' || $transType == 'DB') && $amount > 0 && $ori_amount != $amount){
 						$params['internalcomment'].= "\n".'!!! Amount mismatch !!!';
-						$params['cleared'] = 11; // 'Teilweise bezahlt'
+//						$params['cleared'] = 11; // 'Teilweise bezahlt'
+						$params['cleared'] = 21; // 'Teilweise bezahlt'
 					}
 					// check currency
 					if(!empty($currency) && $ori_currency != $currency){
@@ -3320,10 +3329,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$params['FRONTEND.LANGUAGE'] 	= strtoupper(Shopware()->Locale()->getLanguage());
 			$params['FRONTEND.MODE'] 		= "WHITELABEL";
 
-			if($params['FRONTEND.LANGUAGE'] == 'ja'){
-                $params['FRONTEND.LANGUAGE'] = 'jp';
+			if($params['FRONTEND.LANGUAGE'] == 'JA'){
+                $params['FRONTEND.LANGUAGE'] = 'JP';
             }
-
 			// set payment method
             switch(strtolower($config['PAYMENT.METHOD'])){
 				/* prezlewy24 */

@@ -1,7 +1,8 @@
 {block name="hp_payment_hpr"}
 	<div style="margin:10px;">
 		<img style="display:inline; margin-bottom: 10px; margin-top: 5px;" alt="easycredit Logo" src="https://static.easycredit.de/content/image/logo/ratenkauf_42_55.png" id="rk_easycredit_logo"> 
-		<a rel="nofollow" style="color:#000000;" class="easycredit-tooltip" onclick="javascript:window.open('https://www.easycredit.de/Ratenkauf.htm','whatiseasycredit','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600'); return false;" href="https://www.easycredit.de/Ratenkauf.htm">
+		{*<a rel="nofollow" style="color:#000000;" class="easycredit-tooltip" onclick="javascript:window.open('https://www.easycredit.de/Ratenkauf.htm','whatiseasycredit','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600'); return false;" href="https://www.easycredit.de/Ratenkauf.htm">*}
+		<a rel="nofollow" style="color:#000000;" class="easycredit-tooltip" onclick="javascript:window.open('https://www.easycredit-ratenkauf.de','whatiseasycredit','toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, ,left=0, top=0, width=800, height=600'); return false;" href="https://www.easycredit-ratenkauf.de">
 			Was ist Ratenkauf by easyCredit?
 		</a>
 		<input type="hidden" name='ACTIVATEEASY' value='{$activeEasy}' />

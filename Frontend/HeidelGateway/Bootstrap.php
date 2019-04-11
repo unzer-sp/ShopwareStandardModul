@@ -56,7 +56,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	public function getInfo(){
 		$prefix 	= substr($_SERVER['SCRIPT_FILENAME'], 0, strrpos($_SERVER['SCRIPT_FILENAME'], '/'));
 //		$hp_logo 	= base64_encode(file_get_contents(dirname(__FILE__) . '/img/heidelpay.png'));
-		$hp_logo 	= dirname(__FILE__) . '/img/heidelpay.png';
+		$hp_logo 	= substr(realpath(dirname(__FILE__)), strlen(Shopware()->DocPath())-1) . '/img/heidelpay.png';
 		return array(
 				'version' => $this->getVersion(),
 				'autor' => 'heidelpay GmbH (SP)',
@@ -1952,7 +1952,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		// SSL Problem?! http://forum.shopware.com/allgemein-f25/nach-update-auf-4-3-1-resource-shop-not-found-klarna-t22933.html
         if($request->getModuleName() == 'frontend'){
             $realpath 		= realpath(dirname(__FILE__));
-			$pluginPath 	= substr($realpath,strpos($realpath, '/engine'));
+			$pluginPath 	= substr($realpath, strlen(Shopware()->DocPath())-1);
 			$basepath		= Shopware()->System()->sCONFIG['sBASEPATH'];
 			$shopPath		= substr($basepath,strpos($basepath, '/'));
 

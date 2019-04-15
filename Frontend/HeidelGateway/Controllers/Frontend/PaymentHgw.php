@@ -1503,7 +1503,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             'forceSecure' 	=> 1,
                             'controller' 	=> 'paymentHgw',
                             'action' 		=> 'afterEasy',
-                            'HpTransId'     => $resp['IDENTIFICATION_TRANSACTIONID']
+                            'HpTransId'     => $resp['IDENTIFICATION_TRANSACTIONID'],
+                            'txnid' => $resp['IDENTIFICATION_TRANSACTIONID']
                         ));
                         break;
                     case 'HP.PA':
@@ -1515,7 +1516,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         print Shopware()->Front()->Router()->assemble(array(
                             'forceSecure' => 1,
                             'controller' => 'PaymentHgw',
-                            'action' => 'success'
+                            'action' => 'success',
+                            'txnid' => $resp['IDENTIFICATION_TRANSACTIONID']
                         ));
                         break;
 
@@ -1875,16 +1877,18 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 //                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
 //                $parameters = json_decode($transaction['jsonresponse']);
 //            }
+
             /*************************************************/
             $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
-            if(empty($transaction->IDENTIFICATION_TRANSACTIONID)){
+            if(empty($transaction['transactionid'])){
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
             }
-            if(empty($transaction->IDENTIFICATION_TRANSACTIONID)){
+            if(empty($transaction['transactionid'])){
                 $transaction = $this->getHgwTransactions($this->Request()->getParams()['txnid']);
             }
             $parameters = json_decode($transaction['jsonresponse']);
             /*************************************************/
+
 			if ($parameters->PROCESSING_RESULT == 'NOK' || empty($parameters->PROCESSING_RESULT)) {
 				Shopware()->Session()->HPError = $parameters->PROCESSING_RETURN_CODE;
 				print Shopware()->Front()->Router()->assemble(array(

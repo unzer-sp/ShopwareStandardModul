@@ -215,7 +215,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
         $msg = 'Update Fehler. Alte Modulversion: '.$oldVersion.'<br />';
         $form = $this->Form();
         switch($oldVersion){
-            case '14.05.08':
             case '14.05.15':
             case '14.05.22':
             case '14.06.03':

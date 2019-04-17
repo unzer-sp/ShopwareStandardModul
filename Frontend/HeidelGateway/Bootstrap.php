@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.04.08';
+		return '19.04.19';
 	}
 
 	/**
@@ -970,6 +970,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     // Fix for marking "completly paid" in case of divergent amounts in case of paypal-payments
                     // tested for Sw 5.1.6 - 5.5.8
                     $msg .= '* update 19.04.08<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+            case '19.04.19':
+                try{
+                    // fixes a problem with customer loses session in case of OT-Payments
+                    // tested for Sw 5.1.6 - 5.5.8
+                    $msg .= '* update 19.04.19<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

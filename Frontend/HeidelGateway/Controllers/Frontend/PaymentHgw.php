@@ -4161,7 +4161,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 $orderObject->setOrderStatus($statusModel);
                 $orderObject->setTemporaryId($transactionData['IDENTIFICATION_UNIQUEID']);
                 $orderObject->setTransactionId($transactionData['IDENTIFICATION_TRANSACTIONID']);
-                $orderObject->setInternalComment($transactionData['PROCESSING_TIMESTAMP'].'\n Short-Id: '.$transactionData['IDENTIFICATION_SHORTID']);
+                $orderObject->setInternalComment($transactionData['PROCESSING_TIMESTAMP'].'
+'.' Short-Id: '.$transactionData['IDENTIFICATION_SHORTID']);
                 $orderObject->setPaymentStatus($statusModelPayment);
                 $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
 

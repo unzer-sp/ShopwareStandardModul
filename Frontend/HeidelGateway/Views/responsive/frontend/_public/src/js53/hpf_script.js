@@ -128,7 +128,7 @@ document.asyncReady(function() {
             if(checkedClassPos >= 0) {
                 pm = checkedClass.substr(checkedClassPos + prefix.length);
 
-                callAFunction(pm);
+                // callAFunction(pm);
 
                 if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
                     // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
@@ -174,7 +174,7 @@ document.asyncReady(function() {
                     pm = checkedClass.substr(checkedClassPos+prefix.length);
 
                    if(((pm.toLowerCase() == 'cc') || (pm.toLowerCase() == 'dc')) && $('#hp_frame_'+pm).length > 0){
-                       callAFunction(pm);
+                       // callAFunction(pm);
                         // get the target origin from the FRONTEND.PAYMENT_FRAME_URL parameter
                         targetOrigin = getDomainFromUrl($('#hp_frame_'+pm).attr('src'));
                         paymentFrameForm = document.getElementsByName('shippingPaymentForm');

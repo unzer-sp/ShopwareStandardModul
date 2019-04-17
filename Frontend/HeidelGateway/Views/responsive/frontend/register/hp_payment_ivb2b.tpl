@@ -75,7 +75,7 @@
 					{if isset($b2bBirthdate) && $b2bBirthdate != '0000-00-00'}
 						{html_select_date|utf8_encode time=$b2bBirthdate start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY'}</br>
 					{else}
-						{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben" required="required"}</br>
+						{html_select_date|utf8_encode time=$payment_data start_year='-10' end_year='-100' reverse_years='true' day_value_format='%02d' field_order='DMY' all_empty="bitte angeben"}</br>
 					{/if}
 					<input type="hidden" name="COMPANY.EXECUTIVE.1.BIRTHDATE" id="birthdate_ivb2b" value="{$b2bBirthdate}">
 					{*<input type="hidden" name="NAME.BIRTHDATE" id="birthdate_ivb2b" value="1985-06-18">*}

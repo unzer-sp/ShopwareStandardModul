@@ -937,6 +937,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 				$resp['CRITERION_SHIPPINGHASH']		= $this->Request()->getPost('CRITERION_SHIPPINGHASH') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHIPPINGHASH'), $flag, $enc) : '';
 				$resp['CRITERION_BILLSAFE_REFERENCE']= $this->Request()->getPost('CRITERION_BILLSAFE_REFERENCE') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_BILLSAFE_REFERENCE'), $flag, $enc) : '';
 				$resp['CRITERION_SESS']				= $this->Request()->getPost('CRITERION_SESS') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SESS'), $flag, $enc) : '';
+				$resp['CRITERION_TEMPORDER']		= $this->Request()->getPost('CRITERION_TEMPORDER') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_TEMPORDER'), $flag, $enc) : '';
 				$resp['CRITERION_PUSH_URL']			= $this->Request()->getPost('CRITERION_PUSH_URL') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_PUSH_URL'), $flag, $enc) : '';
 				$resp['CRITERION_RESPONSE_URL']		= $this->Request()->getPost('CRITERION_RESPONSE_URL') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_RESPONSE_URL'), $flag, $enc) : '';
 				$resp['CRITERION_SHOP_TYPE']		= $this->Request()->getPost('CRITERION_SHOP_TYPE') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOP_TYPE'), $flag, $enc) : '';
@@ -1044,7 +1045,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					print Shopware()->Front()->Router()->assemble(array(
 							'forceSecure' 	=> 1,
 							'controller' 	=> 'PaymentHgw',
-							'action' 		=> 'success'
+							'action' 		=> 'success',
+                            'txnid'         => $resp['IDENTIFICATION_TRANSACTIONID']
 					));
 					return;
 				} elseif ($resp['PROCESSING_RESULT'] == 'ACK' && $resp['PAYMENT_CODE'] == 'WT.IN') {
@@ -1501,7 +1503,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                             'forceSecure' 	=> 1,
                             'controller' 	=> 'paymentHgw',
                             'action' 		=> 'afterEasy',
-                            'HpTransId'     => $resp['IDENTIFICATION_TRANSACTIONID']
+                            'HpTransId'     => $resp['IDENTIFICATION_TRANSACTIONID'],
+                            'txnid' => $resp['IDENTIFICATION_TRANSACTIONID']
                         ));
                         break;
                     case 'HP.PA':
@@ -1513,7 +1516,8 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         print Shopware()->Front()->Router()->assemble(array(
                             'forceSecure' => 1,
                             'controller' => 'PaymentHgw',
-                            'action' => 'success'
+                            'action' => 'success',
+                            'txnid' => $resp['IDENTIFICATION_TRANSACTIONID']
                         ));
                         break;
 
@@ -1865,17 +1869,27 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             unset($this->View()->amortisationText);
 
             // get transaction from hgw_transactions
-            if (empty(Shopware()->Session()->HPOrderId)) {
+//            if (empty(Shopware()->Session()->HPOrderId)) {
+//                $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
+//                $parameters = json_decode($transaction['jsonresponse']);
+//
+//            } elseif (empty(Shopware()->Session()->HPOrderId)) {
+//                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
+//                $parameters = json_decode($transaction['jsonresponse']);
+//            }
+
+            /*************************************************/
+            $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
+            if(empty($transaction['transactionid'])){
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
-                $parameters = json_decode($transaction['jsonresponse']);
-//                Shopware()->Session()->sessionId = $parameters->CRITERION_SESS;
-
-            } else {
-                $transaction = $this->getHgwTransactions(Shopware()->Session()->HPOrderId);
-                $parameters = json_decode($transaction['jsonresponse']);
             }
+            if(empty($transaction['transactionid'])){
+                $transaction = $this->getHgwTransactions($this->Request()->getParams()['txnid']);
+            }
+            $parameters = json_decode($transaction['jsonresponse']);
+            /*************************************************/
 
-			if ($parameters->PROCESSING_RESULT == 'NOK') {
+			if ($parameters->PROCESSING_RESULT == 'NOK' || empty($parameters->PROCESSING_RESULT)) {
 				Shopware()->Session()->HPError = $parameters->PROCESSING_RETURN_CODE;
 				print Shopware()->Front()->Router()->assemble(array(
 						'forceSecure' 	=> 1,
@@ -1983,7 +1997,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						$comment = str_replace('Konto: ','Konto: <br />',$comment);
 
 						// Fix to compare Basket amount with payment amount and set order status to
-						$swAmount = $this->getAmount();
+                        $swAmount = $this->getAmount();
 						$hpAmount = floatval(trim($parameters->PRESENTATION_AMOUNT));
 
 						if ($swAmount - $hpAmount >= 0.01) {
@@ -1996,7 +2010,17 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 						}
 
 						Shopware()->Session()->HPTrans = $parameters->IDENTIFICATION_UNIQUEID;
-						$return = $this->saveOrder($parameters->IDENTIFICATION_TRANSACTIONID, $parameters->IDENTIFICATION_UNIQUEID, $paymentStatus);
+						try{
+                            $return = $this->saveOrder($parameters->IDENTIFICATION_TRANSACTIONID, $parameters->IDENTIFICATION_UNIQUEID, $paymentStatus);
+                        } catch (Exception $e) {
+						    $return = $this->convertOrder([
+						        'IDENTIFICATION_UNIQUEID'   => $parameters->IDENTIFICATION_UNIQUEID ,
+						        'IDENTIFICATION_TRANSACTIONID' => $parameters->IDENTIFICATION_TRANSACTIONID ,
+						        'PROCESSING_TIMESTAMP' => $parameters->PROCESSING_TIMESTAMP ,
+						        'IDENTIFICATION_SHORTID' => $parameters->IDENTIFICATION_SHORTID ,
+						        'CRITERION_TEMPORDER'       => $parameters->CRITERION_TEMPORDER,
+                            ],21);
+                        }
 
 						Shopware()->Session()->sOrderVariables['sTransactionumber'] = $parameters->IDENTIFICATION_TRANSACTIONID;
 
@@ -2338,12 +2362,22 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 					'sUniqueID' 	=> Shopware()->Session()->HPTrans,
                     'txnId'         => $txnId,
                     'sAGB'          => true
-			)
-					);
+			));
+
 		}catch(Exception $e){
-			Shopware()->Plugins()->HeidelGateway()->Logging('successAction | '.$e->getMessage());
+            Shopware()->Container()->get('pluginlogger')->error("heidelpay Failure while saving transaction | ".$e->getMessage()." | at TXN-ID: ".$parameters->IDENTIFICATION_TRANSACTIONID);
+
+            $this->failAction();
+            return Shopware()->Front()->Router()->assemble(array(
+                'forceSecure' 	=> 1,
+                'controller' 	=> 'PaymentHgw',
+                'action' 		=> 'fail',
+
+            ));
+            exit();
+            //Shopware()->Plugins()->HeidelGateway()->Logging('successAction | '.$e->getMessage());
 			// 			$this->hgw()->Logging('successAction | '.$e->getMessage());
-			return;
+//			return;
 		}
 	}
 
@@ -3882,7 +3916,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 		try {
 			$transactionResult = Shopware()->Db()->fetchRow($sql, $params);
 			if (empty($transactionResult) || $transactionResult == '') {
-				self::hgw()->Logging('getHgwTransactions  | No Transaction found for '.$transactionId);
+				return [];
 			}
 
 		} catch (Exception $e){
@@ -3947,7 +3981,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
         );
     }
 
-    public function convertOrder($transactionData)
+    public function convertOrder($transactionData, $paymentStatus = 12)
     {
         try {
             if (empty($transactionData)) {
@@ -3979,8 +4013,9 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     ->where('orders.temporaryId = ?1')
                     ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
                 $result = $builder->getQuery()->getArrayResult();
+                /** @var \Shopware\Models\Order\Order $orderObject */
                 $orderObject = Shopware()->Models()->find("\Shopware\Models\Order\Order",['id' => $result[0]['id']]);
-
+                
                 // create instance of ordernumber-model to create new ordernumber for order
                 $numberRepository = Shopware()->Models()->getRepository("\Shopware\Models\Order\Number");
                 $numberModel = $numberRepository->findOneBy(['name' => 'invoice']);
@@ -4119,19 +4154,32 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 Shopware()->Models()->persist($shippingModel);
 
                 
-                $statusModel = Shopware()->Models()->find("\Shopware\Models\Order\Status", '0');
-                
+                $statusModel = Shopware()->Models()->find("\Shopware\Models\Order\Status", "0");
+                $statusModelPayment = Shopware()->Models()->find("\Shopware\Models\Order\Status", $paymentStatus);
+
                 // Finally set the order to be a regular order
                 $orderObject->setOrderStatus($statusModel);
                 $orderObject->setTemporaryId($transactionData['IDENTIFICATION_UNIQUEID']);
                 $orderObject->setTransactionId($transactionData['IDENTIFICATION_TRANSACTIONID']);
-                $orderObject->setInternalComment($transactionData['PROCESSING_TIMESTAMP'].'\n Short-Id: '.$transactionData['IDENTIFICATION_SHORTID']);
+                $orderObject->setInternalComment($transactionData['PROCESSING_TIMESTAMP'].'
+'.' Short-Id: '.$transactionData['IDENTIFICATION_SHORTID']);
+                $orderObject->setPaymentStatus($statusModelPayment);
                 $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
 
                 Shopware()->Models()->flush();
                 $this->View()->assign(['success' => true]);
-            }
 
+                // to send a Status E-Mail to customer
+                // sending e-mail via $this->saveOrder() doesn't work
+                $this->savePaymentStatus(
+                    $transactionData['IDENTIFICATION_TRANSACTIONID'],
+                    $transactionData['IDENTIFICATION_UNIQUEID'],
+                    12,
+                    true
+                );
+
+                return $newOrderNumber;
+            }
         } catch (Exception $e){
             self::hgw()->Logging('convertOrder failed | Message:'.$e->getMessage());
         }

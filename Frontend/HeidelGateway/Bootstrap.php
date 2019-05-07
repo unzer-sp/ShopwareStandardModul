@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.04.19';
+		return '19.05.07';
 	}
 
 	/**
@@ -978,6 +978,13 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     // fixes a problem with customer loses session in case of OT-Payments
                     // tested for Sw 5.1.6 - 5.5.8
                     $msg .= '* update 19.04.19<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+            case '19.05.07':
+                try{
+                    // another fix for customer loses session in case of OT-Payments
+                    $msg .= '* update 19.05.07<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

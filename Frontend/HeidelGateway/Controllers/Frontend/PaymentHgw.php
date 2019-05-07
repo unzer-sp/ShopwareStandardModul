@@ -2005,7 +2005,7 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                 try{
 Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction vor saveOrder | Txn-Id: ".$parameters->IDENTIFICATION_TRANSACTIONID." | Referer: ".$_SERVER["HTTP_REFERER"]);
                     $return = $this->saveOrder($parameters->IDENTIFICATION_TRANSACTIONID, $parameters->IDENTIFICATION_UNIQUEID, $paymentStatus);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction Nach saveOrder | Bestellnummer: ".$return);
+Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction nach saveOrder | Bestellnummer: ".$return);
                 } catch (Exception $e) {
 Shopware()->Container()->get('pluginlogger')->warning("heidelpay successAction saveOrder FAILED convortOrder started | UniqueId: ".$parameters->IDENTIFICATION_UNIQUEID);
                     $return = $this->convertOrder([
@@ -2015,7 +2015,7 @@ Shopware()->Container()->get('pluginlogger')->warning("heidelpay successAction s
                         'IDENTIFICATION_SHORTID' => $parameters->IDENTIFICATION_SHORTID ,
                         'CRITERION_TEMPORDER'       => $parameters->CRITERION_TEMPORDER,
                     ],21);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction convertOrder durch | Ordernumber: ".$return);
+Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction convertOrder FAILED durch | Ordernumber: ".$return);
                 }
 
                 if(!$return){
@@ -2164,7 +2164,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction fall
                                 );
                             }
 
-                            $orderNum = $this->getOrder($transactionId);
+                            $orderNum = $this->getOrder($parameters->IDENTIFICATION_TRANSACTIONID);
                             $prepayment = array();
                             $user = $this->getUser();
                             foreach($repl AS $k => $v){
@@ -2370,14 +2370,18 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction fall
 //                'txnId'         => $txnId,
 //                'sAGB'          => true
 //            ));
-            return $this->redirect(array(
-                'controller' 	=> 'checkout',
-                'action' 		=> 'finish',
-                'forceSecure'	=> 1,
-                'sUniqueID' 	=> $transaction['uniqueid'],
-                'txnId'         => $transaction['transactionid'],
-                'sAGB'          => true
-            ));
+            $url = array(
+                'controller' => 'checkout',
+                'action' => 'finish',
+                'forceSecure' => 1,
+                'sUniqueID' => $transaction['uniqueid'],
+                'txnId' => $transaction['transactionid'],
+                'sAGB' => true
+            );
+Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction redirects to| ".$url);
+
+
+            return $this->redirect($url);
 
         }catch(Exception $e){
             Shopware()->Container()->get('pluginlogger')->error("heidelpay Failure while saving transaction | ".$e->getMessage()." Stacktrace: ".$e->getTraceAsString()." | at TXN-ID: ".$parameters->IDENTIFICATION_TRANSACTIONID. " | TemporaryID: ".$parameters->CRITERION_TEMPORDER);

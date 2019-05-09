@@ -2003,11 +2003,9 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
 
                 Shopware()->Session()->HPTrans = $parameters->IDENTIFICATION_UNIQUEID;
                 try{
-Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction vor saveOrder | Txn-Id: ".$parameters->IDENTIFICATION_TRANSACTIONID." | Referer: ".$_SERVER["HTTP_REFERER"]);
                     $return = $this->saveOrder($parameters->IDENTIFICATION_TRANSACTIONID, $parameters->IDENTIFICATION_UNIQUEID, $paymentStatus);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction nach saveOrder | Bestellnummer: ".$return);
                 } catch (Exception $e) {
-Shopware()->Container()->get('pluginlogger')->warning("heidelpay successAction saveOrder FAILED convortOrder started | UniqueId: ".$parameters->IDENTIFICATION_UNIQUEID);
+                    Shopware()->Container()->get('pluginlogger')->warning("heidelpay successAction saveOrder FAILED convortOrder started | Txn-Id: ".$parameters->IDENTIFICATION_TRANSACTIONID." | UniqueId: ".$parameters->IDENTIFICATION_UNIQUEID);
                     $return = $this->convertOrder([
                         'IDENTIFICATION_UNIQUEID'   => $parameters->IDENTIFICATION_UNIQUEID ,
                         'IDENTIFICATION_TRANSACTIONID' => $parameters->IDENTIFICATION_TRANSACTIONID ,
@@ -2015,11 +2013,10 @@ Shopware()->Container()->get('pluginlogger')->warning("heidelpay successAction s
                         'IDENTIFICATION_SHORTID' => $parameters->IDENTIFICATION_SHORTID ,
                         'CRITERION_TEMPORDER'       => $parameters->CRITERION_TEMPORDER,
                     ],21);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction convertOrder FAILED durch | Ordernumber: ".$return);
+                    Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction convertOrder created an order | Ordernumber: ".$return);
                 }
 
                 if(!$return){
-Shopware()->Container()->get('pluginlogger')->warning("heidelpay successAction fallback convertOrderCall");
                     $return = $this->convertOrder([
                         'IDENTIFICATION_UNIQUEID'   => $parameters->IDENTIFICATION_UNIQUEID ,
                         'IDENTIFICATION_TRANSACTIONID' => $parameters->IDENTIFICATION_TRANSACTIONID ,
@@ -2027,7 +2024,7 @@ Shopware()->Container()->get('pluginlogger')->warning("heidelpay successAction f
                         'IDENTIFICATION_SHORTID' => $parameters->IDENTIFICATION_SHORTID ,
                         'CRITERION_TEMPORDER'       => $parameters->CRITERION_TEMPORDER,
                     ],21);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction fallback convertOrderCall Bestellnummer:".$return);
+                    Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction convertOrder 2nd try created an order | Ordernumber: ".$return);
                 }
                 Shopware()->Session()->sOrderVariables['sTransactionumber'] = $parameters->IDENTIFICATION_TRANSACTIONID;
 
@@ -2270,7 +2267,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction fall
                 );
 
                 $this->addOrderInfos($parameters->IDENTIFICATION_TRANSACTIONID, $params, $paymentStatus);
-                Shopware()->Session()->HPdidRequest == false;
+                Shopware()->Session()->HPdidRequest = false;
                 $txnId = Shopware()->Session()->HPOrderId;
                 unset(Shopware()->Session()->HPdidRequest);
                 unset(Shopware()->Session()->HPOrderId);
@@ -2340,7 +2337,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction fall
                                 'controller' 	=> 'PaymentHgw',
                                 'action' 		=> 'savePayment',
                                 'appendSession' => 'SESSION_ID',
-                                'register' 		=> $resp['var_Register']['payment'],
+                                'register' 		=> $parameters->var_Register,
                                 'sTarget' 		=> $parameters->var_sTarget,
                                 '__csrf_token' 	=> $parameters->__csrf_token
                             ));
@@ -2350,7 +2347,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction fall
                                 'controller' 	=> 'PaymentHgw',
                                 'action' 		=> 'savePayment',
                                 'appendSession' => 'SESSION_ID',
-                                'register' 		=> $resp['var_Register']['payment'],
+                                'register' 		=> $parameters->var_Register,
                                 'sTarget' 		=> $parameters->var_sTarget
                             ));
                         }
@@ -2358,7 +2355,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction fall
                 }
             }
 
-            Shopware()->Session()->HPdidRequest == false;
+            Shopware()->Session()->HPdidRequest = false;
             unset(Shopware()->Session()->HPdidRequest);
             unset(Shopware()->Session()->HPOrderId);
 
@@ -4019,7 +4016,6 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
                     ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
                 $result = $builder->getQuery()->getArrayResult();
                 $customerDbResult = $result;
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/ Database Query");
 
                 // Check required fields
                 if (empty($customerDbResult) || $customerDbResult[0]['customer'] === null || $customerDbResult[0]['customer']['defaultBillingAddress'] === null) {
@@ -4036,7 +4032,9 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/ Da
                 $result = $builder->getQuery()->getArrayResult();
                 /** @var \Shopware\Models\Order\Order $orderObject */
                 $orderObject = Shopware()->Models()->find("\Shopware\Models\Order\Order",['id' => $result[0]['id']]);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/  Orderobjekt loaded");
+
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/4  orderobject loaded");
+
                 // create instance of ordernumber-model to create new ordernumber for order
                 $numberRepository = Shopware()->Models()->getRepository("\Shopware\Models\Order\Number");
                 $numberModel = $numberRepository->findOneBy(['name' => 'invoice']);
@@ -4048,7 +4046,9 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/  O
                 $newOrderNumber = $numberModel->getNumber() + 1;
                 // Set new ordernumber
                 $numberModel->setNumber($newOrderNumber);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/ Ordernumber generated: ".$newOrderNumber);
+
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 ordernumber generated: ".$newOrderNumber);
+
                 // setting ordernumber to orderobject
                 $orderObject->setNumber($newOrderNumber);
 
@@ -4096,7 +4096,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/ Or
                 $customerObject->setLastname($customerData[0]['lastname']);
                 $customerObject->setBirthday($customerData[0]['birthday']);
                 Shopware()->Models()->persist($customerObject);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 4/  CustomerObjekt generated");
+
                 // copy customer number into billing address from customer
                 // Casting null values to empty strings to fulfill the restrictions of the s_order_billingaddress table
 
@@ -4119,12 +4119,10 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 4/  C
                     'stateId'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['stateId'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['stateId']: ' ',
                     'number'                    => !empty($customerDbResult[0]['customer']['number']) ? $customerDbResult[0]['customer']['number'] : ' ',
                 ];
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 5/ Billingaddress filled:".print_r($billingAddress,1));
 
                 // make an instance of Billingmodel
                 $billingModel = new Shopware\Models\Order\Billing();
                 $billingModel->fromArray($billingAddress);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 6/ BillingModel generated");
 
                 $queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
                 $queryBuilder->select('*')
@@ -4132,11 +4130,13 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 6/ Bi
                     ->where('id = :id')
                     ->setParameter('id', $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']);
                 $countryArray = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 7/ CountryArray:".print_r($countryArray[0],1));
+
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 Country from DB loaded");
+
                 $countryModel = new \Shopware\Models\Country\Country();
                 $countryModel = $countryModel->fromArray($countryArray[0]);
                 Shopware()->Models()->persist($countryModel);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 8/ CountryModel persisted");
+
                 // setting some Values for Billingmodel
                 $billingModel->setCountry($countryModel);
                 $billingModel->setCustomer($customerObject);
@@ -4144,7 +4144,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 8/ Co
                 $billingModel->setZipCode($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode']);
                 $billingModel->setOrder($orderObject);
                 Shopware()->Models()->persist($billingModel);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 8/ Values for BillingModel set");
+
                 // Casting null values to empty strings to fulfill the restrictions of the s_order_shippingaddress table
                 $shippingAddress = array_map(function ($value) {
                     return (string)$value;
@@ -4178,7 +4178,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 8/ Va
                 $shippingModel->setOrder($orderObject);
                 $shippingModel->setZipCode($customerDbResult[0]['customer']['defaultBillingAddress']['zipcode']);
                 Shopware()->Models()->persist($shippingModel);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 9/ ShippingModel persited");
+
                 $statusModel = Shopware()->Models()->find("\Shopware\Models\Order\Status", "0");
                 $statusModelPayment = Shopware()->Models()->find("\Shopware\Models\Order\Status", $paymentStatus);
 
@@ -4190,7 +4190,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 9/ Sh
 '.' Short-Id: '.$transactionData['IDENTIFICATION_SHORTID']);
                 $orderObject->setPaymentStatus($statusModelPayment);
                 $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 10/ Setting some OrderValues");
+
                 Shopware()->Models()->flush();
                 $this->View()->assign(['success' => true]);
 
@@ -4202,13 +4202,13 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 10/ S
                     12,
                     true
                 );
-Shopware()->Container()->get('pluginlogger')->info("Paymentstatus changed E-Mail sent End of convertOrder for ordernumber: ".$newOrderNumber);
+                Shopware()->Container()->get('pluginlogger')->info("4/4 Paymentstatus changed, E-Mail sent to customer, End of convertOrder for ordernumber: ".$newOrderNumber);
 
                 return $newOrderNumber;
             }
         } catch (Exception $e){
-Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FEHLER / EXCEPTION on Stacktrace".$e->getTraceAsString());
-Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FEHLER / EXCEPTION with failureMessage ".$e->getMessage());
+            Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FEHLER / EXCEPTION on Stacktrace".$e->getTraceAsString());
+            Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FEHLER / EXCEPTION with failureMessage ".$e->getMessage());
         }
     }
 

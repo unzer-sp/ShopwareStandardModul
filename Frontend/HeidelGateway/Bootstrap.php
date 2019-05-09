@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.05.07';
+		return '19.05.10';
 	}
 
 	/**
@@ -981,13 +981,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '19.05.07':
+            case '19.05.10':
                 try{
-                    // another fix for customer loses session in case of OT-Payments
-                    $msg .= '* update 19.05.07<br />';
+                    // another fix for customer loses session in case of OT-Payments and Paypal
+                    $msg .= '* update 19.05.10<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
+
 
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
@@ -3781,7 +3782,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             ];
 
             $shoppingCart['basket'] = array_merge($shoppingCart['basket'],$basketTotalData['basket']);
-			return $shoppingCart;
+            return $shoppingCart;
 		}catch(Exception $e){
 			$this->Logging('prepareBasketData | '.$e->getMessage());
 			return;

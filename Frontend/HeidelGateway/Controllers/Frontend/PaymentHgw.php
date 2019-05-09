@@ -2375,13 +2375,11 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                 'txnId' => $transaction['transactionid'],
                 'sAGB' => true
             );
-Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction redirects to| ".$url);
-
 
             return $this->redirect($url);
 
         }catch(Exception $e){
-            Shopware()->Container()->get('pluginlogger')->error("heidelpay Failure while saving transaction | ".$e->getMessage()." Stacktrace: ".$e->getTraceAsString()." | at TXN-ID: ".$parameters->IDENTIFICATION_TRANSACTIONID. " | TemporaryID: ".$parameters->CRITERION_TEMPORDER);
+            Shopware()->Container()->get('pluginlogger')->error("heidelpay successAction Failure while saving transaction | ".$e->getMessage()." Stacktrace: ".$e->getTraceAsString()." | at TXN-ID: ".$parameters->IDENTIFICATION_TRANSACTIONID. " | TemporaryID: ".$parameters->CRITERION_TEMPORDER);
 
             $this->failAction();
             return Shopware()->Front()->Router()->assemble(array(

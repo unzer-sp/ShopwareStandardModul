@@ -41,7 +41,7 @@
 				<div class="heidelB2bRegistered" style="margin-top: 10px">
 					{* Company CommercialRegisterNumber *}
 					<label for="heidelb2bCompanyRegisterNr">{s name='B2bCompanyRegisterNr' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bCompanyRegisterNr" type="text" value="{$b2bCompanyRegisterNr}" name="COMPANY.COMMERCIALREGISTERNUMBER" required><br />
+					<input id="heidelb2bCompanyRegisterNr" type="text" value="{$b2bCompanyRegisterNr}" name="COMPANY.COMMERCIALREGISTERNUMBER"><br />
 
 					{* Company VatId /UstId *}
 					<label for="heidelb2bCompanyUstNr">{s name='B2bCompanyUstNr' namespace='frontend/payment_heidelpay/gateway'}{/s}:</label></br>
@@ -64,11 +64,11 @@
 
 					{* Company Executive Preame *}
 					<label for="heidelb2bPreName">{s name='B2bPreName' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bPreName" type="text" value="{$b2bCompanyPreName}" name="COMPANY.EXECUTIVE.1.GIVEN" required><br />
+					<input id="heidelb2bPreName" type="text" value="{$b2bCompanyPreName}" name="COMPANY.EXECUTIVE.1.GIVEN"><br />
 
 					{* Company Executive Surname *}
 					<label for="heidelb2bLastName">{s name='B2bLastName' namespace='frontend/payment_heidelpay/gateway'}{/s}*:</label></br>
-					<input id="heidelb2bLastName" type="text" value="{$b2bCompanySurName}" name="COMPANY.EXECUTIVE.1.FAMILY" required><br />
+					<input id="heidelb2bLastName" type="text" value="{$b2bCompanySurName}" name="COMPANY.EXECUTIVE.1.FAMILY"><br />
 
 					{* Company Executive Birthdate *}
 					<label>{s name='hp_RegisterLabelBirthday' namespace='frontend/register/hp_payment'}{/s}*:</label><br />

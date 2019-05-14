@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.05.10';
+		return '19.05.15';
 	}
 
 	/**
@@ -981,10 +981,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '19.05.10':
+            case '19.05.15':
                 try{
                     // another fix for customer loses session in case of OT-Payments and Paypal
-                    $msg .= '* update 19.05.10<br />';
+                    $msg .= '* update 19.05.15<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }

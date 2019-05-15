@@ -989,7 +989,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                     $this->logError($msg,$e);
                 }
 
-
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
         }

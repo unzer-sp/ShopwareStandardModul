@@ -4179,7 +4179,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                 $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
 
                 // setting some Values in $_SESSION
-                $this->Request()->setParam(['sUniqueID' => $transactionData['IDENTIFICATION_UNIQUEID']]);
+                $this->Request()->setParam('sUniqueID',$transactionData['IDENTIFICATION_UNIQUEID']);
                 Shopware()->Session()->sUserId = $customerDbResult[0]['customerId'];
                 Shopware()->Session()->sessionId = $customerDbResult[0]['temporaryId'];
 
@@ -4198,7 +4198,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                     12,
                     true
                 );
-                Shopware()->Container()->get('pluginlogger')->info("4/4 Paymentstatus changed, E-Mail sent to customer, End of convertOrder for ordernumber: ".$newOrderNumber);
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrrder 4/4 Paymentstatus changed, E-Mail sent to customer, End of convertOrder for ordernumber: ".$newOrderNumber);
 
 
                 $this->View()->assign(['success' => true]);

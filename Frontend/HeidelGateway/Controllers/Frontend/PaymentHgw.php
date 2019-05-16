@@ -1823,6 +1823,14 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                     'action' => 'fail',
                     'appendSession' => 'SESSION_ID'
                 ));
+//                return $this->redirect(
+//                    array(
+//                        'forceSecure' => 1,
+//                        'controller' => 'PaymentHgw',
+//                        'action' => 'fail',
+//                        'appendSession' => 'SESSION_ID'
+//                    )
+//                );
             } else{
                 Shopware()->Session()->HPError = $this->getHPErrorMsg($parameters->PROCESSING_RETURN_CODE);
 
@@ -1833,6 +1841,14 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                         'action' => 'shippingPayment',
                         'appendSession' => 'SESSION_ID'
                     ));
+//                    return $this->redirect(
+//                        array(
+//                            'forceSecure' => 1,
+//                            'controller' => 'checkout',
+//                            'action' => 'shippingPayment',
+//                            'appendSession' => 'SESSION_ID'
+//                        )
+//                    );
                 }else{
                     $this->View()->ErrorMessage = Shopware()->Session()->HPError;
                     $this->View()->sErrorMessage = $this->getHPErrorMsg(Shopware()->Session()->HPError);
@@ -1843,6 +1859,15 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                         'sTarget' => $parameters->sTarget,
                         'appendSession' => 'SESSION_ID'
                     ));
+//                    return $this->redirect(
+//                        array(
+//                            'forceSecure' => 1,
+//                            'controller' => 'account',
+//                            'action' => 'payment',
+//                            'sTarget' => $parameters->sTarget,
+//                            'appendSession' => 'SESSION_ID'
+//                        )
+//                    );
                 }
             }
 
@@ -2012,6 +2037,7 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                         'PROCESSING_TIMESTAMP' => $parameters->PROCESSING_TIMESTAMP ,
                         'IDENTIFICATION_SHORTID' => $parameters->IDENTIFICATION_SHORTID ,
                         'CRITERION_TEMPORDER'       => $parameters->CRITERION_TEMPORDER,
+                        'CRITERION_USER_ID'       => $parameters->CRITERION_USER_ID,
                     ],21);
                     Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction convertOrder created an order | Ordernumber: ".$return);
                 }
@@ -2023,6 +2049,7 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                         'PROCESSING_TIMESTAMP' => $parameters->PROCESSING_TIMESTAMP ,
                         'IDENTIFICATION_SHORTID' => $parameters->IDENTIFICATION_SHORTID ,
                         'CRITERION_TEMPORDER'       => $parameters->CRITERION_TEMPORDER,
+                        'CRITERION_USER_ID'       => $parameters->CRITERION_USER_ID,
                     ],21);
                     Shopware()->Container()->get('pluginlogger')->info("heidelpay successAction convertOrder 2nd try created an order | Ordernumber: ".$return);
                 }
@@ -4000,7 +4027,7 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
     {
         try {
             if (empty($transactionData)) {
-                self::hgw()->Logging('convertOrder failed');
+                Shopware()->Container()->get('pluginlogger')->error('convertOrder failed | no transactiondata given');
             } else {
                 // Get user, shipping and billing
                 $builder = Shopware()->Models()->createQueryBuilder();
@@ -4042,7 +4069,8 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/4  
                     return;
                 }
                 // fetch last ordernumber and add 1
-                $newOrderNumber = $numberModel->getNumber() + 1;
+//                $newOrderNumber = $numberModel->getNumber() + 1;
+                $newOrderNumber = $numberModel->getNumber();
                 // Set new ordernumber
                 $numberModel->setNumber($newOrderNumber);
 
@@ -4151,7 +4179,6 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                  * @var \Shopware\Models\Country\Country $countryModel
                  */
                 $countryModel = Shopware()->Models()->find("\Shopware\Models\Country\Country", $customerDbResult[0]['customer']['defaultShippingAddress']['countryId']);
-//                $countryModel->setArea(Shopware()->Models()->find("Shopware\Models\Country\Area", $countryModel->getArea()));
 
                 /**
                  * @var \Shopware\Models\Order\Shipping $shippingModel
@@ -4178,18 +4205,42 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                 $orderObject->setPaymentStatus($statusModelPayment);
                 $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
 
-                // setting some Values in $_SESSION
-                $this->Request()->setParam('sUniqueID',$transactionData['IDENTIFICATION_UNIQUEID']);
-                Shopware()->Session()->sUserId = $customerDbResult[0]['customerId'];
-                Shopware()->Session()->sessionId = $customerDbResult[0]['temporaryId'];
-
-                $sOrderVariables = new ArrayObject();
-                $sOrderVariables->setFlags(ArrayObject::STD_PROP_LIST |ArrayObject::ARRAY_AS_PROPS);
-                $sOrderVariables['sOrderNumber'] = $orderObject->getNumber();
-                Shopware()->Session()->sOrderVariables = $sOrderVariables;
-
                 // saving all generated Models and Onjects
                 Shopware()->Models()->flush();
+
+                // setting some Values in $_SESSION
+                $this->Request()->setParam('sUniqueID',$transactionData['IDENTIFICATION_UNIQUEID']);
+                Shopware()->Session()->sUserId = $transactionData['CRITERION_USER_ID'];
+
+                /************** added Params *************/
+                $sessionParam = "auto-user";
+                Shopware()->Session()->$sessionParam = 1;
+                Shopware()->Session()->userInfo = [
+                    'firstname' => $customerDbResult[0]['customer']['firstname'],
+                    'lastname' => $customerDbResult[0]['customer']['lastname'],
+                    'email' => $customerDbResult[0]['customer']['email'],
+                    'salutation' => $customerDbResult[0]['customer']['salutation'],
+                    'title' => $customerDbResult[0]['customer']['title'],
+                    'birthday' => $customerDbResult[0]['customer']['birthday'],
+                    'accountmode' => $customerDbResult[0]['customer']['accountMode'],
+                ];
+                Shopware()->Session()->sUserMail = $customerDbResult[0]['customer']['email'];
+                Shopware()->Session()->sUserPassword = $customerDbResult[0]['customer']['hashPassword'];
+                Shopware()->Session()->sUserGroup = $customerDbResult[0]['customer']['groupKey'];
+                Shopware()->Session()->sBasketAmount = $customerDbResult[0]['invoiceAmount'];
+                Shopware()->Session()->sDispatch = $customerDbResult[0]['dispatchId'];
+
+
+                /************** added Params *************/
+                $sOrderVariables = new ArrayObject();
+                $sOrderVariables->setFlags(ArrayObject::STD_PROP_LIST |ArrayObject::ARRAY_AS_PROPS);
+                $sOrderVariables['sAmount'] = $orderObject->getInvoiceAmount();
+                $sOrderVariables['sAmountNet'] = $orderObject->getInvoiceAmountNet();
+                $sOrderVariables['sShippingcosts'] = $orderObject->getInvoiceShipping();
+//                $sOrderVariables['sBasket']['Amount'] = $orderObject->get();
+
+                Shopware()->Session()->sOrderVariables = $sOrderVariables;
+
                 // to send a Status E-Mail to customer
                 // sending e-mail via $this->saveOrder() doesn't work
                 $this->savePaymentStatus(
@@ -4198,8 +4249,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                     12,
                     true
                 );
-                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrrder 4/4 Paymentstatus changed, E-Mail sent to customer, End of convertOrder for ordernumber: ".$newOrderNumber);
-
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 4/4 Paymentstatus changed, E-Mail sent to customer, End of convertOrder for ordernumber: ".$newOrderNumber);
 
                 $this->View()->assign(['success' => true]);
 

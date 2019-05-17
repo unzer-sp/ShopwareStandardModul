@@ -7,7 +7,7 @@
  * @subpackage Plugin
  * @link http://www.heidelpay.com
  * @copyright Copyright (c) 2018, heidelpay GmbH
- * @author Jens Richter / Sascha Pflueger
+ * @author heidelpay Group
  */
 use Shopware\Components\CSRFWhitelistAware;
 
@@ -465,7 +465,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         return $this->forward('fail');
                     }
 
-                    if ($activePayment == 'gir') {
+                    if ($activePayment == 'gir'|| $activePayment == 'pis') {
                         return $this->redirect($getFormUrl['FRONTEND_REDIRECT_URL']);
                     }
 
@@ -476,7 +476,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                     $this->View()->cardBrands 	= $cardBrands;
                     $this->View()->bankCountry	= $bankCountry;
 
-                    if(	$activePayment != 'sue' && $activePayment != 'p24' ){
+                    if(	$activePayment != 'sue' && $activePayment != 'p24' && $activePayment != 'pis'){
                         $this->View()->pm 		= $activePayment;
                     }
 
@@ -3421,6 +3421,13 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                     $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
                     $params['PAYMENT.CODE'] 		= "OT.".$type;
                     $params['ACCOUNT.BRAND'] 		= "SOFORT";
+                    $params['FRONTEND.ENABLED'] 	= "true";
+                    break;
+                /* PIS-Solution*/
+                case 'pis':
+                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+                    $params['PAYMENT.CODE'] 		= "OT.".$type;
+                    $params['ACCOUNT.BRAND'] 		= "PIS";
                     $params['FRONTEND.ENABLED'] 	= "true";
                     break;
                 /* griopay */

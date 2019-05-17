@@ -7,7 +7,7 @@
 * @subpackage Plugin
 * @link http://www.heidelpay.com
 * @copyright Copyright (c) 2016, heidelpay GmbH
-* @author Jens Richter / Sascha Pflueger
+* @author heidelpay Group
 */
 
 class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backend_ExtJs implements Enlight_Hook{

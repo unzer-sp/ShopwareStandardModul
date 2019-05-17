@@ -7,7 +7,7 @@
 * @subpackage Plugin
 * @link http://www.heidelpay.com
 * @copyright Copyright (c) 2018, heidelpay GmbH
-* @author Jens Richter / Sascha Pflueger
+* @author heidelpay Group
 */
 require_once __DIR__ . '/Components/CSRFWhitelistAware.php';
 
@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.05.15';
+		return '19.05.17';
 	}
 
 	/**
@@ -59,7 +59,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 		$hp_logo 	= dirname(__FILE__) . '/img/heidelpay.png';
 		return array(
 				'version' => $this->getVersion(),
-				'autor' => 'heidelpay GmbH (SP)',
+				'autor' => 'heidelpay Group',
 				'label' => $this->getLabel(),
 				'source' => "Default",
 				'description' =>
@@ -988,6 +988,21 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
+            case '19.05.17':
+                try{
+                    // integration of Flexipay
+                    $this->createPayments();
+                    $form->setElement('text', 'HGW_PIS_CHANNEL',
+                        array(
+                            'label'=>'Flexipay Channel',
+                            'value'=>'',
+                            'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
+                        )
+                    );
+                    $msg .= '* update 19.05.17<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
 
                 // overwrite $msg if update was successful
                 $msg = 'Update auf Version '.$this->getVersion().' erfolgreich.';
@@ -1601,6 +1616,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
             $form->setElement('text', 'HGW_IVPD_CHANNEL', array('label'=>'Payolution branded Channel', 'value'=>'','scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
             $form->setElement('text', 'HGW_P24_CHANNEL', array('label'=>'Przelewy24 Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_SUE_CHANNEL', array('label'=>'Sofort Banking Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
+			$form->setElement('text', 'HGW_PIS_CHANNEL', array('label'=>'Flexipay Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_GIR_CHANNEL', array('label'=>'Giropay Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_VA_CHANNEL', array('label'=>'PayPal Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
 			$form->setElement('text', 'HGW_IDE_CHANNEL', array('label'=>'Ideal Channel', 'value'=>'', 'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP));
@@ -1793,7 +1809,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 						return;
 					}
 				}
-					
 			} else {
 				Shopware()->Payments()->update($newData, $where);
 			}
@@ -4153,6 +4168,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'description'	=> 'Heidelpay CD-Edition Sofort',
 					'trans_desc' 	=> 'Heidelpay CD-Edition Sofort Banking',
 			);
+            $inst[] = array(
+                    'name'			=> 'pis',
+                    'description'	=> 'Heidelpay CD-Edition Flexipay',
+                    'trans_desc' 	=> 'Heidelpay CD-Edition Flexipay',
+            );
 			$inst[] = array(
 					'name'			=> 'p24',
 					'description'	=> 'Heidelpay CD-Edition Przelewy24',

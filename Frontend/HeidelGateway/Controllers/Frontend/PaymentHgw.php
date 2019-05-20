@@ -118,7 +118,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
 			$ppd_crit['CRITERION.SESS'] = $user['additional']['user']['sessionID'];
 
 			$realpath 		= realpath(dirname(__FILE__));
-			$start 			= strpos($realpath, '/engine');
+			$start 			= strlen(Shopware()->DocPath())-1;
 			$ende 			= strpos($realpath, '/Controllers');
 			$len = $ende - $start;
 			$pluginPath 	= substr($realpath,$start,$len);

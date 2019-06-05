@@ -4776,9 +4776,9 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 
 	var $billsafeDesc = 'Kaufen Sie jetzt auf Rechnung und begutachten Sie Ihre Eink&auml;ufe in Ruhe bevor Sie bezahlen.
 		<br/><br/><a title="Ihre Vorteile" href="http://www.billsafe.de/special/payment-info" target="_blank"><img src="https://images.billsafe.de/image/image/id/191997712fbe" style="border:0"/></a>';
-	var $barpayDesc ='Sicher, schnell und ohne Geb&uuml;hren: mit BarPay zahlen Sie Internet-Eink&auml;ufe mit Bargeld. Ohne Anmeldung. Ohne Kreditkarte. Ohne Kontodetails.
-		<br /><br />Nach Auswahl von BarPay &uuml;bermittelt Ihnen Ihr Online-H&auml;ndler einen individuellen Barcode per E-Mail oder zum Download auf Ihren Computer. Diesen k&ouml;nnen Sie ausdrucken und in &uuml;ber 18.000 BarPay-Akzeptanzstellen bezahlen. Der Zahlungseingang wird dem Online-H&auml;ndler in Echtzeit &uuml;bermittelt, und die bestellte Ware geht umgehend in den Versand. <br /><br />
-		<a href="http://www.barpay.de/info/" onclick="window.open(this.href,\'Popup\',\'width=580,height=550,scrollbars=no\');return false;"><img src="engine/Shopware/Plugins/Default/Frontend/HeidelGateway/img/BarPay.jpg" style="border:0"/></a>';
+//	var $barpayDesc ='Sicher, schnell und ohne Geb&uuml;hren: mit BarPay zahlen Sie Internet-Eink&auml;ufe mit Bargeld. Ohne Anmeldung. Ohne Kreditkarte. Ohne Kontodetails.
+//		<br /><br />Nach Auswahl von BarPay &uuml;bermittelt Ihnen Ihr Online-H&auml;ndler einen individuellen Barcode per E-Mail oder zum Download auf Ihren Computer. Diesen k&ouml;nnen Sie ausdrucken und in &uuml;ber 18.000 BarPay-Akzeptanzstellen bezahlen. Der Zahlungseingang wird dem Online-H&auml;ndler in Echtzeit &uuml;bermittelt, und die bestellte Ware geht umgehend in den Versand. <br /><br />
+//		<a href="http://www.barpay.de/info/" onclick="window.open(this.href,\'Popup\',\'width=580,height=550,scrollbars=no\');return false;"><img src="engine/Shopware/Plugins/Default/Frontend/HeidelGateway/img/BarPay.jpg" style="border:0"/></a>';
 
 	/**
 	 * Method to create the prepayment mail

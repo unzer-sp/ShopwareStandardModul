@@ -4032,6 +4032,23 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
 
     public function convertOrder($transactionData, $paymentStatus = 12)
     {
+
+//        if(version_compare(Shopware()->Config()->version,"5.2.0","<")){
+//            $this->hgw()->Logging('convertOrder | cannot create paid Order for transactionId='.$transactionData['IDENTIFICATION_TRANSACTIONID']
+//                .' heidelpay UniqueId= '.$transactionData['IDENTIFICATION_UNIQUEID']);
+//
+//            return $this->redirect(
+//                    array(
+//                        'forceSecure' => 1,
+//                        'controller' => 'PaymentHgw',
+//                        'action' => 'fail',
+//
+//                    )
+//                );
+//            /**
+//             * @todo Customermodel hat unter 5.1.6 noch keine Beziehung zu defaultShippingAdress oder defaultBillingAdress daher muss hierfür ein anderer Fix gefunden werden
+//             */
+//        }
         try {
             if (empty($transactionData)) {
                 Shopware()->Container()->get('pluginlogger')->error('convertOrder failed | no transactiondata given');
@@ -4080,7 +4097,6 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/4  
                 $newOrderNumber = $numberModel->getNumber();
                 // Set new ordernumber
                 $numberModel->setNumber($newOrderNumber);
-
 Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 ordernumber generated: ".$newOrderNumber);
 
                 // setting ordernumber to orderobject
@@ -4100,11 +4116,13 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                  * @var \Shopware\Models\Customer\Customer $customerObject
                  */
                 $customerModelRepo = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer');
+                /*
+                 * @var Shopware\Models\Customer\Customer $customerObject
+                 */
                 $customerObject = $customerModelRepo->findOneBy(array('id' => intval($userID = $customerDbResult[0]['customer']['id'])));
 
                 // copy customer number into billing address from customer
                 // Casting null values to empty strings to fulfill the restrictions of the s_order_billingaddress table
-
                 $billingAddress = [
                     'id'                        => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['id'])          ? $customerDbResult[0]['customer']['defaultBillingAddress']['id'] : ' ',
                     'company'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['company'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['company'] : ' ',
@@ -4139,7 +4157,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                     ->setParameter('id', $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']);
                 $countryArray = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
 
-                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 Country from DB loaded");
+Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 Country from DB loaded");
 
                 // find countryModel to set it to BillingAdrdress
                 /**
@@ -4280,13 +4298,13 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
             'response',
             'responseReg',
             'responseHpr',
-            'alibi',
             'notify',
             'rawnotify',
             'wallet',
             'saveBirthdate',
             'savePayment',
-            'succsess'
+            'success',
+            'gateway'
         );
     }
 }

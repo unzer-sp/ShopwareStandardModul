@@ -836,6 +836,7 @@ function valShippingPaymentForm() {
     $(".alert.is--error.is--rounded").remove();
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
+
     // remove check vor cc and dc
     if ((pm != 'cc') && (pm != 'dc')) {
         // check if 'newreg' is shown
@@ -849,47 +850,6 @@ function valShippingPaymentForm() {
                 }
             });
 
-            // if (pm == 'dd') {
-            //     var errors = new Array();
-            //     // direct debit
-            //     errors = valInputDdIban(jQuery('.' + checkedOpt + '  #iban').val(), pm);
-            //
-            //     // direct debit secured
-            //     if(jQuery('#salutation').is(':visible')){
-            //         // getting Values from input fields
-            //         var birthDay = jQuery('select[name=Date_Day]').val();
-            //         var birthMonth = jQuery('select[name=Date_Month]').val();
-            //         var birthYear = jQuery('select[name=Date_Year]').val();
-            //
-            //         jQuery('#birthdate_dd').val(birthYear + '-' + birthMonth + '-' + birthDay);
-            //
-            //         errors = valDirectDebitSecured(errors);
-            //     }
-            // }
-            //
-            // if (pm == 'papg') {
-            //     var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val() - 1, jQuery('.hgw_papg select[name="Date_Day"]').val());
-            //     var today = new Date();
-            //     var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
-            //     var errors = valBirthdate(age);
-            // }
-            //
-            // if(pm == 'san'){
-            //     var errors = valSantander();
-            //
-            //     if(errors.length >0)
-            //     {
-            //         return false;
-            //     }
-            // }
-            //
-            // if(pm == 'ivpd'){
-            //     var errors = valPayolutionDirect();
-            //     if(errors.length >0)
-            //     {
-            //         return false;
-            //     }
-            // }
             switch (pm.toLocaleLowerCase()) {
                 case "dd":
                     var errors = valInputDdIban(jQuery('.newreg_' + pm + ' #iban').val(), pm);

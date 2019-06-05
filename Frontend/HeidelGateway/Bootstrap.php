@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.05.17';
+		return '19.06.06';
 	}
 
 	/**
@@ -988,7 +988,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '19.05.17':
+            case '19.06.06':
                 try{
                     // integration of Flexipay
                     $this->createPayments();
@@ -999,7 +999,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 19.05.17<br />';
+                    $msg .= '* update 19.06.06<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -4168,11 +4168,11 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 					'description'	=> 'Heidelpay CD-Edition Sofort',
 					'trans_desc' 	=> 'Heidelpay CD-Edition Sofort Banking',
 			);
-            $inst[] = array(
-                    'name'			=> 'pis',
-                    'description'	=> 'Heidelpay CD-Edition Flexipay',
-                    'trans_desc' 	=> 'Heidelpay CD-Edition Flexipay',
-            );
+//            $inst[] = array(
+//                    'name'			=> 'pis',
+//                    'description'	=> 'Heidelpay CD-Edition Flexipay',
+//                    'trans_desc' 	=> 'Heidelpay CD-Edition Flexipay',
+//            );
 			$inst[] = array(
 					'name'			=> 'p24',
 					'description'	=> 'Heidelpay CD-Edition Przelewy24',

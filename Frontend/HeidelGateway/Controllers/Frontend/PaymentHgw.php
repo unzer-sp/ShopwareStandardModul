@@ -3425,10 +3425,10 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                     break;
                 /* PIS-Solution*/
                 case 'pis':
-                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
-                    $params['PAYMENT.CODE'] 		= "OT.".$type;
-                    $params['ACCOUNT.BRAND'] 		= "PIS";
-                    $params['FRONTEND.ENABLED'] 	= "true";
+//                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+//                    $params['PAYMENT.CODE'] 		= "OT.".$type;
+//                    $params['ACCOUNT.BRAND'] 		= "PIS";
+//                    $params['FRONTEND.ENABLED'] 	= "true";
                     break;
                 /* griopay */
                 case 'gir':

@@ -1,6 +1,5 @@
 document.asyncReady(function () {
     if (swVersion.substring(0, 3) >= '5.2') {
-
         var orgLink = jQuery('form.payment').attr('action');
         if (orgLink == 'undefined') {
             var orglink = jQuery('form[name="shippingPaymentForm"]').attr('action');
@@ -60,6 +59,7 @@ document.asyncReady(function () {
                 });
 
                 $(document).ajaxComplete(function (event, xhr, settings) {
+                    
                     // function set birthdate for santander
                     if(jQuery('.newreg_san').is(":visible")) {
                         $(".hgw_required").attr("required","required");
@@ -304,9 +304,6 @@ document.asyncReady(function () {
 
                 if(pm != undefined)
                 {
-                    /**
-                     * @todo Zahlart herausfinden, da die GebDat-Eingabefelder jetzt DateDD_Day DateSan_Day und DatePay_Day heißen
-                     */
                     if (jQuery(".newreg_" + pm).is(":visible")) {
                         birthDay = jQuery(".newreg_" + pm + " [name='Date_Day']").val();
                         birthMonth = jQuery(".newreg_" + pm + " [name = 'Date_Month']").val();
@@ -837,79 +834,81 @@ function valShippingPaymentForm() {
     var checkedOpt = jQuery('.payment--method-list input:radio:checked').attr('class');
     var pm = checkedOpt.substr(checkedOpt.indexOf('hgw_') + 4);
 
-    // remove check vor cc and dc
-    if ((pm != 'cc') && (pm != 'dc')) {
-        // check if 'newreg' is shown
-        if (jQuery('.newreg_' + pm).is(':visible')) {
-            // set 'error' to empty inputs
-            jQuery('.hgw_' + pm).find('input').each(function () {
-                if (jQuery(this).val() == '') {
-                    jQuery(this).addClass('has--error');
-                } else {
-                    jQuery(this).removeClass('has--error');
+    if(checkedOpt.indexOf('hgw_') !== -1){
+        // remove check vor cc and dc
+        if ((pm != 'cc') && (pm != 'dc')) {
+            // check if 'newreg' is shown
+            if (jQuery('.newreg_' + pm).is(':visible')) {
+                // set 'error' to empty inputs
+                jQuery('.hgw_' + pm).find('input').each(function () {
+                    if (jQuery(this).val() == '') {
+                        jQuery(this).addClass('has--error');
+                    } else {
+                        jQuery(this).removeClass('has--error');
+                    }
+                });
+
+                switch (pm.toLocaleLowerCase()) {
+                    case "dd":
+                        var errors = valInputDdIban(jQuery('.newreg_' + pm + ' #iban').val(), pm);
+                        break;
+
+                    case "papg":
+                        var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val() - 1, jQuery('.hgw_papg select[name="Date_Day"]').val());
+                        var today = new Date();
+                        var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
+                        var errors = valBirthdate(age);
+                        break;
+
+                    case "san":
+                        var errors = valSantander();
+                        if(errors.length >0){return false;}
+                        break;
+
+                    case "ivpd":
+                        var errors = valPayolutionDirect();
+                        if(errors.length >0){return false;}
+                        break;
+
+                    case "hps":
+                        var errors = valSantanderHP();
+                    // if(errors.length >0){return false;}
                 }
-            });
 
-            switch (pm.toLocaleLowerCase()) {
-                case "dd":
-                    var errors = valInputDdIban(jQuery('.newreg_' + pm + ' #iban').val(), pm);
-                    break;
 
-                case "papg":
-                    var dob = new Date(jQuery('.hgw_papg select[name="Date_Year"]').val(), jQuery('.hgw_papg select[name="Date_Month"]').val() - 1, jQuery('.hgw_papg select[name="Date_Day"]').val());
-                    var today = new Date();
-                    var age = Math.floor((today - dob) / (365.25 * 24 * 60 * 60 * 1000));
-                    var errors = valBirthdate(age);
-                    break;
-
-                case "san":
-                    var errors = valSantander();
-                    if(errors.length >0){return false;}
-                    break;
-
-                case "ivpd":
-                    var errors = valPayolutionDirect();
-                    if(errors.length >0){return false;}
-                    break;
-
-                case "hps":
-                    var errors = valSantanderHP();
-                // if(errors.length >0){return false;}
             }
 
+            if (
+                (jQuery('div.hgw_' + pm + ' .has--error').length > 0)
+                || (jQuery('div.newreg_' + pm + ' .has--error').length > 0)
 
-        }
+            ) {
+                if (jQuery('.content-main--inner .content .alert--content ul').length == 0) {
+                    jQuery('.content-main--inner .content .alert--content').html('<ul class="alert--list"></ul>');
+                }
 
-        if (
-            (jQuery('div.hgw_' + pm + ' .has--error').length > 0)
-            || (jQuery('div.newreg_' + pm + ' .has--error').length > 0)
+                jQuery('.content-main--inner .content .alert--content ul li').remove();
+                jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">' + jQuery('.msg_fill').html() + '</li>');
 
-        ) {
-            if (jQuery('.content-main--inner .content .alert--content ul').length == 0) {
-                jQuery('.content-main--inner .content .alert--content').html('<ul class="alert--list"></ul>');
+                jQuery.each(errors, function (key, value) {
+                    jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">' + jQuery(value).html() + '</li>');
+                });
+
+                jQuery('.content-main--inner .alert').removeClass('is--hidden');
+                jQuery('html, body').animate({scrollTop: 0}, 0);
+
+                return false;
+            } else {
+                // disable all other input fields
+                // jQuery('.payment--method-list input').attr('disabled', 'disabled');
+                // jQuery('.payment--method-list select').attr('disabled', 'disabled');
+                // jQuery('.payment--method-list input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
+                // jQuery('.payment--method-list input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
+                jQuery('.payment--method .block input').attr('disabled', 'disabled');
+                jQuery('.payment--method .block select').attr('disabled', 'disabled');
+                jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
+                jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
             }
-
-            jQuery('.content-main--inner .content .alert--content ul li').remove();
-            jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">' + jQuery('.msg_fill').html() + '</li>');
-
-            jQuery.each(errors, function (key, value) {
-                jQuery('.content-main--inner .content .alert--content ul').append('<li class="list--entry">' + jQuery(value).html() + '</li>');
-            });
-
-            jQuery('.content-main--inner .alert').removeClass('is--hidden');
-            jQuery('html, body').animate({scrollTop: 0}, 0);
-
-            return false;
-        } else {
-            // disable all other input fields
-            // jQuery('.payment--method-list input').attr('disabled', 'disabled');
-            // jQuery('.payment--method-list select').attr('disabled', 'disabled');
-            // jQuery('.payment--method-list input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
-            // jQuery('.payment--method-list input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
-            jQuery('.payment--method .block input').attr('disabled', 'disabled');
-            jQuery('.payment--method .block select').attr('disabled', 'disabled');
-            jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('input').removeAttr('disabled');
-            jQuery('.payment--method .block input:radio:checked').parents('.payment--method').find('select').removeAttr('disabled');
         }
     }
 }
@@ -971,9 +970,7 @@ function valInputDdAccount(acc, bank, pm) {
 function valBirthdate(age) {
     var errors = {};
     var i = 0;
-    /**
-     * @todo Namen der Select-Ferlder stiommen nicht mehr. Neue Namen: DateDD_Day, DatePay_Day, DateSan_Day, DateSanHp_day
-     */
+
     if (age < 18) {
         jQuery('.hgw_papg select[name="Date_Year"]').parent('.js--fancy-select').addClass('has--error');
         jQuery('.hgw_papg select[name="Date_Month"]').parent('.js--fancy-select').addClass('has--error');

@@ -3425,10 +3425,10 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                     break;
                 /* PIS-Solution*/
                 case 'pis':
-//                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
-//                    $params['PAYMENT.CODE'] 		= "OT.".$type;
-//                    $params['ACCOUNT.BRAND'] 		= "PIS";
-//                    $params['FRONTEND.ENABLED'] 	= "true";
+                    $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
+                    $params['PAYMENT.CODE'] 		= "OT.".$type;
+                    $params['ACCOUNT.BRAND'] 		= "PIS";
+                    $params['FRONTEND.ENABLED'] 	= "true";
                     break;
                 /* griopay */
                 case 'gir':
@@ -4032,42 +4032,26 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
 
     public function convertOrder($transactionData, $paymentStatus = 12)
     {
+        // Customermodel hat unter 5.1.6 noch keine Beziehung zu defaultShippingAdress oder defaultBillingAdress
+        // daher musste funktion angepasst werden
 
-//        if(version_compare(Shopware()->Config()->version,"5.2.0","<")){
-//            $this->hgw()->Logging('convertOrder | cannot create paid Order for transactionId='.$transactionData['IDENTIFICATION_TRANSACTIONID']
-//                .' heidelpay UniqueId= '.$transactionData['IDENTIFICATION_UNIQUEID']);
-//
-//            return $this->redirect(
-//                    array(
-//                        'forceSecure' => 1,
-//                        'controller' => 'PaymentHgw',
-//                        'action' => 'fail',
-//
-//                    )
-//                );
-//            /**
-//             * @todo Customermodel hat unter 5.1.6 noch keine Beziehung zu defaultShippingAdress oder defaultBillingAdress daher muss hierfür ein anderer Fix gefunden werden
-//             */
-//        }
-        try {
-            if (empty($transactionData)) {
-                Shopware()->Container()->get('pluginlogger')->error('convertOrder failed | no transactiondata given');
-            } else {
+        if(version_compare(Shopware()->Config()->version,"5.2.0","<")){
+            try{
                 // Get user, shipping and billing
                 $builder = Shopware()->Models()->createQueryBuilder();
                 $builder->select(['orders', 'customer', 'billing', 'payment', 'shipping'])
                     ->from("\Shopware\Models\Order\Order", 'orders')
                     ->leftJoin('orders.customer', 'customer')
                     ->leftJoin('orders.payment', 'payment')
-                    ->leftJoin('customer.defaultBillingAddress', 'billing')
-                    ->leftJoin('customer.defaultShippingAddress', 'shipping')
+                    ->leftJoin('customer.billing', 'billing')
+                    ->leftJoin('customer.shipping', 'shipping')
                     ->where('orders.temporaryId = ?1')
                     ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
                 $result = $builder->getQuery()->getArrayResult();
                 $customerDbResult = $result;
 
                 // Check required fields
-                if (empty($customerDbResult) || $customerDbResult[0]['customer'] === null || $customerDbResult[0]['customer']['defaultBillingAddress'] === null) {
+                if (empty($customerDbResult) || $customerDbResult[0]['customer'] === null || $customerDbResult[0]['customer']['billing'] === null) {
                     Shopware()->Container()->get('pluginlogger')->error('convertOrder failed | no customer / order data found');
                     return;
                 }
@@ -4082,8 +4066,7 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
 
                 /** @var \Shopware\Models\Order\Order $orderObject */
                 $orderObject = Shopware()->Models()->find("\Shopware\Models\Order\Order",['id' => $result[0]['id']]);
-
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/4  orderobject loaded");
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/4  orderobject loaded");
 
                 // create instance of ordernumber-model to create new ordernumber for order
                 $numberRepository = Shopware()->Models()->getRepository("\Shopware\Models\Order\Number");
@@ -4097,7 +4080,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/4  
                 $newOrderNumber = $numberModel->getNumber();
                 // Set new ordernumber
                 $numberModel->setNumber($newOrderNumber);
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 ordernumber generated: ".$newOrderNumber);
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 ordernumber generated: ".$newOrderNumber);
 
                 // setting ordernumber to orderobject
                 $orderObject->setNumber($newOrderNumber);
@@ -4107,8 +4090,8 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                 }
 
                 // If there is no shipping address, set billing address to be the shipping address
-                if ($customerDbResult[0]['customer']['defaultShippingAddress'] === null) {
-                    $customerDbResult[0]['customer']['defaultShippingAddress'] = $customerDbResult[0]['customer']['defaultBillingAddress'];
+                if ($customerDbResult[0]['customer']['shipping'] === null) {
+                    $customerDbResult[0]['customer']['shipping'] = $customerDbResult[0]['customer']['billing'];
                 }
 
                 // get Customer-Model for Customer-Information
@@ -4124,22 +4107,23 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                 // copy customer number into billing address from customer
                 // Casting null values to empty strings to fulfill the restrictions of the s_order_billingaddress table
                 $billingAddress = [
-                    'id'                        => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['id'])          ? $customerDbResult[0]['customer']['defaultBillingAddress']['id'] : ' ',
-                    'company'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['company'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['company'] : ' ',
-                    'department'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['department'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['department'] : ' ',
-                    'title'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['title'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['title'] : ' ',
-                    'salutation'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['salutation'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['salutation']: ' ',
-                    'firstname'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['firstname'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['firstname']: ' ',
-                    'lastname'                  => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['lastname'])    ? $customerDbResult[0]['customer']['defaultBillingAddress']['lastName']: ' ',
-                    'street'                    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['street'])      ? $customerDbResult[0]['customer']['defaultBillingAddress']['street']: ' ',
-                    'zipCode'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['zipcode'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['zipCode']: ' ',
-                    'city'                      => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['city'])        ? $customerDbResult[0]['customer']['defaultBillingAddress']['city']: ' ',
-                    'phone'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['phone'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['phone']: ' ',
-                    'vatId'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['vatId'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['vatId']: ' ',
-                    'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']: ' ',
-                    'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']: ' ',
-                    'countryId'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['countryId'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']: ' ',
-                    'stateId'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['stateId'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['stateId']: ' ',
+                    'id'                        => !empty($customerDbResult[0]['customer']['billing']['id'])          ? $customerDbResult[0]['customer']['billing']['id'] : ' ',
+                    'id'                        => !empty($customerDbResult[0]['customer']['billing']['customerId'])  ? $customerDbResult[0]['customer']['billing']['customerId'] : ' ',
+                    'company'                   => !empty($customerDbResult[0]['customer']['billing']['company'])     ? $customerDbResult[0]['customer']['billing']['company'] : ' ',
+                    'department'                => !empty($customerDbResult[0]['customer']['billing']['department'])  ? $customerDbResult[0]['customer']['billing']['department'] : ' ',
+                    'title'                     => !empty($customerDbResult[0]['customer']['billing']['title'])       ? $customerDbResult[0]['customer']['billing']['title'] : ' ',
+                    'salutation'                => !empty($customerDbResult[0]['customer']['billing']['salutation'])  ? $customerDbResult[0]['customer']['billing']['salutation']: ' ',
+                    'firstName'                 => !empty($customerDbResult[0]['customer']['billing']['firstName'])   ? $customerDbResult[0]['customer']['billing']['firstName']: ' ',
+                    'lastName'                  => !empty($customerDbResult[0]['customer']['billing']['lastName'])    ? $customerDbResult[0]['customer']['billing']['lastName']: ' ',
+                    'street'                    => !empty($customerDbResult[0]['customer']['billing']['street'])      ? $customerDbResult[0]['customer']['billing']['street']: ' ',
+                    'zipCode'                   => !empty($customerDbResult[0]['customer']['billing']['zipcode'])     ? $customerDbResult[0]['customer']['billing']['zipCode']: ' ',
+                    'city'                      => !empty($customerDbResult[0]['customer']['billing']['city'])        ? $customerDbResult[0]['customer']['billing']['city']: ' ',
+                    'phone'                     => !empty($customerDbResult[0]['customer']['billing']['phone'])       ? $customerDbResult[0]['customer']['billing']['phone']: ' ',
+                    'vatId'                     => !empty($customerDbResult[0]['customer']['billing']['vatId'])       ? $customerDbResult[0]['customer']['billing']['vatId']: ' ',
+                    'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['billing']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['billing']['additionalAddressLine1']: ' ',
+                    'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['billing']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['billing']['additionalAddressLine2']: ' ',
+                    'countryId'                 => !empty($customerDbResult[0]['customer']['billing']['countryId'])   ? $customerDbResult[0]['customer']['billing']['countryId']: ' ',
+                    'stateId'                   => !empty($customerDbResult[0]['customer']['billing']['stateId'])     ? $customerDbResult[0]['customer']['billing']['stateId']: ' ',
                     'number'                    => !empty($customerDbResult[0]['customer']['number']) ? $customerDbResult[0]['customer']['number'] : ' ',
                 ];
 
@@ -4154,10 +4138,10 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 o
                 $queryBuilder->select('*')
                     ->from('s_core_countries')
                     ->where('id = :id')
-                    ->setParameter('id', $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']);
+                    ->setParameter('id', $customerDbResult[0]['customer']['billing']['countryId']);
                 $countryArray = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
 
-Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 Country from DB loaded");
+                Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 Country from DB loaded");
 
                 // find countryModel to set it to BillingAdrdress
                 /**
@@ -4168,42 +4152,40 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 C
                 // setting some Values for Billingmodel
                 $billingModel->setCountry($countryModel);
                 $billingModel->setCustomer($customerObject);
-                $billingModel->setLastName($customerDbResult[0]['customer']['lastname']);
-                $billingModel->setZipCode($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode']);
+                $billingModel->setLastName($customerDbResult[0]['customer']['billing']['lastName']);
+                $billingModel->setZipCode($customerDbResult[0]['customer']['shipping']['zipCode']);
                 $billingModel->setOrder($orderObject);
                 Shopware()->Models()->persist($billingModel);
-
 
                 // Casting null values to empty strings to fulfill the restrictions of the s_order_shippingaddress table
                 $shippingAddress = array_map(function ($value) {
                     return (string)$value;
-                }, $result[0]['customer']['defaultShippingAddress']);
+                }, $result[0]['customer']['shipping']);
 
                 $shippingAddress = [
-                    'id'                        => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['id'])          ? $customerDbResult[0]['customer']['defaultBillingAddress']['id'] : ' ',
-                    'company'                   => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['company'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['company'] : ' ',
-                    'department'                => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['department'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['department'] : ' ',
-                    'title'                     => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['title'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['title'] : ' ',
-                    'salutation'                => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['salutation'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['salutation']: ' ',
-                    'firstname'                 => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['firstname'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['firstname']: ' ',
-                    'lastname'                  => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['lastname'])    ? $customerDbResult[0]['customer']['defaultBillingAddress']['lastname']: ' ',
-                    'street'                    => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['street'])      ? $customerDbResult[0]['customer']['defaultBillingAddress']['street']: ' ',
-                    'zipCode'                   => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['zipCode']: ' ',
-                    'city'                      => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['city'])        ? $customerDbResult[0]['customer']['defaultBillingAddress']['city']: ' ',
-                    'phone'                     => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['phone'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['phone']: ' ',
-                    'vatId'                     => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['vatId'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['vatId']: ' ',
-                    'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']: ' ',
-                    'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']: ' ',
-                    'countryId'                 => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['countryId'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']: ' ',
-                    'stateId'                   => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['stateId'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['stateId']: ' ',
+                    'id'                        => !empty($customerDbResult[0]['customer']['shipping']['id'])          ? $customerDbResult[0]['customer']['billing']['id'] : ' ',
+                    'company'                   => !empty($customerDbResult[0]['customer']['shipping']['company'])     ? $customerDbResult[0]['customer']['billing']['company'] : ' ',
+                    'department'                => !empty($customerDbResult[0]['customer']['shipping']['department'])  ? $customerDbResult[0]['customer']['billing']['department'] : ' ',
+                    'title'                     => !empty($customerDbResult[0]['customer']['shipping']['title'])       ? $customerDbResult[0]['customer']['billing']['title'] : ' ',
+                    'salutation'                => !empty($customerDbResult[0]['customer']['shipping']['salutation'])  ? $customerDbResult[0]['customer']['billing']['salutation']: ' ',
+                    'firstName'                 => !empty($customerDbResult[0]['customer']['shipping']['firstName'])   ? $customerDbResult[0]['customer']['billing']['firstName']: ' ',
+                    'lastName'                  => !empty($customerDbResult[0]['customer']['shipping']['lastName'])    ? $customerDbResult[0]['customer']['billing']['lastName']: ' ',
+                    'street'                    => !empty($customerDbResult[0]['customer']['shipping']['street'])      ? $customerDbResult[0]['customer']['billing']['street']: ' ',
+                    'zipCode'                   => !empty($customerDbResult[0]['customer']['shipping']['zipCode'])     ? $customerDbResult[0]['customer']['billing']['zipCode']: ' ',
+                    'city'                      => !empty($customerDbResult[0]['customer']['shipping']['city'])        ? $customerDbResult[0]['customer']['billing']['city']: ' ',
+                    'phone'                     => !empty($customerDbResult[0]['customer']['shipping']['phone'])       ? $customerDbResult[0]['customer']['billing']['phone']: ' ',
+                    'vatId'                     => !empty($customerDbResult[0]['customer']['shipping']['vatId'])       ? $customerDbResult[0]['customer']['billing']['vatId']: ' ',
+                    'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['shipping']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['billing']['additionalAddressLine1']: ' ',
+                    'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['shipping']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['billing']['additionalAddressLine2']: ' ',
+                    'countryId'                 => !empty($customerDbResult[0]['customer']['shipping']['countryId'])   ? $customerDbResult[0]['customer']['billing']['countryId']: ' ',
+                    'stateId'                   => !empty($customerDbResult[0]['customer']['shipping']['stateId'])     ? $customerDbResult[0]['customer']['billing']['stateId']: ' ',
                     'number'                    => !empty($customerDbResult[0]['customer']['number']) ? $customerDbResult[0]['customer']['number'] : '',
                 ];
-
 
                 /**
                  * @var \Shopware\Models\Country\Country $countryModel
                  */
-                $countryModel = Shopware()->Models()->find("\Shopware\Models\Country\Country", $customerDbResult[0]['customer']['defaultShippingAddress']['countryId']);
+                $countryModel = Shopware()->Models()->find("\Shopware\Models\Country\Country", $customerDbResult[0]['customer']['shipping']['countryId']);
 
                 /**
                  * @var \Shopware\Models\Order\Shipping $shippingModel
@@ -4215,7 +4197,8 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 C
                 $shippingModel->setCountry($countryModel);
                 $shippingModel->setCustomer($customerObject);
                 $shippingModel->setOrder($orderObject);
-                $shippingModel->setZipCode($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode']);
+                $shippingModel->setZipCode($customerDbResult[0]['customer']['shipping']['zipCode']);
+
                 Shopware()->Models()->persist($shippingModel);
 
                 $statusModel = Shopware()->Models()->find("\Shopware\Models\Order\Status", "0");
@@ -4223,6 +4206,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 C
 
                 // Finally set the order to be a regular order
                 $orderObject->setOrderStatus($statusModel);
+                $orderObject->setCustomer($customerObject);
                 $orderObject->setTemporaryId($transactionData['IDENTIFICATION_UNIQUEID']);
                 $orderObject->setTransactionId($transactionData['IDENTIFICATION_TRANSACTIONID']);
                 $orderObject->setInternalComment($transactionData['PROCESSING_TIMESTAMP'].'
@@ -4231,7 +4215,7 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 C
                 $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
 
                 // saving all generated Models and Onjects
-                Shopware()->Models()->flush();
+                Shopware()->Models()->flush($orderObject);
 
                 // setting some Values in $_SESSION
                 $this->Request()->setParam('sUniqueID',$transactionData['IDENTIFICATION_UNIQUEID']);
@@ -4254,7 +4238,6 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 C
                 Shopware()->Session()->sUserGroup = $customerDbResult[0]['customer']['groupKey'];
                 Shopware()->Session()->sBasketAmount = $customerDbResult[0]['invoiceAmount'];
                 Shopware()->Session()->sDispatch = $customerDbResult[0]['dispatchId'];
-
 
                 /************** added Params *************/
                 $sOrderVariables = new ArrayObject();
@@ -4279,10 +4262,254 @@ Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 C
                 $this->View()->assign(['success' => true]);
 
                 return $newOrderNumber;
+
+            } catch (Exception $e){
+                $this->hgw()->Logging('convertOrder | cannot create paid Order for transactionId='.$transactionData['IDENTIFICATION_TRANSACTIONID']
+                    .' heidelpay UniqueId= '.$transactionData['IDENTIFICATION_UNIQUEID']);
+                Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FAILURE / EXCEPTION on Stacktrace".$e->getTraceAsString());
+                Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FAILURE / EXCEPTION with failureMessage ".$e->getMessage());
+                return $this->redirect(
+                    array(
+                        'forceSecure' => 1,
+                        'controller' => 'PaymentHgw',
+                        'action' => 'fail',
+
+                    )
+                );
             }
-        } catch (Exception $e){
-            Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FAILURE / EXCEPTION on Stacktrace".$e->getTraceAsString());
-            Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FAILURE / EXCEPTION with failureMessage ".$e->getMessage());
+        } else {
+            try {
+                if (empty($transactionData)) {
+                    Shopware()->Container()->get('pluginlogger')->error('convertOrder failed | no transactiondata given');
+                } else {
+                    // Get user, shipping and billing
+                    $builder = Shopware()->Models()->createQueryBuilder();
+                    $builder->select(['orders', 'customer', 'billing', 'payment', 'shipping'])
+                        ->from("\Shopware\Models\Order\Order", 'orders')
+                        ->leftJoin('orders.customer', 'customer')
+                        ->leftJoin('orders.payment', 'payment')
+                        ->leftJoin('customer.defaultBillingAddress', 'billing')
+                        ->leftJoin('customer.defaultShippingAddress', 'shipping')
+                        ->where('orders.temporaryId = ?1')
+                        ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
+                    $result = $builder->getQuery()->getArrayResult();
+                    $customerDbResult = $result;
+
+                    // Check required fields
+                    if (empty($customerDbResult) || $customerDbResult[0]['customer'] === null || $customerDbResult[0]['customer']['defaultBillingAddress'] === null) {
+                        Shopware()->Container()->get('pluginlogger')->error('convertOrder failed | no customer / order data found');
+                        return;
+                    }
+
+                    // create Order-Object from abborded order in db
+                    $builder = Shopware()->Models()->createQueryBuilder();
+                    $builder->select('orders.id')
+                        ->from("\Shopware\Models\Order\Order", 'orders')
+                        ->where('orders.temporaryId = ?1')
+                        ->setParameter(1, $transactionData['CRITERION_TEMPORDER']);
+                    $result = $builder->getQuery()->getArrayResult();
+
+                    /** @var \Shopware\Models\Order\Order $orderObject */
+                    $orderObject = Shopware()->Models()->find("\Shopware\Models\Order\Order",['id' => $result[0]['id']]);
+                    Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 1/4  orderobject loaded");
+
+                    // create instance of ordernumber-model to create new ordernumber for order
+                    $numberRepository = Shopware()->Models()->getRepository("\Shopware\Models\Order\Number");
+                    $numberModel = $numberRepository->findOneBy(['name' => 'invoice']);
+                    if ($numberModel === null) {
+                        Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder | Ordernumber couldn't be created");
+                        return;
+                    }
+                    // fetch last ordernumber and add 1
+//                $newOrderNumber = $numberModel->getNumber() + 1;
+                    $newOrderNumber = $numberModel->getNumber();
+                    // Set new ordernumber
+                    $numberModel->setNumber($newOrderNumber);
+                    Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 ordernumber generated: ".$newOrderNumber);
+
+                    // setting ordernumber to orderobject
+                    $orderObject->setNumber($newOrderNumber);
+
+                    foreach ($orderObject->getDetails() as $detailModel) {
+                        $detailModel->setNumber($newOrderNumber);
+                    }
+
+                    // If there is no shipping address, set billing address to be the shipping address
+                    if ($customerDbResult[0]['customer']['defaultShippingAddress'] === null) {
+                        $customerDbResult[0]['customer']['defaultShippingAddress'] = $customerDbResult[0]['customer']['defaultBillingAddress'];
+                    }
+
+                    // get Customer-Model for Customer-Information
+                    /**
+                     * @var \Shopware\Models\Customer\Customer $customerObject
+                     */
+                    $customerModelRepo = Shopware()->Models()->getRepository('Shopware\Models\Customer\Customer');
+                    /*
+                     * @var Shopware\Models\Customer\Customer $customerObject
+                     */
+                    $customerObject = $customerModelRepo->findOneBy(array('id' => intval($userID = $customerDbResult[0]['customer']['id'])));
+
+                    // copy customer number into billing address from customer
+                    // Casting null values to empty strings to fulfill the restrictions of the s_order_billingaddress table
+                    $billingAddress = [
+                        'id'                        => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['id'])          ? $customerDbResult[0]['customer']['defaultBillingAddress']['id'] : ' ',
+                        'company'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['company'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['company'] : ' ',
+                        'department'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['department'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['department'] : ' ',
+                        'title'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['title'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['title'] : ' ',
+                        'salutation'                => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['salutation'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['salutation']: ' ',
+                        'firstname'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['firstname'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['firstname']: ' ',
+                        'lastname'                  => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['lastname'])    ? $customerDbResult[0]['customer']['defaultBillingAddress']['lastName']: ' ',
+                        'street'                    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['street'])      ? $customerDbResult[0]['customer']['defaultBillingAddress']['street']: ' ',
+                        'zipCode'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['zipcode'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['zipCode']: ' ',
+                        'city'                      => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['city'])        ? $customerDbResult[0]['customer']['defaultBillingAddress']['city']: ' ',
+                        'phone'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['phone'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['phone']: ' ',
+                        'vatId'                     => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['vatId'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['vatId']: ' ',
+                        'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']: ' ',
+                        'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']: ' ',
+                        'countryId'                 => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['countryId'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']: ' ',
+                        'stateId'                   => !empty($customerDbResult[0]['customer']['defaultBillingAddress']['stateId'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['stateId']: ' ',
+                        'number'                    => !empty($customerDbResult[0]['customer']['number']) ? $customerDbResult[0]['customer']['number'] : ' ',
+                    ];
+
+                    // make an instance of Billingmodel
+                    /**
+                     * @var \Shopware\Models\Order\Billing $billingModel
+                     */
+                    $billingModel = new Shopware\Models\Order\Billing();
+                    $billingModel->fromArray($billingAddress);
+
+                    $queryBuilder = Shopware()->Container()->get('dbal_connection')->createQueryBuilder();
+                    $queryBuilder->select('*')
+                        ->from('s_core_countries')
+                        ->where('id = :id')
+                        ->setParameter('id', $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']);
+                    $countryArray = $queryBuilder->execute()->fetchAll(\PDO::FETCH_ASSOC);
+
+                    Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 3/4 Country from DB loaded");
+
+                    // find countryModel to set it to BillingAdrdress
+                    /**
+                     * @var \Shopware\Models\Country\Country $countryModel
+                     */
+                    $countryModel = Shopware()->Models()->find("\Shopware\Models\Country\Country", $countryArray[0]['id']);
+
+                    // setting some Values for Billingmodel
+                    $billingModel->setCountry($countryModel);
+                    $billingModel->setCustomer($customerObject);
+                    $billingModel->setLastName($customerDbResult[0]['customer']['lastname']);
+                    $billingModel->setZipCode($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode']);
+                    $billingModel->setOrder($orderObject);
+                    Shopware()->Models()->persist($billingModel);
+
+                    // Casting null values to empty strings to fulfill the restrictions of the s_order_shippingaddress table
+                    $shippingAddress = array_map(function ($value) {
+                        return (string)$value;
+                    }, $result[0]['customer']['defaultShippingAddress']);
+
+                    $shippingAddress = [
+                        'id'                        => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['id'])          ? $customerDbResult[0]['customer']['defaultBillingAddress']['id'] : ' ',
+                        'company'                   => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['company'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['company'] : ' ',
+                        'department'                => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['department'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['department'] : ' ',
+                        'title'                     => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['title'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['title'] : ' ',
+                        'salutation'                => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['salutation'])  ? $customerDbResult[0]['customer']['defaultBillingAddress']['salutation']: ' ',
+                        'firstname'                 => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['firstname'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['firstname']: ' ',
+                        'lastname'                  => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['lastname'])    ? $customerDbResult[0]['customer']['defaultBillingAddress']['lastname']: ' ',
+                        'street'                    => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['street'])      ? $customerDbResult[0]['customer']['defaultBillingAddress']['street']: ' ',
+                        'zipCode'                   => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['zipCode']: ' ',
+                        'city'                      => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['city'])        ? $customerDbResult[0]['customer']['defaultBillingAddress']['city']: ' ',
+                        'phone'                     => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['phone'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['phone']: ' ',
+                        'vatId'                     => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['vatId'])       ? $customerDbResult[0]['customer']['defaultBillingAddress']['vatId']: ' ',
+                        'additionalAddressLine1'    => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['additionalAddressLine1']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine1']: ' ',
+                        'additionalAddressLine2'    => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['additionalAddressLine2']) ? $customerDbResult[0]['customer']['defaultBillingAddress']['additionalAddressLine2']: ' ',
+                        'countryId'                 => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['countryId'])   ? $customerDbResult[0]['customer']['defaultBillingAddress']['countryId']: ' ',
+                        'stateId'                   => !empty($customerDbResult[0]['customer']['defaultShippingAddress']['stateId'])     ? $customerDbResult[0]['customer']['defaultBillingAddress']['stateId']: ' ',
+                        'number'                    => !empty($customerDbResult[0]['customer']['number']) ? $customerDbResult[0]['customer']['number'] : '',
+                    ];
+
+
+                    /**
+                     * @var \Shopware\Models\Country\Country $countryModel
+                     */
+                    $countryModel = Shopware()->Models()->find("\Shopware\Models\Country\Country", $customerDbResult[0]['customer']['defaultShippingAddress']['countryId']);
+
+                    /**
+                     * @var \Shopware\Models\Order\Shipping $shippingModel
+                     */
+                    // make a new instance of Shippingmodel
+                    // Create new entry in s_order_shippingaddress
+                    $shippingModel = new Shopware\Models\Order\Shipping();
+                    $shippingModel->fromArray($shippingAddress);
+                    $shippingModel->setCountry($countryModel);
+                    $shippingModel->setCustomer($customerObject);
+                    $shippingModel->setOrder($orderObject);
+                    $shippingModel->setZipCode($customerDbResult[0]['customer']['defaultShippingAddress']['zipcode']);
+                    Shopware()->Models()->persist($shippingModel);
+
+                    $statusModel = Shopware()->Models()->find("\Shopware\Models\Order\Status", "0");
+                    $statusModelPayment = Shopware()->Models()->find("\Shopware\Models\Order\Status", $paymentStatus);
+
+                    // Finally set the order to be a regular order
+                    $orderObject->setOrderStatus($statusModel);
+                    $orderObject->setTemporaryId($transactionData['IDENTIFICATION_UNIQUEID']);
+                    $orderObject->setTransactionId($transactionData['IDENTIFICATION_TRANSACTIONID']);
+                    $orderObject->setInternalComment($transactionData['PROCESSING_TIMESTAMP'].'
+'.' Short-Id: '.$transactionData['IDENTIFICATION_SHORTID']);
+                    $orderObject->setPaymentStatus($statusModelPayment);
+                    $orderObject->setClearedDate($transactionData['PROCESSING_TIMESTAMP']);
+
+                    // saving all generated Models and Onjects
+                    Shopware()->Models()->flush();
+
+                    // setting some Values in $_SESSION
+                    $this->Request()->setParam('sUniqueID',$transactionData['IDENTIFICATION_UNIQUEID']);
+                    Shopware()->Session()->sUserId = $transactionData['CRITERION_USER_ID'];
+
+                    /************** added Params *************/
+                    $sessionParam = "auto-user";
+                    Shopware()->Session()->$sessionParam = 1;
+                    Shopware()->Session()->userInfo = [
+                        'firstname' => $customerDbResult[0]['customer']['firstname'],
+                        'lastname' => $customerDbResult[0]['customer']['lastname'],
+                        'email' => $customerDbResult[0]['customer']['email'],
+                        'salutation' => $customerDbResult[0]['customer']['salutation'],
+                        'title' => $customerDbResult[0]['customer']['title'],
+                        'birthday' => $customerDbResult[0]['customer']['birthday'],
+                        'accountmode' => $customerDbResult[0]['customer']['accountMode'],
+                    ];
+                    Shopware()->Session()->sUserMail = $customerDbResult[0]['customer']['email'];
+                    Shopware()->Session()->sUserPassword = $customerDbResult[0]['customer']['hashPassword'];
+                    Shopware()->Session()->sUserGroup = $customerDbResult[0]['customer']['groupKey'];
+                    Shopware()->Session()->sBasketAmount = $customerDbResult[0]['invoiceAmount'];
+                    Shopware()->Session()->sDispatch = $customerDbResult[0]['dispatchId'];
+
+                    /************** added Params *************/
+                    $sOrderVariables = new ArrayObject();
+                    $sOrderVariables->setFlags(ArrayObject::STD_PROP_LIST |ArrayObject::ARRAY_AS_PROPS);
+                    $sOrderVariables['sAmount'] = $orderObject->getInvoiceAmount();
+                    $sOrderVariables['sAmountNet'] = $orderObject->getInvoiceAmountNet();
+                    $sOrderVariables['sShippingcosts'] = $orderObject->getInvoiceShipping();
+//                $sOrderVariables['sBasket']['Amount'] = $orderObject->get();
+
+                    Shopware()->Session()->sOrderVariables = $sOrderVariables;
+
+                    // to send a Status E-Mail to customer
+                    // sending e-mail via $this->saveOrder() doesn't work
+                    $this->savePaymentStatus(
+                        $transactionData['IDENTIFICATION_TRANSACTIONID'],
+                        $transactionData['IDENTIFICATION_UNIQUEID'],
+                        12,
+                        true
+                    );
+                    Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 4/4 Paymentstatus changed, E-Mail sent to customer, End of convertOrder for ordernumber: ".$newOrderNumber);
+
+                    $this->View()->assign(['success' => true]);
+
+                    return $newOrderNumber;
+                }
+            } catch (Exception $e){
+                Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FAILURE / EXCEPTION on Stacktrace".$e->getTraceAsString());
+                Shopware()->Container()->get('pluginlogger')->error("heidelpay convertOrder FAILURE / EXCEPTION with failureMessage ".$e->getMessage());
+            }
         }
     }
 

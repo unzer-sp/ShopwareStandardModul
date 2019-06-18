@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.06.06';
+		return '19.06.18';
 	}
 
 	/**
@@ -988,7 +988,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '19.06.06':
+            case '19.06.18':
                 try{
                     // integration of Flexipay
                     $this->createPayments();
@@ -999,7 +999,8 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                             'scope'=>\Shopware\Models\Config\Element::SCOPE_SHOP
                         )
                     );
-                    $msg .= '* update 19.06.06<br />';
+
+                    $msg .= '* update 19.06.18<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -1972,7 +1973,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * Event for custom code
 	 */
 	public function onPostDispatch(Enlight_Event_EventArgs $args){
-
         $request = $args->getSubject()->Request();
 		$response = $args->getSubject()->Response();
 		$config = Shopware()->Plugins()->Frontend()->HeidelGateway()->Config();
@@ -2028,6 +2028,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 							&& ($action == 'confirm' || $action == 'savePayment' || $action == 'saveBilling'))
 					|| $action == 'cart'
 					){
+
 						// Booking Mode: 3 = Registierung mit Sofortbuchung | 4 = Registierung mit Reservierung
 						$view->heidel_bm_cc = false;
 						$view->heidel_bm_dc = false;

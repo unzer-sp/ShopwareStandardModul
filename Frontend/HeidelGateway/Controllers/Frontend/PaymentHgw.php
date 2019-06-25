@@ -328,7 +328,6 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
             }else{
 
                 $ppd_config = $this->hgw()->ppd_config(NULL, $activePayment, NULL, true);
-//				$ppd_user = $this->hgw()->ppd_user(Null, $activePayment);
                 $ppd_user = $this->hgw()->ppd_user($this->getUser(), $activePayment);
 
                 $ppd_bskt['PRESENTATION.AMOUNT'] = $this->hgw()->formatNumber($basket['amount']);
@@ -464,9 +463,24 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                         Shopware()->Session()->HPError = $getFormUrl['PROCESSING_RETURN_CODE'];
                         return $this->forward('fail');
                     }
-
-                    if ($activePayment == 'gir'|| $activePayment == 'pis') {
+//mail("sascha.pflueger@heidelpay.com","getFormUrl",print_r($getFormUrl,1));
+                    if ($activePayment == 'gir') {
                         return $this->redirect($getFormUrl['FRONTEND_REDIRECT_URL']);
+                    } elseif ($activePayment == 'pis'){
+                        $additionalStringForUrl =
+                            "&amount=".$getFormUrl['PRESENTATION_AMOUNT'].
+                            "&currency=".$getFormUrl['PRESENTATION_CURRENCY'].
+                            "&merchant_name=".Shopware()->Shop()->getName().
+                            "&merchant_address="."Germany".
+                            "&return_url=".$getFormUrl['FRONTEND_RESPONSE_URL']
+                        ;
+//mail("sascha.pflueger@heidelpay.com","Url zum weiterleiten",print_r($getFormUrl['PROCESSING_REDIRECT_URL'].$additionalStringForUrl,1));
+/*
+ * INFO: Frontend.Enabled ist auf False gesetzt um die URL zu Flexipay direkt zu erhalten um daran Parameter anhängen zu können
+ * Da Frontend.Enabled = False gesetzt ist muss anstelle des Params FRONTEND_REDIRECT_URL der Param PROCESSING_REDIRECT_URL benutzt werden
+ */
+//                        return $this->redirect($getFormUrl['[FRONTEND_REDIRECT_URL'].$additionalStringForUrl );
+                        return $this->redirect($getFormUrl['PROCESSING_REDIRECT_URL'].$additionalStringForUrl );
                     }
 
                     /* Paymentmethod Sofortueberweisung, Prezlewy24, iDeal, EPS*/
@@ -945,7 +959,7 @@ class Shopware_Controllers_Frontend_PaymentHgw extends Shopware_Controllers_Fron
                 $resp['SHOPMODULE_VERSION']			= $this->Request()->getPost('SHOPMODULE_VERSION') == true ? htmlspecialchars($this->Request()->getPost('SHOPMODULE_VERSION'), $flag, $enc) : '';
                 $resp['CRITERION_INSURANCE-RESERVATION'] = $this->Request()->getPost('CRITERION_INSURANCE-RESERVATION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_INSURANCE-RESERVATION'), $flag, $enc) : '';
                 $resp['CRITERION_FACTORING']        = $this->Request()->getPost('CRITERION_FACTORING') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_FACTORING'), $flag, $enc) : '';
-$resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPWARESESSION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOPWARESESSION'), $flag, $enc) : '';
+                $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPWARESESSION') == true ? htmlspecialchars($this->Request()->getPost('CRITERION_SHOPWARESESSION'), $flag, $enc) : '';
 
                 $resp['PAYMENT_CODE']				= $this->Request()->getPost('PAYMENT_CODE') == true ? htmlspecialchars($this->Request()->getPost('PAYMENT_CODE'), $flag, $enc) : '';
 
@@ -1897,7 +1911,6 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
             // get transaction from hgw_transactions
             /*************************************************/
             $transaction = $this->getHgwTransactions($this->Request()->getParams()['txnid']);
-
             if(empty($transaction['transactionid'])){
                 $transaction = $this->getHgwTransactions(Shopware()->Session()->sessionId);
             }
@@ -3428,7 +3441,8 @@ $resp['CRITERION_SHOPWARESESSION']  = $this->Request()->getPost('CRITERION_SHOPW
                     $type = (!array_key_exists('PAYMENT.TYPE',$config)) ? 'PA' : $config['PAYMENT.TYPE'];
                     $params['PAYMENT.CODE'] 		= "OT.".$type;
                     $params['ACCOUNT.BRAND'] 		= "PIS";
-                    $params['FRONTEND.ENABLED'] 	= "true";
+//                    $params['FRONTEND.ENABLED'] 	= "true";
+                    $params['FRONTEND.ENABLED'] 	= "false";
                     break;
                 /* griopay */
                 case 'gir':

@@ -4035,10 +4035,8 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
 
     public function convertOrder($transactionData, $paymentStatus = 12)
     {
-        // Customermodel hat unter 5.1.6 noch keine Beziehung zu defaultShippingAdress oder defaultBillingAdress
-        // daher musste funktion angepasst werden
-
-        if(version_compare(Shopware()->Config()->version,"5.2.0","<")){
+        // customermodel has no direct relation to defaultShippingAddress or defaultBillingAddress in SW 5.1.6 - 5.2.27
+        if(version_compare(Shopware()->Config()->version,"5.2.0","<=")){
             try{
                 // Get user, shipping and billing
                 $builder = Shopware()->Models()->createQueryBuilder();
@@ -4081,6 +4079,7 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
                 // fetch last ordernumber and add 1
 //                $newOrderNumber = $numberModel->getNumber() + 1;
                 $newOrderNumber = $numberModel->getNumber();
+
                 // Set new ordernumber
                 $numberModel->setNumber($newOrderNumber);
                 Shopware()->Container()->get('pluginlogger')->info("heidelpay convertOrder 2/4 ordernumber generated: ".$newOrderNumber);
@@ -4105,7 +4104,7 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
                 /*
                  * @var Shopware\Models\Customer\Customer $customerObject
                  */
-                $customerObject = $customerModelRepo->findOneBy(array('id' => intval($userID = $customerDbResult[0]['customer']['id'])));
+                $customerObject = $customerModelRepo->findOneBy(array('id' => (int)$userID = $customerDbResult[0]['customer']['id']));
 
                 // copy customer number into billing address from customer
                 // Casting null values to empty strings to fulfill the restrictions of the s_order_billingaddress table
@@ -4248,8 +4247,9 @@ $params['CRITERION.SHOPWARESESSION'] = Shopware()->Session()->get('sessionId');
                 $sOrderVariables['sAmount'] = $orderObject->getInvoiceAmount();
                 $sOrderVariables['sAmountNet'] = $orderObject->getInvoiceAmountNet();
                 $sOrderVariables['sShippingcosts'] = $orderObject->getInvoiceShipping();
-//                $sOrderVariables['sBasket']['Amount'] = $orderObject->get();
-
+                $sOrderVariables['sBasket']['Amount'] = $orderObject->getInvoiceAmount();
+                $sOrderVariables['sUserData']['billingaddress'] = $orderObject->getCustomer()->getDefaultBillingAddress();
+                $sOrderVariables['sUserData']['shippingaddress'] = $orderObject->getCustomer()->getDefaultShippingAddress();
                 Shopware()->Session()->sOrderVariables = $sOrderVariables;
 
                 // to send a Status E-Mail to customer

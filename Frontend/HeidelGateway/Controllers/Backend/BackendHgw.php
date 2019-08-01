@@ -591,7 +591,7 @@ class Shopware_Controllers_Backend_BackendHgw extends Shopware_Controllers_Backe
                                 }
 
                                 if ($payInfo['payType'] == 'rc') {
-                                    $btns['rv']['active'] =
+                                    $btns['rv']['active'] = 'active';
                                     $btns['rv1']['active'] =
                                     $btns['rv2']['active'] =
                                     $btns['rv3']['active'] =

@@ -25,7 +25,7 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 * @return string version number
 	 */
 	public function getVersion(){
-		return '19.06.19';
+		return '19.08.01';
 	}
 
 	/**
@@ -988,9 +988,10 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
-            case '19.06.19':
+            case '19.07.01':
                 try{
-                    // integration of Flexipay
+                    // integrated direct redirect for EPS without bank-select
+                    // integration of Flexipay PIS
                     $this->createPayments();
                     $form->setElement('text', 'HGW_PIS_CHANNEL',
                         array(
@@ -1000,7 +1001,14 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
                         )
                     );
 
-                    $msg .= '* update 19.06.19<br />';
+                    $msg .= '* update 19.07.01<br />';
+                } catch (Exception $e) {
+                    $this->logError($msg,$e);
+                }
+            case '19.08.01':
+                try{
+                    // another fix for customer loses session for Sw < 5.2.27
+                    $msg .= '* update 19.08.01<br />';
                 } catch (Exception $e) {
                     $this->logError($msg,$e);
                 }
@@ -1255,168 +1263,410 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 				SELECT `s_core_shops`.`id`, `s_core_locales`.`locale` FROM `s_core_shops`, `s_core_locales`
 				WHERE `s_core_shops`.`locale_id` = `s_core_locales`.`id`
 			';
-			try {
-				$shops = Shopware()->Db()->fetchAll($sql);
-				$dbErrors = Shopware()->Db()->getErrorMessage();
-			} catch (Exception $e) {
-				if (empty($dbErrors)) {
-					$this->Logging('createPayments get all shops| '.$e->getMessage());
-					return;
-				} else {
-					$this->Logging('createPayments get all shops |'.$e->getMessage().' | DB-Errors: '.$dbErrors);
-					return;
-				}
-			}
 
-			foreach($shops as $shop){
-				if($shop['locale'] == 'en_GB'){
-					$shopId = $shop['id'];
-					break;
-				}
-			}
+			/****************************************************************************************/
+            if(version_compare($swVersion,"5.6.0",">=")){
+                $prefix_name = 'hgw_';
+                $prefix_description = 'Heidelpay CD-Edition ';
+                $controllername = 'PaymentHgw';
+                /** @var \Shopware\Components\Plugin\PaymentInstaller $installer */
+                $installer = Shopware()->Container()->get("shopware.plugin_payment_installer");
+                // Creditcard
+                $options = [
+                    'name' => $prefix_name.'cc',
+                    'description' => $prefix_description.'Kreditkarte',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Debitcard
+                $options = [
+                    'name' => $prefix_name.'dc',
+                    'description' => $prefix_description.'Debitkarte',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Direct Debit
+                $options = [
+                    'name' => $prefix_name.'dd',
+                    'description' => $prefix_description.'Lastschrift',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Invoice
+                $options = [
+                    'name' => $prefix_name.'iv',
+                    'description' => $prefix_description.'Rechnung',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Invoice guaranteed
+                $options = [
+                    'name' => $prefix_name.'papg',
+                    'description' => $prefix_description.'gesicherter Rechnungskauf',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Invoice B2B guaranteed
+                $options = [
+                    'name' => $prefix_name.'ivb2b',
+                    'description' => $prefix_description.'gesicherter B2B Rechnungskauf',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Invoice Santander guaranteed
+                $options = [
+                    'name' => $prefix_name.'san',
+                    'description' => $prefix_description.'Rechnungskauf von Santander',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Payolution Rechnungskauf
+                $options = [
+                    'name' => $prefix_name.'ivpd',
+                    'description' =>'Payolution Rechnungskauf',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Invoice Santander guaranteed
+                $options = [
+                    'name' => $prefix_name.'san',
+                    'description' => $prefix_description.'Rechnungskauf von Santander',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Prepayment
+                $options = [
+                    'name' => $prefix_name.'pp',
+                    'description' => $prefix_description.'Vorkasse',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Sofort
+                $options = [
+                    'name' => $prefix_name.'sue',
+                    'description' => $prefix_description.'Sofort',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Flexipay
+                $options = [
+                    'name' => $prefix_name.'pis',
+                    'description' => $prefix_description.'Flexipay',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Przelewy24
+                $options = [
+                    'name' => $prefix_name.'p24',
+                    'description' => $prefix_description.'Przelewy24',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Giropay
+                $options = [
+                    'name' => $prefix_name.'gir',
+                    'description' => $prefix_description.'Giropay',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Paypal
+                $options = [
+                    'name' => $prefix_name.'pay',
+                    'description' => $prefix_description.'PayPal',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Ideal
+                $options = [
+                    'name' => $prefix_name.'ide',
+                    'description' => $prefix_description.'Ideal',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // EPS
+                $options = [
+                    'name' => $prefix_name.'eps',
+                    'description' => $prefix_description.'EPS',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // MangirKart
+                $options = [
+                    'name' => $prefix_name.'mk',
+                    'description' => $prefix_description.'Mangirkart',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Postfinance
+                $options = [
+                    'name' => $prefix_name.'pf',
+                    'description' => $prefix_description.'PostFinance',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>''
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // Masterpass
+                $options = [
+                    'name' => $prefix_name.'mpa',
+                    'description' => $prefix_description.'MasterPass',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>'MasterPass ist eine digitale Bezahllösung für den Einkauf im Internet von MasterCard, die von Banken und MasterCard direkt bereitgestellt wird. Ihre Kartendaten und Lieferadressen werden an einem geschützten Ort aufbewahrt. Nachdem Sie sich registriert haben, können Sie mit wenigen Klicks sicher online einkaufen.'
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // ratenkauf by easyCredit
+                $options = [
+                    'name' => $prefix_name.'hpr',
+                    'description' => $prefix_description.'ratenkauf by easyCredit',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>'
+                                <div class="EasyPermission">
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' EUR). </p>
+								</div>
+								',
+                    'template' => 'hp_payment_hpr.tpl'
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+                // ratenkauf by easyCredit
+                $options = [
+                    'name' => $prefix_name.'hps',
+                    'description' => 'Ratenkauf von Santander',
+                    'action' => '',
+                    'active' => 0,
+                    'position' => 0,
+                    'additionalDescription' =>'
+                                <div class="EasyPermission">
+									<p>Der Finanzierungsbetrag liegt außerhalb der zulässigen Beträge ('.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' - '.Shopware()->Plugins()->Frontend()->HeidelGateway()->Config()->HGW_EASYMINAMOUNT.' EUR). </p>
+								</div>
+								',
+                    'template' => 'hp_payment_hps.tpl'
+                ];
+                $payment = $installer->createOrUpdate($this->getName(), $options);
+            } else {
+                try {
+                    $shops = Shopware()->Db()->fetchAll($sql);
+                    $dbErrors = Shopware()->Db()->getErrorMessage();
+                } catch (Exception $e) {
+                    if (empty($dbErrors)) {
+                        $this->Logging('createPayments get all shops| '.$e->getMessage());
+                        return;
+                    } else {
+                        $this->Logging('createPayments get all shops |'.$e->getMessage().' | DB-Errors: '.$dbErrors);
+                        return;
+                    }
+                }
 
-			foreach ($inst as $key => $val){
-				// search for old hgw-paymethods
-				if (version_compare($swVersion,"5.2.0",">=")) {
+                foreach($shops as $shop){
+                    if($shop['locale'] == 'en_GB'){
+                        $shopId = $shop['id'];
+                        break;
+                    }
+                }
 
-					$sql = 'SELECT * FROM `s_core_paymentmeans` WHERE `name`="hgw_'.$val['name'].'";';
-					try {
-						$getOldPayments = Shopware()->Db()->fetchRow($sql);
-						$dbErrors.= Shopware()->Db()->getErrorMessage();
+                foreach ($inst as $key => $val){
+                    // search for old hgw-paymethods
+                    if (version_compare($swVersion,"5.2.0",">=")) {
 
-					} catch (Exception $e) {
-						if (empty($dbErrors)) {
-							$this->Logging('createPayments Fetching old paymethods| '.$e->getMessage());
-							return;
-						} else {
-							$this->Logging('createPayments Fetching old paymethods | '.$e->getMessage().' | DB-Errors: '.$dbErrors);
-							return;
-						}
-					}
-				} else {
-					try {
-						$getOldPayments = Shopware()->Payments()->fetchRow(array('name=?'=>"hgw_".$val['name']));
-						$dbErrors .= Shopware()->Db()->getErrorMessage();
-					} catch (Exception $e) {
-						if (empty($dbErrors)) {
-							$this->Logging('createPayments Fetching old paymethods| '.$e->getMessage());
-							return;
-						} else {
-							$this->Logging('createPayments Fetching old paymethods | '.$e->getMessage().' | DB-Errors: '.$dbErrors);
-							return;
-						}
-					}
-				}
+                        $sql = 'SELECT * FROM `s_core_paymentmeans` WHERE `name`="hgw_'.$val['name'].'";';
+                        try {
+                            $getOldPayments = Shopware()->Db()->fetchRow($sql);
+                            $dbErrors.= Shopware()->Db()->getErrorMessage();
 
-				if(empty($val['additionaldescription'])){ $val['additionaldescription'] = " "; }
+                        } catch (Exception $e) {
+                            if (empty($dbErrors)) {
+                                $this->Logging('createPayments Fetching old paymethods| '.$e->getMessage());
+                                return;
+                            } else {
+                                $this->Logging('createPayments Fetching old paymethods | '.$e->getMessage().' | DB-Errors: '.$dbErrors);
+                                return;
+                            }
+                        }
+                    } else {
+                        try {
+                            $getOldPayments = Shopware()->Payments()->fetchRow(array('name=?'=>"hgw_".$val['name']));
+                            $dbErrors .= Shopware()->Db()->getErrorMessage();
+                        } catch (Exception $e) {
+                            if (empty($dbErrors)) {
+                                $this->Logging('createPayments Fetching old paymethods| '.$e->getMessage());
+                                return;
+                            } else {
+                                $this->Logging('createPayments Fetching old paymethods | '.$e->getMessage().' | DB-Errors: '.$dbErrors);
+                                return;
+                            }
+                        }
+                    }
 
-				/* check for description translation */
-				if(isset($val['trans_desc']) && $val['trans_desc'] != ''){
-					$translations[$val['name']]['trans_desc'] = $val['trans_desc'];
-				}
-				if(isset($val['trans_addDesc']) && $val['trans_addDesc'] != ''){
-					$translations[$val['name']]['trans_addDesc'] = $val['trans_addDesc'];
-				}
+                    if(empty($val['additionaldescription'])){ $val['additionaldescription'] = " "; }
 
-				// if hgw-paymentmethod is in DB update otherwise enter a new entry to DB
-				if(!empty($getOldPayments['id'])){
-					if(isset($translations[$val['name']])){
-						$translations[$val['name']]['payId'] = $getOldPayments['id'];
-					}
+                    /* check for description translation */
+                    if(isset($val['trans_desc']) && $val['trans_desc'] != ''){
+                        $translations[$val['name']]['trans_desc'] = $val['trans_desc'];
+                    }
+                    if(isset($val['trans_addDesc']) && $val['trans_addDesc'] != ''){
+                        $translations[$val['name']]['trans_addDesc'] = $val['trans_addDesc'];
+                    }
 
-					$newData	= array("pluginID" => (int)$this->getId(), "action" => 'PaymentHgw');
-					$where		= array("id = ".(int)$getOldPayments['id']);
+                    // if hgw-paymentmethod is in DB update otherwise enter a new entry to DB
+                    if(!empty($getOldPayments['id'])){
+                        if(isset($translations[$val['name']])){
+                            $translations[$val['name']]['payId'] = $getOldPayments['id'];
+                        }
+
+                        $newData	= array("pluginID" => (int)$this->getId(), "action" => 'PaymentHgw');
+                        $where		= array("id = ".(int)$getOldPayments['id']);
 
 
 //					if ($this->assertVersionGreaterThen('5.2')) {
-					if (version_compare($swVersion,"5.2.0",">=")) {
-						try {
-							$affRows = Shopware()->Db()->update('s_core_paymentmeans', $newData, $where);
-							$dbErrors .= Shopware()->Db()->getErrorMessage();
-						} catch (Exception $e) {
-							if (empty($dbErrors)) {
-								$this->Logging('createPayments updateing old paymethods| '.$e->getMessage());
-								return;
-							} else {
-								$this->Logging('createPayments updateing old paymethods| '.$e->getMessage().' | DB-Errors: '.$dbErrors);
-								return;
-							}
-						}
-					} else {
-						try {
-							Shopware()->Payments()->update($newData, $where);
-							$dbErrors .= Shopware()->Db()->getErrorMessage();
-						} catch (Exception $e) {
-							if (empty($dbErrors)) {
-								$this->Logging('createPayments updateing old paymethods| '.$e->getMessage());
-								return;
-							} else {
-								$this->Logging('createPayments updateing old paymethods| '.$e->getMessage().' | DB-Errors: '.$dbErrors);
-								return;
-							}
-						}
-					}
-				} else {
-					if (version_compare($swVersion,"5.2.0",">=")) {
+                        if (version_compare($swVersion,"5.2.0",">=")) {
+                            try {
+                                $affRows = Shopware()->Db()->update('s_core_paymentmeans', $newData, $where);
+                                $dbErrors .= Shopware()->Db()->getErrorMessage();
+                            } catch (Exception $e) {
+                                if (empty($dbErrors)) {
+                                    $this->Logging('createPayments updateing old paymethods| '.$e->getMessage());
+                                    return;
+                                } else {
+                                    $this->Logging('createPayments updateing old paymethods| '.$e->getMessage().' | DB-Errors: '.$dbErrors);
+                                    return;
+                                }
+                            }
+                        } else {
+                            try {
+                                Shopware()->Payments()->update($newData, $where);
+                                $dbErrors .= Shopware()->Db()->getErrorMessage();
+                            } catch (Exception $e) {
+                                if (empty($dbErrors)) {
+                                    $this->Logging('createPayments updateing old paymethods| '.$e->getMessage());
+                                    return;
+                                } else {
+                                    $this->Logging('createPayments updateing old paymethods| '.$e->getMessage().' | DB-Errors: '.$dbErrors);
+                                    return;
+                                }
+                            }
+                        }
+                    } else {
+                        if (version_compare($swVersion,"5.2.0",">=")) {
 
-						$bind = array(
-								':name' 		=> "hgw_".$val['name'],
-								':description' 	=> $val['description'],
-								':action' 		=> 'PaymentHgw',
-								':active' 		=> 0,
-								':pluginID' 	=> $this->getId(),
-								':position' 	=> "1".$key,
-								':additionaldescription' => $val['additionaldescription']
+                            $bind = array(
+                                ':name' 		=> "hgw_".$val['name'],
+                                ':description' 	=> $val['description'],
+                                ':action' 		=> 'PaymentHgw',
+                                ':active' 		=> 0,
+                                ':pluginID' 	=> $this->getId(),
+                                ':position' 	=> "1".$key,
+                                ':additionaldescription' => $val['additionaldescription']
 
-						);
-						$sql = 'INSERT INTO `s_core_paymentmeans` (name, description, action, active, pluginID, position, additionaldescription)
+                            );
+                            $sql = 'INSERT INTO `s_core_paymentmeans` (name, description, action, active, pluginID, position, additionaldescription)
 								VALUES (:name, :description, :action, :active, :pluginID, :position, :additionaldescription);';
-						try {
-							Shopware()->Db()->query($sql,$bind);
-							$dbErrors .= Shopware()->Db()->getErrorMessage();
-						} catch (Exception $e) {
-							if (empty($dbErrors)) {
-								$this->Logging('createPayments inserting new paymethods| '.$e->getMessage());
-								return;
-							} else {
-								$this->Logging('createPayments inserting new paymethods| DB-Errors: '.$dbErrors.' | '.$e->getMessage());
-								return;
-							}
-						}
-					} else {
-						/* SW-Version < 5.1.6 */
-						$paymentRow = Shopware()->Payments()->createRow(array(
-								'name' => "hgw_".$val['name'],
-								'description' => $val['description'],
-								'action' => 'PaymentHgw',
-								'active' => 0,
-								'pluginID' => $this->getId(),
-								'position' => "1".$key,
-								'additionaldescription' => $val['additionaldescription']
-						))->save();
-					}
-				}
-			}
+                            try {
+                                Shopware()->Db()->query($sql,$bind);
+                                $dbErrors .= Shopware()->Db()->getErrorMessage();
+                            } catch (Exception $e) {
+                                if (empty($dbErrors)) {
+                                    $this->Logging('createPayments inserting new paymethods| '.$e->getMessage());
+                                    return;
+                                } else {
+                                    $this->Logging('createPayments inserting new paymethods| DB-Errors: '.$dbErrors.' | '.$e->getMessage());
+                                    return;
+                                }
+                            }
+                        } else {
+                            /* SW-Version < 5.1.6 */
+                            $paymentRow = Shopware()->Payments()->createRow(array(
+                                'name' => "hgw_".$val['name'],
+                                'description' => $val['description'],
+                                'action' => 'PaymentHgw',
+                                'active' => 0,
+                                'pluginID' => $this->getId(),
+                                'position' => "1".$key,
+                                'additionaldescription' => $val['additionaldescription']
+                            ))->save();
+                        }
+                    }
+                }
 
-			/* set translation */
-			if(isset($shopId)){
-				foreach($translations as $key => $translation){
-					if(empty($translation['payId'])){
-						$payment = Shopware()->Payments()->fetchRow(array('name=?'=>"hgw_".$key));
-						$payId = $payment['id'];
-					}else{
-						$payId = $translation['payId'];
-					}
+                /* set translation */
+                if(isset($shopId)){
+                    foreach($translations as $key => $translation){
+                        if(empty($translation['payId'])){
+                            $payment = Shopware()->Payments()->fetchRow(array('name=?'=>"hgw_".$key));
+                            $payId = $payment['id'];
+                        }else{
+                            $payId = $translation['payId'];
+                        }
 
-					$translationObject = new Shopware_Components_Translation();
-					$translationObject->write(
-							$shopId, 'config_payment', $payId, array(
-									'description' => $translation['trans_desc'],
-									'additionalDescription' => $translation['trans_addDesc'],
-							), true
-							);
-				}
-			}
+                        $translationObject = new Shopware_Components_Translation();
+                        $translationObject->write(
+                            $shopId, 'config_payment', $payId, array(
+                            'description' => $translation['trans_desc'],
+                            'additionalDescription' => $translation['trans_addDesc'],
+                        ), true
+                        );
+                    }
+                }
+            }
+            /****************************************************************************************/
+
 		}catch(Exception $e){
 			$this->Logging('createPayments | '.$e->getMessage());
 			return;
@@ -3912,7 +4162,6 @@ class Shopware_Plugins_Frontend_HeidelGateway_Bootstrap extends Shopware_Compone
 	 */
 	public function doRequest($params = array(), $url = NULL){
 		try{
-
 		    if($url == NULL){ $url = self::$requestUrl; }
 			$client = new Zend_Http_Client($url, array(
 					'useragent' => 'Shopware/' . Shopware()->Config()->Version,
